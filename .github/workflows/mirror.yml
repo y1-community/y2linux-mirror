@@ -1,0 +1,53 @@
+name: Portable flashing packages
+# managed-by: ryan-specter/inni-packager
+
+on:
+  schedule:
+    - cron: "41 3,9,15,21 * * *"
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: "Comma-separated tag globs"
+        required: false
+        type: string
+      platforms:
+        description: "Comma-separated platform keys"
+        required: false
+        type: string
+      limit:
+        description: "Only the N newest releases"
+        required: false
+        type: string
+      offset:
+        description: "Skip the N newest releases"
+        required: false
+        type: string
+      force:
+        description: "Rebuild releases that are already current"
+        required: false
+        type: boolean
+        default: false
+      dry_run:
+        description: "Build without publishing"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: portable-flashing-packages
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    uses: ryan-specter/inni-packager/.github/workflows/reusable-mirror.yml@main
+    with:
+      tags: ${{ inputs.tags || '' }}
+      platforms: ${{ inputs.platforms || '' }}
+      limit: ${{ inputs.limit || '' }}
+      offset: ${{ inputs.offset || '' }}
+      force: ${{ inputs.force || false }}
+      dry_run: ${{ inputs.dry_run || false }}
+    secrets: inherit
