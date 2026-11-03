@@ -1,0 +1,56 @@
+{
+  "source_repo": "schulzcode/y2linux",
+  "mirror_repo": "y1-community/y2linux-mirror",
+  "branch": "main",
+  "updater_repo": "y1-community/updater-ce-neo",
+  "title_prefix": "Portable Flashing Package: ",
+  "copy_original_assets": true,
+  "source_readme": {
+    "enabled": true,
+    "path": "README.md",
+    "commit_message": "Mirror source README"
+  },
+  "build_workers": 2,
+  "max_asset_bytes": 2147483648,
+  "releases": {
+    "include_prereleases": true,
+    "tags": [],
+    "exclude_tags": []
+  },
+  "defaults": {
+    "software_name": "Reborn (Y2Linux)",
+    "target_model": "Y2",
+    "target_type": "Stock",
+    "description": ""
+  },
+  "rules": [
+    {
+      "match_asset": "(?i)360p",
+      "target_type": "360p"
+    },
+    {
+      "match_asset": "(?i)240p",
+      "target_type": "240p"
+    },
+    {
+      "match_asset": "(?i)rom_y1_type[-_ ]?a",
+      "target_model": "Y1",
+      "target_type": "Type A"
+    },
+    {
+      "match_asset": "(?i)rom_y1_type[-_ ]?b",
+      "target_model": "Y1",
+      "target_type": "Type B"
+    },
+    {
+      "match_asset": "(?i)type[-_ ]?b",
+      "target_model": "Y2",
+      "target_type": "Type B"
+    },
+    {
+      "match_asset": "(?i)(^|[-_.])y2([-_.]|$)",
+      "target_model": "Y2",
+      "target_type": "Stock"
+    }
+  ]
+}
