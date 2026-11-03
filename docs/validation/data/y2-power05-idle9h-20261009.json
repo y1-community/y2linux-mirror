@@ -1,0 +1,34 @@
+{
+  "archive": "out/deep-sleep-final/evidence/20261009/89-long-idle-return",
+  "captured_cest": "2026-10-09 18:54",
+  "image": "POWER-FINAL-05 (Linux 837b614), boot 65d3b0c9-6502-4ac9-af17-3b5a8e763a43, taint 0",
+  "read_only": true,
+  "device_mutations": [],
+  "uptime_boottime_s": 32679.524,
+  "monotonic_s": 1455.8,
+  "spm_sleep_total_s": 31229.586,
+  "spm_sleep_fraction": 0.9557,
+  "kernel_suspends": 53,
+  "maintenance_wakes_600s": 51,
+  "cable_wakes": 2,
+  "wake_codes": {
+    "0x1": 51,
+    "0x20": 2
+  },
+  "wifi_restores_after_long_sleep": 2,
+  "oops": 0,
+  "usb_irq_overflow": 0,
+  "product_guard_pending": false,
+  "soc_voltage_derived": {
+    "journal_start_boottime_s": 14373.2,
+    "v_start": 3.9008,
+    "percent_start": 65,
+    "v_entry": 3.8472,
+    "percent_entry": 54,
+    "hours": 5.07,
+    "points_per_hour": 2.2,
+    "note": "Journal rotated; voltage-derived, non-linear curve, no current sensor: indicative only."
+  },
+  "owner_reference": "stock firmware recalled by the owner at about 1 percent per night; not measured on this unit",
+  "interpretation": "Single run: neither the 05 overnight USB overflow (defect 1) nor the Oops (defect 2) recurred. One pass does not clear them."
+}

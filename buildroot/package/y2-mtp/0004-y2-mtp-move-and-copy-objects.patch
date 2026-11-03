@@ -1,0 +1,386 @@
+diff --git a/inc/mtp_operations.h b/inc/mtp_operations.h
+index c220de1..706b5e6 100644
+--- a/inc/mtp_operations.h
++++ b/inc/mtp_operations.h
+@@ -49,6 +49,9 @@ uint32_t mtp_op_GetPartialObject(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hd
+ uint32_t mtp_op_BeginEditObject(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr, int * size,uint32_t * ret_params, int * ret_params_size);
+ uint32_t mtp_op_EndEditObject(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr, int * size,uint32_t * ret_params, int * ret_params_size);
+ 
++uint32_t mtp_op_MoveObject(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr, int * size,uint32_t * ret_params, int * ret_params_size);
++uint32_t mtp_op_CopyObject(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr, int * size,uint32_t * ret_params, int * ret_params_size);
++
+ uint32_t mtp_op_TruncateObject(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr, int * size,uint32_t * ret_params, int * ret_params_size);
+ uint32_t mtp_op_DeleteObject(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr, int * size,uint32_t * ret_params, int * ret_params_size);
+ uint32_t mtp_op_SendObject(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr, int * size,uint32_t * ret_params, int * ret_params_size);
+diff --git a/src/mtp.c b/src/mtp.c
+index 3e135ed..3629543 100644
+--- a/src/mtp.c
++++ b/src/mtp.c
+@@ -587,6 +587,14 @@ int process_in_packet(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr, int raws
+ 			response_code = mtp_op_DeleteObject(ctx,mtp_packet_hdr,&size,(uint32_t*)&params,&params_size);
+ 		break;
+ 
++		case MTP_OPERATION_MOVE_OBJECT:
++			response_code = mtp_op_MoveObject(ctx,mtp_packet_hdr,&size,(uint32_t*)&params,&params_size);
++		break;
++
++		case MTP_OPERATION_COPY_OBJECT:
++			response_code = mtp_op_CopyObject(ctx,mtp_packet_hdr,&size,(uint32_t*)&params,&params_size);
++		break;
++
+ 		case MTP_OPERATION_GET_OBJECT_PROPS_SUPPORTED:
+ 			response_code = mtp_op_GetObjectPropsSupported(ctx,mtp_packet_hdr,&size,(uint32_t*)&params,&params_size);
+ 		break;
+diff --git a/src/mtp_operations/mtp_op_moveobject.c b/src/mtp_operations/mtp_op_moveobject.c
+new file mode 100644
+index 0000000..96e9508
+--- /dev/null
++++ b/src/mtp_operations/mtp_op_moveobject.c
+@@ -0,0 +1,334 @@
++/*
++ * uMTP Responder
++ * Copyright (c) 2018 - 2025 Viveris Technologies
++ *
++ * uMTP Responder is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 3.0 of
++ * the License, or (at your option) any later version.
++ *
++ * uMTP Responder is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License version 3 for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with uMTP Responder; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++/**
++ * @file   mtp_op_moveobject.c
++ * @brief  MoveObject and CopyObject (Y2Linux)
++ *
++ * Windows Explorer moves and copies files inside a device with these two
++ * operations, as do libmtp hosts (Linux file managers, macOS MTP apps).
++ * Inside one storage a move is a rename that keeps the object handle. Between
++ * storages (Internal Storage and the SD card are separate filesystems), and
++ * for every copy, each file is copied like an upload (space reserve, hidden
++ * temporary name, fsync, never replacing a name) and only a complete copy
++ * removes the source of a move.
++ */
++
++#include "buildconf.h"
++
++#include <errno.h>
++#include <inttypes.h>
++#include <pthread.h>
++#include <dirent.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <sys/stat.h>
++
++#include "mtp.h"
++#include "mtp_helpers.h"
++#include "mtp_constant.h"
++#include "mtp_operations.h"
++#include "mtp_ops_helpers.h"
++#include "hash_utils.h"
++
++#include "logs_out.h"
++
++#define Y2_COPY_DEPTH 32
++
++/* candidate lies inside the folder `ancestor` (or is it). */
++static int inside(fs_handles_db * db, uint32_t candidate, uint32_t ancestor)
++{
++	int guard = 4096;
++	while( candidate && candidate != 0xFFFFFFFF && guard-- )
++	{
++		if( candidate == ancestor )
++			return 1;
++		fs_entry * entry = get_entry_by_handle(db, candidate);
++		if( !entry )
++			return 0;
++		candidate = entry->parent;
++	}
++	return 0;
++}
++
++/* The objects below a folder that moved to another storage: their handles
++ * name the old filesystem. The folder's new contents are scanned again. */
++static void forget_contents(fs_handles_db * db, uint32_t folder)
++{
++	for( fs_entry * e = db->entry_list; e; e = e->next )
++	{
++		if( e->handle != folder && !(e->flags & ENTRY_IS_DELETED) && inside(db, e->parent, folder) )
++			e->flags |= ENTRY_IS_DELETED;
++	}
++}
++
++static int copy_tree(const char * from, const char * to, int folder, int depth)
++{
++	if( !folder )
++		return y2_copy_file(from, to);
++
++	if( depth > Y2_COPY_DEPTH )
++	{
++		errno = ELOOP;
++		return -1;
++	}
++
++	if( y2_mkdir(to, 0700) )
++		return -1;
++
++	DIR * dir = y2_opendir(from);
++	if( !dir )
++		return -1;
++
++	int result = 0;
++	struct dirent * d;
++	while( !result && (d = readdir(dir)) )
++	{
++		if( !strcmp(d->d_name, ".") || !strcmp(d->d_name, "..") || !strncmp(d->d_name, ".y2-mtp-", 8) )
++			continue;
++
++		size_t a = strlen(from) + strlen(d->d_name) + 2, b = strlen(to) + strlen(d->d_name) + 2;
++		char * source = malloc(a), * target = malloc(b);
++		if( !source || !target )
++		{
++			free(source); free(target);
++			errno = ENOMEM;
++			result = -1;
++			break;
++		}
++		snprintf(source, a, "%s/%s", from, d->d_name);
++		snprintf(target, b, "%s/%s", to, d->d_name);
++
++		struct stat64 st;
++		if( y2_stat(source, &st) )
++			result = -1;
++		else if( S_ISDIR(st.st_mode) || S_ISREG(st.st_mode) )
++			result = copy_tree(source, target, S_ISDIR(st.st_mode), depth + 1);
++
++		free(source); free(target);
++	}
++
++	int error = errno;
++	closedir(dir);
++	errno = error;
++	return result;
++}
++
++static uint32_t failure_response(int error)
++{
++	switch( error )
++	{
++		case ENOSPC:
++		case EDQUOT:
++		case EFBIG:
++			return MTP_RESPONSE_STORAGE_FULL;
++		case EACCES:
++		case EPERM:
++		case EROFS:
++			return MTP_RESPONSE_ACCESS_DENIED;
++		default:
++			return MTP_RESPONSE_GENERAL_ERROR;
++	}
++}
++
++static uint32_t transfer_object(mtp_ctx * ctx, uint32_t handle, uint32_t storage_id, uint32_t parent_handle,
++                                int move, uint32_t * new_handle)
++{
++	uint32_t response_code;
++
++	if( parent_handle == 0xFFFFFFFF )
++		parent_handle = 0x00000000;
++
++	/* A move changes the source storage, a copy only reads it. */
++	if( check_handle_access( ctx, NULL, handle, move, &response_code) )
++		return response_code;
++
++	fs_entry * entry = get_entry_by_handle(ctx->fs_db, handle);
++	if( !entry || !handle || (entry->flags & ENTRY_IS_DELETED) )
++		return MTP_RESPONSE_INVALID_OBJECT_HANDLE;
++
++	uint32_t storage_flags = mtp_get_storage_flags(ctx, storage_id);
++	if( storage_flags == 0xFFFFFFFF )
++		return MTP_RESPONSE_INVALID_STORAGE_ID;
++	if( storage_flags & (UMTP_STORAGE_LOCKED | UMTP_STORAGE_NOTMOUNTED) )
++		return MTP_RESPONSE_STORE_NOT_AVAILABLE;
++	if( storage_flags & UMTP_STORAGE_READONLY )
++		return MTP_RESPONSE_STORE_READ_ONLY;
++
++	fs_entry * destination = get_entry_by_handle_and_storageid(ctx->fs_db, parent_handle, storage_id);
++	if( !destination || !(destination->flags & ENTRY_IS_DIR) || (destination->flags & ENTRY_IS_DELETED) )
++		return MTP_RESPONSE_INVALID_PARENT_OBJECT;
++
++	int folder = (entry->flags & ENTRY_IS_DIR) != 0;
++	if( folder && storage_id == entry->storage_id && inside(ctx->fs_db, parent_handle, handle) )
++		return MTP_RESPONSE_INVALID_PARENT_OBJECT;                 /* into itself */
++
++	if( move && entry->parent == parent_handle && entry->storage_id == storage_id )
++		return MTP_RESPONSE_OK;                                     /* already there */
++
++	char * from = build_full_path(ctx->fs_db, mtp_get_storage_root(ctx, entry->storage_id), entry);
++	char * folder_path = build_full_path(ctx->fs_db, mtp_get_storage_root(ctx, storage_id), destination);
++	char * to = NULL;
++	if( from && folder_path && entry->name )
++	{
++		size_t length = strlen(folder_path) + strlen(entry->name) + 2;
++		to = malloc(length);
++		if( to )
++			snprintf(to, length, "%s/%s", folder_path, entry->name);
++	}
++	free(folder_path);
++	if( !from || !to )
++	{
++		free(from); free(to);
++		return MTP_RESPONSE_GENERAL_ERROR;
++	}
++
++	response_code = MTP_RESPONSE_GENERAL_ERROR;
++	if( set_storage_giduid(ctx, storage_id) )
++		goto done;
++
++	if( move && storage_id == entry->storage_id )
++	{
++		/* One filesystem: rename, the handle and everything below stay valid. */
++		if( y2_rename(from, to) )
++		{
++			response_code = failure_response(errno);
++			goto done;
++		}
++		remove_entry(ctx->fs_db, entry);
++		entry->parent = parent_handle;
++		insert_entry(ctx->fs_db, entry);
++		response_code = MTP_RESPONSE_OK;
++		goto done;
++	}
++
++	struct stat64 st;
++	if( !y2_stat(to, &st) )
++	{
++		response_code = MTP_RESPONSE_GENERAL_ERROR;                 /* never replace a name */
++		goto done;
++	}
++
++	if( copy_tree(from, to, folder, 0) )
++	{
++		int error = errno;
++		/* Only this operation's own partial folder is removed again. */
++		if( folder )
++			fs_remove_tree(to);
++		response_code = failure_response(error);
++		goto done;
++	}
++
++	if( move )
++	{
++		/* The complete copy exists; now the source goes. */
++		int removed = folder ? fs_remove_tree(from) : y2_remove(from);
++		if( removed )
++		{
++			/* Both remain: show the host both places as they are. */
++			char * old_folder = NULL;
++			fs_entry * old_parent = get_entry_by_handle_and_storageid(ctx->fs_db, entry->parent, entry->storage_id);
++			if( old_parent )
++				old_folder = build_full_path(ctx->fs_db, mtp_get_storage_root(ctx, entry->storage_id), old_parent);
++			if( old_folder )
++			{
++				scan_and_add_folder(ctx->fs_db, old_folder, entry->parent, entry->storage_id);
++				free(old_folder);
++			}
++			response_code = MTP_RESPONSE_PARTIAL_DELETION;
++			goto done;
++		}
++		if( folder )
++			forget_contents(ctx->fs_db, handle);
++		remove_entry(ctx->fs_db, entry);
++		entry->parent = parent_handle;
++		entry->storage_id = storage_id;
++		insert_entry(ctx->fs_db, entry);
++		if( folder )
++			scan_and_add_folder(ctx->fs_db, to, handle, storage_id);
++		response_code = MTP_RESPONSE_OK;
++		goto done;
++	}
++
++	filefoundinfo info;
++	memset(&info, 0, sizeof info);
++	if( !fs_entry_stat(to, &info) )
++		goto done;
++	fs_entry * copy = add_entry(ctx->fs_db, &info, parent_handle, storage_id);
++	if( !copy )
++		goto done;
++	if( new_handle )
++		*new_handle = copy->handle;
++	response_code = MTP_RESPONSE_OK;
++
++done:
++	restore_giduid(ctx);
++	free(from);
++	free(to);
++	return response_code;
++}
++
++uint32_t mtp_op_MoveObject(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr, int * size,uint32_t * ret_params, int * ret_params_size)
++{
++	uint32_t response_code;
++
++	if(!ctx->fs_db)
++		return MTP_RESPONSE_SESSION_NOT_OPEN;
++
++	if( pthread_mutex_lock( &ctx->inotify_mutex ) )
++		return MTP_RESPONSE_GENERAL_ERROR;
++
++	uint32_t handle = peek(mtp_packet_hdr, sizeof(MTP_PACKET_HEADER), 4);     // Object handle
++	uint32_t storage = peek(mtp_packet_hdr, sizeof(MTP_PACKET_HEADER) + 4, 4); // Destination storage
++	uint32_t parent = peek(mtp_packet_hdr, sizeof(MTP_PACKET_HEADER) + 8, 4);  // Destination folder
++
++	response_code = transfer_object(ctx, handle, storage, parent, 1, NULL);
++
++	pthread_mutex_unlock( &ctx->inotify_mutex );
++
++	return response_code;
++}
++
++uint32_t mtp_op_CopyObject(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr, int * size,uint32_t * ret_params, int * ret_params_size)
++{
++	uint32_t response_code;
++	uint32_t new_handle = 0xFFFFFFFF;
++
++	if(!ctx->fs_db)
++		return MTP_RESPONSE_SESSION_NOT_OPEN;
++
++	if( pthread_mutex_lock( &ctx->inotify_mutex ) )
++		return MTP_RESPONSE_GENERAL_ERROR;
++
++	uint32_t handle = peek(mtp_packet_hdr, sizeof(MTP_PACKET_HEADER), 4);
++	uint32_t storage = peek(mtp_packet_hdr, sizeof(MTP_PACKET_HEADER) + 4, 4);
++	uint32_t parent = peek(mtp_packet_hdr, sizeof(MTP_PACKET_HEADER) + 8, 4);
++
++	response_code = transfer_object(ctx, handle, storage, parent, 0, &new_handle);
++	if( response_code == MTP_RESPONSE_OK )
++	{
++		ret_params[0] = new_handle;
++		*ret_params_size = sizeof(uint32_t);
++	}
++
++	pthread_mutex_unlock( &ctx->inotify_mutex );
++
++	return response_code;
++}
+diff --git a/src/mtp_support_def.c b/src/mtp_support_def.c
+index 35a5333..65e8570 100644
+--- a/src/mtp_support_def.c
++++ b/src/mtp_support_def.c
+@@ -46,6 +46,8 @@ const unsigned short supported_op[]=
+ 	MTP_OPERATION_GET_DEVICE_PROP_VALUE                  ,//0x1015
+ 	MTP_OPERATION_SET_DEVICE_PROP_VALUE                  ,//0x1016
+ 	//MTP_OPERATION_RESET_DEVICE_PROP_VALUE                ,//0x1017
++	MTP_OPERATION_MOVE_OBJECT                            ,//0x1019
++	MTP_OPERATION_COPY_OBJECT                            ,//0x101A
+ 	MTP_OPERATION_GET_PARTIAL_OBJECT                     ,//0x101B
+ 	MTP_OPERATION_GET_OBJECT_PROPS_SUPPORTED             ,//0x9801
+ 	MTP_OPERATION_GET_OBJECT_PROP_DESC                   ,//0x9802

@@ -1,0 +1,298 @@
+{
+  "automatic_sleep": {
+    "controlled_30min_2h_overnight_qualification": "NOT_PASSED",
+    "current_boot_boottime_minus_monotonic_s_range": [
+      0.003900307001458714,
+      0.022036768999896594
+    ],
+    "current_boot_events": {
+      "snapshot": 79,
+      "suspend_refused_sleep_recovery_required": 380
+    },
+    "current_boot_observed_suspend_seconds": 0,
+    "current_spm_entries": 0,
+    "current_spm_restore_failures": 0,
+    "current_spm_resumes": 0,
+    "first_entry_snapshot": {
+      "battery": {
+        "calibration_source": "estimated Li-ion curve within Y2 stock 3.4V precharge and 4.175V CV bounds; not a measured discharge curve",
+        "charge_counter_uah": null,
+        "charging": false,
+        "confidence": "provisional",
+        "current_ua": null,
+        "filtered_voltage_uv": 4103052,
+        "percent": 88,
+        "provisional": true,
+        "resting": false,
+        "source": "voltage_estimate",
+        "status": "Discharging",
+        "temperature_millicelsius": null,
+        "voltage_uv": 4087573
+      },
+      "boottime_s": 398.388264792,
+      "monotonic_s": 398.388270484,
+      "voltage_uv": 4092187
+    },
+    "first_unplugged_journal_row": {
+      "backlight": {
+        "y2-backlight": "4"
+      },
+      "boot_id": "0132fb21-8462-4f77-9faf-3a7e7f1b8429",
+      "boottime_s": 343.759756481,
+      "event": "snapshot",
+      "filtered_voltage_uv": 4114305,
+      "monotonic_s": 343.751670865,
+      "percent": 88,
+      "source_file": "power-journal.previous.jsonl",
+      "source_line": 247,
+      "status": "Discharging",
+      "voltage_uv": 4104492
+    },
+    "guard_preserved": true,
+    "kernel_suspend_request": {
+      "backlight": {
+        "y2-backlight": "4"
+      },
+      "boot_id": "0132fb21-8462-4f77-9faf-3a7e7f1b8429",
+      "boottime_s": 398.406834023,
+      "event": "suspend_kernel_suspend",
+      "filtered_voltage_uv": 4103052,
+      "monotonic_s": 398.402445023,
+      "percent": 88,
+      "source_file": "power-journal.previous.jsonl",
+      "source_line": 252,
+      "status": "Discharging",
+      "voltage_uv": 4087573
+    },
+    "pending_guard": {
+      "boot_id": "0132fb21-8462-4f77-9faf-3a7e7f1b8429",
+      "identity": {
+        "build_git_commit": "cfb7e098eae60918f47d7b330445bf66e9d61817",
+        "build_id": "Y2LINUX-PLATFORM-V1-DEEPSLEEP-FINAL-03",
+        "kernel": "6.18.0-y2linux-platform-v1-deepsleep-final-03",
+        "reborn_source_commit": "97ff8c357bab12319087740d7c97b5051e6588f5"
+      },
+      "pending": true,
+      "updated": 1791421592.369859
+    },
+    "previous_boot_events": {
+      "snapshot": 6,
+      "suspend_kernel_suspend": 1,
+      "suspend_quiescing_radios": 1,
+      "suspend_reborn_prepared": 1,
+      "suspend_refused_charger_active": 2,
+      "suspend_refused_charger_or_usb_active": 2,
+      "suspend_requested": 1,
+      "suspend_syncing": 1
+    },
+    "reset_cause": "Unknown; owner did not restart, RGU reports no cause, and no pstore panic survives.",
+    "reset_status": "valid=1 raw=0x0 cause=none_reported hw_watchdog=0 sw_reset=0 irq_watchdog=0 debug_reset=0 spm_watchdog=0 source=rgu_wdt_status_at_probe",
+    "retained_previous_devices": "ring=valid cycle=1 last=558 backstop_s=0\n535 phase=2 enter result=0 ms=398616 device=y2-mt6582-wifi\n536 phase=2 leave result=0 ms=398617 device=y2-mt6582-wifi\n537 phase=2 enter result=0 ms=398617 device=rfkill0\n538 phase=2 leave result=0 ms=398617 device=rfkill0\n539 phase=2 enter result=0 ms=398617 device=input4\n540 phase=2 leave result=0 ms=398617 device=input4\n541 phase=2 enter result=0 ms=398617 device=pcmC0D0p\n542 phase=2 leave result=0 ms=398618 device=pcmC0D0p\n543 phase=2 enter result=0 ms=398618 device=sound\n544 phase=2 leave result=0 ms=398618 device=sound\n545 phase=2 enter result=0 ms=398618 device=mmc1:aaaa\n546 phase=2 enter result=0 ms=398618 device=mmc0:0001\n547 phase=2 enter result=0 ms=398619 device=1-0030\n548 phase=255 leave result=0 ms=398619 device=cs_sleep_begin\n549 phase=255 leave result=0 ms=398619 device=cs_sleep_done\n550 phase=2 leave result=0 ms=398619 device=1-0030\n551 phase=2 leave result=0 ms=398619 device=mmc0:0001\n552 phase=2 leave result=0 ms=398637 device=mmc1:aaaa\n553 phase=2 enter result=0 ms=398637 device=11240000.mmc\n554 phase=2 leave result=0 ms=398637 device=11240000.mmc\n555 phase=2 enter result=0 ms=398637 device=11230000.mmc\n556 phase=2 leave result=0 ms=398637 device=11230000.mmc\n557 phase=2 enter result=0 ms=398637 device=11008000.i2c\n558 phase=2 leave result=0 ms=398638 device=11008000.i2c",
+    "retained_previous_pm": "valid=1 sequence=8 stage=DPM_PREPARED failed_stage=NONE error=0 wake=0x0 r13=0x0 raw=0x0 pcm_pointer=0x0 pcm_length=0 wake_mask=0x0 boot_vector=0x0 boot_enable=0x0 cirq=0x0 fsm=0x0 power=0x0 power_s=0x0 rtc_enable=0x0 pmic_mask0=0x0 pmic_mask1=0x0 pmic_status0=0x0 pmic_status1=0x0 reset_resume_entry=0x0 sleep_timer=0 watchdog_timer=0 pcm_control1=0x0 clock_control=0x0 ca7_cache_config=0x0 retention=stock_internal_sram_warm_reset",
+    "root_cause_limit": "Last recorded phase is DPM_PREPARED; all retained callback returns are successful through 11008000.i2c at 398638 ms. No blocked callback or exact failing instruction is identified."
+  },
+  "battery": {
+    "entry_adc_to_last_discharge_delta_uv": -270703,
+    "first_ssh_connected_sample": {
+      "battery": {
+        "calibration_source": "estimated Li-ion curve within Y2 stock 3.4V precharge and 4.175V CV bounds; not a measured discharge curve",
+        "charge_counter_uah": null,
+        "charging": true,
+        "confidence": "provisional",
+        "current_ua": null,
+        "filtered_voltage_uv": 3905110,
+        "percent": 54,
+        "provisional": true,
+        "resting": false,
+        "source": "voltage_estimate",
+        "status": "Charging",
+        "temperature_millicelsius": null,
+        "voltage_uv": 3938598
+      },
+      "sample_age_s_approximate": 0.5285283080011141,
+      "separate_sysfs_voltage_uv": 3922338
+    },
+    "first_unplugged_journal_row": {
+      "backlight": {
+        "y2-backlight": "4"
+      },
+      "boot_id": "0132fb21-8462-4f77-9faf-3a7e7f1b8429",
+      "boottime_s": 343.759756481,
+      "event": "snapshot",
+      "filtered_voltage_uv": 4114305,
+      "monotonic_s": 343.751670865,
+      "percent": 88,
+      "source_file": "power-journal.previous.jsonl",
+      "source_line": 247,
+      "status": "Discharging",
+      "voltage_uv": 4104492
+    },
+    "health_connected_sample": {
+      "battery": {
+        "calibration_source": "estimated Li-ion curve within Y2 stock 3.4V precharge and 4.175V CV bounds; not a measured discharge curve",
+        "charge_counter_uah": null,
+        "charging": true,
+        "confidence": "provisional",
+        "current_ua": null,
+        "filtered_voltage_uv": 3954574,
+        "percent": 55,
+        "provisional": true,
+        "resting": false,
+        "source": "voltage_estimate",
+        "status": "Charging",
+        "temperature_millicelsius": null,
+        "voltage_uv": 3955517
+      },
+      "sample_age_s_approximate": 0.5118187689986371
+    },
+    "last_dark_discharge_row": {
+      "backlight": {
+        "y2-backlight": "4"
+      },
+      "boot_id": "81dce40c-9bb5-4f14-8465-c7e80ba3c602",
+      "boottime_s": 23149.180693378,
+      "event": "snapshot",
+      "filtered_voltage_uv": 3835075,
+      "monotonic_s": 23149.172830993,
+      "percent": 56,
+      "source_file": "power-journal.jsonl",
+      "source_line": 269,
+      "status": "Discharging",
+      "voltage_uv": 3846972
+    },
+    "last_precable_discharge_row": {
+      "backlight": {
+        "y2-backlight": "0"
+      },
+      "boot_id": "81dce40c-9bb5-4f14-8465-c7e80ba3c602",
+      "boottime_s": 23179.994067764,
+      "event": "suspend_refused_sleep_recovery_required",
+      "filtered_voltage_uv": 3841652,
+      "monotonic_s": 23179.988641072,
+      "percent": 55,
+      "source_file": "power-journal.jsonl",
+      "source_line": 270,
+      "status": "Discharging",
+      "voltage_uv": 3821484
+    },
+    "limitations": [
+      "Voltage and provisional SOC show depletion, not a measured charge or battery-health result.",
+      "The starting and ending observations cross an unexpected reboot.",
+      "Morning screen-on load differs from dark idle; 56%/3.846972V was the last dark row and 55%/3.821484V the last Discharging row.",
+      "All SSH battery readings are after cable reconnection; charging changes the voltage and estimate."
+    ]
+  },
+  "clock_limit": "Device clock uses build_floor and clock_not_established; wall timestamps regress across the reboot. Use boot IDs, per-boot BOOTTIME and recorded host UTC; do not subtract cross-boot device wall times.",
+  "device_mutations": [],
+  "evidence_root": "out/deep-sleep-final/evidence/20261008/66-image03-morning-return",
+  "evidence_sha256": {
+    "battery-timeline.csv": "eb7281c333a3af554d5b1982f909d14ae9155bdce1023c1366d6c51be0f49675",
+    "diagnostic-exports.tar": "214f485291aa0eeb33e8092694c1197bdc99b59d5cecf03a51489357d3808372",
+    "first-return.json": "891c3a74ea4452eff03e817f2ce5ac2a4b0c6a4f95ebb2e72e9653f118146619",
+    "health-receipt.json": "e0ba2378dd0953cd5616ec69fb7672e62d0674406f59eab72b87d7b02f9bd995",
+    "health.json": "e3d4997858a02bdf7550fade80895ce3afcee191bc968272e24f0b4efae2da4b",
+    "owner-observation.json": "d03a06ba88cc6f94050cd57b73ec3311e4dc36aa8b39e5269ee0af12cbbc5ffd",
+    "persistent.tar": "afe6ab539d3e859416a2399b25810972fb0d5d93c1dd6f97f1170afbe57d6dfc",
+    "power-events-current03.jsonl": "43cc5efd74ba46745b9600bfa2758451fa74064ccbc86ee26acb500d4816cde9",
+    "retained-sysfs.tar": "c757b8cda244b1cfb7ad7d9a28da9bbda72b66888d114018373e687c60721a42"
+  },
+  "health": {
+    "application_status_ok": true,
+    "backstop": "provider=1 armed_s=0 running=0 paused=0 staged=0 seconds=0 error=0",
+    "bluetooth_powered": false,
+    "charger": "phase=CONSTANT_CURRENT source=1 source_valid=1 charge_limit_ua=450000\nactive=1 online=1 present=1 fault=0x0 sample_error=0 stop_error=0 paused=0 last_error=0\nbattery_uv=3959252 baton_raw=10388 isense_raw=18469 pmic_die_mc=35772 input_budget_ua=500000\nchr_con0=0x007b cv_status=0x00ae battery_ovp=0x0003 baton=0x0005 watchdog=0x0001 thermal=0x0000\nwatchdog_pets=167 last_pet_ms=23385116 total_seconds=173 cv_seconds=0 precharge_seconds=0 hold=0 full=0 timeout=0\nfirst_fault=0x0 at_ms=0 battery_uv=0 sample_error=0 chr=0x0 cv=0x0 ovp=0x0 watchdog=0x0 thermal=0x0\ndormant_blocked=1 check_reg=0x0 check_mask=0x0 check_expected=0x0 check_actual=0x0 check_error=0",
+    "ext4_counters": {
+      "/sys/fs/ext4/mmcblk0p5/errors_count": 0,
+      "/sys/fs/ext4/mmcblk0p5/warning_count": 0,
+      "/sys/fs/ext4/mmcblk0p7/errors_count": 0,
+      "/sys/fs/ext4/mmcblk0p7/warning_count": 0,
+      "/sys/fs/ext4/mmcblk1p1/errors_count": 0,
+      "/sys/fs/ext4/mmcblk1p1/warning_count": 0
+    },
+    "first_frame": true,
+    "pcm_status": "closed",
+    "playback": "paused",
+    "pm_processes": [],
+    "pstore_files": [],
+    "rtc_alarm": "",
+    "scan_active": false,
+    "screen_off": true,
+    "wifi_enabled": false
+  },
+  "host_health_capture": {
+    "device_mutations": [],
+    "host_finish_utc": "2026-10-08T07:46:16.160279+00:00",
+    "host_lease": "/tmp/y2-platform-v1-device.lock",
+    "host_start_utc": "2026-10-08T07:46:15.127140+00:00",
+    "returncode": 0,
+    "source": "out/deep-sleep-final/morning-readonly-health.py",
+    "transport": "USB SSH with strict host-key checking"
+  },
+  "identity": {
+    "consecutive_unclean": 1,
+    "current_boot_id": "81dce40c-9bb5-4f14-8465-c7e80ba3c602",
+    "first_capture_boottime_s": 23261.894176923,
+    "installed_hash_matches_archive65": {
+      "/usr/bin/reborn": true,
+      "/usr/lib/y2-platform/y2_platform/power_journal.py": true,
+      "/usr/lib/y2-platform/y2_platform/product_sleep.py": true,
+      "/usr/lib/y2-platform/y2_platform/suspend_record.py": true
+    },
+    "previous_boot_id": "0132fb21-8462-4f77-9faf-3a7e7f1b8429",
+    "previous_boot_orderly_shutdown": false,
+    "taint": 0,
+    "versions": {
+      "battery_profile_schema": 1,
+      "build_git_commit": "cfb7e098eae60918f47d7b330445bf66e9d61817",
+      "build_id": "Y2LINUX-PLATFORM-V1-DEEPSLEEP-FINAL-03",
+      "data_schema_version": 1,
+      "feature_contract_version": 2,
+      "kernel_version": "6.18.0-y2linux-platform-v1-deepsleep-final-03",
+      "layout_version": 1,
+      "low_battery_policy_schema": 2,
+      "platform_api_version": 1,
+      "reborn_source_commit": "97ff8c357bab12319087740d7c97b5051e6588f5",
+      "reborn_version": "0.2.0",
+      "release_version": "1.0.0-platform-v1-deepsleep-final-candidate.3",
+      "rootfs_version": "2025.02.18-platform-v1.33"
+    }
+  },
+  "journal_sha256": {
+    "power-journal.jsonl": "21b4fc549c64b37ebe3ea84946063fc0f90ce713ccaf21a28ba9a117f4ecb81b",
+    "power-journal.previous.jsonl": "6af336ca01a21f88db2dd26334342be3c686d4669a71461e5b29932df3d1d1b2"
+  },
+  "next_gap": "Investigate the recurring pre-SPM device-suspend failure on exact03; preserve the failure guard. No new experiment is authorized by this evidence update.",
+  "owner_observation": {
+    "arithmetic_only": {
+      "drop_percentage_points": 33,
+      "percentage_points_per_hour_approximate": 5.5
+    },
+    "elapsed_hours_approximate": 6,
+    "end_display_percent": 55,
+    "limitations": "Approximate owner interval and provisional voltage-based SOC, not measured capacity/current or a runtime forecast.",
+    "manual_restart_after_installation": false,
+    "observation": "About six hours unplugged; display now 55%, around 88% at unplug.",
+    "recorded_host_utc": "2026-10-08T07:49:21.472423+00:00",
+    "restart_clarification_verbatim": "no i just installed the newest firmware we did tonight and went to sleep",
+    "start_percent_approximate": 88
+  },
+  "recorded_host_utc": "2026-10-08T07:49:21.472423+00:00",
+  "retained_boot_archive_sha256": "2e13490844dcef8e8d6480272d3dba7d5d4c90bf4347bc001f426aac2ab1c172",
+  "runtime_cpu_idle": {
+    "category": "CPU0 DORMANT/C3 runtime idle, distinct from whole-system suspend",
+    "first_capture_entries": 807610,
+    "first_capture_failures": 0,
+    "first_capture_hardware_residency_us": 15970000272,
+    "first_capture_restore_failures": 0,
+    "first_capture_resumes": 807610,
+    "limitation": "Descriptive journal window includes brief morning screen wakes; not electrical-power measurement or full C3 qualification.",
+    "window_cpuidle_dormant_fraction": 0.6964252528675647,
+    "window_cpuidle_dormant_time_us_delta": 15908566919,
+    "window_elapsed_s": 22843.179298131,
+    "window_end_boottime_s": 23149.180693378,
+    "window_start_boottime_s": 306.001395247
+  },
+  "schema": "org.y2linux.deepsleep-morning-observation/v1",
+  "scope": "Read-only morning evidence retrieval; no new physical trial or readiness promotion.",
+  "verdict": "AUTOMATIC_SUSPEND_FAILED_UNEXPECTED_REBOOT"
+}

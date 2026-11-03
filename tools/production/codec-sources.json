@@ -1,0 +1,51 @@
+{
+  "fdk-aac": {
+    "version": "2.0.3",
+    "variant": "fdk-aac-free (Red Hat stripped FDK: AAC-LC only, HE-AAC SBR/PS removed)",
+    "upstream": "https://gitlab.freedesktop.org/wtaymans/fdk-aac-stripped (branch stripped5, 9896ddc0d08b)",
+    "url": "https://archive.ubuntu.com/ubuntu/pool/universe/f/fdk-aac-free/fdk-aac-free_2.0.3.orig.tar.gz",
+    "sha256": "2dc6952b70283888994ae6e551a79039781f0a64c67fb637bffd5a8f483c34c5",
+    "license": "FDK-AAC license",
+    "license_files": {
+      "NOTICE": "95ec80da40b4af12ad4c4f3158c9cfb80f2479f3246e4260cb600827cc8c7836"
+    },
+    "distribution_limit": "Copyright license requires notice and corresponding source and forbids copyright fees; no patent license granted. Fedora Legal: this stripped implementation is no longer encumbered by AAC patents.",
+    "reviewed_license_source": "fdk-aac-free_2.0.3.orig.tar.gz NOTICE (identical to fdk-aac v2.0.3 NOTICE)",
+    "reviewed_at": "2026-10-16",
+    "public_distribution_state": "APPROVED_BY_OWNER_2026-10-16",
+    "private_integration_state": "compiled_and_enabled_not_physically_qualified"
+  },
+  "libfreeaptx": {
+    "version": "0.2.2",
+    "upstream_commit": "6dee419f934ec781e531f885f7e8e740752e67d1",
+    "url": "https://github.com/regularhunter/libfreeaptx/archive/0.2.2/libfreeaptx-0.2.2.tar.gz",
+    "sha256": "5ab5ebddf3f2eb7ce47a505b87460b00fc1ede99c70010796d3575ab31ea80bf",
+    "license": "LGPL-2.1-or-later",
+    "license_files": {
+      "COPYING": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551"
+    },
+    "distribution_limit": "Use shared library and retain corresponding source/license. Codec trademark/patent product clearance not established; no Adaptive or Lossless claim.",
+    "reviewed_license_source": "https://github.com/regularhunter/libfreeaptx/blob/0.2.2/COPYING",
+    "reviewed_at": "2026-10-02",
+    "public_distribution_state": "NOT_PUBLIC_OWNER_PRIVATE_ONLY_2026-10-16",
+    "private_integration_state": "compiled_and_experimentally_enabled_not_physically_qualified"
+  },
+  "libldac": {
+    "version": "2.0.2.3",
+    "packaging_commit": "fbffba45d15d959da6ee04eafe14c0d4721f6030",
+    "libldac_commit": "82b6a1abee84787b8fa167efe20290073f60db2d",
+    "url": "https://github.com/EHfive/ldacBT/releases/download/v2.0.2.3/ldacBT-2.0.2.3.tar.gz",
+    "sha256": "4bd8eece78bb5c1361fab95743e7100506e2408a25c4a592a0f8d349746dc5b4",
+    "license": "Apache-2.0",
+    "license_files": {
+      "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "libldac/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "libldac/NOTICE": "2fdf859264d3d799cef9eb2e3cf3effc99d2782667eae1fd518d70d121cbac59"
+    },
+    "distribution_limit": "AOSP NOTICE requires certification for product use. Product certification and public distribution approval not established.",
+    "reviewed_license_source": "https://android.googlesource.com/platform/external/libldac/+/master/NOTICE",
+    "reviewed_at": "2026-10-16",
+    "public_distribution_state": "APPROVED_BY_OWNER_2026-10-16",
+    "private_integration_state": "compiled_and_experimentally_enabled_not_physically_qualified"
+  }
+}

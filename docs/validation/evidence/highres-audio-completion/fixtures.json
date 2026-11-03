@@ -1,0 +1,104 @@
+[
+  {
+    "file": "lowbits-16-44100.wav",
+    "sha256": "b583f40c2ca47e7645fed4e2fb3a8a1d0ec901112b9dfcce411305102ba478b0",
+    "bits": 16,
+    "rate": 44100,
+    "pattern": [
+      18,
+      19,
+      20,
+      21,
+      -18,
+      -19,
+      -20,
+      -21
+    ],
+    "max_normalized_amplitude": 0.000640869140625
+  },
+  {
+    "file": "lowbits-24-44100.wav",
+    "sha256": "764321d53cf72f66ef127a917f8def6f77c746ad11c265a47c2b8fcf39515736",
+    "bits": 24,
+    "rate": 44100,
+    "pattern": [
+      4608,
+      4609,
+      4735,
+      4863,
+      -4864,
+      -4863,
+      -4737,
+      -4609
+    ],
+    "max_normalized_amplitude": 0.000579833984375
+  },
+  {
+    "file": "lowbits-32-44100.wav",
+    "sha256": "8182b48b33e27335ffb0f7b82f3df06e5eff32bafb81dd1553afae69068db68d",
+    "bits": 32,
+    "rate": 44100,
+    "pattern": [
+      1179648,
+      1179649,
+      1179775,
+      1179903,
+      -1179904,
+      -1179903,
+      -1179777,
+      -1179649
+    ],
+    "max_normalized_amplitude": 0.0005494356155395508
+  },
+  {
+    "file": "lowbits-16-48000.wav",
+    "sha256": "a97032f1f199bb26e38ec2261138b8fc1c27b4c08f50abe3812b0e22b62d6566",
+    "bits": 16,
+    "rate": 48000,
+    "pattern": [
+      18,
+      19,
+      20,
+      21,
+      -18,
+      -19,
+      -20,
+      -21
+    ],
+    "max_normalized_amplitude": 0.000640869140625
+  },
+  {
+    "file": "lowbits-24-48000.wav",
+    "sha256": "bc9535ee099ec988c9095b358dca0e787f75267d323dd6f271209c02d11e9d49",
+    "bits": 24,
+    "rate": 48000,
+    "pattern": [
+      4608,
+      4609,
+      4735,
+      4863,
+      -4864,
+      -4863,
+      -4737,
+      -4609
+    ],
+    "max_normalized_amplitude": 0.000579833984375
+  },
+  {
+    "file": "lowbits-32-48000.wav",
+    "sha256": "00979c059774bedb33d4ecd65f1d14e8cf380d847b5b427ba8959b25272b71b2",
+    "bits": 32,
+    "rate": 48000,
+    "pattern": [
+      1179648,
+      1179649,
+      1179775,
+      1179903,
+      -1179904,
+      -1179903,
+      -1179777,
+      -1179649
+    ],
+    "max_normalized_amplitude": 0.0005494356155395508
+  }
+]

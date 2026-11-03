@@ -1,0 +1,23 @@
+--- a/drivers/phy/mediatek/phy-mtk-mipi-dsi.c
++++ b/drivers/phy/mediatek/phy-mtk-mipi-dsi.c
+@@ -162,7 +162,7 @@
+ 	if (ret)
+ 		return dev_err_probe(dev, ret, "Failed to register PLL\n");
+ 
+-	phy = devm_phy_create(dev, NULL, &mtk_mipi_tx_ops);
++	phy = devm_phy_create(dev, NULL, mipi_tx->driver_data->phy_ops ?: &mtk_mipi_tx_ops);
+ 	if (IS_ERR(phy))
+ 		return dev_err_probe(dev, PTR_ERR(phy), "Failed to create MIPI D-PHY\n");
+ 
+@@ -179,7 +179,11 @@
+ 	return devm_of_clk_add_hw_provider(dev, of_clk_hw_simple_get, &mipi_tx->pll_hw);
+ }
+ 
++extern const struct mtk_mipitx_data mt6582_mipitx_data;
+ static const struct of_device_id mtk_mipi_tx_match[] = {
++#if IS_ENABLED(CONFIG_Y2_PLATFORM)
++	{ .compatible = "mediatek,mt6582-mipi-tx", .data = &mt6582_mipitx_data },
++#endif
+ 	{ .compatible = "mediatek,mt2701-mipi-tx", .data = &mt2701_mipitx_data },
+ 	{ .compatible = "mediatek,mt8173-mipi-tx", .data = &mt8173_mipitx_data },
+ 	{ .compatible = "mediatek,mt8183-mipi-tx", .data = &mt8183_mipitx_data },

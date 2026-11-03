@@ -1,0 +1,1096 @@
+{
+  "schema": 1,
+  "date": "2026-10-04",
+  "method": {
+    "access": "SSH with non-blocking exclusive host flock; no device access before acquisition",
+    "gpu_time": "runtime-PM active residence, including 200ms autosuspend delay; not GPU execution utilization",
+    "cpu_time": "whole Reborn process /proc stat ticks, percentage of one core; includes workers; SSH observer is separate",
+    "display": "DRM state/clocks/backlight readback and OVL interrupts; no optical or electrical measurement",
+    "input": "real recognized evdev injection with zero record timestamps, open/close per detent; no physical-input latency claim",
+    "artwork": "temporary ARM helper/lib/4096 JPEG in /run; stock process untouched; 12 decodes in each fresh helper process; CLOCK_PROCESS_CPUTIME_ID median/getrusage RSS; normal DVFS retained",
+    "harness_corrections": [
+      "extra run completed input workload then failed formatting library track count; finally restored off and removed scratch; rerun used known three-track scope",
+      "final Home restoration explicitly woke before injecting Home; verified Home and off afterward"
+    ],
+    "raw_receipts": "ignored out/platform-v1-graphics/device*.jsonl and device-restored.json"
+  },
+  "identity": {
+    "versions": {
+      "release_version": "1.0.0-baseline-candidate.2",
+      "rootfs_version": "2025.02.18-platform-v1.21",
+      "build_id": "Y2LINUX-BASELINE-02",
+      "platform_api_version": 1,
+      "feature_contract_version": 2,
+      "battery_profile_schema": 1,
+      "low_battery_policy_schema": 2,
+      "layout_version": 1,
+      "kernel_version": "6.18.0-y2linux-baseline-02",
+      "data_schema_version": 1,
+      "reborn_version": "0.2.0",
+      "build_git_commit": "8584ccd85f052f351fe51650b2348c83ca894ed4",
+      "reborn_source_commit": "b71b468860233faa0a42b8448ec5777fa952b8e3"
+    },
+    "kernel": "6.18.0-y2linux-baseline-02",
+    "reborn_build": "b71b468860233faa0a42b8448ec5777fa952b8e3",
+    "boot": "27e6d684-3794-4490-95db-a489027cd4f4",
+    "taint": "0",
+    "saved_screen_off": true,
+    "initial_screen": "home",
+    "initial_playback": "paused",
+    "splash_events": [
+      {
+        "subsystem": "startup",
+        "event": "splash_console_hidden",
+        "mono_ms": 383,
+        "sequence": 1,
+        "errno": 0
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_started",
+        "mono_ms": 384,
+        "sequence": 2,
+        "errno": 0
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_visible",
+        "mono_ms": 489,
+        "sequence": 3,
+        "errno": 0
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "storage_discovery",
+        "mono_ms": 565,
+        "sequence": 4
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "storage_preflight",
+        "mono_ms": 1595,
+        "sequence": 5
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "fsck_start",
+        "mono_ms": 1716,
+        "sequence": 6
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "fsck_complete",
+        "mono_ms": 1759,
+        "sequence": 7
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "root_data_mounted",
+        "mono_ms": 1831,
+        "sequence": 8
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "switch_root",
+        "mono_ms": 1846,
+        "sequence": 9
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "rc_data",
+        "mono_ms": 5490,
+        "sequence": 10
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "rc_time",
+        "mono_ms": 6265,
+        "sequence": 11
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "rc_power",
+        "mono_ms": 6804,
+        "sequence": 12
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "rc_bluetooth",
+        "mono_ms": 7480,
+        "sequence": 13
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "rc_connectivity",
+        "mono_ms": 7540,
+        "sequence": 14
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "rc_readiness",
+        "mono_ms": 7555,
+        "sequence": 15
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "conn_wifi_wait",
+        "mono_ms": 8317,
+        "sequence": 16
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "conn_wifi",
+        "mono_ms": 24959,
+        "sequence": 17
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "system_ready",
+        "mono_ms": 24960,
+        "sequence": 18
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "model_restored",
+        "mono_ms": 25043,
+        "sequence": 19
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "graphics_ready",
+        "mono_ms": 25346,
+        "sequence": 20
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "storage_ready",
+        "mono_ms": 25359,
+        "sequence": 21
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "library_workers_ready",
+        "mono_ms": 25389,
+        "sequence": 22
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "core_services_ready",
+        "mono_ms": 25407,
+        "sequence": 23
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "audio_ready",
+        "mono_ms": 25408,
+        "sequence": 24
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "radio_workers_ready",
+        "mono_ms": 25413,
+        "sequence": 25
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "runtime_ready",
+        "mono_ms": 25417,
+        "sequence": 26
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_phase",
+        "phase": "ready",
+        "mono_ms": 25423,
+        "sequence": 27
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_released",
+        "mono_ms": 25453,
+        "sequence": 28,
+        "errno": 0
+      },
+      {
+        "subsystem": "startup",
+        "event": "splash_presented",
+        "mono_ms": 25466,
+        "sequence": 29,
+        "errno": 0
+      }
+    ]
+  },
+  "graphics_selftest": {
+    "offscreen_readback": true,
+    "passed": true,
+    "renderer": "Mesa Project; EGL 1.4; Mali400; OpenGL ES 2.0 Mesa 24.0.9"
+  },
+  "windows": [
+    {
+      "scenario": "screen_on_static",
+      "elapsed_s": 20.137662897000155,
+      "frames": 25.0,
+      "fps": 1.2414548861935797,
+      "process_cpu_percent_one_core": 7.00180555813179,
+      "cpu_ticks_delta": 141,
+      "gpu_runtime_active_ms": 4148,
+      "gpu_runtime_suspended_ms": 15986,
+      "gpu_before": {
+        "runtime_status": "suspended",
+        "runtime_active_time": "436238",
+        "runtime_suspended_time": "5360201",
+        "control": "auto",
+        "autosuspend_delay_ms": "200"
+      },
+      "gpu_after": {
+        "runtime_status": "active",
+        "runtime_active_time": "440386",
+        "runtime_suspended_time": "5376187",
+        "control": "auto",
+        "autosuspend_delay_ms": "200"
+      },
+      "context_losses_delta": 0.0,
+      "missed_frames_delta": 0.0,
+      "last_frame_wall_ms": 15.876571999999998,
+      "irq_delta": {
+        "gpmmu": 0,
+        "ppmmu0": 0,
+        "ppmmu1": 0,
+        "14007000.ovl": 1307,
+        "14008000.rdma": 0,
+        "1400c000.dsi": 0,
+        "mt6582-afe": 0,
+        "mt6582-keypad": 0
+      },
+      "gpu_job_irq_delta": "NOT_CAPTURED: initial regex interpreted word boundaries as backspace; final totals alone cannot establish deltas",
+      "kms_after": {
+        "enable": "1",
+        "active": "1"
+      },
+      "genpd_after": "domain                          status          children        performance\n    /device                         runtime status                  managed by\n------------------------------------------------------------------------------\ny2-mfg                          on                              0\n    13010000.gpu                    active                      0           SW",
+      "clocks_after": "    mm_dsi_digital                   1       1        0        26000000    0          0     50000      Y      1400c000.dsi                    digital                  \n    mipi_tx0_pll                     1       1        1        338000000   0          0     50000      Y      1400c000.dsi                    hs                       \n    y2-mmpll                         1       1        0        500500000   0          0     50000      Y      deviceless                      no_connection_id         \n       y2-mfg-source                 2       2        0        500500000   0          0     50000      Y         10006000.power-controller       mfg                      \n          y2-mfg-g3d                 1       1        0        500500000   0          0     50000      Y            13010000.gpu                    core                     \n mm_dsi_engine                       1       1        0        0           0          0     50000      Y   1400c000.dsi                    engine                   \n mm_mdp_rdma                         0       0        0        0           0          0     50000      N   clk-mt6582-mm.1.auto            idle-handoff             \n mm_disp_ovl                         1       1        0        0           0          0     50000      Y   14007000.ovl                    no_connection_id         \n mm_disp_rdma                        1       1        0        0           0          0     50000      Y   14008000.rdma                   no_connection_id         \n mm_smi_common                       2       2        0        0           0          0     50000      Y   13010000.gpu                    bus                      ",
+      "backlight_before": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "0",
+          "brightness": "32",
+          "actual_brightness": "32",
+          "max_brightness": "32"
+        }
+      },
+      "backlight_after": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "0",
+          "brightness": "32",
+          "actual_brightness": "32",
+          "max_brightness": "32"
+        }
+      },
+      "cpu_frequency_khz_before": "598000",
+      "cpu_frequency_khz_after": "1040000",
+      "idle_delta": {
+        "/sys/devices/system/cpu/cpu3/cpuidle/state1": {
+          "name": "SLIDLE",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu3/cpuidle/state2": {
+          "name": "DORMANT",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu3/cpuidle/state0": {
+          "name": "WFI",
+          "usage": 1722,
+          "time_us": 19004766
+        },
+        "/sys/devices/system/cpu/cpu1/cpuidle/state1": {
+          "name": "SLIDLE",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu1/cpuidle/state2": {
+          "name": "DORMANT",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu1/cpuidle/state0": {
+          "name": "WFI",
+          "usage": 1224,
+          "time_us": 19287522
+        },
+        "/sys/devices/system/cpu/cpu2/cpuidle/state1": {
+          "name": "SLIDLE",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu2/cpuidle/state2": {
+          "name": "DORMANT",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu2/cpuidle/state0": {
+          "name": "WFI",
+          "usage": 2233,
+          "time_us": 18916275
+        },
+        "/sys/devices/system/cpu/cpu0/cpuidle/state1": {
+          "name": "SLIDLE",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu0/cpuidle/state2": {
+          "name": "DORMANT",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu0/cpuidle/state0": {
+          "name": "WFI",
+          "usage": 2922,
+          "time_us": 19524356
+        }
+      },
+      "spm_after": "mode=SPM_CPU_SHUTDOWN_INFRA_RETAINED broken=0 entries=0 resumes=0 aborts=0 result=0 wake=0x0 ticks32k=0 event=0x0 debug=0x0 r13=0x0 power=0x3f5e/0x3f5e\ndormant_entries=0 dormant_resumes=0 dormant_aborts=391805 dormant_failures=0 dormant_result=-16 dormant_broken=0\ndormant_stage=topology resume_restore_ns=0\ndormant_wake_result=-61 dormant_wake_stage=never_entered\ndormant_attempts=391805 dormant_successes=0 dormant_residency_us=0 dormant_restore_failures=0 dormant_budget=-1 dormant_wake=0x0 dormant_debug=0x0 dormant_event=0x0 dormant_r13=0x0 pcm_words=480 pcm_origin=MT6582_d53dd75c_dpidle\nuart_sleep_request=0 uart_sleep_ack=0 uart_sleep_attempts=0 uart_sleep_successes=0 uart_sleep_timeouts=0 uart_sleep_restore_failures=0 uart_sleep_result=0 uart_sleep_rejection=not_attempted uart_power_before=0x0 uart_power_request=0x0 uart_power_after=0x0 uart_r13_before=0x0 uart_r13_ack=0x0 uart_request_live=0 uart_ack_live=0",
+      "thermal_c_before": {
+        "cpu-thermal": 54.3,
+        "pmic-thermal": 52.146
+      },
+      "thermal_c_after": {
+        "cpu-thermal": 54.4,
+        "pmic-thermal": 52.731
+      }
+    },
+    {
+      "scenario": "screen_off",
+      "elapsed_s": 20.19089861900011,
+      "frames": 0.0,
+      "fps": 0.0,
+      "process_cpu_percent_one_core": 5.6461082862712875,
+      "cpu_ticks_delta": 114,
+      "gpu_runtime_active_ms": 0,
+      "gpu_runtime_suspended_ms": 20191,
+      "gpu_before": {
+        "runtime_status": "suspended",
+        "runtime_active_time": "440629",
+        "runtime_suspended_time": "5378312",
+        "control": "auto",
+        "autosuspend_delay_ms": "200"
+      },
+      "gpu_after": {
+        "runtime_status": "suspended",
+        "runtime_active_time": "440629",
+        "runtime_suspended_time": "5398503",
+        "control": "auto",
+        "autosuspend_delay_ms": "200"
+      },
+      "context_losses_delta": 0.0,
+      "missed_frames_delta": 0.0,
+      "last_frame_wall_ms": 15.48865,
+      "irq_delta": {
+        "gpmmu": 0,
+        "ppmmu0": 0,
+        "ppmmu1": 0,
+        "14007000.ovl": 0,
+        "14008000.rdma": 0,
+        "1400c000.dsi": 0,
+        "mt6582-afe": 0,
+        "mt6582-keypad": 0
+      },
+      "gpu_job_irq_delta": "NOT_CAPTURED: initial regex interpreted word boundaries as backspace; final totals alone cannot establish deltas",
+      "kms_after": {
+        "enable": "0",
+        "active": "0"
+      },
+      "genpd_after": "domain                          status          children        performance\n    /device                         runtime status                  managed by\n------------------------------------------------------------------------------\ny2-mfg                          off-0                           0\n    13010000.gpu                    suspended                   0           SW",
+      "clocks_after": "    mm_dsi_digital                   0       0        0        26000000    0          0     50000      N      1400c000.dsi                    digital                  \n    mipi_tx0_pll                     0       0        0        338000000   0          0     50000      Y      1400c000.dsi                    hs                       \n    y2-mmpll                         0       1        0        500500000   0          0     50000      Y      deviceless                      no_connection_id         \n       y2-mfg-source                 0       1        0        500500000   0          0     50000      N         10006000.power-controller       mfg                      \n          y2-mfg-g3d                 0       0        0        500500000   0          0     50000      N            13010000.gpu                    core                     \n mm_dsi_engine                       0       0        0        0           0          0     50000      N   1400c000.dsi                    engine                   \n mm_mdp_rdma                         0       0        0        0           0          0     50000      N   clk-mt6582-mm.1.auto            idle-handoff             \n mm_disp_ovl                         0       0        0        0           0          0     50000      N   14007000.ovl                    no_connection_id         \n mm_disp_rdma                        0       0        0        0           0          0     50000      N   14008000.rdma                   no_connection_id         \n mm_smi_common                       0       0        0        0           0          0     50000      N   13010000.gpu                    bus                      ",
+      "backlight_before": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "4",
+          "brightness": "32",
+          "actual_brightness": "0",
+          "max_brightness": "32"
+        }
+      },
+      "backlight_after": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "4",
+          "brightness": "32",
+          "actual_brightness": "0",
+          "max_brightness": "32"
+        }
+      },
+      "cpu_frequency_khz_before": "598000",
+      "cpu_frequency_khz_after": "598000",
+      "idle_delta": {
+        "/sys/devices/system/cpu/cpu3/cpuidle/state1": {
+          "name": "SLIDLE",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu3/cpuidle/state2": {
+          "name": "DORMANT",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu3/cpuidle/state0": {
+          "name": "WFI",
+          "usage": 2226,
+          "time_us": 18916502
+        },
+        "/sys/devices/system/cpu/cpu1/cpuidle/state1": {
+          "name": "SLIDLE",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu1/cpuidle/state2": {
+          "name": "DORMANT",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu1/cpuidle/state0": {
+          "name": "WFI",
+          "usage": 505,
+          "time_us": 19827800
+        },
+        "/sys/devices/system/cpu/cpu2/cpuidle/state1": {
+          "name": "SLIDLE",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu2/cpuidle/state2": {
+          "name": "DORMANT",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu2/cpuidle/state0": {
+          "name": "WFI",
+          "usage": 1036,
+          "time_us": 19483836
+        },
+        "/sys/devices/system/cpu/cpu0/cpuidle/state1": {
+          "name": "SLIDLE",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu0/cpuidle/state2": {
+          "name": "DORMANT",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu0/cpuidle/state0": {
+          "name": "WFI",
+          "usage": 1494,
+          "time_us": 19444852
+        }
+      },
+      "spm_after": "mode=SPM_CPU_SHUTDOWN_INFRA_RETAINED broken=0 entries=0 resumes=0 aborts=0 result=0 wake=0x0 ticks32k=0 event=0x0 debug=0x0 r13=0x0 power=0x3f4e/0x3f4e\ndormant_entries=0 dormant_resumes=0 dormant_aborts=393205 dormant_failures=0 dormant_result=-16 dormant_broken=0\ndormant_stage=topology resume_restore_ns=0\ndormant_wake_result=-61 dormant_wake_stage=never_entered\ndormant_attempts=393205 dormant_successes=0 dormant_residency_us=0 dormant_restore_failures=0 dormant_budget=-1 dormant_wake=0x0 dormant_debug=0x0 dormant_event=0x0 dormant_r13=0x0 pcm_words=480 pcm_origin=MT6582_d53dd75c_dpidle\nuart_sleep_request=0 uart_sleep_ack=0 uart_sleep_attempts=0 uart_sleep_successes=0 uart_sleep_timeouts=0 uart_sleep_restore_failures=0 uart_sleep_result=0 uart_sleep_rejection=not_attempted uart_power_before=0x0 uart_power_request=0x0 uart_power_after=0x0 uart_r13_before=0x0 uart_r13_ack=0x0 uart_request_live=0 uart_ack_live=0",
+      "thermal_c_before": {
+        "cpu-thermal": 54.3,
+        "pmic-thermal": 51.561
+      },
+      "thermal_c_after": {
+        "cpu-thermal": 54.4,
+        "pmic-thermal": 50.976
+      }
+    },
+    {
+      "scenario": "screen_on_after_wake",
+      "elapsed_s": 10.138207230999797,
+      "frames": 15.0,
+      "fps": 1.4795515280190963,
+      "process_cpu_percent_one_core": 7.200484103026269,
+      "cpu_ticks_delta": 73,
+      "gpu_runtime_active_ms": 2482,
+      "gpu_runtime_suspended_ms": 7657,
+      "gpu_before": {
+        "runtime_status": "active",
+        "runtime_active_time": "443310",
+        "runtime_suspended_time": "5406262",
+        "control": "auto",
+        "autosuspend_delay_ms": "200"
+      },
+      "gpu_after": {
+        "runtime_status": "active",
+        "runtime_active_time": "445792",
+        "runtime_suspended_time": "5413919",
+        "control": "auto",
+        "autosuspend_delay_ms": "200"
+      },
+      "context_losses_delta": 0.0,
+      "missed_frames_delta": 0.0,
+      "last_frame_wall_ms": 15.872573,
+      "irq_delta": {
+        "gpmmu": 0,
+        "ppmmu0": 0,
+        "ppmmu1": 0,
+        "14007000.ovl": 658,
+        "14008000.rdma": 0,
+        "1400c000.dsi": 0,
+        "mt6582-afe": 0,
+        "mt6582-keypad": 0
+      },
+      "gpu_job_irq_delta": "NOT_CAPTURED: initial regex interpreted word boundaries as backspace; final totals alone cannot establish deltas",
+      "kms_after": {
+        "enable": "1",
+        "active": "1"
+      },
+      "genpd_after": "domain                          status          children        performance\n    /device                         runtime status                  managed by\n------------------------------------------------------------------------------\ny2-mfg                          on                              0\n    13010000.gpu                    active                      0           SW",
+      "clocks_after": "    mm_dsi_digital                   1       1        0        26000000    0          0     50000      Y      1400c000.dsi                    digital                  \n    mipi_tx0_pll                     1       1        1        338000000   0          0     50000      Y      1400c000.dsi                    hs                       \n    y2-mmpll                         1       1        0        500500000   0          0     50000      Y      deviceless                      no_connection_id         \n       y2-mfg-source                 2       2        0        500500000   0          0     50000      Y         10006000.power-controller       mfg                      \n          y2-mfg-g3d                 1       1        0        500500000   0          0     50000      Y            13010000.gpu                    core                     \n mm_dsi_engine                       1       1        0        0           0          0     50000      Y   1400c000.dsi                    engine                   \n mm_mdp_rdma                         0       0        0        0           0          0     50000      N   clk-mt6582-mm.1.auto            idle-handoff             \n mm_disp_ovl                         1       1        0        0           0          0     50000      Y   14007000.ovl                    no_connection_id         \n mm_disp_rdma                        1       1        0        0           0          0     50000      Y   14008000.rdma                   no_connection_id         \n mm_smi_common                       2       2        0        0           0          0     50000      Y   13010000.gpu                    bus                      ",
+      "backlight_before": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "0",
+          "brightness": "32",
+          "actual_brightness": "32",
+          "max_brightness": "32"
+        }
+      },
+      "backlight_after": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "0",
+          "brightness": "32",
+          "actual_brightness": "32",
+          "max_brightness": "32"
+        }
+      },
+      "cpu_frequency_khz_before": "598000",
+      "cpu_frequency_khz_after": "598000",
+      "idle_delta": {
+        "/sys/devices/system/cpu/cpu3/cpuidle/state1": {
+          "name": "SLIDLE",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu3/cpuidle/state2": {
+          "name": "DORMANT",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu3/cpuidle/state0": {
+          "name": "WFI",
+          "usage": 467,
+          "time_us": 9625351
+        },
+        "/sys/devices/system/cpu/cpu1/cpuidle/state1": {
+          "name": "SLIDLE",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu1/cpuidle/state2": {
+          "name": "DORMANT",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu1/cpuidle/state0": {
+          "name": "WFI",
+          "usage": 1330,
+          "time_us": 9432826
+        },
+        "/sys/devices/system/cpu/cpu2/cpuidle/state1": {
+          "name": "SLIDLE",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu2/cpuidle/state2": {
+          "name": "DORMANT",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu2/cpuidle/state0": {
+          "name": "WFI",
+          "usage": 776,
+          "time_us": 9685401
+        },
+        "/sys/devices/system/cpu/cpu0/cpuidle/state1": {
+          "name": "SLIDLE",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu0/cpuidle/state2": {
+          "name": "DORMANT",
+          "usage": 0,
+          "time_us": 0
+        },
+        "/sys/devices/system/cpu/cpu0/cpuidle/state0": {
+          "name": "WFI",
+          "usage": 1455,
+          "time_us": 9655096
+        }
+      },
+      "spm_after": "mode=SPM_CPU_SHUTDOWN_INFRA_RETAINED broken=0 entries=0 resumes=0 aborts=0 result=0 wake=0x0 ticks32k=0 event=0x0 debug=0x0 r13=0x0 power=0x3f5e/0x3f5e\ndormant_entries=0 dormant_resumes=0 dormant_aborts=395166 dormant_failures=0 dormant_result=-16 dormant_broken=0\ndormant_stage=topology resume_restore_ns=0\ndormant_wake_result=-61 dormant_wake_stage=never_entered\ndormant_attempts=395166 dormant_successes=0 dormant_residency_us=0 dormant_restore_failures=0 dormant_budget=-1 dormant_wake=0x0 dormant_debug=0x0 dormant_event=0x0 dormant_r13=0x0 pcm_words=480 pcm_origin=MT6582_d53dd75c_dpidle\nuart_sleep_request=0 uart_sleep_ack=0 uart_sleep_attempts=0 uart_sleep_successes=0 uart_sleep_timeouts=0 uart_sleep_restore_failures=0 uart_sleep_result=0 uart_sleep_rejection=not_attempted uart_power_before=0x0 uart_power_request=0x0 uart_power_after=0x0 uart_r13_before=0x0 uart_r13_ack=0x0 uart_request_live=0 uart_ack_live=0",
+      "thermal_c_before": {
+        "cpu-thermal": 54.6,
+        "pmic-thermal": 52.731
+      },
+      "thermal_c_after": {
+        "cpu-thermal": 54.9,
+        "pmic-thermal": 52.731
+      }
+    }
+  ],
+  "list_navigation": {
+    "scenario": "list_navigation",
+    "elapsed_s": 14.779213048999736,
+    "frames": 113.0,
+    "fps": 7.645873946424224,
+    "process_cpu_percent_one_core": 10.555365802143177,
+    "cpu_ticks_delta": 156,
+    "gpu_runtime_active_ms": 14673,
+    "gpu_runtime_suspended_ms": 105,
+    "gpu_before": {
+      "runtime_status": "suspended",
+      "runtime_active_time": "464055",
+      "runtime_suspended_time": "5662153",
+      "control": "auto",
+      "autosuspend_delay_ms": "200"
+    },
+    "gpu_after": {
+      "runtime_status": "active",
+      "runtime_active_time": "478728",
+      "runtime_suspended_time": "5662258",
+      "control": "auto",
+      "autosuspend_delay_ms": "200"
+    },
+    "context_losses_delta": 0.0,
+    "missed_frames_delta": 0.0,
+    "last_frame_wall_ms": 8.567669,
+    "irq_delta": {
+      "gpmmu": 0,
+      "ppmmu0": 0,
+      "ppmmu1": 0,
+      "14007000.ovl": 959,
+      "14008000.rdma": 0,
+      "1400c000.dsi": 0,
+      "mt6582-afe": 0,
+      "mt6582-keypad": 0
+    },
+    "gpu_job_irq_delta": "NOT_CAPTURED: initial regex interpreted word boundaries as backspace; final totals alone cannot establish deltas",
+    "kms_after": {
+      "enable": "1",
+      "active": "1"
+    },
+    "genpd_after": "domain                          status          children        performance\n    /device                         runtime status                  managed by\n------------------------------------------------------------------------------\ny2-mfg                          on                              0\n    13010000.gpu                    active                      0           SW",
+    "clocks_after": "    mm_dsi_digital                   1       1        0        26000000    0          0     50000      Y      1400c000.dsi                    digital                  \n    mipi_tx0_pll                     1       1        1        338000000   0          0     50000      Y      1400c000.dsi                    hs                       \n    y2-mmpll                         1       1        0        500500000   0          0     50000      Y      deviceless                      no_connection_id         \n       y2-mfg-source                 2       2        0        500500000   0          0     50000      Y         10006000.power-controller       mfg                      \n          y2-mfg-g3d                 1       1        0        500500000   0          0     50000      Y            13010000.gpu                    core                     \n mm_dsi_engine                       1       1        0        0           0          0     50000      Y   1400c000.dsi                    engine                   \n mm_mdp_rdma                         0       0        0        0           0          0     50000      N   clk-mt6582-mm.1.auto            idle-handoff             \n mm_disp_ovl                         1       1        0        0           0          0     50000      Y   14007000.ovl                    no_connection_id         \n mm_disp_rdma                        1       1        0        0           0          0     50000      Y   14008000.rdma                   no_connection_id         \n mm_smi_common                       2       2        0        0           0          0     50000      Y   13010000.gpu                    bus                      ",
+    "backlight_before": {
+      "/sys/class/backlight/y2-backlight": {
+        "bl_power": "0",
+        "brightness": "32",
+        "actual_brightness": "32",
+        "max_brightness": "32"
+      }
+    },
+    "backlight_after": {
+      "/sys/class/backlight/y2-backlight": {
+        "bl_power": "0",
+        "brightness": "32",
+        "actual_brightness": "32",
+        "max_brightness": "32"
+      }
+    },
+    "cpu_frequency_khz_before": "598000",
+    "cpu_frequency_khz_after": "747500",
+    "idle_delta": {
+      "/sys/devices/system/cpu/cpu3/cpuidle/state1": {
+        "name": "SLIDLE",
+        "usage": 0,
+        "time_us": 0
+      },
+      "/sys/devices/system/cpu/cpu3/cpuidle/state2": {
+        "name": "DORMANT",
+        "usage": 0,
+        "time_us": 0
+      },
+      "/sys/devices/system/cpu/cpu3/cpuidle/state0": {
+        "name": "WFI",
+        "usage": 795,
+        "time_us": 14170829
+      },
+      "/sys/devices/system/cpu/cpu1/cpuidle/state1": {
+        "name": "SLIDLE",
+        "usage": 0,
+        "time_us": 0
+      },
+      "/sys/devices/system/cpu/cpu1/cpuidle/state2": {
+        "name": "DORMANT",
+        "usage": 0,
+        "time_us": 0
+      },
+      "/sys/devices/system/cpu/cpu1/cpuidle/state0": {
+        "name": "WFI",
+        "usage": 1800,
+        "time_us": 13271727
+      },
+      "/sys/devices/system/cpu/cpu2/cpuidle/state1": {
+        "name": "SLIDLE",
+        "usage": 0,
+        "time_us": 0
+      },
+      "/sys/devices/system/cpu/cpu2/cpuidle/state2": {
+        "name": "DORMANT",
+        "usage": 0,
+        "time_us": 0
+      },
+      "/sys/devices/system/cpu/cpu2/cpuidle/state0": {
+        "name": "WFI",
+        "usage": 1607,
+        "time_us": 13564064
+      },
+      "/sys/devices/system/cpu/cpu0/cpuidle/state1": {
+        "name": "SLIDLE",
+        "usage": 0,
+        "time_us": 0
+      },
+      "/sys/devices/system/cpu/cpu0/cpuidle/state2": {
+        "name": "DORMANT",
+        "usage": 0,
+        "time_us": 0
+      },
+      "/sys/devices/system/cpu/cpu0/cpuidle/state0": {
+        "name": "WFI",
+        "usage": 3007,
+        "time_us": 13971511
+      }
+    },
+    "spm_after": "mode=SPM_CPU_SHUTDOWN_INFRA_RETAINED broken=0 entries=0 resumes=0 aborts=0 result=0 wake=0x0 ticks32k=0 event=0x0 debug=0x0 r13=0x0 power=0x3f5e/0x3f5e\ndormant_entries=0 dormant_resumes=0 dormant_aborts=413049 dormant_failures=0 dormant_result=-16 dormant_broken=0\ndormant_stage=topology resume_restore_ns=0\ndormant_wake_result=-61 dormant_wake_stage=never_entered\ndormant_attempts=413049 dormant_successes=0 dormant_residency_us=0 dormant_restore_failures=0 dormant_budget=-1 dormant_wake=0x0 dormant_debug=0x0 dormant_event=0x0 dormant_r13=0x0 pcm_words=480 pcm_origin=MT6582_d53dd75c_dpidle\nuart_sleep_request=0 uart_sleep_ack=0 uart_sleep_attempts=0 uart_sleep_successes=0 uart_sleep_timeouts=0 uart_sleep_restore_failures=0 uart_sleep_result=0 uart_sleep_rejection=not_attempted uart_power_before=0x0 uart_power_request=0x0 uart_power_after=0x0 uart_r13_before=0x0 uart_r13_ack=0x0 uart_request_live=0 uart_ack_live=0",
+    "thermal_c_before": {
+      "cpu-thermal": 54.3,
+      "pmic-thermal": 52.146
+    },
+    "thermal_c_after": {
+      "cpu-thermal": 54.8,
+      "pmic-thermal": 52.731
+    },
+    "events": 100,
+    "loaded_tracks": 3,
+    "scope": "three-track Songs selection movement; not a long overflowing-list qualification"
+  },
+  "wake_cycles": [
+    {
+      "cycle": 1,
+      "on_backlight": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "0",
+          "brightness": "32",
+          "actual_brightness": "32",
+          "max_brightness": "32"
+        }
+      },
+      "off_backlight": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "4",
+          "brightness": "32",
+          "actual_brightness": "0",
+          "max_brightness": "32"
+        }
+      },
+      "on_kms": {
+        "enable": "1",
+        "active": "1"
+      },
+      "off_kms": {
+        "enable": "0",
+        "active": "0"
+      },
+      "on_context_losses": 0.0,
+      "off_context_losses": 0.0
+    },
+    {
+      "cycle": 2,
+      "on_backlight": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "0",
+          "brightness": "32",
+          "actual_brightness": "32",
+          "max_brightness": "32"
+        }
+      },
+      "off_backlight": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "4",
+          "brightness": "32",
+          "actual_brightness": "0",
+          "max_brightness": "32"
+        }
+      },
+      "on_kms": {
+        "enable": "1",
+        "active": "1"
+      },
+      "off_kms": {
+        "enable": "0",
+        "active": "0"
+      },
+      "on_context_losses": 0.0,
+      "off_context_losses": 0.0
+    },
+    {
+      "cycle": 3,
+      "on_backlight": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "0",
+          "brightness": "32",
+          "actual_brightness": "32",
+          "max_brightness": "32"
+        }
+      },
+      "off_backlight": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "4",
+          "brightness": "32",
+          "actual_brightness": "0",
+          "max_brightness": "32"
+        }
+      },
+      "on_kms": {
+        "enable": "1",
+        "active": "1"
+      },
+      "off_kms": {
+        "enable": "0",
+        "active": "0"
+      },
+      "on_context_losses": 0.0,
+      "off_context_losses": 0.0
+    },
+    {
+      "cycle": 4,
+      "on_backlight": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "0",
+          "brightness": "32",
+          "actual_brightness": "32",
+          "max_brightness": "32"
+        }
+      },
+      "off_backlight": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "4",
+          "brightness": "32",
+          "actual_brightness": "0",
+          "max_brightness": "32"
+        }
+      },
+      "on_kms": {
+        "enable": "1",
+        "active": "1"
+      },
+      "off_kms": {
+        "enable": "0",
+        "active": "0"
+      },
+      "on_context_losses": 0.0,
+      "off_context_losses": 0.0
+    },
+    {
+      "cycle": 5,
+      "on_backlight": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "0",
+          "brightness": "32",
+          "actual_brightness": "32",
+          "max_brightness": "32"
+        }
+      },
+      "off_backlight": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "4",
+          "brightness": "32",
+          "actual_brightness": "0",
+          "max_brightness": "32"
+        }
+      },
+      "on_kms": {
+        "enable": "1",
+        "active": "1"
+      },
+      "off_kms": {
+        "enable": "0",
+        "active": "0"
+      },
+      "on_context_losses": 0.0,
+      "off_context_losses": 0.0
+    }
+  ],
+  "brightness": [
+    {
+      "percent": 10,
+      "backlight": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "0",
+          "brightness": "4",
+          "actual_brightness": "4",
+          "max_brightness": "32"
+        }
+      }
+    },
+    {
+      "percent": 50,
+      "backlight": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "0",
+          "brightness": "16",
+          "actual_brightness": "16",
+          "max_brightness": "32"
+        }
+      }
+    },
+    {
+      "percent": 100,
+      "backlight": {
+        "/sys/class/backlight/y2-backlight": {
+          "bl_power": "0",
+          "brightness": "32",
+          "actual_brightness": "32",
+          "max_brightness": "32"
+        }
+      }
+    }
+  ],
+  "postwake_graphics_selftest": {
+    "offscreen_readback": true,
+    "passed": true,
+    "renderer": "Mesa Project; EGL 1.4; Mali400; OpenGL ES 2.0 Mesa 24.0.9"
+  },
+  "arm_artwork": [
+    {
+      "phase": "arm_artwork",
+      "variant": "installed",
+      "cpu_freq_before": "1040000",
+      "cpu_freq_after": "1300000",
+      "result": {
+        "passed": true,
+        "rgba_bytes": 102400,
+        "cpu_median_ms": 491.569,
+        "rss_kib": 30044,
+        "repeats": 12,
+        "first_pixel": [
+          200,
+          40,
+          80,
+          255
+        ]
+      }
+    },
+    {
+      "phase": "arm_artwork",
+      "variant": "reduced_jpeg",
+      "cpu_freq_before": "1300000",
+      "cpu_freq_after": "1300000",
+      "result": {
+        "passed": true,
+        "rgba_bytes": 102400,
+        "cpu_median_ms": 75.555,
+        "rss_kib": 9296,
+        "repeats": 12,
+        "first_pixel": [
+          200,
+          40,
+          80,
+          255
+        ]
+      }
+    },
+    {
+      "phase": "arm_artwork_reverse",
+      "variant": "reduced_jpeg",
+      "cpu_freq_before": "1300000",
+      "cpu_freq_after": "1300000",
+      "result": {
+        "passed": true,
+        "rgba_bytes": 102400,
+        "cpu_median_ms": 75.332,
+        "rss_kib": 9320,
+        "repeats": 12,
+        "first_pixel": [
+          200,
+          40,
+          80,
+          255
+        ]
+      }
+    },
+    {
+      "phase": "arm_artwork_reverse",
+      "variant": "installed",
+      "cpu_freq_before": "1300000",
+      "cpu_freq_after": "1300000",
+      "result": {
+        "passed": true,
+        "rgba_bytes": 102400,
+        "cpu_median_ms": 492.637,
+        "rss_kib": 29920,
+        "repeats": 12,
+        "first_pixel": [
+          200,
+          40,
+          80,
+          255
+        ]
+      }
+    }
+  ],
+  "restoration": {
+    "errors": [],
+    "same_boot": true,
+    "build": "b71b468860233faa0a42b8448ec5777fa952b8e3",
+    "taint": "0",
+    "current_screen": "home",
+    "screen_off": true,
+    "playback": "paused",
+    "backlight": {
+      "/sys/class/backlight/y2-backlight": {
+        "bl_power": "4",
+        "brightness": "32",
+        "actual_brightness": "0",
+        "max_brightness": "32"
+      }
+    },
+    "scratch_removed": true,
+    "lock_released": true
+  },
+  "limitations": [
+    "no GPU-only render time or upload measurement",
+    "no optical white-flash observation, cold reboot or shutdown trial",
+    "no electrical watts, battery savings or long thermal endurance",
+    "no full system suspend; owned by another session",
+    "C2/C3 did not enter in observed attached-SSH condition; SPM dormant guard reports topology"
+  ],
+  "sha256": {
+    "device.jsonl": "2728d91c64db940e19ae31241faf4594ce0e36721425665390b5c05984077d90",
+    "device-extra.jsonl": "99a16265c816ae6cb6c3e83620c02a6dd448d3ddf79bc50794f5590c4d49748f",
+    "device-art-reverse.jsonl": "c76815cc78099027248b1e28c0cd811dfb637865937b0669ac6e7165e9ce30f9",
+    "device-restored.json": "07ae2a0d1d9d8564350d81cbb3ba9866cbe6b25109941958adea12e17baa33fe",
+    "fixture_4096.jpg": "ab9b6b853b4dadee4fdc85b2d74a76d366f85cd2ba3e0df264a725c1f35472d5",
+    "arm_art_helper": "5bc1e813456aae3652224aadcf2f6fa2af86729cef714c57013902faf1ab798a",
+    "changed_arm_media_so": "5d448d9a28c5ec41c6bbc7fc38207d684e6dde4c263bcc857555d7cc49953904"
+  },
+  "sdk_ffmpeg": "9.0.2",
+  "device_ffmpeg_runtime_version": "NOT_INDEPENDENTLY_CAPTURED",
+  "candidate_scope": {
+    "reborn_source": "a2df691edfbb105a164e2f5f574b158ec5f81e6c",
+    "graphics_pipeline": "stock b71b4688, not performance candidate batching/shaders",
+    "media_integration": "select one reduced-JPEG implementation; independent FFmpeg a22107c/43a695c overlaps; retain aggregate I/O and cancellation guards",
+    "combined_candidate_qualification": "NOT_RUN"
+  }
+}

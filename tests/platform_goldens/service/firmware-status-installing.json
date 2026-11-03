@@ -1,0 +1,16 @@
+{
+ "argv": [
+  "firmware",
+  "status"
+ ],
+ "calls": [],
+ "exit": 0,
+ "stdout": {
+  "state": "Installing"
+ },
+ "tree": {
+  "added": {},
+  "changed": {},
+  "removed": []
+ }
+}

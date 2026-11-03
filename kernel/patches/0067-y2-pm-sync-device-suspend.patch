@@ -1,0 +1,18 @@
+--- a/kernel/power/main.c
++++ b/kernel/power/main.c
+@@ -122,8 +122,13 @@
+ 	return blocking_notifier_call_chain(&pm_chain_head, val, NULL);
+ }
+ 
+-/* If set, devices may be suspended and resumed asynchronously. */
+-int pm_async_enabled = 1;
++/* If set, devices may be suspended and resumed asynchronously. Y2 default is
++ * off: the 6.18 async parent/child scheduling stalled the device phase with
++ * only dpm_wait_fn waiters and no blocked driver; the list is already ordered
++ * children-first, so synchronous suspend cannot wait on an unscheduled device.
++ * Writing 1 to /sys/power/pm_async still re-enables it for experiments.
++ */
++int pm_async_enabled;
+ 
+ static int __init pm_async_setup(char *str)
+ {

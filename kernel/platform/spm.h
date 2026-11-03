@@ -1,0 +1,32 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+#ifndef Y2_SPM_H
+#define Y2_SPM_H
+#include <linux/types.h>
+#include <linux/kconfig.h>
+#include <linux/errno.h>
+int y2_spm_dormant_idle(void);
+int y2_spm_cpu_disable(unsigned cpu);
+int y2_spm_cpu_kill(unsigned cpu);
+int y2_spm_cpu_boot(unsigned cpu, unsigned long entry);
+void y2_ccf_boot_state(unsigned *vector, unsigned *enable);
+int y2_ccf_boot_vector(unsigned long entry);
+int y2_spm_radio_power(unsigned domain, int on);
+int y2_spm_unstarted_md_off(void);
+int y2_ccf_md_unconfigured(void);
+int y2_spm_radio_status(unsigned domain);
+int y2_ccf_radio_protect(unsigned domain, bool protect);
+int y2_ccf_disp_protect(bool protect);
+struct generic_pm_domain;
+struct generic_pm_domain *y2_spm_dis_genpd(void);
+bool y2_spm_disp_access_begin(unsigned long *flags);
+void y2_spm_disp_access_end(unsigned long flags);
+int y2_ccf_radio_remap(unsigned domain);
+int y2_spm_mfg_status(void);
+#if IS_ENABLED(CONFIG_Y2_POWER)
+int y2_spm_disp_status(void);
+int y2_spm_isp_status(void);
+#else
+static inline int y2_spm_disp_status(void) { return -EOPNOTSUPP; }
+static inline int y2_spm_isp_status(void) { return -EOPNOTSUPP; }
+#endif
+#endif

@@ -1,0 +1,17 @@
+#!/bin/sh
+# Only the Wi-Fi DHCP lease changes here; USB has its own fixed-address service.
+[ "$1" = wlan0 ] || exit 1
+umask 077
+case "$2" in
+ CONNECTED)
+    start-stop-daemon -K -p /run/y2/wifi-dhcp.pid 2>/dev/null || :
+    /usr/sbin/y2-platform wifi-event CONNECTED || exit 1
+    export Y2_DHCP_GENERATION=$(cat /run/y2/wifi-epoch)
+    udhcpc -b -R -i wlan0 -p /run/y2/wifi-dhcp.pid -s /usr/libexec/y2/dhcp-event -t 3 -T 3 -A 10 >/run/y2/wifi-dhcp.log 2>&1
+    ;;
+ DISCONNECTED)
+    start-stop-daemon -K -p /run/y2/wifi-dhcp.pid 2>/dev/null || :
+    rm -f /run/y2/wifi-dhcp.pid
+    /usr/sbin/y2-platform wifi-event DISCONNECTED
+    ;;
+esac

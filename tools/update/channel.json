@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "name": "stable",
+  "manifest_url": "https://github.com/SchulzCode/Y2Linux/releases/latest/download/manifest.json",
+  "allowed_redirect_hosts": [
+    "github.com",
+    "objects.githubusercontent.com",
+    "release-assets.githubusercontent.com"
+  ]
+}

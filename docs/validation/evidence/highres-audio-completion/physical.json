@@ -1,0 +1,890 @@
+{
+  "schema": "org.y2linux.highres-completion/v1",
+  "decision": "PRECISION_LIMIT_NOT_PROVEN",
+  "installed_versions": {
+    "release_version": "1.0.0-platform-v1-baseline-candidate.1",
+    "rootfs_version": "2025.02.18-platform-v1.24",
+    "build_id": "Y2LINUX-PLATFORM-V1-BASELINE-01",
+    "platform_api_version": 1,
+    "feature_contract_version": 2,
+    "battery_profile_schema": 1,
+    "low_battery_policy_schema": 2,
+    "layout_version": 1,
+    "kernel_version": "6.18.0-y2linux-platform-v1-baseline-01",
+    "data_schema_version": 1,
+    "reborn_version": "0.2.0",
+    "build_git_commit": "98daf3f0220f4a1580bb4893094ee9f0e02362a5",
+    "reborn_source_commit": "9cd12baeeb70b204e08299bd4c91c8c35604c304"
+  },
+  "boot_before": "9d4d0245-f1f0-45ef-abc9-f43234ae30de",
+  "taint_before": 512,
+  "taint_with_read_only_module": 4608,
+  "boot_after": "3bbea37e-e6ae-41e0-bcca-c81bb836fe64",
+  "taint_after": 512,
+  "diagnostic_modules_removed": true,
+  "cleanup": "Normal reboot required because installed CONFIG_MODULE_UNLOAD=n; original image identity retained; temporary process/library/music removed; -60 dB/headphone off restored",
+  "physical_serial_capture": false,
+  "analog_low_bit_measurement": false,
+  "capture_endpoint_present": false,
+  "cards": " 0 [Y2Audio        ]: Y2Audio - Y2Audio\n                      Y2Audio\n",
+  "pcm": "00-00: Y2 Headphone Playback (*) :  : playback 1\n",
+  "direct_constraints": {
+    "schema": "org.y2linux.audio-query/v1",
+    "state": "Observed",
+    "device": "hw:Y2Audio,0",
+    "physical_qualification": false,
+    "pcm_started": false,
+    "constraint_bits_are_hardware_precision": false,
+    "combinations": [
+      {
+        "format": "S16_LE",
+        "physical_bits": 16,
+        "valid_bits": 16,
+        "rate_hz": 44100,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": true
+      },
+      {
+        "format": "S16_LE",
+        "physical_bits": 16,
+        "valid_bits": 16,
+        "rate_hz": 48000,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": true
+      },
+      {
+        "format": "S16_LE",
+        "physical_bits": 16,
+        "valid_bits": 16,
+        "rate_hz": 88200,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": false
+      },
+      {
+        "format": "S16_LE",
+        "physical_bits": 16,
+        "valid_bits": 16,
+        "rate_hz": 96000,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": false
+      },
+      {
+        "format": "S24_LE",
+        "physical_bits": 32,
+        "valid_bits": 24,
+        "rate_hz": 44100,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": false
+      },
+      {
+        "format": "S24_LE",
+        "physical_bits": 32,
+        "valid_bits": 24,
+        "rate_hz": 48000,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": false
+      },
+      {
+        "format": "S24_LE",
+        "physical_bits": 32,
+        "valid_bits": 24,
+        "rate_hz": 88200,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": false
+      },
+      {
+        "format": "S24_LE",
+        "physical_bits": 32,
+        "valid_bits": 24,
+        "rate_hz": 96000,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": false
+      },
+      {
+        "format": "S32_LE",
+        "physical_bits": 32,
+        "valid_bits": 32,
+        "rate_hz": 44100,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": false
+      },
+      {
+        "format": "S32_LE",
+        "physical_bits": 32,
+        "valid_bits": 32,
+        "rate_hz": 48000,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": false
+      },
+      {
+        "format": "S32_LE",
+        "physical_bits": 32,
+        "valid_bits": 32,
+        "rate_hz": 88200,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": false
+      },
+      {
+        "format": "S32_LE",
+        "physical_bits": 32,
+        "valid_bits": 32,
+        "rate_hz": 96000,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": false
+      },
+      {
+        "format": "S24_3LE",
+        "physical_bits": 24,
+        "valid_bits": 24,
+        "rate_hz": 44100,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": false
+      },
+      {
+        "format": "S24_3LE",
+        "physical_bits": 24,
+        "valid_bits": 24,
+        "rate_hz": 48000,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": false
+      },
+      {
+        "format": "S24_3LE",
+        "physical_bits": 24,
+        "valid_bits": 24,
+        "rate_hz": 88200,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": false
+      },
+      {
+        "format": "S24_3LE",
+        "physical_bits": 24,
+        "valid_bits": 24,
+        "rate_hz": 96000,
+        "meaningful_bits": null,
+        "channels": 2,
+        "accepted_constraints": false
+      }
+    ]
+  },
+  "aplay_tests": [
+    {
+      "command": "aplay --dump-hw-params -D hw:Y2Audio,0 /tmp/y2-highres-completion.f5f1kp/lowbits-16-44100.wav > /tmp/y2-highres-completion.f5f1kp/aplay.log 2>&1 & p=$!; sleep 1; cat /proc/asound/card0/pcm0p/sub0/hw_params; cat /sys/kernel/debug/y2_audio_observer/highres; wait \"$p\"; r=$?; cat /tmp/y2-highres-completion.f5f1kp/aplay.log; exit \"$r\"",
+      "exit": 0,
+      "stdout": "access: RW_INTERLEAVED\nformat: S16_LE\nsubformat: STD\nchannels: 2\nrate: 44100 (44100/1)\nperiod_size: 5512\nbuffer_size: 22048\nobserver_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=44100 channels=2 sample_bits=16 frame_bits=32 period_frames=5512 buffer_frames=22048 dma_bytes=88192 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff1500\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x00000009\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x87ba0000\nAFE_DL1_CUR=0x87bb5090\nAFE_DL1_END=0x87bb587f\nAFE_I2S_CON3=0x0000090b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000001\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\nPlaying WAVE '/tmp/y2-highres-completion.f5f1kp/lowbits-16-44100.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Stereo\nHW Params of device \"hw:Y2Audio,0\":\n--------------------\nACCESS: MMAP_INTERLEAVED RW_INTERLEAVED\nFORMAT: S16_LE\nSUBFORMAT: STD MSBITS_MAX\nSAMPLE_BITS: 16\nFRAME_BITS: 32\nCHANNELS: 2\nRATE: [44100 48000]\nPERIOD_TIME: (2666 743039)\nPERIOD_SIZE: [128 32768]\nPERIOD_BYTES: [512 131072]\nPERIODS: [2 256]\nBUFFER_TIME: (5333 1486078)\nBUFFER_SIZE: [256 65536]\nBUFFER_BYTES: [1024 262144]\nTICK_TIME: ALL\n--------------------\nHW Params of device \"hw:Y2Audio,0\":\n--------------------\nACCESS: RW_INTERLEAVED\nFORMAT: S16_LE\nSUBFORMAT: STD\nSAMPLE_BITS: 16\nFRAME_BITS: 32\nCHANNELS: 2\nRATE: 44100\nPERIOD_TIME: (124988 124989)\nPERIOD_SIZE: 5512\nPERIOD_BYTES: 22048\nPERIODS: 4\nBUFFER_TIME: (499954 499955)\nBUFFER_SIZE: 22048\nBUFFER_BYTES: 88192\nTICK_TIME: 0\n--------------------\n",
+      "stderr": "",
+      "device": "hw:Y2Audio,0",
+      "bits": 16,
+      "rate": 44100
+    },
+    {
+      "command": "aplay --dump-hw-params -D hw:Y2Audio,0 /tmp/y2-highres-completion.f5f1kp/lowbits-16-48000.wav > /tmp/y2-highres-completion.f5f1kp/aplay.log 2>&1 & p=$!; sleep 1; cat /proc/asound/card0/pcm0p/sub0/hw_params; cat /sys/kernel/debug/y2_audio_observer/highres; wait \"$p\"; r=$?; cat /tmp/y2-highres-completion.f5f1kp/aplay.log; exit \"$r\"",
+      "exit": 0,
+      "stdout": "access: RW_INTERLEAVED\nformat: S16_LE\nsubformat: STD\nchannels: 2\nrate: 48000 (48000/1)\nperiod_size: 6000\nbuffer_size: 24000\nobserver_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=48000 channels=2 sample_bits=16 frame_bits=32 period_frames=6000 buffer_frames=24000 dma_bytes=96000 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff1500\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x0000000a\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x87340000\nAFE_DL1_CUR=0x87356a40\nAFE_DL1_END=0x873576ff\nAFE_I2S_CON3=0x00000a0b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000002\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\nPlaying WAVE '/tmp/y2-highres-completion.f5f1kp/lowbits-16-48000.wav' : Signed 16 bit Little Endian, Rate 48000 Hz, Stereo\nHW Params of device \"hw:Y2Audio,0\":\n--------------------\nACCESS: MMAP_INTERLEAVED RW_INTERLEAVED\nFORMAT: S16_LE\nSUBFORMAT: STD MSBITS_MAX\nSAMPLE_BITS: 16\nFRAME_BITS: 32\nCHANNELS: 2\nRATE: [44100 48000]\nPERIOD_TIME: (2666 743039)\nPERIOD_SIZE: [128 32768]\nPERIOD_BYTES: [512 131072]\nPERIODS: [2 256]\nBUFFER_TIME: (5333 1486078)\nBUFFER_SIZE: [256 65536]\nBUFFER_BYTES: [1024 262144]\nTICK_TIME: ALL\n--------------------\nHW Params of device \"hw:Y2Audio,0\":\n--------------------\nACCESS: RW_INTERLEAVED\nFORMAT: S16_LE\nSUBFORMAT: STD\nSAMPLE_BITS: 16\nFRAME_BITS: 32\nCHANNELS: 2\nRATE: 48000\nPERIOD_TIME: 125000\nPERIOD_SIZE: 6000\nPERIOD_BYTES: 24000\nPERIODS: 4\nBUFFER_TIME: 500000\nBUFFER_SIZE: 24000\nBUFFER_BYTES: 96000\nTICK_TIME: 0\n--------------------\n",
+      "stderr": "",
+      "device": "hw:Y2Audio,0",
+      "bits": 16,
+      "rate": 48000
+    },
+    {
+      "command": "aplay --dump-hw-params -D hw:Y2Audio,0 /tmp/y2-highres-completion.f5f1kp/lowbits-24-44100.wav > /tmp/y2-highres-completion.f5f1kp/aplay.log 2>&1 & p=$!; sleep 1; cat /proc/asound/card0/pcm0p/sub0/hw_params; cat /sys/kernel/debug/y2_audio_observer/highres; wait \"$p\"; r=$?; cat /tmp/y2-highres-completion.f5f1kp/aplay.log; exit \"$r\"",
+      "exit": 1,
+      "stdout": "closed\nobserver_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=closed state=0 format=NONE rate=0 channels=0 sample_bits=0 frame_bits=0 period_frames=0 buffer_frames=0 dma_bytes=0 snapshot_offset=0 snapshot_bytes=0\nregisters=SKIPPED_PCM_NOT_RUNNING\nPlaying WAVE '/tmp/y2-highres-completion.f5f1kp/lowbits-24-44100.wav' : Signed 24 bit Little Endian in 3bytes, Rate 44100 Hz, Stereo\nHW Params of device \"hw:Y2Audio,0\":\n--------------------\nACCESS: MMAP_INTERLEAVED RW_INTERLEAVED\nFORMAT: S16_LE\nSUBFORMAT: STD MSBITS_MAX\nSAMPLE_BITS: 16\nFRAME_BITS: 32\nCHANNELS: 2\nRATE: [44100 48000]\nPERIOD_TIME: (2666 743039)\nPERIOD_SIZE: [128 32768]\nPERIOD_BYTES: [512 131072]\nPERIODS: [2 256]\nBUFFER_TIME: (5333 1486078)\nBUFFER_SIZE: [256 65536]\nBUFFER_BYTES: [1024 262144]\nTICK_TIME: ALL\n--------------------\naplay: set_params:1393: Sample format non available\nAvailable formats:\n- S16_LE\n",
+      "stderr": "",
+      "device": "hw:Y2Audio,0",
+      "bits": 24,
+      "rate": 44100
+    },
+    {
+      "command": "aplay --dump-hw-params -D hw:Y2Audio,0 /tmp/y2-highres-completion.f5f1kp/lowbits-24-48000.wav > /tmp/y2-highres-completion.f5f1kp/aplay.log 2>&1 & p=$!; sleep 1; cat /proc/asound/card0/pcm0p/sub0/hw_params; cat /sys/kernel/debug/y2_audio_observer/highres; wait \"$p\"; r=$?; cat /tmp/y2-highres-completion.f5f1kp/aplay.log; exit \"$r\"",
+      "exit": 1,
+      "stdout": "closed\nobserver_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=closed state=0 format=NONE rate=0 channels=0 sample_bits=0 frame_bits=0 period_frames=0 buffer_frames=0 dma_bytes=0 snapshot_offset=0 snapshot_bytes=0\nregisters=SKIPPED_PCM_NOT_RUNNING\nPlaying WAVE '/tmp/y2-highres-completion.f5f1kp/lowbits-24-48000.wav' : Signed 24 bit Little Endian in 3bytes, Rate 48000 Hz, Stereo\nHW Params of device \"hw:Y2Audio,0\":\n--------------------\nACCESS: MMAP_INTERLEAVED RW_INTERLEAVED\nFORMAT: S16_LE\nSUBFORMAT: STD MSBITS_MAX\nSAMPLE_BITS: 16\nFRAME_BITS: 32\nCHANNELS: 2\nRATE: [44100 48000]\nPERIOD_TIME: (2666 743039)\nPERIOD_SIZE: [128 32768]\nPERIOD_BYTES: [512 131072]\nPERIODS: [2 256]\nBUFFER_TIME: (5333 1486078)\nBUFFER_SIZE: [256 65536]\nBUFFER_BYTES: [1024 262144]\nTICK_TIME: ALL\n--------------------\naplay: set_params:1393: Sample format non available\nAvailable formats:\n- S16_LE\n",
+      "stderr": "",
+      "device": "hw:Y2Audio,0",
+      "bits": 24,
+      "rate": 48000
+    },
+    {
+      "command": "aplay --dump-hw-params -D hw:Y2Audio,0 /tmp/y2-highres-completion.f5f1kp/lowbits-32-44100.wav > /tmp/y2-highres-completion.f5f1kp/aplay.log 2>&1 & p=$!; sleep 1; cat /proc/asound/card0/pcm0p/sub0/hw_params; cat /sys/kernel/debug/y2_audio_observer/highres; wait \"$p\"; r=$?; cat /tmp/y2-highres-completion.f5f1kp/aplay.log; exit \"$r\"",
+      "exit": 1,
+      "stdout": "closed\nobserver_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=closed state=0 format=NONE rate=0 channels=0 sample_bits=0 frame_bits=0 period_frames=0 buffer_frames=0 dma_bytes=0 snapshot_offset=0 snapshot_bytes=0\nregisters=SKIPPED_PCM_NOT_RUNNING\nPlaying WAVE '/tmp/y2-highres-completion.f5f1kp/lowbits-32-44100.wav' : Signed 32 bit Little Endian, Rate 44100 Hz, Stereo\nHW Params of device \"hw:Y2Audio,0\":\n--------------------\nACCESS: MMAP_INTERLEAVED RW_INTERLEAVED\nFORMAT: S16_LE\nSUBFORMAT: STD MSBITS_MAX\nSAMPLE_BITS: 16\nFRAME_BITS: 32\nCHANNELS: 2\nRATE: [44100 48000]\nPERIOD_TIME: (2666 743039)\nPERIOD_SIZE: [128 32768]\nPERIOD_BYTES: [512 131072]\nPERIODS: [2 256]\nBUFFER_TIME: (5333 1486078)\nBUFFER_SIZE: [256 65536]\nBUFFER_BYTES: [1024 262144]\nTICK_TIME: ALL\n--------------------\naplay: set_params:1393: Sample format non available\nAvailable formats:\n- S16_LE\n",
+      "stderr": "",
+      "device": "hw:Y2Audio,0",
+      "bits": 32,
+      "rate": 44100
+    },
+    {
+      "command": "aplay --dump-hw-params -D hw:Y2Audio,0 /tmp/y2-highres-completion.f5f1kp/lowbits-32-48000.wav > /tmp/y2-highres-completion.f5f1kp/aplay.log 2>&1 & p=$!; sleep 1; cat /proc/asound/card0/pcm0p/sub0/hw_params; cat /sys/kernel/debug/y2_audio_observer/highres; wait \"$p\"; r=$?; cat /tmp/y2-highres-completion.f5f1kp/aplay.log; exit \"$r\"",
+      "exit": 1,
+      "stdout": "closed\nobserver_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=closed state=0 format=NONE rate=0 channels=0 sample_bits=0 frame_bits=0 period_frames=0 buffer_frames=0 dma_bytes=0 snapshot_offset=0 snapshot_bytes=0\nregisters=SKIPPED_PCM_NOT_RUNNING\nPlaying WAVE '/tmp/y2-highres-completion.f5f1kp/lowbits-32-48000.wav' : Signed 32 bit Little Endian, Rate 48000 Hz, Stereo\nHW Params of device \"hw:Y2Audio,0\":\n--------------------\nACCESS: MMAP_INTERLEAVED RW_INTERLEAVED\nFORMAT: S16_LE\nSUBFORMAT: STD MSBITS_MAX\nSAMPLE_BITS: 16\nFRAME_BITS: 32\nCHANNELS: 2\nRATE: [44100 48000]\nPERIOD_TIME: (2666 743039)\nPERIOD_SIZE: [128 32768]\nPERIOD_BYTES: [512 131072]\nPERIODS: [2 256]\nBUFFER_TIME: (5333 1486078)\nBUFFER_SIZE: [256 65536]\nBUFFER_BYTES: [1024 262144]\nTICK_TIME: ALL\n--------------------\naplay: set_params:1393: Sample format non available\nAvailable formats:\n- S16_LE\n",
+      "stderr": "",
+      "device": "hw:Y2Audio,0",
+      "bits": 32,
+      "rate": 48000
+    },
+    {
+      "command": "aplay --dump-hw-params -D plughw:Y2Audio,0 /tmp/y2-highres-completion.f5f1kp/lowbits-16-44100.wav > /tmp/y2-highres-completion.f5f1kp/aplay.log 2>&1 & p=$!; sleep 1; cat /proc/asound/card0/pcm0p/sub0/hw_params; cat /sys/kernel/debug/y2_audio_observer/highres; wait \"$p\"; r=$?; cat /tmp/y2-highres-completion.f5f1kp/aplay.log; exit \"$r\"",
+      "exit": 0,
+      "stdout": "access: RW_INTERLEAVED\nformat: S16_LE\nsubformat: STD\nchannels: 2\nrate: 44100 (44100/1)\nperiod_size: 5512\nbuffer_size: 22048\nobserver_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=44100 channels=2 sample_bits=16 frame_bits=32 period_frames=5512 buffer_frames=22048 dma_bytes=88192 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff1500\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x00000009\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x87480000\nAFE_DL1_CUR=0x87494c10\nAFE_DL1_END=0x8749587f\nAFE_I2S_CON3=0x0000090b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000001\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\nPlaying WAVE '/tmp/y2-highres-completion.f5f1kp/lowbits-16-44100.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Stereo\nHW Params of device \"plughw:Y2Audio,0\":\n--------------------\nACCESS: MMAP_INTERLEAVED MMAP_NONINTERLEAVED MMAP_COMPLEX RW_INTERLEAVED RW_NONINTERLEAVED\nFORMAT: S8 U8 S16_LE S16_BE U16_LE U16_BE S24_LE S24_BE U24_LE U24_BE S32_LE S32_BE U32_LE U32_BE FLOAT_LE FLOAT_BE FLOAT64_LE FLOAT64_BE MU_LAW A_LAW IMA_ADPCM S20_LE S20_BE U20_LE U20_BE S24_3LE S24_3BE U24_3LE U24_3BE S20_3LE S20_3BE U20_3LE U20_3BE S18_3LE S18_3BE U18_3LE U18_3BE\nSUBFORMAT: STD MSBITS_MAX MSBITS_20 MSBITS_24\nSAMPLE_BITS: [4 64]\nFRAME_BITS: [4 640000]\nCHANNELS: [1 10000]\nRATE: [4000 4294967295)\nPERIOD_TIME: (2666 743039)\nPERIOD_SIZE: (10 3191328204)\nPERIOD_BYTES: (5 4294967295)\nPERIODS: (0 429496730)\nBUFFER_TIME: [1 4294967295]\nBUFFER_SIZE: [21 4294967294]\nBUFFER_BYTES: [11 4294967295]\nTICK_TIME: ALL\n--------------------\nHW Params of device \"plughw:Y2Audio,0\":\n--------------------\nACCESS: RW_INTERLEAVED\nFORMAT: S16_LE\nSUBFORMAT: STD\nSAMPLE_BITS: 16\nFRAME_BITS: 32\nCHANNELS: 2\nRATE: 44100\nPERIOD_TIME: (124988 124989)\nPERIOD_SIZE: 5512\nPERIOD_BYTES: 22048\nPERIODS: 4\nBUFFER_TIME: (499954 499955)\nBUFFER_SIZE: 22048\nBUFFER_BYTES: 88192\nTICK_TIME: 0\n--------------------\n",
+      "stderr": "",
+      "device": "plughw:Y2Audio,0",
+      "bits": 16,
+      "rate": 44100
+    },
+    {
+      "command": "aplay --dump-hw-params -D plughw:Y2Audio,0 /tmp/y2-highres-completion.f5f1kp/lowbits-16-48000.wav > /tmp/y2-highres-completion.f5f1kp/aplay.log 2>&1 & p=$!; sleep 1; cat /proc/asound/card0/pcm0p/sub0/hw_params; cat /sys/kernel/debug/y2_audio_observer/highres; wait \"$p\"; r=$?; cat /tmp/y2-highres-completion.f5f1kp/aplay.log; exit \"$r\"",
+      "exit": 0,
+      "stdout": "access: RW_INTERLEAVED\nformat: S16_LE\nsubformat: STD\nchannels: 2\nrate: 48000 (48000/1)\nperiod_size: 6000\nbuffer_size: 24000\nobserver_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=48000 channels=2 sample_bits=16 frame_bits=32 period_frames=6000 buffer_frames=24000 dma_bytes=96000 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff1500\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x0000000a\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x874a0000\nAFE_DL1_CUR=0x874b6a00\nAFE_DL1_END=0x874b76ff\nAFE_I2S_CON3=0x00000a0b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000002\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\nPlaying WAVE '/tmp/y2-highres-completion.f5f1kp/lowbits-16-48000.wav' : Signed 16 bit Little Endian, Rate 48000 Hz, Stereo\nHW Params of device \"plughw:Y2Audio,0\":\n--------------------\nACCESS: MMAP_INTERLEAVED MMAP_NONINTERLEAVED MMAP_COMPLEX RW_INTERLEAVED RW_NONINTERLEAVED\nFORMAT: S8 U8 S16_LE S16_BE U16_LE U16_BE S24_LE S24_BE U24_LE U24_BE S32_LE S32_BE U32_LE U32_BE FLOAT_LE FLOAT_BE FLOAT64_LE FLOAT64_BE MU_LAW A_LAW IMA_ADPCM S20_LE S20_BE U20_LE U20_BE S24_3LE S24_3BE U24_3LE U24_3BE S20_3LE S20_3BE U20_3LE U20_3BE S18_3LE S18_3BE U18_3LE U18_3BE\nSUBFORMAT: STD MSBITS_MAX MSBITS_20 MSBITS_24\nSAMPLE_BITS: [4 64]\nFRAME_BITS: [4 640000]\nCHANNELS: [1 10000]\nRATE: [4000 4294967295)\nPERIOD_TIME: (2666 743039)\nPERIOD_SIZE: (10 3191328204)\nPERIOD_BYTES: (5 4294967295)\nPERIODS: (0 429496730)\nBUFFER_TIME: [1 4294967295]\nBUFFER_SIZE: [21 4294967294]\nBUFFER_BYTES: [11 4294967295]\nTICK_TIME: ALL\n--------------------\nHW Params of device \"plughw:Y2Audio,0\":\n--------------------\nACCESS: RW_INTERLEAVED\nFORMAT: S16_LE\nSUBFORMAT: STD\nSAMPLE_BITS: 16\nFRAME_BITS: 32\nCHANNELS: 2\nRATE: 48000\nPERIOD_TIME: 125000\nPERIOD_SIZE: 6000\nPERIOD_BYTES: 24000\nPERIODS: 4\nBUFFER_TIME: 500000\nBUFFER_SIZE: 24000\nBUFFER_BYTES: 96000\nTICK_TIME: 0\n--------------------\n",
+      "stderr": "",
+      "device": "plughw:Y2Audio,0",
+      "bits": 16,
+      "rate": 48000
+    },
+    {
+      "command": "aplay --dump-hw-params -D plughw:Y2Audio,0 /tmp/y2-highres-completion.f5f1kp/lowbits-24-44100.wav > /tmp/y2-highres-completion.f5f1kp/aplay.log 2>&1 & p=$!; sleep 1; cat /proc/asound/card0/pcm0p/sub0/hw_params; cat /sys/kernel/debug/y2_audio_observer/highres; wait \"$p\"; r=$?; cat /tmp/y2-highres-completion.f5f1kp/aplay.log; exit \"$r\"",
+      "exit": 0,
+      "stdout": "access: MMAP_INTERLEAVED\nformat: S16_LE\nsubformat: STD\nchannels: 2\nrate: 44100 (44100/1)\nperiod_size: 5512\nbuffer_size: 22048\nobserver_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=44100 channels=2 sample_bits=16 frame_bits=32 period_frames=5512 buffer_frames=22048 dma_bytes=88192 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff1200\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x00000009\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x87300000\nAFE_DL1_CUR=0x87314e70\nAFE_DL1_END=0x8731587f\nAFE_I2S_CON3=0x0000090b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000001\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\nPlaying WAVE '/tmp/y2-highres-completion.f5f1kp/lowbits-24-44100.wav' : Signed 24 bit Little Endian in 3bytes, Rate 44100 Hz, Stereo\nHW Params of device \"plughw:Y2Audio,0\":\n--------------------\nACCESS: MMAP_INTERLEAVED MMAP_NONINTERLEAVED MMAP_COMPLEX RW_INTERLEAVED RW_NONINTERLEAVED\nFORMAT: S8 U8 S16_LE S16_BE U16_LE U16_BE S24_LE S24_BE U24_LE U24_BE S32_LE S32_BE U32_LE U32_BE FLOAT_LE FLOAT_BE FLOAT64_LE FLOAT64_BE MU_LAW A_LAW IMA_ADPCM S20_LE S20_BE U20_LE U20_BE S24_3LE S24_3BE U24_3LE U24_3BE S20_3LE S20_3BE U20_3LE U20_3BE S18_3LE S18_3BE U18_3LE U18_3BE\nSUBFORMAT: STD MSBITS_MAX MSBITS_20 MSBITS_24\nSAMPLE_BITS: [4 64]\nFRAME_BITS: [4 640000]\nCHANNELS: [1 10000]\nRATE: [4000 4294967295)\nPERIOD_TIME: (2666 743039)\nPERIOD_SIZE: (10 3191328204)\nPERIOD_BYTES: (5 4294967295)\nPERIODS: (0 429496730)\nBUFFER_TIME: [1 4294967295]\nBUFFER_SIZE: [21 4294967294]\nBUFFER_BYTES: [11 4294967295]\nTICK_TIME: ALL\n--------------------\nHW Params of device \"plughw:Y2Audio,0\":\n--------------------\nACCESS: RW_INTERLEAVED\nFORMAT: S24_3LE\nSUBFORMAT: STD\nSAMPLE_BITS: 24\nFRAME_BITS: 48\nCHANNELS: 2\nRATE: 44100\nPERIOD_TIME: (124988 124989)\nPERIOD_SIZE: 5512\nPERIOD_BYTES: 33072\nPERIODS: 4\nBUFFER_TIME: (499954 499955)\nBUFFER_SIZE: 22048\nBUFFER_BYTES: 132288\nTICK_TIME: 0\n--------------------\n",
+      "stderr": "",
+      "device": "plughw:Y2Audio,0",
+      "bits": 24,
+      "rate": 44100
+    },
+    {
+      "command": "aplay --dump-hw-params -D plughw:Y2Audio,0 /tmp/y2-highres-completion.f5f1kp/lowbits-24-48000.wav > /tmp/y2-highres-completion.f5f1kp/aplay.log 2>&1 & p=$!; sleep 1; cat /proc/asound/card0/pcm0p/sub0/hw_params; cat /sys/kernel/debug/y2_audio_observer/highres; wait \"$p\"; r=$?; cat /tmp/y2-highres-completion.f5f1kp/aplay.log; exit \"$r\"",
+      "exit": 0,
+      "stdout": "access: MMAP_INTERLEAVED\nformat: S16_LE\nsubformat: STD\nchannels: 2\nrate: 48000 (48000/1)\nperiod_size: 6000\nbuffer_size: 24000\nobserver_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=48000 channels=2 sample_bits=16 frame_bits=32 period_frames=6000 buffer_frames=24000 dma_bytes=96000 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff1200\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x0000000a\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x87320000\nAFE_DL1_CUR=0x87336810\nAFE_DL1_END=0x873376ff\nAFE_I2S_CON3=0x00000a0b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000002\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\nPlaying WAVE '/tmp/y2-highres-completion.f5f1kp/lowbits-24-48000.wav' : Signed 24 bit Little Endian in 3bytes, Rate 48000 Hz, Stereo\nHW Params of device \"plughw:Y2Audio,0\":\n--------------------\nACCESS: MMAP_INTERLEAVED MMAP_NONINTERLEAVED MMAP_COMPLEX RW_INTERLEAVED RW_NONINTERLEAVED\nFORMAT: S8 U8 S16_LE S16_BE U16_LE U16_BE S24_LE S24_BE U24_LE U24_BE S32_LE S32_BE U32_LE U32_BE FLOAT_LE FLOAT_BE FLOAT64_LE FLOAT64_BE MU_LAW A_LAW IMA_ADPCM S20_LE S20_BE U20_LE U20_BE S24_3LE S24_3BE U24_3LE U24_3BE S20_3LE S20_3BE U20_3LE U20_3BE S18_3LE S18_3BE U18_3LE U18_3BE\nSUBFORMAT: STD MSBITS_MAX MSBITS_20 MSBITS_24\nSAMPLE_BITS: [4 64]\nFRAME_BITS: [4 640000]\nCHANNELS: [1 10000]\nRATE: [4000 4294967295)\nPERIOD_TIME: (2666 743039)\nPERIOD_SIZE: (10 3191328204)\nPERIOD_BYTES: (5 4294967295)\nPERIODS: (0 429496730)\nBUFFER_TIME: [1 4294967295]\nBUFFER_SIZE: [21 4294967294]\nBUFFER_BYTES: [11 4294967295]\nTICK_TIME: ALL\n--------------------\nHW Params of device \"plughw:Y2Audio,0\":\n--------------------\nACCESS: RW_INTERLEAVED\nFORMAT: S24_3LE\nSUBFORMAT: STD\nSAMPLE_BITS: 24\nFRAME_BITS: 48\nCHANNELS: 2\nRATE: 48000\nPERIOD_TIME: 125000\nPERIOD_SIZE: 6000\nPERIOD_BYTES: 36000\nPERIODS: 4\nBUFFER_TIME: 500000\nBUFFER_SIZE: 24000\nBUFFER_BYTES: 144000\nTICK_TIME: 0\n--------------------\n",
+      "stderr": "",
+      "device": "plughw:Y2Audio,0",
+      "bits": 24,
+      "rate": 48000
+    },
+    {
+      "command": "aplay --dump-hw-params -D plughw:Y2Audio,0 /tmp/y2-highres-completion.f5f1kp/lowbits-32-44100.wav > /tmp/y2-highres-completion.f5f1kp/aplay.log 2>&1 & p=$!; sleep 1; cat /proc/asound/card0/pcm0p/sub0/hw_params; cat /sys/kernel/debug/y2_audio_observer/highres; wait \"$p\"; r=$?; cat /tmp/y2-highres-completion.f5f1kp/aplay.log; exit \"$r\"",
+      "exit": 0,
+      "stdout": "access: MMAP_INTERLEAVED\nformat: S16_LE\nsubformat: STD\nchannels: 2\nrate: 44100 (44100/1)\nperiod_size: 5512\nbuffer_size: 22048\nobserver_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=44100 channels=2 sample_bits=16 frame_bits=32 period_frames=5512 buffer_frames=22048 dma_bytes=88192 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff1200\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x00000009\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x872c0000\nAFE_DL1_CUR=0x872d4e10\nAFE_DL1_END=0x872d587f\nAFE_I2S_CON3=0x0000090b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000001\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\nPlaying WAVE '/tmp/y2-highres-completion.f5f1kp/lowbits-32-44100.wav' : Signed 32 bit Little Endian, Rate 44100 Hz, Stereo\nHW Params of device \"plughw:Y2Audio,0\":\n--------------------\nACCESS: MMAP_INTERLEAVED MMAP_NONINTERLEAVED MMAP_COMPLEX RW_INTERLEAVED RW_NONINTERLEAVED\nFORMAT: S8 U8 S16_LE S16_BE U16_LE U16_BE S24_LE S24_BE U24_LE U24_BE S32_LE S32_BE U32_LE U32_BE FLOAT_LE FLOAT_BE FLOAT64_LE FLOAT64_BE MU_LAW A_LAW IMA_ADPCM S20_LE S20_BE U20_LE U20_BE S24_3LE S24_3BE U24_3LE U24_3BE S20_3LE S20_3BE U20_3LE U20_3BE S18_3LE S18_3BE U18_3LE U18_3BE\nSUBFORMAT: STD MSBITS_MAX MSBITS_20 MSBITS_24\nSAMPLE_BITS: [4 64]\nFRAME_BITS: [4 640000]\nCHANNELS: [1 10000]\nRATE: [4000 4294967295)\nPERIOD_TIME: (2666 743039)\nPERIOD_SIZE: (10 3191328204)\nPERIOD_BYTES: (5 4294967295)\nPERIODS: (0 429496730)\nBUFFER_TIME: [1 4294967295]\nBUFFER_SIZE: [21 4294967294]\nBUFFER_BYTES: [11 4294967295]\nTICK_TIME: ALL\n--------------------\nHW Params of device \"plughw:Y2Audio,0\":\n--------------------\nACCESS: RW_INTERLEAVED\nFORMAT: S32_LE\nSUBFORMAT: STD\nSAMPLE_BITS: 32\nFRAME_BITS: 64\nCHANNELS: 2\nRATE: 44100\nPERIOD_TIME: (124988 124989)\nPERIOD_SIZE: 5512\nPERIOD_BYTES: 44096\nPERIODS: 4\nBUFFER_TIME: (499954 499955)\nBUFFER_SIZE: 22048\nBUFFER_BYTES: 176384\nTICK_TIME: 0\n--------------------\n",
+      "stderr": "",
+      "device": "plughw:Y2Audio,0",
+      "bits": 32,
+      "rate": 44100
+    },
+    {
+      "command": "aplay --dump-hw-params -D plughw:Y2Audio,0 /tmp/y2-highres-completion.f5f1kp/lowbits-32-48000.wav > /tmp/y2-highres-completion.f5f1kp/aplay.log 2>&1 & p=$!; sleep 1; cat /proc/asound/card0/pcm0p/sub0/hw_params; cat /sys/kernel/debug/y2_audio_observer/highres; wait \"$p\"; r=$?; cat /tmp/y2-highres-completion.f5f1kp/aplay.log; exit \"$r\"",
+      "exit": 0,
+      "stdout": "access: MMAP_INTERLEAVED\nformat: S16_LE\nsubformat: STD\nchannels: 2\nrate: 48000 (48000/1)\nperiod_size: 6000\nbuffer_size: 24000\nobserver_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=48000 channels=2 sample_bits=16 frame_bits=32 period_frames=6000 buffer_frames=24000 dma_bytes=96000 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff1200\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x0000000a\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x872e0000\nAFE_DL1_CUR=0x872f6890\nAFE_DL1_END=0x872f76ff\nAFE_I2S_CON3=0x00000a0b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000002\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\nPlaying WAVE '/tmp/y2-highres-completion.f5f1kp/lowbits-32-48000.wav' : Signed 32 bit Little Endian, Rate 48000 Hz, Stereo\nHW Params of device \"plughw:Y2Audio,0\":\n--------------------\nACCESS: MMAP_INTERLEAVED MMAP_NONINTERLEAVED MMAP_COMPLEX RW_INTERLEAVED RW_NONINTERLEAVED\nFORMAT: S8 U8 S16_LE S16_BE U16_LE U16_BE S24_LE S24_BE U24_LE U24_BE S32_LE S32_BE U32_LE U32_BE FLOAT_LE FLOAT_BE FLOAT64_LE FLOAT64_BE MU_LAW A_LAW IMA_ADPCM S20_LE S20_BE U20_LE U20_BE S24_3LE S24_3BE U24_3LE U24_3BE S20_3LE S20_3BE U20_3LE U20_3BE S18_3LE S18_3BE U18_3LE U18_3BE\nSUBFORMAT: STD MSBITS_MAX MSBITS_20 MSBITS_24\nSAMPLE_BITS: [4 64]\nFRAME_BITS: [4 640000]\nCHANNELS: [1 10000]\nRATE: [4000 4294967295)\nPERIOD_TIME: (2666 743039)\nPERIOD_SIZE: (10 3191328204)\nPERIOD_BYTES: (5 4294967295)\nPERIODS: (0 429496730)\nBUFFER_TIME: [1 4294967295]\nBUFFER_SIZE: [21 4294967294]\nBUFFER_BYTES: [11 4294967295]\nTICK_TIME: ALL\n--------------------\nHW Params of device \"plughw:Y2Audio,0\":\n--------------------\nACCESS: RW_INTERLEAVED\nFORMAT: S32_LE\nSUBFORMAT: STD\nSAMPLE_BITS: 32\nFRAME_BITS: 64\nCHANNELS: 2\nRATE: 48000\nPERIOD_TIME: 125000\nPERIOD_SIZE: 6000\nPERIOD_BYTES: 48000\nPERIODS: 4\nBUFFER_TIME: 500000\nBUFFER_SIZE: 24000\nBUFFER_BYTES: 192000\nTICK_TIME: 0\n--------------------\n",
+      "stderr": "",
+      "device": "plughw:Y2Audio,0",
+      "bits": 32,
+      "rate": 48000
+    }
+  ],
+  "reborn_tests": [
+    {
+      "source_bits": 16,
+      "rate_hz": 44100,
+      "decoder_format": "s16",
+      "dsp_format": "fltp",
+      "source_precision_reported": 16,
+      "alsa": {
+        "buffer": 4096,
+        "channels": 2,
+        "device": "hw:CARD=Y2Audio,DEV=0",
+        "fallback": true,
+        "fallback_reason": "preferred S32_LE is unavailable in the enabled hardware path",
+        "format": "S16_LE",
+        "hardware_mixer_gain_db": -24.0,
+        "period": 512,
+        "rate": 44100
+      },
+      "hw_params": "access: RW_INTERLEAVED\nformat: S16_LE\nsubformat: STD\nchannels: 2\nrate: 44100 (44100/1)\nperiod_size: 512\nbuffer_size: 4096\n",
+      "observer": "observer_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=44100 channels=2 sample_bits=16 frame_bits=32 period_frames=512 buffer_frames=4096 dma_bytes=16384 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff1500\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x00000009\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x87910000\nAFE_DL1_CUR=0x879120d0\nAFE_DL1_END=0x87913fff\nAFE_I2S_CON3=0x0000090b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000001\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\n",
+      "final_sink_probe_hex": "1200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff1500",
+      "byte_comparison": {
+        "source_bits": 16,
+        "rate": 44100,
+        "ring_byte_count": 256,
+        "byte_identical_to_probe": true,
+        "cpu_percent_one_core": 4.6990607209674975
+      },
+      "errors": {
+        "audio_recoveries": 0.0,
+        "audio_xruns": 0.0,
+        "ffmpeg_decode_errors": 0.0,
+        "ffmpeg_filter_errors": 0.0,
+        "playback_errors": 0.0
+      }
+    },
+    {
+      "source_bits": 16,
+      "rate_hz": 48000,
+      "decoder_format": "s16",
+      "dsp_format": "fltp",
+      "source_precision_reported": 16,
+      "alsa": {
+        "buffer": 4096,
+        "channels": 2,
+        "device": "hw:CARD=Y2Audio,DEV=0",
+        "fallback": true,
+        "fallback_reason": "preferred S32_LE is unavailable in the enabled hardware path",
+        "format": "S16_LE",
+        "hardware_mixer_gain_db": -24.0,
+        "period": 512,
+        "rate": 48000
+      },
+      "hw_params": "access: RW_INTERLEAVED\nformat: S16_LE\nsubformat: STD\nchannels: 2\nrate: 48000 (48000/1)\nperiod_size: 512\nbuffer_size: 4096\n",
+      "observer": "observer_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=48000 channels=2 sample_bits=16 frame_bits=32 period_frames=512 buffer_frames=4096 dma_bytes=16384 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff1500\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x0000000a\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x87838000\nAFE_DL1_CUR=0x878388a0\nAFE_DL1_END=0x8783bfff\nAFE_I2S_CON3=0x00000a0b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000002\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\n",
+      "final_sink_probe_hex": "1200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff1500",
+      "byte_comparison": {
+        "source_bits": 16,
+        "rate": 48000,
+        "ring_byte_count": 256,
+        "byte_identical_to_probe": true,
+        "cpu_percent_one_core": 5.368256675871446
+      },
+      "errors": {
+        "audio_recoveries": 0.0,
+        "audio_xruns": 0.0,
+        "ffmpeg_decode_errors": 0.0,
+        "ffmpeg_filter_errors": 0.0,
+        "playback_errors": 0.0
+      }
+    },
+    {
+      "source_bits": 24,
+      "rate_hz": 44100,
+      "decoder_format": "s32",
+      "dsp_format": "fltp",
+      "source_precision_reported": 24,
+      "alsa": {
+        "buffer": 4096,
+        "channels": 2,
+        "device": "hw:CARD=Y2Audio,DEV=0",
+        "fallback": true,
+        "fallback_reason": "preferred S32_LE is unavailable in the enabled hardware path",
+        "format": "S16_LE",
+        "hardware_mixer_gain_db": -24.0,
+        "period": 512,
+        "rate": 44100
+      },
+      "hw_params": "access: RW_INTERLEAVED\nformat: S16_LE\nsubformat: STD\nchannels: 2\nrate: 44100 (44100/1)\nperiod_size: 512\nbuffer_size: 4096\n",
+      "observer": "observer_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=44100 channels=2 sample_bits=16 frame_bits=32 period_frames=512 buffer_frames=4096 dma_bytes=16384 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff1200\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x00000009\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x87300000\nAFE_DL1_CUR=0x873012c0\nAFE_DL1_END=0x87303fff\nAFE_I2S_CON3=0x0000090b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000001\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\n",
+      "final_sink_probe_hex": "1200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff1200",
+      "byte_comparison": {
+        "source_bits": 24,
+        "rate": 44100,
+        "ring_byte_count": 256,
+        "byte_identical_to_probe": true,
+        "cpu_percent_one_core": 4.2937472629469635
+      },
+      "errors": {
+        "audio_recoveries": 0.0,
+        "audio_xruns": 0.0,
+        "ffmpeg_decode_errors": 0.0,
+        "ffmpeg_filter_errors": 0.0,
+        "playback_errors": 0.0
+      }
+    },
+    {
+      "source_bits": 24,
+      "rate_hz": 48000,
+      "decoder_format": "s32",
+      "dsp_format": "fltp",
+      "source_precision_reported": 24,
+      "alsa": {
+        "buffer": 4096,
+        "channels": 2,
+        "device": "hw:CARD=Y2Audio,DEV=0",
+        "fallback": true,
+        "fallback_reason": "preferred S32_LE is unavailable in the enabled hardware path",
+        "format": "S16_LE",
+        "hardware_mixer_gain_db": -24.0,
+        "period": 512,
+        "rate": 48000
+      },
+      "hw_params": "access: RW_INTERLEAVED\nformat: S16_LE\nsubformat: STD\nchannels: 2\nrate: 48000 (48000/1)\nperiod_size: 512\nbuffer_size: 4096\n",
+      "observer": "observer_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=48000 channels=2 sample_bits=16 frame_bits=32 period_frames=512 buffer_frames=4096 dma_bytes=16384 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff1200\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x0000000a\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x87308000\nAFE_DL1_CUR=0x8730a3b0\nAFE_DL1_END=0x8730bfff\nAFE_I2S_CON3=0x00000a0b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000002\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\n",
+      "final_sink_probe_hex": "1200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff1200",
+      "byte_comparison": {
+        "source_bits": 24,
+        "rate": 48000,
+        "ring_byte_count": 256,
+        "byte_identical_to_probe": true,
+        "cpu_percent_one_core": 5.392832458650134
+      },
+      "errors": {
+        "audio_recoveries": 0.0,
+        "audio_xruns": 0.0,
+        "ffmpeg_decode_errors": 0.0,
+        "ffmpeg_filter_errors": 0.0,
+        "playback_errors": 0.0
+      }
+    },
+    {
+      "source_bits": 32,
+      "rate_hz": 44100,
+      "decoder_format": "s32",
+      "dsp_format": "fltp",
+      "source_precision_reported": 32,
+      "alsa": {
+        "buffer": 4096,
+        "channels": 2,
+        "device": "hw:CARD=Y2Audio,DEV=0",
+        "fallback": true,
+        "fallback_reason": "preferred S32_LE is unavailable in the enabled hardware path",
+        "format": "S16_LE",
+        "hardware_mixer_gain_db": -24.0,
+        "period": 512,
+        "rate": 44100
+      },
+      "hw_params": "access: RW_INTERLEAVED\nformat: S16_LE\nsubformat: STD\nchannels: 2\nrate: 44100 (44100/1)\nperiod_size: 512\nbuffer_size: 4096\n",
+      "observer": "observer_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=44100 channels=2 sample_bits=16 frame_bits=32 period_frames=512 buffer_frames=4096 dma_bytes=16384 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff1200\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x00000009\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x87348000\nAFE_DL1_CUR=0x87349810\nAFE_DL1_END=0x8734bfff\nAFE_I2S_CON3=0x0000090b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000001\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\n",
+      "final_sink_probe_hex": "1200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff1200",
+      "byte_comparison": {
+        "source_bits": 32,
+        "rate": 44100,
+        "ring_byte_count": 256,
+        "byte_identical_to_probe": true,
+        "cpu_percent_one_core": 5.321812059610828
+      },
+      "errors": {
+        "audio_recoveries": 0.0,
+        "audio_xruns": 0.0,
+        "ffmpeg_decode_errors": 0.0,
+        "ffmpeg_filter_errors": 0.0,
+        "playback_errors": 0.0
+      }
+    },
+    {
+      "source_bits": 32,
+      "rate_hz": 48000,
+      "decoder_format": "s32",
+      "dsp_format": "fltp",
+      "source_precision_reported": 32,
+      "alsa": {
+        "buffer": 4096,
+        "channels": 2,
+        "device": "hw:CARD=Y2Audio,DEV=0",
+        "fallback": true,
+        "fallback_reason": "preferred S32_LE is unavailable in the enabled hardware path",
+        "format": "S16_LE",
+        "hardware_mixer_gain_db": -24.0,
+        "period": 512,
+        "rate": 48000
+      },
+      "hw_params": "access: RW_INTERLEAVED\nformat: S16_LE\nsubformat: STD\nchannels: 2\nrate: 48000 (48000/1)\nperiod_size: 512\nbuffer_size: 4096\n",
+      "observer": "observer_version=1 read_only=true physical_serial_capture=false\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=48000 channels=2 sample_bits=16 frame_bits=32 period_frames=512 buffer_frames=4096 dma_bytes=16384 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff1200\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x0000000a\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x853dc000\nAFE_DL1_CUR=0x853df400\nAFE_DL1_END=0x853dffff\nAFE_I2S_CON3=0x00000a0b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000002\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\n",
+      "final_sink_probe_hex": "1200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff1200",
+      "byte_comparison": {
+        "source_bits": 32,
+        "rate": 48000,
+        "ring_byte_count": 256,
+        "byte_identical_to_probe": true,
+        "cpu_percent_one_core": 4.940428095710505
+      },
+      "errors": {
+        "audio_recoveries": 0.0,
+        "audio_xruns": 0.0,
+        "ffmpeg_decode_errors": 0.0,
+        "ffmpeg_filter_errors": 0.0,
+        "playback_errors": 0.0
+      }
+    }
+  ],
+  "dl1_monitor": [
+    {
+      "command": "cat /sys/kernel/debug/y2_audio_observer_v2/highres",
+      "exit": 0,
+      "stdout": "observer_version=1 read_only=true physical_serial_capture=false\nsource_contract=MT6582_Functional_Specification_v0.91_ch53 dl1_output_bits_per_channel=16 dl1_fetch_format=packed_le_s16_stereo pbuf_bits_19_16=DL_ULTRA_TH_not_HD wide_pcm_unavailable_stage=DL1_memory_interface\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=44100 channels=2 sample_bits=16 frame_bits=32 period_frames=512 buffer_frames=4096 dma_bytes=16384 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff1500\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x00000009\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x85858000\nAFE_DL1_CUR=0x8585be50\nAFE_DL1_END=0x8585bfff\nAFE_I2S_CON3=0x0000090b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\nAFE_MEMIF_MON0=0x0012ffee\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000001\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\n",
+      "stderr": ""
+    },
+    {
+      "command": "cat /sys/kernel/debug/y2_audio_observer_v2/highres",
+      "exit": 0,
+      "stdout": "observer_version=1 read_only=true physical_serial_capture=false\nsource_contract=MT6582_Functional_Specification_v0.91_ch53 dl1_output_bits_per_channel=16 dl1_fetch_format=packed_le_s16_stereo pbuf_bits_19_16=DL_ULTRA_TH_not_HD wide_pcm_unavailable_stage=DL1_memory_interface\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=48000 channels=2 sample_bits=16 frame_bits=32 period_frames=512 buffer_frames=4096 dma_bytes=16384 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff15001200eeff1300edff1400ecff1500ebffeeff1200edff1300ecff1400ebff1500\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x0000000a\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x878b8000\nAFE_DL1_CUR=0x878b8630\nAFE_DL1_END=0x878bbfff\nAFE_I2S_CON3=0x00000a0b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\nAFE_MEMIF_MON0=0x0014ffec\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000002\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\n",
+      "stderr": ""
+    },
+    {
+      "command": "cat /sys/kernel/debug/y2_audio_observer_v2/highres",
+      "exit": 0,
+      "stdout": "observer_version=1 read_only=true physical_serial_capture=false\nsource_contract=MT6582_Functional_Specification_v0.91_ch53 dl1_output_bits_per_channel=16 dl1_fetch_format=packed_le_s16_stereo pbuf_bits_19_16=DL_ULTRA_TH_not_HD wide_pcm_unavailable_stage=DL1_memory_interface\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=44100 channels=2 sample_bits=16 frame_bits=32 period_frames=512 buffer_frames=4096 dma_bytes=16384 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff1200\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x00000009\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x8742c000\nAFE_DL1_CUR=0x8742cb60\nAFE_DL1_END=0x8742ffff\nAFE_I2S_CON3=0x0000090b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\nAFE_MEMIF_MON0=0x0012ffed\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000001\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\n",
+      "stderr": ""
+    },
+    {
+      "command": "cat /sys/kernel/debug/y2_audio_observer_v2/highres",
+      "exit": 0,
+      "stdout": "observer_version=1 read_only=true physical_serial_capture=false\nsource_contract=MT6582_Functional_Specification_v0.91_ch53 dl1_output_bits_per_channel=16 dl1_fetch_format=packed_le_s16_stereo pbuf_bits_19_16=DL_ULTRA_TH_not_HD wide_pcm_unavailable_stage=DL1_memory_interface\npcm=Y2 Headphone Playback (*) runtime=present state=3 format=S16_LE rate=48000 channels=2 sample_bits=16 frame_bits=32 period_frames=512 buffer_frames=4096 dma_bytes=16384 snapshot_offset=0 snapshot_bytes=256\ndma_hex=1200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff12001200edff1200edff1200edff1200edffedff1200edff1200edff1200edff1200\ndevice=11220000.audio-controller active_reference=1\nAFE_DAC_CON0=0x00003003\nAFE_DAC_CON1=0x0000000a\nAFE_CONN0=0x00400020\nAFE_DL1_BASE=0x87490000\nAFE_DL1_CUR=0x87493f60\nAFE_DL1_END=0x87493fff\nAFE_I2S_CON3=0x00000a0b\nAFE_MEMIF_PBUF_SIZE=0xff0000ff\nAFE_MEMIF_MON0=0xffed0012\ndevice=1-0030 active_reference=1\nDEVID_AB=0x00000043\nDEVID_CD=0x00000013\nDEVID_E=0x00000010\nSP_SRATE=0x00000002\nSP_BITSIZE=0x00000006\nASP_LRCK_HI_TIME_1=0x0000001f\nASP_LRCK_HI_TIME_2=0x00000000\nASP_LRCK_PERIOD_1=0x0000003f\nASP_LRCK_PERIOD_2=0x00000000\nASP_CLOCK_CONF=0x0000000c\nASP_FRAME_CONF=0x00000002\nASP_CH_1_LOC=0x00000000\nASP_CH_2_LOC=0x00000020\nASP_CH_1_SZ_EN=0x00000005\nASP_CH_2_SZ_EN=0x0000000d\n",
+      "stderr": ""
+    }
+  ],
+  "software_24bit_probes": [
+    {
+      "source_bits": 24,
+      "rate_hz": 44100,
+      "sink_format": "S24_LE",
+      "meaningful_bits": 24,
+      "physical_output": false,
+      "probe_hex": "0012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff1200000012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff1200000012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff1200000012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff120000"
+    },
+    {
+      "source_bits": 24,
+      "rate_hz": 44100,
+      "sink_format": "S32_LE",
+      "meaningful_bits": 24,
+      "physical_output": false,
+      "probe_hex": "000012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff1200000012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff1200000012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff1200000012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff1200"
+    },
+    {
+      "source_bits": 24,
+      "rate_hz": 48000,
+      "sink_format": "S24_LE",
+      "meaningful_bits": 24,
+      "physical_output": false,
+      "probe_hex": "0012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff1200000012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff1200000012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff1200000012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff120000"
+    },
+    {
+      "source_bits": 24,
+      "rate_hz": 48000,
+      "sink_format": "S32_LE",
+      "meaningful_bits": 24,
+      "physical_output": false,
+      "probe_hex": "000012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff1200000012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff1200000012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff1200000012000000edff000112000001edff007f1200007fedff00ff120000ffedff0000edff000012000001edff00011200007fedff007f120000ffedff00ff1200"
+    }
+  ],
+  "cpu_benchmarks": [
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 16,
+      "source_rate_hz": 44100,
+      "output_rate_hz": 44100,
+      "format": 1,
+      "dsp_enabled": false,
+      "frames": 1102500,
+      "checksum": 65170,
+      "cpu_seconds": 0.438409769,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 1.753639
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 16,
+      "source_rate_hz": 44100,
+      "output_rate_hz": 44100,
+      "format": 3,
+      "dsp_enabled": false,
+      "frames": 1102500,
+      "checksum": 0,
+      "cpu_seconds": 0.541012845,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 2.164051
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 16,
+      "source_rate_hz": 44100,
+      "output_rate_hz": 44100,
+      "format": 2,
+      "dsp_enabled": false,
+      "frames": 1102500,
+      "checksum": 36320,
+      "cpu_seconds": 0.511460153,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 2.045841
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 16,
+      "source_rate_hz": 44100,
+      "output_rate_hz": 44100,
+      "format": 1,
+      "dsp_enabled": true,
+      "frames": 1102500,
+      "checksum": 75625,
+      "cpu_seconds": 0.685802463,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 2.74321
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 16,
+      "source_rate_hz": 44100,
+      "output_rate_hz": 44100,
+      "format": 3,
+      "dsp_enabled": true,
+      "frames": 1102500,
+      "checksum": 28110,
+      "cpu_seconds": 0.815495914,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 3.261984
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 16,
+      "source_rate_hz": 44100,
+      "output_rate_hz": 44100,
+      "format": 2,
+      "dsp_enabled": true,
+      "frames": 1102500,
+      "checksum": 53640,
+      "cpu_seconds": 0.75220239,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 3.00881
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 24,
+      "source_rate_hz": 48000,
+      "output_rate_hz": 48000,
+      "format": 1,
+      "dsp_enabled": false,
+      "frames": 1200000,
+      "checksum": 57080,
+      "cpu_seconds": 0.511894697,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 2.047579
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 24,
+      "source_rate_hz": 48000,
+      "output_rate_hz": 48000,
+      "format": 3,
+      "dsp_enabled": false,
+      "frames": 1200000,
+      "checksum": 20995,
+      "cpu_seconds": 0.62675416,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 2.507017
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 24,
+      "source_rate_hz": 48000,
+      "output_rate_hz": 48000,
+      "format": 2,
+      "dsp_enabled": false,
+      "frames": 1200000,
+      "checksum": 36715,
+      "cpu_seconds": 0.587079846,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 2.348319
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 24,
+      "source_rate_hz": 48000,
+      "output_rate_hz": 48000,
+      "format": 1,
+      "dsp_enabled": true,
+      "frames": 1200000,
+      "checksum": 81765,
+      "cpu_seconds": 0.777466098,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 3.109864
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 24,
+      "source_rate_hz": 48000,
+      "output_rate_hz": 48000,
+      "format": 3,
+      "dsp_enabled": true,
+      "frames": 1200000,
+      "checksum": 27675,
+      "cpu_seconds": 0.906136251,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 3.624545
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 24,
+      "source_rate_hz": 48000,
+      "output_rate_hz": 48000,
+      "format": 2,
+      "dsp_enabled": true,
+      "frames": 1200000,
+      "checksum": 86300,
+      "cpu_seconds": 0.857575701,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 3.430303
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 24,
+      "source_rate_hz": 96000,
+      "output_rate_hz": 48000,
+      "format": 1,
+      "dsp_enabled": false,
+      "frames": 1200000,
+      "checksum": 70610,
+      "cpu_seconds": 1.563361542,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 6.253446
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 24,
+      "source_rate_hz": 96000,
+      "output_rate_hz": 48000,
+      "format": 3,
+      "dsp_enabled": false,
+      "frames": 1200000,
+      "checksum": 27520,
+      "cpu_seconds": 1.682908539,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 6.731634
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 24,
+      "source_rate_hz": 96000,
+      "output_rate_hz": 48000,
+      "format": 2,
+      "dsp_enabled": false,
+      "frames": 1200000,
+      "checksum": 74750,
+      "cpu_seconds": 1.629641691,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 6.518567
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 24,
+      "source_rate_hz": 96000,
+      "output_rate_hz": 48000,
+      "format": 1,
+      "dsp_enabled": true,
+      "frames": 1200000,
+      "checksum": 55280,
+      "cpu_seconds": 2.047993063,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 8.191972
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 24,
+      "source_rate_hz": 96000,
+      "output_rate_hz": 48000,
+      "format": 3,
+      "dsp_enabled": true,
+      "frames": 1200000,
+      "checksum": 45420,
+      "cpu_seconds": 2.155656854,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 8.622627
+    },
+    {
+      "schema": "org.y2linux.precision-bench/v1",
+      "physical_output": false,
+      "ffmpeg": "9.0.2",
+      "source_bits": 24,
+      "source_rate_hz": 96000,
+      "output_rate_hz": 48000,
+      "format": 2,
+      "dsp_enabled": true,
+      "frames": 1200000,
+      "checksum": 79395,
+      "cpu_seconds": 2.117400909,
+      "audio_seconds": 25.0,
+      "percent_one_core_realtime": 8.469604
+    }
+  ],
+  "reborn_checks": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.39,
+      "log": "out/highres-audio/software/reborn-0.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 5.13,
+      "log": "out/highres-audio/software/reborn-1.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--locked"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 31.33,
+      "log": "out/highres-audio/software/reborn-2.log"
+    },
+    {
+      "command": [
+        "sh",
+        "tools/build/cross.sh"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 14.14,
+      "log": "out/highres-audio/software/reborn-3.log"
+    }
+  ],
+  "withdrawn_decision": "HARDWARE_PROVEN_UNSUPPORTED_ON_DL1_PATH",
+  "interpretation_correction": "Actual installed S16 parameters/DMA/register values are valid. Initial module source_contract/output_bits label was an inference from monitor fields, not physical bit-width proof."
+}

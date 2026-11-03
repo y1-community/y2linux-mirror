@@ -1,0 +1,39 @@
+{
+  "schema": "y2-deepsleep04-early-boot/v1",
+  "image": "DEEPSLEEP-FINAL-04",
+  "boot_id": "aae0ddb3-7b48-4b6b-957e-952cb28322bf",
+  "taint": 0,
+  "journal_boottime_s": {
+    "suspend_requested": 35.6,
+    "kernel_suspend": 39.4,
+    "kernel_resumed": 592.3,
+    "complete": 594.3
+  },
+  "spm": {
+    "entries": 1,
+    "resumes": 1,
+    "aborts": 0,
+    "ticks32k": 18081448,
+    "seconds": 551.802001953125,
+    "wake": "0x20 USB (product label unknown)"
+  },
+  "receipt": {
+    "cycles": 1,
+    "suspended_seconds": 551.802,
+    "state": "restored",
+    "same_boot": true
+  },
+  "checks": {
+    "taint": 0,
+    "ext4_errors": 0,
+    "pstore": "empty",
+    "application": "ok",
+    "guard": "pending:false (04 identity)"
+  },
+  "battery_provisional": "69% at entry; Charging 69% after reconnect; no drain conclusion",
+  "archives": [
+    "out/deep-sleep-final/evidence/20261008/74-image04-early-boot-return",
+    "out/deep-sleep-final/evidence/20261008/75-image04-early-boot-health"
+  ],
+  "limits": "One cycle after an owner reboot; entry at 39 s uptime is earlier than the 03/02 stalls (~400-460 s) and passed, so a simple 'early after boot' trigger is not supported by this sample, but one pass cannot exclude it."
+}

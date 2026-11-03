@@ -1,0 +1,1281 @@
+{
+ "schema": 1,
+ "date": "2026-10-11",
+ "source": {
+  "stock_image": "evidence-private/20260908-ram-map/fm-decompressed.bin (Y2 stock FM kernel, base 0xc0008000) + fm-symbols.json",
+  "PMIC_INIT_SETTING_V1": "0xc04b81f8",
+  "mt6323_power_gs_suspend_data": "0xc0757cd0",
+  "mt6582_power_gs_suspend_data": "0xc0759c98",
+  "live_pmic_dump": "out/deep-sleep-final/evidence/20261011/99-power12-pmic-regdump/regs.txt (POWER-FINAL-12 boot 09ce553a, awake, charging, read-only debugfs regmap)",
+  "note": "Stock init values are what the Y2 FM kernel writes at PMIC probe (E2 branch); field names from the stock upmu_set_* accessors. The awake dump is not the in-sleep state."
+ },
+ "pmic_init_setting_v1": [
+  {
+   "reg": "0x2",
+   "shift": 4,
+   "mask": "0xf",
+   "stock": "0xb",
+   "y2_power_final_12": "0xb",
+   "match": true,
+   "field": "rg_vcdt_hv_vth"
+  },
+  {
+   "reg": "0xc",
+   "shift": 1,
+   "mask": "0x7",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "rg_vbat_ov_vth"
+  },
+  {
+   "reg": "0x1a",
+   "shift": 0,
+   "mask": "0xf",
+   "stock": "0x3",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_chrwdt_td"
+  },
+  {
+   "reg": "0x24",
+   "shift": 1,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "rg_bc11_rst"
+  },
+  {
+   "reg": "0x2a",
+   "shift": 4,
+   "mask": "0x7",
+   "stock": "0x0",
+   "y2_power_final_12": "0x1",
+   "match": false,
+   "field": "rg_csdac_stp"
+  },
+  {
+   "reg": "0x2e",
+   "shift": 2,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "rg_csdac_mode"
+  },
+  {
+   "reg": "0x2e",
+   "shift": 6,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "rg_hwcv_en"
+  },
+  {
+   "reg": "0x2e",
+   "shift": 7,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "rg_ulc_det_en"
+  },
+  {
+   "reg": "0x3c",
+   "shift": 5,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "thr_hwpdn_en"
+  },
+  {
+   "reg": "0x40",
+   "shift": 4,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_en_drvsel"
+  },
+  {
+   "reg": "0x40",
+   "shift": 5,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_rst_drvsel"
+  },
+  {
+   "reg": "0x46",
+   "shift": 1,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "pwrbb_deb_en"
+  },
+  {
+   "reg": "0x48",
+   "shift": 8,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vproc_pg_h2l_en"
+  },
+  {
+   "reg": "0x48",
+   "shift": 9,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vsys_pg_h2l_en"
+  },
+  {
+   "reg": "0x4e",
+   "shift": 5,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "strup_auxadc_rstb_sw"
+  },
+  {
+   "reg": "0x4e",
+   "shift": 7,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "strup_auxadc_rstb_sel"
+  },
+  {
+   "reg": "0x50",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "strup_pwroff_seq_en"
+  },
+  {
+   "reg": "0x50",
+   "shift": 1,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "strup_pwroff_preoff_en"
+  },
+  {
+   "reg": "0x52",
+   "shift": 9,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "spk_ther_shdn_l_en"
+  },
+  {
+   "reg": "0x56",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_spk_intg_rst_l"
+  },
+  {
+   "reg": "0x64",
+   "shift": 8,
+   "mask": "0xf",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_spkpga_gain"
+  },
+  {
+   "reg": "0x102",
+   "shift": 6,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "rg_rtc_75k_ck_pdn"
+  },
+  {
+   "reg": "0x102",
+   "shift": 11,
+   "mask": "0x1",
+   "stock": "0x0",
+   "y2_power_final_12": "0x0",
+   "match": true,
+   "field": "rg_drv_32k_ck_pdn"
+  },
+  {
+   "reg": "0x102",
+   "shift": 15,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "rg_buck32k_pdn"
+  },
+  {
+   "reg": "0x108",
+   "shift": 12,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_efuse_ck_pdn"
+  },
+  {
+   "reg": "0x10e",
+   "shift": 5,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_auxadc_ctl_ck_pdn"
+  },
+  {
+   "reg": "0x120",
+   "shift": 4,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "rg_srclken_hw_mode"
+  },
+  {
+   "reg": "0x120",
+   "shift": 5,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "rg_osc_hw_mode"
+  },
+  {
+   "reg": "0x148",
+   "shift": 1,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "rg_smt_int"
+  },
+  {
+   "reg": "0x148",
+   "shift": 3,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "rg_smt_rtc_32k1v8"
+  },
+  {
+   "reg": "0x160",
+   "shift": 2,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_int_en_bat_l"
+  },
+  {
+   "reg": "0x160",
+   "shift": 6,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_int_en_thr_l"
+  },
+  {
+   "reg": "0x160",
+   "shift": 7,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_int_en_thr_h"
+  },
+  {
+   "reg": "0x166",
+   "shift": 1,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_int_en_fchrkey"
+  },
+  {
+   "reg": "0x212",
+   "shift": 4,
+   "mask": "0x3",
+   "stock": "0x2",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "qi_vproc_vsleep"
+  },
+  {
+   "reg": "0x216",
+   "shift": 1,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vproc_vosel_ctrl"
+  },
+  {
+   "reg": "0x21c",
+   "shift": 0,
+   "mask": "0x7f",
+   "stock": "0x17",
+   "y2_power_final_12": "0x5",
+   "match": false,
+   "field": "vproc_sfchg_frate"
+  },
+  {
+   "reg": "0x21c",
+   "shift": 7,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vproc_sfchg_fen"
+  },
+  {
+   "reg": "0x21c",
+   "shift": 15,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vproc_sfchg_ren"
+  },
+  {
+   "reg": "0x222",
+   "shift": 0,
+   "mask": "0x7f",
+   "stock": "0x18",
+   "y2_power_final_12": "0x48",
+   "match": false,
+   "field": "vproc_vosel_sleep"
+  },
+  {
+   "reg": "0x230",
+   "shift": 0,
+   "mask": "0x3",
+   "stock": "0x3",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vproc_transtd"
+  },
+  {
+   "reg": "0x230",
+   "shift": 8,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vproc_vsleep_en"
+  },
+  {
+   "reg": "0x238",
+   "shift": 0,
+   "mask": "0x3",
+   "stock": "0x3",
+   "y2_power_final_12": "0x3",
+   "match": true,
+   "field": "rg_vsys_slp"
+  },
+  {
+   "reg": "0x238",
+   "shift": 4,
+   "mask": "0x3",
+   "stock": "0x2",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "qi_vsys_vsleep"
+  },
+  {
+   "reg": "0x23c",
+   "shift": 1,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vsys_vosel_ctrl"
+  },
+  {
+   "reg": "0x242",
+   "shift": 0,
+   "mask": "0x7f",
+   "stock": "0x23",
+   "y2_power_final_12": "0x5",
+   "match": false,
+   "field": "vsys_sfchg_frate"
+  },
+  {
+   "reg": "0x242",
+   "shift": 8,
+   "mask": "0x7f",
+   "stock": "0x11",
+   "y2_power_final_12": "0x5",
+   "match": false,
+   "field": "vsys_sfchg_rrate"
+  },
+  {
+   "reg": "0x242",
+   "shift": 15,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vsys_sfchg_ren"
+  },
+  {
+   "reg": "0x256",
+   "shift": 0,
+   "mask": "0x3",
+   "stock": "0x3",
+   "y2_power_final_12": "0x1",
+   "match": false,
+   "field": "vsys_transtd"
+  },
+  {
+   "reg": "0x256",
+   "shift": 4,
+   "mask": "0x3",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vsys_vosel_trans_en"
+  },
+  {
+   "reg": "0x256",
+   "shift": 8,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vsys_vsleep_en"
+  },
+  {
+   "reg": "0x302",
+   "shift": 8,
+   "mask": "0x3",
+   "stock": "0x2",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_vpa_csl"
+  },
+  {
+   "reg": "0x302",
+   "shift": 14,
+   "mask": "0x3",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_vpa_zx_os"
+  },
+  {
+   "reg": "0x310",
+   "shift": 7,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vpa_sfchg_fen"
+  },
+  {
+   "reg": "0x310",
+   "shift": 15,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vpa_sfchg_ren"
+  },
+  {
+   "reg": "0x326",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vpa_dlc_map_en"
+  },
+  {
+   "reg": "0x402",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "vtcxo_lp_sel"
+  },
+  {
+   "reg": "0x402",
+   "shift": 11,
+   "mask": "0x1",
+   "stock": "0x0",
+   "y2_power_final_12": "0x0",
+   "match": true,
+   "field": "vtcxo_on_ctrl"
+  },
+  {
+   "reg": "0x404",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "va_lp_sel"
+  },
+  {
+   "reg": "0x404",
+   "shift": 8,
+   "mask": "0x3",
+   "stock": "0x2",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_va_sense_sel"
+  },
+  {
+   "reg": "0x500",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "vio28_lp_sel"
+  },
+  {
+   "reg": "0x502",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "vusb_lp_sel"
+  },
+  {
+   "reg": "0x504",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vmc_lp_sel"
+  },
+  {
+   "reg": "0x506",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vmch_lp_sel"
+  },
+  {
+   "reg": "0x508",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vemc_3v3_lp_sel"
+  },
+  {
+   "reg": "0x514",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_stb_sim1_sio"
+  },
+  {
+   "reg": "0x516",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vsim1_lp_sel"
+  },
+  {
+   "reg": "0x518",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vsim2_lp_sel"
+  },
+  {
+   "reg": "0x524",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_stb_sim2_sio"
+  },
+  {
+   "reg": "0x542",
+   "shift": 2,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "vibr_ther_shen_en"
+  },
+  {
+   "reg": "0x54e",
+   "shift": 15,
+   "mask": "0x1",
+   "stock": "0x0",
+   "y2_power_final_12": "0x0",
+   "match": true,
+   "field": "rg_vrf18_en"
+  },
+  {
+   "reg": "0x550",
+   "shift": 1,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "vrf18_on_ctrl"
+  },
+  {
+   "reg": "0x552",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "vm_lp_sel"
+  },
+  {
+   "reg": "0x552",
+   "shift": 14,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "rg_vm_en"
+  },
+  {
+   "reg": "0x556",
+   "shift": 0,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x1",
+   "match": true,
+   "field": "vio18_lp_sel"
+  },
+  {
+   "reg": "0x756",
+   "shift": 2,
+   "mask": "0x3",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_adc_trim_ch6_sel"
+  },
+  {
+   "reg": "0x756",
+   "shift": 4,
+   "mask": "0x3",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_adc_trim_ch5_sel"
+  },
+  {
+   "reg": "0x756",
+   "shift": 8,
+   "mask": "0x3",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_adc_trim_ch3_sel"
+  },
+  {
+   "reg": "0x756",
+   "shift": 10,
+   "mask": "0x3",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_adc_trim_ch2_sel"
+  },
+  {
+   "reg": "0x778",
+   "shift": 15,
+   "mask": "0x1",
+   "stock": "0x1",
+   "y2_power_final_12": "0x0",
+   "match": false,
+   "field": "rg_vref18_enb_md"
+  }
+ ],
+ "pmic_init_summary": {
+  "writes": 80,
+  "differ_on_12": 55
+ },
+ "mt6323_power_gs_suspend_data": [
+  {
+   "reg": "0x4e",
+   "mask": "0xa0",
+   "golden": "0xa0"
+  },
+  {
+   "reg": "0x52",
+   "mask": "0x1",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x66",
+   "mask": "0x200",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x102",
+   "mask": "0xc7ff",
+   "golden": "0x8042"
+  },
+  {
+   "reg": "0x108",
+   "mask": "0xffff",
+   "golden": "0x15ff"
+  },
+  {
+   "reg": "0x10e",
+   "mask": "0xf0",
+   "golden": "0x20"
+  },
+  {
+   "reg": "0x120",
+   "mask": "0x83fd",
+   "golden": "0xb9"
+  },
+  {
+   "reg": "0x126",
+   "mask": "0xc000",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x212",
+   "mask": "0x30",
+   "golden": "0x20"
+  },
+  {
+   "reg": "0x216",
+   "mask": "0x2",
+   "golden": "0x2"
+  },
+  {
+   "reg": "0x21c",
+   "mask": "0x8080",
+   "golden": "0x8080"
+  },
+  {
+   "reg": "0x230",
+   "mask": "0x100",
+   "golden": "0x100"
+  },
+  {
+   "reg": "0x256",
+   "mask": "0x100",
+   "golden": "0x100"
+  },
+  {
+   "reg": "0x310",
+   "mask": "0x8080",
+   "golden": "0x8080"
+  },
+  {
+   "reg": "0x402",
+   "mask": "0xc01",
+   "golden": "0x401"
+  },
+  {
+   "reg": "0x404",
+   "mask": "0x1",
+   "golden": "0x1"
+  },
+  {
+   "reg": "0x408",
+   "mask": "0x8000",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x416",
+   "mask": "0x80",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x418",
+   "mask": "0x1000",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x41c",
+   "mask": "0x1000",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x500",
+   "mask": "0x1",
+   "golden": "0x1"
+  },
+  {
+   "reg": "0x502",
+   "mask": "0x1",
+   "golden": "0x1"
+  },
+  {
+   "reg": "0x504",
+   "mask": "0x1000",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x506",
+   "mask": "0x4000",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x508",
+   "mask": "0x4000",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x512",
+   "mask": "0x4000",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x516",
+   "mask": "0x8000",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x518",
+   "mask": "0x8000",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x51a",
+   "mask": "0x100",
+   "golden": "0x100"
+  },
+  {
+   "reg": "0x536",
+   "mask": "0x8000",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x54e",
+   "mask": "0x8000",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x550",
+   "mask": "0x2",
+   "golden": "0x2"
+  },
+  {
+   "reg": "0x552",
+   "mask": "0x4001",
+   "golden": "0x4001"
+  },
+  {
+   "reg": "0x556",
+   "mask": "0x1",
+   "golden": "0x1"
+  },
+  {
+   "reg": "0x55a",
+   "mask": "0x4000",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x55e",
+   "mask": "0x4000",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x700",
+   "mask": "0x1980",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x704",
+   "mask": "0x33",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x708",
+   "mask": "0x7c",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x70c",
+   "mask": "0xc250",
+   "golden": "0x200"
+  },
+  {
+   "reg": "0x70e",
+   "mask": "0x100",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x742",
+   "mask": "0x5",
+   "golden": "0x0"
+  },
+  {
+   "reg": "0x776",
+   "mask": "0x8000",
+   "golden": "0x8000"
+  },
+  {
+   "reg": "0x778",
+   "mask": "0x8000",
+   "golden": "0x8000"
+  }
+ ],
+ "mt6582_power_gs_suspend_data": [
+  {
+   "phys": "0x10000004",
+   "mask": "0xff9f",
+   "golden": "0x80"
+  },
+  {
+   "phys": "0x1000000c",
+   "mask": "0x1",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x10000040",
+   "mask": "0x87818107",
+   "golden": "0x810106"
+  },
+  {
+   "phys": "0x10000050",
+   "mask": "0x80808080",
+   "golden": "0x80808080"
+  },
+  {
+   "phys": "0x10000060",
+   "mask": "0x80808080",
+   "golden": "0x80808080"
+  },
+  {
+   "phys": "0x10000070",
+   "mask": "0x80808080",
+   "golden": "0x80808080"
+  },
+  {
+   "phys": "0x10000080",
+   "mask": "0x83ef",
+   "golden": "0x300"
+  },
+  {
+   "phys": "0x10000200",
+   "mask": "0x3ff",
+   "golden": "0x3ff"
+  },
+  {
+   "phys": "0x10000204",
+   "mask": "0x11",
+   "golden": "0x11"
+  },
+  {
+   "phys": "0x10001008",
+   "mask": "0x1f",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x10001010",
+   "mask": "0x7",
+   "golden": "0x7"
+  },
+  {
+   "phys": "0x10001014",
+   "mask": "0x1",
+   "golden": "0x1"
+  },
+  {
+   "phys": "0x10001048",
+   "mask": "0x91bfe7",
+   "golden": "0x80bfe6"
+  },
+  {
+   "phys": "0x10001050",
+   "mask": "0x303",
+   "golden": "0x303"
+  },
+  {
+   "phys": "0x10001054",
+   "mask": "0x37f",
+   "golden": "0x300"
+  },
+  {
+   "phys": "0x10001058",
+   "mask": "0x1f0f07",
+   "golden": "0x100000"
+  },
+  {
+   "phys": "0x10003018",
+   "mask": "0x3ffffff",
+   "golden": "0x2feffff"
+  },
+  {
+   "phys": "0x10003030",
+   "mask": "0x3ffffff",
+   "golden": "0x3ffffff"
+  },
+  {
+   "phys": "0x10003050",
+   "mask": "0x1ff3",
+   "golden": "0xf3"
+  },
+  {
+   "phys": "0x10003054",
+   "mask": "0xff",
+   "golden": "0xf0"
+  },
+  {
+   "phys": "0x10003058",
+   "mask": "0x1f0f07",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x100041dc",
+   "mask": "0x3000000",
+   "golden": "0x3000000"
+  },
+  {
+   "phys": "0x1000f800",
+   "mask": "0x1",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x1020005c",
+   "mask": "0x200",
+   "golden": "0x200"
+  },
+  {
+   "phys": "0x10208000",
+   "mask": "0x1000",
+   "golden": "0x1000"
+  },
+  {
+   "phys": "0x10209004",
+   "mask": "0xff03f3",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x10209008",
+   "mask": "0x7",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x1020900c",
+   "mask": "0x79ce7f",
+   "golden": "0x780000"
+  },
+  {
+   "phys": "0x10209018",
+   "mask": "0xff00ff",
+   "golden": "0x50001"
+  },
+  {
+   "phys": "0x10209024",
+   "mask": "0xfffff",
+   "golden": "0x88888"
+  },
+  {
+   "phys": "0x10209210",
+   "mask": "0x1",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x10209220",
+   "mask": "0x1",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x10209230",
+   "mask": "0x1",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x10209240",
+   "mask": "0x1",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x1020924c",
+   "mask": "0x3",
+   "golden": "0x2"
+  },
+  {
+   "phys": "0x11220000",
+   "mask": "0x44",
+   "golden": "0x44"
+  },
+  {
+   "phys": "0x13000000",
+   "mask": "0x0",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x1300000c",
+   "mask": "0x0",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x13000010",
+   "mask": "0x0",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x14000100",
+   "mask": "0x0",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x14000110",
+   "mask": "0x0",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x14000120",
+   "mask": "0xffffffff",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x14000124",
+   "mask": "0xffffffff",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x14000128",
+   "mask": "0xffffffff",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x1400012c",
+   "mask": "0xffffffff",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x14000130",
+   "mask": "0xffffffff",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x14000134",
+   "mask": "0xffffffff",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x15000000",
+   "mask": "0x0",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x15009094",
+   "mask": "0xffffffff",
+   "golden": "0xffffffff"
+  },
+  {
+   "phys": "0x150090ec",
+   "mask": "0x1",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x150090f4",
+   "mask": "0x0",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x1500a300",
+   "mask": "0x1",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x16000000",
+   "mask": "0x100",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x16000008",
+   "mask": "0x1",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x16000010",
+   "mask": "0x0",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x16000014",
+   "mask": "0x0",
+   "golden": "0x0"
+  },
+  {
+   "phys": "0x16000018",
+   "mask": "0x1",
+   "golden": "0x0"
+  }
+ ],
+ "stock_suspend_hooks": {
+  "tpd_suspend": {
+   "addr": "0xc04a41c0",
+   "behaviour": "read APT32F reg6 (firmware); 1..19: write reg5=1 (sleep); else GPIO56 low (reset held)"
+  },
+  "tpd_resume": {
+   "addr": "0xc04a3088",
+   "behaviour": "GPIO56 high, 10 ms, low, 20 ms, high; write reg5=0"
+  },
+  "usb_phy_savecurrent_internal": {
+   "addr": "0xc04d98f0",
+   "behaviour": "PHY 0x11210800: force suspendm with pulldowns/xcvrsel/termsel, BC1.1 and VBUS comparator off, then USB clock off"
+  },
+  "pmic_mt6323_suspend": {
+   "addr": "0xc04b3dd4",
+   "behaviour": "VREF18_ENB=1, ADC_DECI_GDLY=1, CLKSQ_EN_AUX=1, AUD26M_DIV4_CK_PDN=0, AUXADC SDM HW mode, SDM clocks on"
+  },
+  "cs43131_early_suspend": {
+   "addr": "0xc054bed0",
+   "behaviour": "if no audio: GPIO15/18/20 low and hwPowerDown(id 6, VGP2 refcount)"
+  },
+  "lcm_suspend (GC9503)": {
+   "addr": "0xc04a24f4",
+   "behaviour": "39-row table: power regs, display off 0x28, sleep in 0x10, AF=02 tail; reset pin left high"
+  },
+  "slp_suspend_ops_enter": {
+   "addr": "0xc0035bd4",
+   "behaviour": "spm_go_to_sleep only (no clock writes); golden/register dumps"
+  }
+ },
+ "apt32f_firmware_read": {
+  "reg6": "0x01",
+  "method": "i2ctransfer -f -y 0 w1@0x51 6 r1 (read-only, 2026-10-11, POWER-FINAL-12)"
+ }
+}

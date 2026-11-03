@@ -1,0 +1,45 @@
+--- a/arch/arm/mach-mediatek/Kconfig
++++ b/arch/arm/mach-mediatek/Kconfig
+@@ -10,6 +10,42 @@
+ 	  Support for Mediatek MT65xx & MT81xx SoCs
+ 
+ if ARCH_MEDIATEK
++
++config Y2_PLATFORM
++ bool "Innioasis Y2 platform support"
++ depends on !THUMB2_KERNEL && !ARM_LPAE && PROC_FS
++ # Keep shared DRM infrastructure built in; only the controller aggregate
++ # is loaded after PID1 logging is active in the M2 development initramfs.
++ select DRM_KMS_HELPER
++ select DRM_DISPLAY_HELPER
++ select DRM_GEM_DMA_HELPER
++ select DRM_CLIENT_SELECTION
++ select CEC_CORE
++ select COMMON_CLK_MEDIATEK
++ select EINT_MTK
++ select PINMUX
++ select GENERIC_PINCONF
++ help
++   Bounded Linux 6.18 Y2 core bring-up; a production configuration.
++
++config Y2_POWER
++ bool "Innioasis Y2 integrated power platform"
++ depends on Y2_PLATFORM && IIO && THERMAL_OF && CPU_IDLE && NVMEM && POWER_SUPPLY
++ select ARM_CPU_SUSPEND
++ select PM_GENERIC_DOMAINS if PM
++ help
++   MT6323 source detection, bounded charging, rescue boot metadata and
++   thermal telemetry. MT6582 WFI, CPU hotplug and SPM suspend with Linux
++   context restoration; infrastructure retention and s2idle fallback.
++
++
++config Y2_CONNECTIVITY
++ bool "Innioasis Y2 MT6582 connectivity"
++ depends on Y2_POWER && BT=y && CFG80211=y && REGULATOR && RESET_CONTROLLER && RFKILL
++ select FW_LOADER
++ help
++   Shared MT6582 CONSYS power, bounded calibration, BTIF/STP/HCI and
++   AHB Wi-Fi. Radios are activated only by normal production userspace.
+ 
+ config MACH_MT2701
+ 	bool "MediaTek MT2701 SoCs support"

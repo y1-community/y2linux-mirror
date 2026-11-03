@@ -1,0 +1,133 @@
+--- a/drivers/i2c/busses/i2c-mt65xx.c
++++ b/drivers/i2c/busses/i2c-mt65xx.c
+@@ -4,6 +4,8 @@
+  * Author: Xudong Chen <xudong.chen@mediatek.com>
+  */
+ 
++#include "/project/kernel/platform/boot.h"
++#include "/project/kernel/platform/pm-replay-trace.h"
+ #include <linux/clk.h>
+ #include <linux/completion.h>
+ #include <linux/delay.h>
+@@ -522,6 +524,7 @@
+ };
+ 
+ static const struct of_device_id mtk_i2c_of_match[] = {
++	{ .compatible = "mediatek,mt6582-i2c", .data = &mt6577_compat },
+ 	{ .compatible = "mediatek,mt2712-i2c", .data = &mt2712_compat },
+ 	{ .compatible = "mediatek,mt6577-i2c", .data = &mt6577_compat },
+ 	{ .compatible = "mediatek,mt6589-i2c", .data = &mt6589_compat },
+@@ -868,7 +871,7 @@
+ 	return 0;
+ }
+ 
+-static void mtk_i2c_set_speed(struct mtk_i2c *i2c, unsigned int parent_clk)
++static int mtk_i2c_set_speed(struct mtk_i2c *i2c, unsigned int parent_clk)
+ {
+ 	unsigned int clk_src;
+ 	unsigned int step_cnt;
+@@ -938,6 +941,7 @@
+ 
+ 		break;
+ 	}
++	return clk_div <= max_clk_div ? 0 : -EINVAL;
+ }
+ 
+ static void i2c_dump_register(struct mtk_i2c *i2c)
+@@ -1008,6 +1012,7 @@
+ 	int ret;
+ 
+ 	i2c->irq_stat = 0;
++	y2_pm_replay_note(i2c->dev, "i2c_msg_begin", 0);
+ 
+ 	if (i2c->auto_restart)
+ 		restart_flag = I2C_RS_TRANSFER;
+@@ -1181,6 +1186,7 @@
+ 		writel((msgs + 1)->len, i2c->pdmabase + OFFSET_RX_LEN);
+ 	}
+ 
++	y2_pm_replay_note(i2c->dev, "i2c_dma_go", 0);
+ 	writel(I2C_DMA_START_EN, i2c->pdmabase + OFFSET_EN);
+ 
+ 	if (!i2c->auto_restart) {
+@@ -1192,9 +1198,30 @@
+ 	}
+ 	mtk_i2c_writew(i2c, start_reg, OFFSET_START);
+ 
++	y2_pm_replay_note(i2c->dev, "i2c_wait_begin", 0);
+ 	ret = wait_for_completion_timeout(&i2c->msg_complete,
+ 					  i2c->adap.timeout);
+-
++	y2_pm_replay_note(i2c->dev, "i2c_wait_done", ret ? 0 : -ETIMEDOUT);
++
++    if (of_device_is_compatible(i2c->dev->of_node, "mediatek,mt6582-i2c") &&
++        (!ret || (i2c->irq_stat & (I2C_HS_NACKERR | I2C_ACKERR)))) {
++        dev_warn(i2c->dev, "Y2I2C result=%s irq_seen=%04x parent=%lu div=%u bus=%u op=%u\n",
++            ret ? "NACK" : "timeout", i2c->irq_stat,
++            clk_get_rate(i2c->clocks[0].clk), i2c->clk_src_div, i2c->speed_hz, i2c->op);
++        dev_warn(i2c->dev, "Y2I2C start=%04x status=%04x mask=%04x control=%04x timing=%04x len=%04x transactions=%04x fifo=%04x debug=%04x io=%04x\n",
++            mtk_i2c_readw(i2c, OFFSET_START), mtk_i2c_readw(i2c, OFFSET_INTR_STAT),
++            mtk_i2c_readw(i2c, OFFSET_INTR_MASK), mtk_i2c_readw(i2c, OFFSET_CONTROL),
++            mtk_i2c_readw(i2c, OFFSET_TIMING), mtk_i2c_readw(i2c, OFFSET_TRANSFER_LEN),
++            mtk_i2c_readw(i2c, OFFSET_TRANSAC_LEN), mtk_i2c_readw(i2c, OFFSET_FIFO_STAT),
++            mtk_i2c_readw(i2c, OFFSET_DEBUGSTAT), mtk_i2c_readw(i2c, OFFSET_IO_CONFIG));
++        dev_warn(i2c->dev, "Y2I2C DMA en=%08x flags=%08x con=%08x tx=%08x/%u rx=%08x/%u\n",
++            readl(i2c->pdmabase + OFFSET_EN), readl(i2c->pdmabase + OFFSET_INT_FLAG),
++            readl(i2c->pdmabase + OFFSET_CON), readl(i2c->pdmabase + OFFSET_TX_MEM_ADDR),
++            readl(i2c->pdmabase + OFFSET_TX_LEN), readl(i2c->pdmabase + OFFSET_RX_MEM_ADDR),
++            readl(i2c->pdmabase + OFFSET_RX_LEN));
++        /* Retire controller/DMA ownership BEFORE unmap/free on an error. */
++        mtk_i2c_init_hw(i2c);
++    }
+ 	/* Clear interrupt mask */
+ 	mtk_i2c_writew(i2c, ~(restart_flag | I2C_HS_NACKERR | I2C_ACKERR |
+ 			    I2C_ARB_LOST | I2C_TRANSAC_COMP), OFFSET_INTR_MASK);
+@@ -1243,13 +1270,17 @@
+ 	bool write_then_read_en = false;
+ 	struct mtk_i2c *i2c = i2c_get_adapdata(adap);
+ 
++	y2_pm_replay_note(i2c->dev, "i2c_clk_begin", 0);
+ 	ret = clk_bulk_enable(I2C_MT65XX_CLK_MAX, i2c->clocks);
++	y2_pm_replay_note(i2c->dev, "i2c_clk_done", ret);
+ 	if (ret)
+ 		return ret;
+ 
+ 	i2c->auto_restart = i2c->dev_comp->auto_restart;
+ 
+ 	/* checking if we can skip restart and optimize using WRRD mode */
++	/* Linux 6.18.y combines every write-then-read pair, which also covers
++	 * MT6582 (WRRD without an auto-restart engine). */
+ 	if (num == 2) {
+ 		if (!(msgs[0].flags & I2C_M_RD) && (msgs[1].flags & I2C_M_RD) &&
+ 		    msgs[0].addr == msgs[1].addr) {
+@@ -1300,6 +1331,7 @@
+ 
+ err_exit:
+ 	clk_bulk_disable(I2C_MT65XX_CLK_MAX, i2c->clocks);
++	y2_pm_replay_note(i2c->dev, "i2c_xfer_done", ret < 0 ? ret : 0);
+ 	return ret;
+ }
+ 
+@@ -1375,6 +1407,10 @@
+ 	int ret = 0;
+ 	struct mtk_i2c *i2c;
+ 	int i, irq, speed_clk;
++
++	if (IS_ENABLED(CONFIG_Y2_POWER) && of_machine_is_compatible("innioasis,y2") &&
++	    !y2_normal_boot_enabled())
++		return -EPROBE_DEFER;
+ 
+ 	i2c = devm_kzalloc(&pdev->dev, sizeof(*i2c), GFP_KERNEL);
+ 	if (!i2c)
+@@ -1457,7 +1493,10 @@
+ 
+ 	strscpy(i2c->adap.name, I2C_DRV_NAME, sizeof(i2c->adap.name));
+ 
+-	mtk_i2c_set_speed(i2c, clk_get_rate(i2c->clocks[speed_clk].clk));
++	if (!clk_get_rate(i2c->clocks[speed_clk].clk))
++		return dev_err_probe(&pdev->dev, -EINVAL, "unknown source clock rate\n");
++	ret = mtk_i2c_set_speed(i2c, clk_get_rate(i2c->clocks[speed_clk].clk));
++	if (ret) return dev_err_probe(&pdev->dev, ret, "I2C timing\n");
+ 
+ 	if (i2c->dev_comp->max_dma_support > 32) {
+ 		ret = dma_set_mask(&pdev->dev,

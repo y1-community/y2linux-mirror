@@ -1,0 +1,86 @@
+//! `/run/y2/coexistence.json`: the Wi-Fi transfer rate and the Bluetooth link for the radio policy,
+//! and the Bluetooth codec ceiling while Wi-Fi shares the radio (`/run/y2/bt-codec-ceiling`).
+// SPDX-License-Identifier: GPL-2.0-only
+use super::{atomic_json, json, Failure, Map, Root, Value};
+
+/// Present while the Wi-Fi radio is on: the MT6582 has one 2.4 GHz antenna for Wi-Fi and Bluetooth,
+/// and losses in the air never back up BlueALSA's socket queue, so its adaptive rate cannot see them
+/// (Y2Reborn #87: AAC 320 kbit/s crackled and cut out with Wi-Fi on). BlueALSA's encoders look about
+/// once a second and keep CBR AAC at or below 192 kbit/s and SBC off its top bit-pool (53 -> 45)
+/// meanwhile (BlueALSA patches 0002, 0003: `y2-codec-ceiling.h`). Only its presence counts.
+pub(super) const CODEC_CEILING: &str = "/run/y2/bt-codec-ceiling";
+
+/// The Wi-Fi transfer rate and the Bluetooth link for the radio policy (`/run/y2/coexistence.json`,
+/// provisional) and the codec ceiling (`codec_bitrate_override`, [`CODEC_CEILING`]).
+#[derive(Default)]
+pub(super) struct Coexistence {
+    previous: Option<(f64, f64)>,
+    /// This boot's id, read on the first pass: it cannot change while the service runs.
+    boot_id: Option<Option<String>>,
+}
+
+impl Coexistence {
+    pub(super) fn observe(
+        &mut self,
+        root: &Root,
+        wifi: &crate::commands::observation::snapshot::Wifi,
+        now: f64,
+    ) -> Result<Map<String, Value>, Failure> {
+        // A counter that did not read counts as none.
+        let total: f64 = ["rx_bytes", "tx_bytes"]
+            .iter()
+            .filter_map(|key| wifi.traffic_counters.get(*key).copied().flatten())
+            .map(|bytes| bytes as f64)
+            .sum();
+        let mut rate = None;
+        if let Some((previous_time, previous_bytes)) = self.previous {
+            if now > previous_time && total >= previous_bytes {
+                rate = Some((total - previous_bytes) / (now - previous_time));
+            }
+        }
+        self.previous = Some((now, total));
+        let mut value = Map::new();
+        value.insert("schema".into(), json!(1));
+        let boot_id = self.boot_id.get_or_insert_with(|| root.boot_id());
+        value.insert("boot_id".into(), json!(boot_id));
+        value.insert("monotonic_s".into(), json!(now));
+        value.insert("wifi_active".into(), json!(wifi.state == "Online"));
+        value.insert("wifi_bytes_per_second".into(), json!(rate));
+        value.insert(
+            "wifi_heavy_transfer".into(),
+            json!(rate.is_some_and(|r| r >= 1024.0 * 1024.0)),
+        );
+        value.insert(
+            "cpu_pressure".into(),
+            json!(root.read("/proc/pressure/cpu")),
+        );
+        value.insert(
+            "bluetooth_link".into(),
+            Value::Object(root.json_object("/run/y2/bt-reconnect.json")),
+        );
+        value.insert("provisional".into(), json!(true));
+        let ceiling = codec_ceiling(root, wifi.state != "Off")?;
+        value.insert("codec_bitrate_override".into(), ceiling);
+        atomic_json(&root.path("/run/y2/coexistence.json"), &value, false)?;
+        Ok(value)
+    }
+}
+
+/// [`CODEC_CEILING`] present while the Wi-Fi radio is on (`on`), absent otherwise; checked every pass,
+/// so a removed `/run/y2` heals. What it means, or null.
+fn codec_ceiling(root: &Root, on: bool) -> Result<Value, Failure> {
+    let path = root.path(CODEC_CEILING);
+    let ceiling =
+        json!({"reason": "wifi_radio_on", "aac_max_bps": 192_000, "sbc_bitpool_percent": 85});
+    match (on, path.exists()) {
+        (true, false) => atomic_json(&path, &ceiling, false)?,
+        (false, true) => match std::fs::remove_file(&path) {
+            Err(e) if e.kind() != std::io::ErrorKind::NotFound => {
+                return Err(Failure::os(e, &path))
+            }
+            _ => {}
+        },
+        _ => {}
+    }
+    Ok(if on { ceiling } else { Value::Null })
+}

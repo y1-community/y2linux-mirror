@@ -1,0 +1,154 @@
+{
+  "date": "2026-10-04",
+  "linux_base": "b5aea93",
+  "reborn_base": "b71b468860233faa0a42b8448ec5777fa952b8e3",
+  "reborn_change": "a2df691edfbb105a164e2f5f574b158ec5f81e6c",
+  "host_ffmpeg": "n9.0.2",
+  "production_arm_ffmpeg": "9.0.2",
+  "host_before": {
+    "path": "out/platform-v1-graphics/artwork/4096.jpg",
+    "decode_scale_cpu_median_ms": 15.014719,
+    "rss_kib": 76396,
+    "repeats": 12,
+    "pixel_samples": [
+      [
+        196,
+        37,
+        76,
+        255
+      ],
+      [
+        5,
+        166,
+        65,
+        255
+      ]
+    ]
+  },
+  "host_after": {
+    "path": "out/platform-v1-graphics/artwork/4096.jpg",
+    "decode_scale_cpu_median_ms": 3.9922934999999997,
+    "rss_kib": 51712,
+    "repeats": 12,
+    "pixel_samples": [
+      [
+        200,
+        38,
+        80,
+        255
+      ],
+      [
+        11,
+        170,
+        71,
+        255
+      ]
+    ]
+  },
+  "artwork_regression": {
+    "passed": true,
+    "checks": [
+      "160-160-False.jpg",
+      "160-160-True.jpg",
+      "640-320-False.jpg",
+      "640-320-True.jpg",
+      "4096-4096-False.jpg",
+      "4096-4096-True.jpg",
+      "ordinary.png",
+      "ordinary.webp",
+      "25MP PNG rejected",
+      "truncated JPEG rejected"
+    ],
+    "qualification": "host FFmpeg membrane; no GPU or battery claim"
+  },
+  "arm_qemu": {
+    "passed": true,
+    "rgba_bytes": 102400,
+    "cpu_median_ms": 42.572,
+    "rss_kib": 16684,
+    "repeats": 12,
+    "first_pixel": [
+      200,
+      40,
+      80,
+      255
+    ]
+  },
+  "checks": {
+    "linux_tests": 68,
+    "reborn_workspace_tests": 238,
+    "fmt": "PASS",
+    "strict_clippy": "PASS",
+    "native_C_warnings": "PASS",
+    "arm_workspace_release_build": "PASS"
+  },
+  "physical_status": "BOUNDED_PASS_WITH_STATIC_REDRAW_GAP",
+  "full_system_suspend": "OTHER_SESSION",
+  "flash": false,
+  "push": false,
+  "linux_suite": {
+    "test_gpu": 3,
+    "test_baseline_display": 2,
+    "test_reborn_splash": 26,
+    "test_power": 6,
+    "test_cpu_idle_boot_policy": 10,
+    "test_cpu_idle_completion": 12,
+    "test_slow_idle": 1,
+    "test_platform_power_contract": 8
+  },
+  "embedded_changed_host": {
+    "open_cpu_mean_ms": 0.713,
+    "art_cpu_mean_ms": 4.01,
+    "rss_kib": 47348,
+    "repeats": 12
+  },
+  "host_small": {
+    "baseline": {
+      "path": "out/platform-v1-graphics/artwork/160.jpg",
+      "decode_scale_cpu_median_ms": 0.051211,
+      "rss_kib": 50432,
+      "repeats": 12,
+      "pixel_samples": [
+        [
+          199,
+          39,
+          79,
+          255
+        ],
+        [
+          10,
+          219,
+          88,
+          255
+        ]
+      ]
+    },
+    "after": {
+      "path": "out/platform-v1-graphics/artwork/160.jpg",
+      "decode_scale_cpu_median_ms": 0.057463,
+      "rss_kib": 51004,
+      "repeats": 12,
+      "pixel_samples": [
+        [
+          199,
+          39,
+          79,
+          255
+        ],
+        [
+          10,
+          219,
+          88,
+          255
+        ]
+      ]
+    }
+  },
+  "sdk_version_evidence": {
+    "ffversion_header": "/home/luca/Dokumente/Code/Y2Linux/out/baseline-02-worktrees/Y2Linux/out/baseline-02-build/buildroot/staging/usr/include/libavutil/ffversion.h",
+    "ffversion_header_sha256": "537cc2670bace94fe3a41fd008afdf00c2728e34ba4fd63160bafc29097af4c5",
+    "ffversion_header_mtime": 1791058979.413336,
+    "target_avutil_sha256": "2d614d2242e82e24c1096500160fa5f30058d241c670491ba02b2c4e9bc10a51",
+    "correction": "initial 9.0.1 draft label was incorrect; verified SDK is 9.0.2"
+  }
+}

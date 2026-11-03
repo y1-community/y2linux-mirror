@@ -1,0 +1,341 @@
+#!/usr/bin/env python3
+"""Package BOOTIMG + Y2ROOT using the established preserving SPFT contract.
+
+No device access and no Y2DATA payload, seed, formatting or migration image.
+"""
+import argparse
+import copy
+import json
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+
+PROJECT = Path(__file__).resolve().parents[2]
+REBORN = PROJECT.parent / 'Y2Reborn'
+sys.path.insert(0, str(PROJECT))
+from tools.production.layout import TARGETS, RECOVERY_TARGET, RADIO_FIRMWARE, digest, require, make_scatter, make_recovery_scatter
+from tools.production.boot_update import installed_components
+
+BUILDROOT_SOURCE = PROJECT/'.cache/sources' / ('buildroot-' + json.loads((PROJECT/'buildroot/inputs.lock.json').read_text())['version'])
+
+
+CONFIGURATION_FILES = ('capabilities.json', 'battery-profile.json', 'power-policy.json',
+                       'audio-enabled.json', 'rtc-policy.json', 'bluetooth-codecs.json',
+                       'update-compat.json')
+
+
+def configuration_inventory(target):
+    directory = target/'etc/y2linux'
+    records = {}
+    for name in CONFIGURATION_FILES:
+        path = directory/name
+        value = json.loads(path.read_text())
+        require(isinstance(value, dict) and 'schema' in value, 'configuration schema '+name)
+        records[name] = {'path': '/etc/y2linux/'+name, 'schema': value['schema'],
+                         'sha256': digest(path), 'size_bytes': path.stat().st_size}
+    caps = json.loads((directory/'capabilities.json').read_text())
+    require(caps.get('feature_contract_version') == 2, 'capability contract version')
+    for name, value in caps['capabilities'].items():
+        require(all(type(value.get(key)) is bool for key in ('implemented', 'enabled', 'qualified', 'experimental'))
+                and isinstance(value.get('reason'), str), 'independent capability states '+name)
+        require(not value['qualified'], 'new candidate physical qualification pending '+name)
+    return {'schema': 'org.y2linux.hardware-configuration/v1', 'feature_contract_version': 2,
+            'owner_overrides_preserved': True, 'files': records}
+
+
+def preserving_scatter(stock):
+    text = make_scatter(stock, False)
+    # No stale data-image filename even on an unchecked row.
+    return text.replace('file_name: Y2DATA.img', 'file_name: NONE')
+
+
+def overlay_fallback(previous, overlay, image):
+    """Verify a reviewed root overlay against its unchanged BOOTIMG and image.
+
+    The geometry/data contract still comes from the full production manifest.
+    An overlay receipt is never treated as a full release manifest.
+    """
+    from tools.production.validate import run
+    require(overlay.get('schema') == 'org.y2linux.telemetry-root-overlay/v1',
+            'supported root overlay receipt')
+    versions = overlay['platform_versions']
+    oldboot = next(p for p in previous['payloads'] if p['target_partition'] == 'BOOTIMG')
+    oldroot = copy.deepcopy(next(p for p in installed_components(previous)
+                                 if p['target_partition'] == 'ANDROID'))
+    require(overlay.get('required_installed_bootimg') == oldboot['raw'],
+            'overlay requires the exact fallback BOOTIMG')
+    for field in ('kernel_version', 'layout_version', 'data_schema_version', 'platform_api_version'):
+        require(versions.get(field) == previous.get(field), 'overlay compatibility ' + field)
+    require(versions.get('kernel_source_commit') == overlay.get('base_platform_source_commit') ==
+            previous['build_git_commit'], 'overlay retained kernel provenance')
+    source = overlay.get('source_commit', '')
+    require(len(source) == 40 and all(c in '0123456789abcdef' for c in source) and
+            versions.get('build_git_commit') == source, 'overlay root source identity')
+    require(overlay.get('selected_partitions') == ['ANDROID'] and
+            overlay.get('bootimg_payload_included') is False, 'root-only overlay scope')
+    root = overlay['root']
+    require(root['file'] == 'Y2ROOT.img' and root['bytes'] == oldroot['raw']['size_bytes'],
+            'overlay root filename and geometry')
+    require(image.stat().st_size == root['bytes'] and digest(image) == root['sha256'],
+            'overlay fallback image identity')
+    on_image = json.loads(run('debugfs', '-R', 'cat /etc/y2linux/versions.json', str(image)))
+    require(on_image == versions, 'overlay on-image version identity')
+    identity = run('blkid', '-p', '-o', 'export', str(image)).decode()
+    for key, value in [('TYPE', 'ext4'), ('LABEL', oldroot['filesystem']['label']),
+                       ('UUID', oldroot['filesystem']['uuid'])]:
+        require(key + '=' + value + '\n' in identity, 'overlay filesystem ' + key)
+    run('e2fsck', '-f', '-n', str(image))
+    oldroot['version'] = versions['rootfs_version']
+    oldroot['raw'] = {'file': root['file'], 'size_bytes': root['bytes'], 'sha256': root['sha256']}
+    oldroot['spft'] = {'format': 'raw-ext4', **oldroot['raw']}
+    return oldroot
+
+
+def validate_preservation(out, manifest):
+    previous = json.loads((out/'metadata/base-manifest.json').read_text())
+    require(digest(out/'metadata/base-manifest.json') == manifest['base_manifest_sha256'], 'base identity')
+    require(manifest['profiles'].keys() == {'MT6582_preserve_data_scatter.txt'}, 'only preserving update profile')
+    stock = (PROJECT/'tests/fixtures/production/MT6582_Android_scatter.txt').read_text()
+    require((out/'MT6582_preserve_data_scatter.txt').read_text() == preserving_scatter(stock), 'exact preserving scatter')
+    require(not (out/'Y2DATA.img').exists(), 'no data image in a system update')
+    root = next(p for p in manifest['payloads'] if p['target_partition']=='ANDROID')
+    boot = next(p for p in manifest['payloads'] if p['target_partition']=='BOOTIMG')
+    versions = json.loads((out/'metadata/versions.json').read_text())
+    require(all(manifest.get(k)==v for k,v in versions.items()), 'build version receipt')
+    require(manifest['build_git_commit']==manifest['rootfs_build_git_commit']==
+            (out/'metadata/kernel-source-commit').read_text().strip(), 'kernel/root source receipt')
+    require(root['version']==manifest['rootfs_version'] and boot['version']==manifest['kernel_version'], 'component versions')
+    data = next(p for p in installed_components(previous) if p['target_partition']=='USRDATA')
+    require(manifest['installed_components'] == [root,data], 'new root plus unchanged data contract')
+    require(manifest['data_schema_version'] == previous['data_schema_version'] == 1, 'no data schema reset')
+    require(manifest['minimum_compatible_components'] == previous['minimum_compatible_components'], 'platform compatibility')
+    oldroot = next(p for p in installed_components(previous) if p['target_partition']=='ANDROID')
+    oldboot = next(p for p in previous['payloads'] if p['target_partition']=='BOOTIMG')
+    if 'overlay_manifest_sha256' in manifest['fallback']:
+        receipt = out/'metadata/fallback-overlay-manifest.json'
+        require(digest(receipt) == manifest['fallback']['overlay_manifest_sha256'],
+                'fallback overlay receipt identity')
+        oldroot = overlay_fallback(previous, json.loads(receipt.read_text()), out/'fallback/Y2ROOT.img')
+    for old in (oldboot, oldroot):
+        path=out/'fallback'/old['raw']['file']
+        require(path.stat().st_size == old['raw']['size_bytes'] and digest(path)==old['raw']['sha256'], 'fallback image identity')
+    require(manifest['fallback']['images']==[
+        {'file':'fallback/'+p['raw']['file'],'size_bytes':p['raw']['size_bytes'],'sha256':p['raw']['sha256']}
+        for p in (oldboot,oldroot)], 'fallback identity receipt')
+    require((out/'fallback/MT6582_preserve_data_scatter.txt').read_text()==preserving_scatter(stock), 'fallback preserves data')
+    if 'radio_firmware' in manifest:
+        require(manifest['radio_firmware']==json.loads((out/'metadata/radio-firmware.json').read_text())==RADIO_FIRMWARE,
+                'no radio firmware in the images (RELEASE-49)')
+    else:
+        # Packages before RELEASE-49 carried the owner's reviewed firmware.
+        from tools.connectivity.provision import DEFAULTS, INVENTORY
+        require(manifest['owner_firmware']['redistribution_permission_established'] is False, 'owner-only provisioning')
+        files={x['filename']:{'size_bytes':x['bytes'],'sha256':x['sha256']}
+               for x in json.loads(INVENTORY.read_text())['files']}
+        files.update({name:{'size_bytes':v[0],'sha256':v[1]} for name,v in DEFAULTS.items()})
+        require(manifest['owner_firmware']==json.loads((out/'metadata/owner-firmware.json').read_text())==
+                {'schema':'org.schulzcode.y2linux.owner-firmware/v1',
+                 'redistribution_permission_established':False,'files':files}, 'reviewed firmware receipt')
+    if manifest.get('feature_contract_version') == 2:
+        configuration = manifest['hardware_configuration']
+        require(configuration == json.loads((out/'metadata/hardware-configuration.json').read_text()),
+                'hardware configuration receipt')
+        for name, record in configuration['files'].items():
+            require(name in CONFIGURATION_FILES, 'configuration allowlist')
+            path = out/'metadata/hardware-configuration'/name
+            require(digest(path) == record['sha256'] and path.stat().st_size == record['size_bytes'],
+                    'configuration identity '+name)
+
+
+def distribution_gate(build, public):
+    from tools.production.privacy import public_distribution
+    build = Path(build)
+    manifest = {'radio_firmware': RADIO_FIRMWARE}
+    codecs = json.loads((build/'buildroot/target/etc/y2linux/bluetooth-codecs.json').read_text())
+    state = public_distribution(manifest, codecs)
+    if public:
+        require(state['public_distribution_ready'], 'public distribution unresolved: '+', '.join(state['blockers']))
+    return state
+
+
+def recovery_install(build, out, stock):
+    """OTA-35: the Y2 recovery image as its own one-time SPFT step. It replaces
+    the stock Android recovery; BOOTIMG, the root and Y2DATA are not selected."""
+    from tools.validation.bootimg import RECOVERY_NAME
+    directory = out/'recovery-install'
+    directory.mkdir()
+    image = directory/'RECOVERY.img'
+    shutil.copyfile(Path(build)/'RECOVERY.img', image)
+    raw = image.read_bytes()
+    require(len(raw) <= RECOVERY_TARGET['size'] and raw[:8] == b'ANDROID!' and raw[48:64] == RECOVERY_NAME,
+            'Y2 recovery image within the RECOVERY span')
+    scatter = directory/'MT6582_recovery_scatter.txt'
+    scatter.write_text(make_recovery_scatter(stock))
+    record = {'schema': 'org.y2linux.recovery-install/v1', 'target_partition': 'RECOVERY',
+              'scatter_physical_start_bytes': RECOVERY_TARGET['start'],
+              'scatter_linear_start_bytes': RECOVERY_TARGET['linear'],
+              'partition_size_bytes': RECOVERY_TARGET['size'],
+              'raw': {'file': image.name, 'size_bytes': len(raw), 'sha256': digest(image)},
+              'scatter': {'file': scatter.name, 'sha256': digest(scatter), 'selected_partitions': ['RECOVERY']},
+              'replaces': 'stock Android recovery (keep a readback of RECOVERY before the first write)',
+              'normal_update_path': 'later releases install RECOVERY from the signed OTA package'}
+    (directory/'recovery-install.json').write_text(json.dumps(record, indent=2)+'\n')
+    shutil.copyfile(PROJECT/'docs/architecture/ota-recovery-install.md', directory/'install.md')
+    return record
+
+
+def build_root_image(build):
+    # Buildroot names ext4 output through its rootfs.ext2 alias. Resolve only
+    # inside this build's images directory; arbitrary input links remain banned.
+    directory = (Path(build)/'buildroot/images').resolve(strict=True)
+    image = (directory/'rootfs.ext4').resolve(strict=True)
+    require(image.parent == directory and image.name in ('rootfs.ext2', 'rootfs.ext4'),
+            'generated root image must remain inside build images')
+    return image
+
+
+def audio_stack(build, ffmpeg_version):
+    """Separate compiled conversion formats from selected native hardware policy."""
+    audio_policy=json.loads((build/'buildroot/target/etc/y2linux/audio-enabled.json').read_text())
+    return {
+        'ffmpeg_version':ffmpeg_version,
+        'canonical_sample_format':'fltp',
+        'preferred_output_format':'S16_LE',
+        'candidate_physically_qualified_output_formats':[],
+        'prior_narrow_output_formats':['S16_LE'],
+        'prior_narrow_rates_hz':[44100],
+        'implemented_software_output_formats':['S16_LE','S24_LE','S32_LE'],
+        'enabled_native_output_formats':audio_policy['enabled_formats'],
+        'enabled_native_rates_hz':audio_policy['enabled_rates'],
+        'unimplemented_native_output_formats':['S24_LE','S32_LE'],
+        'unqualified_native_rates_hz':audio_policy['enabled_rates'] + [88200,96000],
+        'precision_scope':'Software output conversion and native AFE admission are separate; no integrated physical output qualification',
+        'qualification_evidence':'docs/hardware-evidence/2026-09-18-gpu01/audio.txt',
+    }
+
+
+def package(build, base, fallback_root, out, fallback_overlay=None, public=False):
+    from tools.production.validate import validate_manifest, validate_rootfs
+    from tools.production.application import receipt as reborn_application
+    distribution_gate(build, public)  # Fail before creating any public package.
+    ffmpeg_version=(REBORN/'FFMPEG_VERSION').read_text().strip()
+    require(out.is_relative_to(PROJECT/'out') and not out.exists(), 'fresh package inside out')
+    require(not subprocess.check_output(['git','status','--porcelain'],cwd=PROJECT).strip(), 'commit reviewed source before packaging')
+    head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=PROJECT,text=True).strip()
+    versions=json.loads((build/'versions.json').read_text())
+    require(versions['build_git_commit']==head==(build/'kernel-source-commit').read_text().strip(), 'source identity')
+    previous=validate_manifest(base)
+    components=installed_components(previous)
+    oldroot=next(p for p in components if p['target_partition']=='ANDROID')
+    if fallback_overlay is not None:
+        oldroot=overlay_fallback(previous,json.loads(fallback_overlay.read_text()),fallback_root)
+    require(fallback_root.stat().st_size==oldroot['raw']['size_bytes'] and digest(fallback_root)==oldroot['raw']['sha256'], 'accepted root fallback')
+    from tools.production.privacy import ext4
+    privacy = {'new_root': ext4(build_root_image(build)),
+               'fallback_root': ext4(fallback_root), 'private_state_found': False}
+    out.mkdir(); (out/'metadata').mkdir(); (out/'fallback').mkdir()
+    shutil.copyfile(build/'BOOTIMG.img',out/'BOOTIMG.img')
+    subprocess.run(['cp','--sparse=always',str(build/'buildroot/images/rootfs.ext4'),str(out/'Y2ROOT.img')],check=True)
+    shutil.copyfile(base/'BOOTIMG.img',out/'fallback/BOOTIMG.img')
+    subprocess.run(['cp','--sparse=always',str(fallback_root),str(out/'fallback/Y2ROOT.img')],check=True)
+    shutil.copyfile(base/'manifest.json',out/'metadata/base-manifest.json')
+    if fallback_overlay is not None:
+        shutil.copyfile(fallback_overlay,out/'metadata/fallback-overlay-manifest.json')
+    for name in ('partitions.json','storage-addressing.json','readback-plan.json','kernel-COPYING','Buildroot-COPYING'):
+        shutil.copyfile(base/'metadata'/name,out/'metadata'/name)
+    for name in ('versions.json','layout.json','rescue-manifest.json','kernel-source-commit'):
+        shutil.copyfile(build/name,out/'metadata'/name)
+    (out/'metadata/radio-firmware.json').write_text(json.dumps(RADIO_FIRMWARE,indent=2)+'\n')
+    for source,name in [(build/'kernel/.config','kernel.config'),(build/'buildroot/.config','buildroot.config'),
+                        (PROJECT/'tools/build/inputs.lock.json','kernel-inputs.lock.json'),
+                        (PROJECT/'tools/build/connectivity-host.lock.json','connectivity-host.lock.json'),
+                        (PROJECT/'buildroot/inputs.lock.json','buildroot-inputs.lock.json')]:
+        shutil.copyfile(source,out/'metadata'/name)
+    if '-gpu.' in versions['rootfs_version'] or versions.get('platform_api_version') == 1:
+        licenses=out/'metadata/graphics-licenses'; licenses.mkdir()
+        def built(package):
+            found=sorted((build/'buildroot/build').glob(package+'-[0-9]*'))
+            if len(found)!=1: raise ValueError('expected one '+package+' build: '+str(found))
+            return found[0], found[0].name.removeprefix(package+'-')
+        mesa,mesa_version=built('mesa3d'); drm,drm_version=built('libdrm')
+        for source,name in [
+                (mesa/'docs/license.rst','Mesa-'+mesa_version+'-license.rst'),
+                (drm/'data/meson.build','libdrm-'+drm_version+'-license.txt'),
+                (PROJECT/'tools/graphics/LICENSE','y2-gpu-check-MIT.txt'),
+                (PROJECT/'tools/graphics/include/lima_drm.h','Linux-6.18-lima-uapi.h'),
+                (PROJECT/'docs/knowledge/evidence/gpu-source-contract.json','gpu-source-contract.json')]:
+            shutil.copyfile(source,licenses/name)
+        for name in ('mesa3d','libdrm'):
+            shutil.copyfile(BUILDROOT_SOURCE/'package'/name/(name+'.hash'),
+                            licenses/(name+'-source.hash'))
+    manifest=copy.deepcopy(previous); manifest.update(versions)
+    for name in ('fallback','userspace_source','rootfs_build_git_commit','installed_components_policy'):
+        manifest.pop(name,None)
+    manifest['rootfs_build_git_commit']=head
+    boot=copy.deepcopy(next(p for p in previous['payloads'] if p['target_partition']=='BOOTIMG'))
+    root=copy.deepcopy(oldroot)
+    for payload,version in ((boot,versions['kernel_version']),(root,versions['rootfs_version'])):
+        name=payload['target_partition']; target=TARGETS[name]; path=out/target['file']
+        require(path.stat().st_size<=target['size'], 'partition size ceiling')
+        payload['version']=version; payload['required_in_profiles']=['preserve-data']
+        payload['raw']={'file':path.name,'size_bytes':path.stat().st_size,'sha256':digest(path)}
+        payload['spft']={'format':'raw-android-mtk-bootimg' if name=='BOOTIMG' else 'raw-ext4',**payload['raw']}
+    boot['modules']['release']=versions['kernel_version']
+    manifest['payloads']=[boot,root]
+    manifest['installed_components']=[copy.deepcopy(root),copy.deepcopy(next(p for p in components if p['target_partition']=='USRDATA'))]
+    manifest['installation_profile']='system-update'
+    manifest['distribution_intent'] = 'public' if public else 'owner-local'
+    manifest['application']=reborn_application(versions['reborn_version'])
+    manifest['base_manifest_sha256']=digest(out/'metadata/base-manifest.json')
+    manifest['status']='Y2Linux Platform v1 software candidate; all current-candidate physical/endurance qualification pending' if versions.get('platform_api_version')==1 else f'Reborn FFmpeg {ffmpeg_version} audio production candidate; physical audio qualification pending'
+    manifest['data_policy']='Preserve existing Y2DATA in place. New private directories are created on first normal boot. No data payload.'
+    manifest['radio_firmware']=RADIO_FIRMWARE
+    if versions.get('feature_contract_version') == 2:
+        manifest['hardware_configuration'] = configuration_inventory(build/'buildroot/target')
+        directory = out/'metadata/hardware-configuration'
+        directory.mkdir()
+        for name in CONFIGURATION_FILES:
+            shutil.copyfile(build/'buildroot/target/etc/y2linux'/name, directory/name)
+        (out/'metadata/hardware-configuration.json').write_text(
+            json.dumps(manifest['hardware_configuration'], indent=2)+'\n')
+    manifest['audio_stack']=audio_stack(build, ffmpeg_version)
+    manifest['fallback']={'policy':f"restore previous BOOTIMG ({previous['kernel_version']}) and Y2ROOT ({oldroot['version']}); preserve Y2DATA",
+        'images':[{'file':'fallback/'+p['raw']['file'],'size_bytes':p['raw']['size_bytes'],'sha256':p['raw']['sha256']}
+                  for p in (next(p for p in previous['payloads'] if p['target_partition']=='BOOTIMG'),oldroot)]}
+    if fallback_overlay is not None:
+        manifest['fallback']['overlay_manifest_sha256']=digest(out/'metadata/fallback-overlay-manifest.json')
+    scatter='MT6582_preserve_data_scatter.txt'
+    stock=(PROJECT/'tests/fixtures/production/MT6582_Android_scatter.txt').read_text()
+    (out/scatter).write_text(preserving_scatter(stock)); (out/'fallback'/scatter).write_text(preserving_scatter(stock))
+    manifest['profiles']={scatter:{'sha256':digest(out/scatter),'selected_partitions':['BOOTIMG','ANDROID']}}
+    if (build/'RECOVERY.img').exists():
+        manifest['recovery_install'] = recovery_install(build, out, stock)
+    from tools.production.composition import write as write_composition
+    manifest['release_composition'] = write_composition(build, out, manifest, privacy)
+    (out/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+    # The owner guide (install and updating), not the historical runbook (V1 review B1).
+    shutil.copyfile(PROJECT/'docs/INSTALL.md',out/'install.md')
+    shutil.copyfile(PROJECT/'docs/architecture/reborn-ffmpeg9-build.md',out/'audio-qualification.md')
+    (out/'SHA256SUMS').write_text(''.join(digest(p)+'  '+str(p.relative_to(out))+'\n'
+        for p in sorted(out.rglob('*')) if p.is_file() and p != out/'SHA256SUMS'))
+    validate_manifest(out); validate_rootfs(out,build,manifest)
+    print('PASS preserving production system update:',out)
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--build',type=Path,required=True)
+    parser.add_argument('--base',type=Path,required=True)
+    parser.add_argument('--fallback-rootfs',type=Path,required=True)
+    parser.add_argument('--fallback-overlay-manifest',type=Path,
+                        help='reviewed root-overlay receipt for the exact fallback root and unchanged base BOOTIMG')
+    parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--public',action='store_true',
+                        help='require resolved firmware and codec distribution receipts; default is owner-local')
+    args=parser.parse_args()
+    package(args.build.resolve(),args.base.resolve(),args.fallback_rootfs.resolve(),args.output.resolve(),
+            args.fallback_overlay_manifest.resolve() if args.fallback_overlay_manifest else None, public=args.public)
+
+
+if __name__=='__main__': main()

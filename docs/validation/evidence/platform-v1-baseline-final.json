@@ -1,0 +1,63 @@
+{
+  "schema": "org.y2linux.platform-v1-baseline-final-receipt/v1",
+  "sealed_utc": "2026-10-04T18:10:36.182326+00:00",
+  "compiled_source": {
+    "linux": "98daf3f0220f4a1580bb4893094ee9f0e02362a5",
+    "reborn": "9cd12baeeb70b204e08299bd4c91c8c35604c304"
+  },
+  "versions": {
+    "build_id": "Y2LINUX-PLATFORM-V1-BASELINE-01",
+    "release_version": "1.0.0-platform-v1-baseline-candidate.1",
+    "rootfs_version": "2025.02.18-platform-v1.24",
+    "kernel_version": "6.18.0-y2linux-platform-v1-baseline-01",
+    "reborn_version": "0.2.0"
+  },
+  "candidate": "/home/luca/Dokumente/Code/Y2Linux/out/y2linux-platform-v1-baseline-candidate",
+  "images": {
+    "BOOTIMG.img": {
+      "file": "BOOTIMG.img",
+      "size_bytes": 7235584,
+      "sha256": "531e23a7d4c94f0a7f2aa18c3c5eb1a486f481cf4806c79bf1956453375e6719"
+    },
+    "Y2ROOT.img": {
+      "file": "Y2ROOT.img",
+      "size_bytes": 536870912,
+      "sha256": "565b8338b00b59ab91ff3fa33efde7674992d9d7d07358d0c2c7eabc043b2ee3"
+    }
+  },
+  "software_counts": {
+    "production_cases": 475,
+    "production_passed": 465,
+    "minimal_host_dependency_skips": 10,
+    "native_dependency_cases": 60,
+    "reborn_workspace_tests": 324,
+    "extended_source_cases": 25,
+    "native_splash_update_cases": 34,
+    "emitted_kernel_cases": 4,
+    "elf_files": 384,
+    "elf_dependency_edges": 1411,
+    "package_records": 106
+  },
+  "all_ten_dependency_skips_passed_natively": true,
+  "source_archive_blobs": {
+    "Y2Linux": 1589,
+    "Y2Reborn": 4299
+  },
+  "source_license_records": 449,
+  "canonical_validation_exit": 0,
+  "cpu_foundation": "16 direct source matches / 3 protected functions / 7 rebuilt master object matches; historical UART01 C1/C2/C3 preserved",
+  "c3_policy": "POLICY_ENABLED after qualified static gate; dynamic guards unchanged",
+  "master_comparison": "1413 target regular files identical, 19 changes; all changed userspace ELF .text identical. 2322 tar members, same timestamps/modes/owners and superblock fields, only 19 content changes. No unexplained build difference.",
+  "physical_state": "INTEGRATED_PHYSICAL_NOT_RUN",
+  "rtc_wake": "Baseline02 FAIL unresolved; integrated Power and RTC separately NOT_RUN",
+  "full_suspend": "PHYSICAL_ACCEPTANCE_PENDING",
+  "battery_electrical_endurance": "NOT_RUN",
+  "public_distribution_ready": false,
+  "owner_main_unchanged": true,
+  "owner_dirty_work_preserved": true,
+  "flash_push_device_access": false,
+  "verdict": "READY_FOR_PLATFORM_V1_PHYSICAL_QUALIFICATION",
+  "receipt_directory": "out/platform-v1-baseline-verification",
+  "package_receipts": "validation/",
+  "qualification": "docs/release/Y2-PLATFORM-V1-PHYSICAL-QUALIFICATION.md"
+}

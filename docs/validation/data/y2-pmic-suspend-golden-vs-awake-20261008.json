@@ -1,0 +1,358 @@
+{
+ "source": "vendor mt_power_gs_array.c mt6323_power_gs_suspend_data @ d53dd75c",
+ "dump": "evidence/20261008/78-image04-pmic-regdump (awake, USB connected, Wi-Fi/BT active)",
+ "entries": [
+  {
+   "reg": "0x4e",
+   "name": "",
+   "mask": "0xa0",
+   "golden": "0xa0",
+   "current_awake": "0x0",
+   "match": false
+  },
+  {
+   "reg": "0x52",
+   "name": "",
+   "mask": "0x1",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x66",
+   "name": "",
+   "mask": "0x200",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x102",
+   "name": "",
+   "mask": "0xc7ff",
+   "golden": "0x8042",
+   "current_awake": "0x8043",
+   "match": false
+  },
+  {
+   "reg": "0x108",
+   "name": "",
+   "mask": "0xffff",
+   "golden": "0x15ff",
+   "current_awake": "0x3bf",
+   "match": false
+  },
+  {
+   "reg": "0x10e",
+   "name": "",
+   "mask": "0xf0",
+   "golden": "0x20",
+   "current_awake": "0x0",
+   "match": false
+  },
+  {
+   "reg": "0x120",
+   "name": "",
+   "mask": "0x83fd",
+   "golden": "0xb9",
+   "current_awake": "0x31",
+   "match": false
+  },
+  {
+   "reg": "0x126",
+   "name": "",
+   "mask": "0xc000",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x212",
+   "name": "",
+   "mask": "0x30",
+   "golden": "0x20",
+   "current_awake": "0x0",
+   "match": false
+  },
+  {
+   "reg": "0x216",
+   "name": "",
+   "mask": "0x2",
+   "golden": "0x2",
+   "current_awake": "0x0",
+   "match": false
+  },
+  {
+   "reg": "0x21c",
+   "name": "",
+   "mask": "0x8080",
+   "golden": "0x8080",
+   "current_awake": "0x0",
+   "match": false
+  },
+  {
+   "reg": "0x230",
+   "name": "",
+   "mask": "0x100",
+   "golden": "0x100",
+   "current_awake": "0x0",
+   "match": false
+  },
+  {
+   "reg": "0x256",
+   "name": "",
+   "mask": "0x100",
+   "golden": "0x100",
+   "current_awake": "0x0",
+   "match": false
+  },
+  {
+   "reg": "0x310",
+   "name": "",
+   "mask": "0x8080",
+   "golden": "0x8080",
+   "current_awake": "0x0",
+   "match": false
+  },
+  {
+   "reg": "0x402",
+   "name": "VTCXO",
+   "mask": "0xc01",
+   "golden": "0x401",
+   "current_awake": "0x401",
+   "match": true
+  },
+  {
+   "reg": "0x404",
+   "name": "VA",
+   "mask": "0x1",
+   "golden": "0x1",
+   "current_awake": "0x0",
+   "match": false
+  },
+  {
+   "reg": "0x408",
+   "name": "VCAMA",
+   "mask": "0x8000",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x416",
+   "name": "VCN33_BT",
+   "mask": "0x80",
+   "golden": "0x0",
+   "current_awake": "0x80",
+   "match": false
+  },
+  {
+   "reg": "0x418",
+   "name": "VCN33_WIFI",
+   "mask": "0x1000",
+   "golden": "0x0",
+   "current_awake": "0x1000",
+   "match": false
+  },
+  {
+   "reg": "0x41c",
+   "name": "VCN28",
+   "mask": "0x1000",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x500",
+   "name": "VIO28",
+   "mask": "0x1",
+   "golden": "0x1",
+   "current_awake": "0x0",
+   "match": false
+  },
+  {
+   "reg": "0x502",
+   "name": "VUSB",
+   "mask": "0x1",
+   "golden": "0x1",
+   "current_awake": "0x0",
+   "match": false
+  },
+  {
+   "reg": "0x504",
+   "name": "VMC(SD IO)",
+   "mask": "0x1000",
+   "golden": "0x0",
+   "current_awake": "0x1000",
+   "match": false
+  },
+  {
+   "reg": "0x506",
+   "name": "VMCH(SD VCC)",
+   "mask": "0x4000",
+   "golden": "0x0",
+   "current_awake": "0x4000",
+   "match": false
+  },
+  {
+   "reg": "0x508",
+   "name": "VEMC3V3(eMMC VCC)",
+   "mask": "0x4000",
+   "golden": "0x0",
+   "current_awake": "0x4000",
+   "match": false
+  },
+  {
+   "reg": "0x512",
+   "name": "VCN18",
+   "mask": "0x4000",
+   "golden": "0x0",
+   "current_awake": "0x4000",
+   "match": false
+  },
+  {
+   "reg": "0x516",
+   "name": "VSIM1",
+   "mask": "0x8000",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x518",
+   "name": "VSIM2",
+   "mask": "0x8000",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x51a",
+   "name": "VRTC",
+   "mask": "0x100",
+   "golden": "0x100",
+   "current_awake": "0x100",
+   "match": true
+  },
+  {
+   "reg": "0x536",
+   "name": "VCAMAF",
+   "mask": "0x8000",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x54e",
+   "name": "VRF18",
+   "mask": "0x8000",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x550",
+   "name": "?",
+   "mask": "0x2",
+   "golden": "0x2",
+   "current_awake": "0x2",
+   "match": true
+  },
+  {
+   "reg": "0x552",
+   "name": "VM",
+   "mask": "0x4001",
+   "golden": "0x4001",
+   "current_awake": "0x4000",
+   "match": false
+  },
+  {
+   "reg": "0x556",
+   "name": "VIO18",
+   "mask": "0x1",
+   "golden": "0x1",
+   "current_awake": "0x0",
+   "match": false
+  },
+  {
+   "reg": "0x55a",
+   "name": "VCAMD",
+   "mask": "0x4000",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x55e",
+   "name": "VCAMIO",
+   "mask": "0x4000",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x700",
+   "name": "",
+   "mask": "0x1980",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x704",
+   "name": "",
+   "mask": "0x33",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x708",
+   "name": "",
+   "mask": "0x7c",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x70c",
+   "name": "",
+   "mask": "0xc250",
+   "golden": "0x200",
+   "current_awake": "0x10",
+   "match": false
+  },
+  {
+   "reg": "0x70e",
+   "name": "",
+   "mask": "0x100",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x742",
+   "name": "",
+   "mask": "0x5",
+   "golden": "0x0",
+   "current_awake": "0x0",
+   "match": true
+  },
+  {
+   "reg": "0x776",
+   "name": "",
+   "mask": "0x8000",
+   "golden": "0x8000",
+   "current_awake": "0x0",
+   "match": false
+  },
+  {
+   "reg": "0x778",
+   "name": "",
+   "mask": "0x8000",
+   "golden": "0x8000",
+   "current_awake": "0x0",
+   "match": false
+  }
+ ]
+}

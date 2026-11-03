@@ -1,0 +1,681 @@
+--- a/drivers/gpu/drm/mediatek/mtk_dsi.c
++++ b/drivers/gpu/drm/mediatek/mtk_dsi.c
+@@ -3,6 +3,7 @@
+  * Copyright (c) 2015 MediaTek Inc.
+  */
+ 
++#include <linux/backlight.h>
+ #include <linux/bitfield.h>
+ #include <linux/clk.h>
+ #include <linux/component.h>
+@@ -14,6 +15,9 @@
+ #include <linux/platform_device.h>
+ #include <linux/reset.h>
+ #include <linux/units.h>
++#include <linux/workqueue.h>
++#include <linux/debugfs.h>
++#include <linux/seq_file.h>
+ 
+ #include <video/mipi_display.h>
+ #include <video/videomode.h>
+@@ -25,6 +29,8 @@
+ #include <drm/drm_of.h>
+ #include <drm/drm_panel.h>
+ #include <drm/drm_print.h>
++#include <drm/drm_vblank.h>
++#include <drm/drm_encoder.h>
+ #include <drm/drm_probe_helper.h>
+ #include <drm/drm_simple_kms_helper.h>
+ 
+@@ -186,6 +192,7 @@
+ struct phy;
+ 
+ struct mtk_dsi_driver_data {
++	bool mt6582;
+ 	const u32 reg_cmdq_off;
+ 	const u32 reg_vm_cmd_off;
+ 	const u32 reg_shadow_dbg_off;
+@@ -196,6 +203,20 @@
+ };
+ 
+ struct mtk_dsi {
++    struct delayed_work y2_sample;
++    struct delayed_work y2_relight;
++    struct backlight_device *y2_bl;
++    bool y2_dark;
++    unsigned y2_samples, y2_irqs;
++    /* Programmed while register reads lagged (POWER-FINAL-44): see host_transfer. */
++    bool y2_regs_lag;
++    struct drm_crtc *y2_crtc;
++    bool y2_vblank;
++    /* F17 (3e55b45e): vblank count at enable and DSI restarts since then. */
++    u64 y2_vblank_start;
++    unsigned y2_restarts;
++    void __iomem *y2_mm, *y2_mutex, *y2_ovl, *y2_rdma, *y2_color, *y2_pins, *y2_phy;
++    void __iomem *y2_larb, *y2_smi, *y2_infra, *y2_top, *y2_spm, *y2_apmixed;
+ 	struct device *dev;
+ 	struct mipi_dsi_host host;
+ 	struct drm_encoder encoder;
+@@ -225,6 +246,160 @@
+ 	const struct mtk_dsi_driver_data *driver_data;
+ };
+ 
++/* F17 (report 51f3b06d): the read lag outlived three DSI power cycles and a
++ * DIS power-down (screen-off with dis_pdn, mutex back at reset values), so its
++ * cause sits outside the DSI block. What it does is known: every read answers
++ * with the data of the read before it (PSCTRL read 0, VACT_NL read PSCTRL),
++ * while writes land. Once the power cycles have failed, every DSI register is
++ * read twice, back to back under a lock, and the second answer is used: the
++ * read-modify-writes store the right values again and frames start. Reading
++ * twice is harmless when the port answers in time, so it stays on until the
++ * next boot. Other blocks are read once. */
++static void __iomem *y2_dsi_twice;
++static DEFINE_RAW_SPINLOCK(y2_dsi_read_lock);
++static u32 y2_dsi_readl(const volatile void __iomem *addr)
++{
++	void __iomem *base = READ_ONCE(y2_dsi_twice);
++	unsigned long flags;
++	u32 v;
++
++	if (likely(!base || addr < base || addr >= base + 0x1000))
++		return readl(addr);
++	raw_spin_lock_irqsave(&y2_dsi_read_lock, flags);
++	(void)readl(addr);
++	v = readl(addr);
++	raw_spin_unlock_irqrestore(&y2_dsi_read_lock, flags);
++	return v;
++}
++#undef readl
++#define readl(c) y2_dsi_readl(c)
++
++/* Read-only bounded post-modeset observation. Only scheduled with DSI powered;
++ * cancel synchronously before bridge disable so no unclocked access occurs.
++ * Component registers are the same retained MT6582 map used by their owners. */
++/* OTA-35 follow-up: a software restart leaves the pipeline without frames
++ * (OVL never completes, vblank stays 1) although the DSI registers equal a
++ * cold start. Keep two whole-block snapshots of the display path, taken by
++ * the sampler below while DSI is powered, for a cold/warm diff over debugfs.
++ * Read-only; M4U is not read (its INFRA clock is normally gated). */
++struct y2_block { const char *name; unsigned base, first, last; };
++static const struct y2_block y2_blocks[] = {
++    {"MMSYS", 0x14000000, 0x000, 0x1fc}, {"OVL", 0x14007000, 0x000, 0x2fc},
++    {"RDMA", 0x14008000, 0x000, 0x0fc}, {"MUTEX", 0x1400e000, 0x000, 0x0fc},
++    {"LARB0", 0x14010000, 0x000, 0x0fc}, {"LARB0", 0x14010000, 0x200, 0x2fc},
++    {"LARB0", 0x14010000, 0xf00, 0xf3c}, {"LARB0", 0x14010000, 0x400, 0x4fc},
++    {"SMI", 0x14011000, 0x000, 0x4fc},
++    {"INFRA", 0x10001000, 0x000, 0x0fc}, {"TOPCK", 0x10000000, 0x000, 0x0fc},
++    {"SPM", 0x10006000, 0x60c, 0x610}, {"DSI", 0x1400c000, 0x000, 0x1fc},
++    {"MIPITX", 0x10010000, 0x000, 0x0fc}, {"APMIXED", 0x10209000, 0x000, 0x2fc},
++};
++#define Y2_SNAP_WORDS 2048
++/* Slots 0/1: the sampler after Linux's modeset. Slot 2: probe, before Linux
++ * touches LK's live pipeline (LK's clocks are protected from the unused
++ * sweep). Slot 3: right after the inherited DSI is parked (POWER-FINAL-40:
++ * is SMI larb0 already busy when Linux takes over after a restart?). */
++#define Y2_SNAP_SLOTS 4
++static u32 y2_snap[Y2_SNAP_SLOTS][Y2_SNAP_WORDS];
++static unsigned y2_snap_taken;
++static u64 y2_snap_vblank[Y2_SNAP_SLOTS];
++static const char *const y2_snap_names[Y2_SNAP_SLOTS] = {"after-modeset-0", "after-modeset-1", "handover", "parked"};
++static void __iomem *y2_block_base(struct mtk_dsi *dsi, unsigned base)
++{
++    switch (base) {
++    case 0x14000000: return dsi->y2_mm;
++    case 0x14007000: return dsi->y2_ovl;
++    case 0x14008000: return dsi->y2_rdma;
++    case 0x1400e000: return dsi->y2_mutex;
++    case 0x14010000: return dsi->y2_larb;
++    case 0x14011000: return dsi->y2_smi;
++    case 0x10001000: return dsi->y2_infra;
++    case 0x10000000: return dsi->y2_top;
++    case 0x10006000: return dsi->y2_spm;
++    case 0x1400c000: return dsi->regs;
++    case 0x10010000: return dsi->y2_phy;
++    case 0x10209000: return dsi->y2_apmixed;
++    }
++    return NULL;
++}
++static void y2_snapshot(struct mtk_dsi *dsi, unsigned slot, u64 vblank)
++{
++    unsigned i, n = 0, off;
++    if (slot >= 2 && (y2_snap_taken & (1U << slot)))
++        return; /* keep the first handover of this boot (probe may repeat) */
++    for (i = 0; i < ARRAY_SIZE(y2_blocks); i++) {
++        void __iomem *b = y2_block_base(dsi, y2_blocks[i].base);
++        for (off = y2_blocks[i].first; off <= y2_blocks[i].last && n < Y2_SNAP_WORDS; off += 4)
++            y2_snap[slot][n++] = b ? readl(b + off) : 0xdeadbeef;
++    }
++    y2_snap_vblank[slot] = vblank;
++    y2_snap_taken |= 1U << slot;
++}
++static int y2_snapshot_show(struct seq_file *f, void *unused)
++{
++    unsigned slot, i, n, off;
++    for (slot = 0; slot < Y2_SNAP_SLOTS; slot++) {
++        if (!(y2_snap_taken & (1U << slot))) continue;
++        seq_printf(f, "sample %u %s vblank %llu\n", slot, y2_snap_names[slot],
++                   (unsigned long long)y2_snap_vblank[slot]);
++        for (i = 0, n = 0; i < ARRAY_SIZE(y2_blocks); i++)
++            for (off = y2_blocks[i].first; off <= y2_blocks[i].last && n < Y2_SNAP_WORDS; off += 4)
++                seq_printf(f, "%u %s %08x %08x\n", slot, y2_blocks[i].name, y2_blocks[i].base + off, y2_snap[slot][n++]);
++    }
++    return 0;
++}
++DEFINE_SHOW_ATTRIBUTE(y2_snapshot);
++
++static void y2_dsi_restart(struct mtk_dsi *dsi);
++
++static void y2_scanout_sample(struct work_struct *work)
++{
++    struct mtk_dsi *dsi = container_of(to_delayed_work(work), struct mtk_dsi, y2_sample);
++    void __iomem *o=dsi->y2_ovl, *r=dsi->y2_rdma, *c=dsi->y2_color;
++    void __iomem *m=dsi->y2_mm, *u=dsi->y2_mutex, *g=dsi->y2_pins, *p=dsi->y2_phy;
++    if (!dsi->refcount) return;
++    if (dsi->y2_samples < 2)
++        y2_snapshot(dsi, dsi->y2_samples, dsi->y2_vblank ? drm_crtc_vblank_count(dsi->y2_crtc) : 0);
++    dev_info(dsi->dev, "Y2SCAN sample=%u vblank=%llu DSI irq=%u mode=%08x start=%08x con=%08x inten=%08x status=%08x txrx=%08x ps=%08x vactive=%u lcc=%08x ld0=%08x\n",
++        dsi->y2_samples, (unsigned long long)(dsi->y2_vblank ? drm_crtc_vblank_count(dsi->y2_crtc) : 0), READ_ONCE(dsi->y2_irqs), readl(dsi->regs+0x14),
++        readl(dsi->regs), readl(dsi->regs+0x10), readl(dsi->regs+8),
++        readl(dsi->regs+0xc), readl(dsi->regs+0x18), readl(dsi->regs+0x1c),
++        readl(dsi->regs+0x2c), readl(dsi->regs+0x104), readl(dsi->regs+0x108));
++    dev_info(dsi->dev, "Y2SCAN OVL en=%08x irq=%08x src=%08x addr=%08x con=%08x pitch=%08x RDMA con=%08x irq=%08x size=%08x/%08x fifo=%08x COLOR cfg=%08x en=%08x size=%u/%u\n",
++        readl(o+0xc),readl(o+8),readl(o+0x2c),readl(o+0x40),readl(o+0x30),readl(o+0x44),
++        readl(r+0x10),readl(r+4),readl(r+0x14),readl(r+0x18),readl(r+0x40),
++        readl(c+0x400),readl(c+0xf00),readl(c+0xf50),readl(c+0xf54));
++    dev_info(dsi->dev, "Y2SCAN MMSYS mout30=%08x out4c=%08x dsi50=%08x reset=%08x CG=%08x/%08x MUTEX en=%08x get=%08x mod=%08x sof=%08x GPIO112 mux=%u dir=%u out=%u in=%u PHY con=%08x pll=%08x/%08x/%08x pwr=%08x\n",
++        readl(m+0x30),readl(m+0x4c),readl(m+0x50),readl(m+0x13c),readl(m+0x100),readl(m+0x110),
++        readl(u+0x20),readl(u+0x24),readl(u+0x2c),readl(u+0x30),
++        (readl(g+0x760)>>6)&7,readl(g+0x70)&1,readl(g+0x470)&1,readl(g+0x570)&1,
++        readl(p),readl(p+0x50),readl(p+0x54),readl(p+0x58),readl(p+0x68));
++    /* F17 (3e55b45e, ST7701S cold boot): video mode started but the DSI stayed
++     * idle (status 0), vblank stayed at 1 and every commit waited out its
++     * flip_done timeouts for the rest of the boot; nothing ever turned the
++     * CRTC off, which cleared it on 51f3b06d. With no frame 250 ms after the
++     * enable, power-cycle the DSI here, twice at most per enable. */
++    if (!dsi->y2_samples && dsi->y2_vblank && dsi->enabled && dsi->y2_restarts < 2 &&
++        drm_crtc_vblank_count(dsi->y2_crtc) - dsi->y2_vblank_start < 2 &&
++        !(readl(dsi->regs + DSI_INTSTA) & DSI_BUSY)) {
++        dsi->y2_restarts++;
++        dev_warn(dsi->dev, "Y2SCAN no frame since the enable and the DSI is idle: restarting the DSI (attempt %u)\n",
++                 dsi->y2_restarts);
++        y2_dsi_restart(dsi);
++        dsi->y2_vblank_start = drm_crtc_vblank_count(dsi->y2_crtc);
++        schedule_delayed_work(&dsi->y2_sample, msecs_to_jiffies(250));
++        return;
++    }
++    if (!dsi->y2_samples && dsi->y2_restarts && dsi->y2_vblank)
++        dev_info(dsi->dev, "Y2SCAN after %u DSI restart(s): %llu frames in 250 ms\n", dsi->y2_restarts,
++                 (unsigned long long)(drm_crtc_vblank_count(dsi->y2_crtc) - dsi->y2_vblank_start));
++    if (++dsi->y2_samples < 4) {
++        schedule_delayed_work(&dsi->y2_sample, msecs_to_jiffies(1000));
++    } else if (dsi->y2_vblank) {
++        drm_crtc_vblank_put(dsi->y2_crtc);
++        dsi->y2_vblank = false;
++    }
++}
++
+ static inline struct mtk_dsi *bridge_to_dsi(struct drm_bridge *b)
+ {
+ 	return container_of(b, struct mtk_dsi, bridge);
+@@ -265,6 +440,22 @@
+ 	timing->clk_hs_zero = timing->clk_hs_trail * 4;
+ 	timing->clk_hs_exit = 2 * timing->clk_hs_trail;
+ 
++	if (dsi->driver_data->mt6582) {
++		timing->lpx = 3;
++		timing->da_hs_prepare = 3;
++		timing->da_hs_zero = 6;
++		timing->da_hs_trail = 14;
++		timing->ta_go = 12;
++		timing->ta_sure = 4;
++		timing->ta_get = 15;
++		timing->da_hs_exit = 18;
++		timing->clk_hs_prepare = 2;
++		timing->clk_hs_post = 18;
++		timing->clk_hs_trail = 14;
++		timing->clk_hs_zero = 16;
++		timing->clk_hs_exit = 6;
++	}
++
+ 	timcon0 = FIELD_PREP(LPX, timing->lpx) |
+ 		  FIELD_PREP(HS_PREP, timing->da_hs_prepare) |
+ 		  FIELD_PREP(HS_ZERO, timing->da_hs_zero) |
+@@ -287,6 +478,25 @@
+ 	writel(timcon1, dsi->regs + DSI_PHY_TIMECON1);
+ 	writel(timcon2, dsi->regs + DSI_PHY_TIMECON2);
+ 	writel(timcon3, dsi->regs + DSI_PHY_TIMECON3);
++}
++
++/* POWER-FINAL-44: on some boots (archive 20261016/143, the restart-entered
++ * recovery after 43's install) the DSI register port answers every read with
++ * the data of the previous read: the whole register file reads shifted by one
++ * word. Every read-modify-write then stores a neighbour's value, DSI_EN never
++ * sticks and no frame starts. PSCTRL and VACT_NL hold known, different values
++ * after the timing setup; read them back to back. */
++static bool y2_dsi_reads_lag(struct mtk_dsi *dsi)
++{
++	u32 ps = readl(dsi->regs + DSI_PSCTRL);
++	u32 vact = readl(dsi->regs + DSI_VACT_NL);
++
++	if (vact == dsi->vm.vactive)
++		return false;
++	/* MMSYS DCM group 1 (DSI/DPI): 0xf = no DCM (POWER-FINAL-47). */
++	dev_warn(dsi->dev, "Y2SCAN DSI read-back ps=%08x vact=%08x expected vact=%08x dcm1=%08x\n",
++		 ps, vact, dsi->vm.vactive, dsi->y2_mm ? readl(dsi->y2_mm + 0x12c) : 0xdeadbeef);
++	return true;
+ }
+ 
+ static void mtk_dsi_enable(struct mtk_dsi *dsi)
+@@ -643,13 +853,24 @@
+ 	u32 status, tmp;
+ 	u32 flag = LPRX_RD_RDY_INT_FLAG | CMD_DONE_INT_FLAG | VM_DONE_INT_FLAG;
+ 
++	++dsi->y2_irqs;
+ 	status = readl(dsi->regs + DSI_INTSTA) & flag;
+ 
+ 	if (status) {
++		if (dsi->driver_data->mt6582) {
++   mtk_dsi_mask(dsi, DSI_RACK, RACK, RACK);
++   if (readl_poll_timeout_atomic(dsi->regs + DSI_INTSTA, tmp,
++                                !(tmp & DSI_BUSY), 1, 2000)) {
++    writel(0, dsi->regs + DSI_INTEN);
++    dev_err_ratelimited(dsi->dev, "DSI IRQ busy timeout; IRQ masked\n");
++    return IRQ_HANDLED;
++   }
++  } else {
+ 		do {
+ 			mtk_dsi_mask(dsi, DSI_RACK, RACK, RACK);
+ 			tmp = readl(dsi->regs + DSI_INTSTA);
+ 		} while (tmp & DSI_BUSY);
++  }
+ 
+ 		mtk_dsi_mask(dsi, DSI_INTSTA, status, 0);
+ 		mtk_dsi_irq_data_set(dsi, status);
+@@ -677,6 +898,8 @@
+ 	struct device *dev = dsi->host.dev;
+ 	int ret;
+ 	u32 bit_per_pixel;
++	unsigned attempt = 0;
++	bool lag;
+ 
+ 	if (++dsi->refcount != 1)
+ 		return 0;
+@@ -684,7 +907,7 @@
+ 	ret = mipi_dsi_pixel_format_to_bpp(dsi->format);
+ 	if (ret < 0) {
+ 		dev_err(dev, "Unknown MIPI DSI format %d\n", dsi->format);
+-		return ret;
++		goto err_refcount;
+ 	}
+ 	bit_per_pixel = ret;
+ 
+@@ -697,7 +920,10 @@
+ 		goto err_refcount;
+ 	}
+ 
+-	phy_power_on(dsi->phy);
++y2_retry:
++	ret = phy_power_on(dsi->phy);
++	if (ret) goto err_refcount;
++	if (dsi->driver_data->mt6582) dsi->data_rate = clk_get_rate(dsi->hs_clk);
+ 
+ 	ret = clk_prepare_enable(dsi->engine_clk);
+ 	if (ret < 0) {
+@@ -711,6 +937,7 @@
+ 		goto err_disable_engine_clk;
+ 	}
+ 
++	if (dsi->driver_data->mt6582) dev_info(dev, "modeset: PHY/clocks ready, initialize DSI\n");
+ 	mtk_dsi_enable(dsi);
+ 
+ 	if (dsi->driver_data->has_shadow_ctl)
+@@ -724,6 +951,30 @@
+ 	mtk_dsi_set_vm_cmd(dsi);
+ 	mtk_dsi_config_vdo_timing(dsi);
+ 	mtk_dsi_set_interrupt_enable(dsi);
++	lag = dsi->driver_data->mt6582 && y2_dsi_reads_lag(dsi);
++	if (lag) {
++		/* Every mtk_dsi_mask() above wrote a neighbour's value: start over
++		 * from a powered-off engine (POWER-FINAL-44). */
++		if (++attempt <= 3 || !READ_ONCE(y2_dsi_twice)) {
++			if (attempt <= 3) {
++				dev_warn(dev, "modeset: DSI register reads lag one register; power-cycling the DSI (attempt %u)\n", attempt);
++			} else {
++				dev_warn(dev, "modeset: DSI register reads lag after 3 power cycles; reading every DSI register twice\n");
++				WRITE_ONCE(y2_dsi_twice, dsi->regs);
++			}
++			clk_disable_unprepare(dsi->digital_clk);
++			clk_disable_unprepare(dsi->engine_clk);
++			phy_power_off(dsi->phy);
++			usleep_range(2000, 3000);
++			goto y2_retry;
++		}
++		dev_err(dev, "modeset: DSI register reads still lag after 3 power cycles\n");
++	} else if (attempt > 3) {
++		dev_info(dev, "modeset: DSI register read-back correct with every register read twice\n");
++	}
++	if (dsi->driver_data->mt6582)
++		dsi->y2_regs_lag = lag;
++	if (dsi->driver_data->mt6582) dev_info(dev, "modeset: DSI command engine ready\n");
+ 
+ 	return 0;
+ err_disable_engine_clk:
+@@ -798,6 +1049,37 @@
+ 	dsi->enabled = true;
+ }
+ 
++/* F17: the body of mtk_dsi_poweroff() and mtk_dsi_poweron() plus the output
++ * enable, for an enabled DSI that streams nothing. Runs from the sampler, which
++ * the bridge disable cancels synchronously first; panel commands only run in
++ * prepare/unprepare, outside the enabled window. The engine is idle, so the
++ * switch to command mode does not wait for VM_DONE. */
++static void y2_dsi_restart(struct mtk_dsi *dsi)
++{
++	int ret;
++
++	mtk_dsi_stop(dsi);
++	mtk_dsi_set_cmd_mode(dsi);
++	mtk_dsi_reset_engine(dsi);
++	mtk_dsi_lane0_ulp_mode_enter(dsi);
++	mtk_dsi_clk_ulp_mode_enter(dsi);
++	writel(0, dsi->regs + DSI_TXRX_CTRL);
++	mtk_dsi_disable(dsi);
++	clk_disable_unprepare(dsi->engine_clk);
++	clk_disable_unprepare(dsi->digital_clk);
++	phy_power_off(dsi->phy);
++	dsi->lanes_ready = false;
++	dsi->enabled = false;
++	dsi->refcount = 0;
++	usleep_range(2000, 3000);
++	ret = mtk_dsi_poweron(dsi);
++	if (ret) {
++		dev_err(dsi->dev, "Y2SCAN DSI restart: power-on failed: %d\n", ret);
++		return;
++	}
++	mtk_output_dsi_enable(dsi);
++}
++
+ static void mtk_output_dsi_disable(struct mtk_dsi *dsi)
+ {
+ 	if (!dsi->enabled)
+@@ -831,6 +1113,11 @@
+ {
+ 	struct mtk_dsi *dsi = bridge_to_dsi(bridge);
+ 
++	if (dsi->driver_data->mt6582) {
++        cancel_delayed_work_sync(&dsi->y2_sample);
++        if (dsi->y2_vblank) drm_crtc_vblank_put(dsi->y2_crtc);
++        dsi->y2_vblank = false;
++    }
+ 	mtk_output_dsi_disable(dsi);
+ }
+ 
+@@ -843,6 +1130,17 @@
+ 		return;
+ 
+ 	mtk_output_dsi_enable(dsi);
++    if (dsi->driver_data->mt6582) {
++        /* First Linux stream is running: relight after ~3 frames. */
++        if (dsi->y2_dark) mod_delayed_work(system_wq, &dsi->y2_relight, msecs_to_jiffies(50));
++        dsi->y2_samples = 0;
++        dsi->y2_restarts = 0;
++        dsi->y2_crtc = bridge->encoder->crtc;
++        dsi->y2_vblank = dsi->y2_crtc && !drm_crtc_vblank_get(dsi->y2_crtc);
++        if (dsi->y2_vblank)
++            dsi->y2_vblank_start = drm_crtc_vblank_count(dsi->y2_crtc);
++        schedule_delayed_work(&dsi->y2_sample, msecs_to_jiffies(250));
++    }
+ }
+ 
+ static void mtk_dsi_bridge_atomic_pre_enable(struct drm_bridge *bridge,
+@@ -1124,6 +1422,30 @@
+ 	u32 dsi_mode;
+ 	int ret, i;
+ 
++	/* Failed pre-enable must not let panel DCS touch a powered-off bus. */
++	if (dsi->driver_data->mt6582 && !dsi->refcount)
++		return -EHOSTDOWN;
++	/* With register reads lagging, the mode read-back and every read-modify-
++	 * write below hold a neighbour's value: each command waited out its 2 s
++	 * timeout (first screen-off after such a boot, #45). Fail at once; the
++	 * panel's power-down falls back to reset low, and the next power-on
++	 * programs the engine afresh. */
++	if (dsi->driver_data->mt6582 && dsi->y2_regs_lag) {
++		dev_warn_ratelimited(dsi->dev, "DCS 0x%02x skipped: DSI register reads lag since power-on\n",
++				     msg->tx_len ? *(const u8 *)msg->tx_buf : 0);
++		return -EIO;
++	}
++	/* F17 (3e55b45e): the one boot whose reads needed the double read and
++	 * that also sent panel reads (lcm=0-st7701, so the stock ID reads ran)
++	 * returned 0 bytes and never streamed; the dozen double-read boots with
++	 * LK's identification and no reads all streamed. readb() below bypasses
++	 * the double read. No read goes out then: the panel is named by LK or by
++	 * the platform's record (panel_hint), or stays as LK left it. */
++	if (dsi->driver_data->mt6582 && READ_ONCE(y2_dsi_twice) && MTK_DSI_HOST_IS_READ(msg->type)) {
++		dev_warn_ratelimited(dsi->dev, "DCS read 0x%02x skipped: DSI register reads need a double read this boot\n",
++				     msg->tx_len ? *(const u8 *)msg->tx_buf : 0);
++		return -EIO;
++	}
+ 	dsi_mode = readl(dsi->regs + DSI_MODE_CTRL);
+ 	if (dsi_mode & MODE) {
+ 		mtk_dsi_stop(dsi);
+@@ -1189,6 +1511,88 @@
+ 	.transfer = mtk_dsi_host_transfer,
+ };
+ 
++/* POWER-FINAL-22: parking LK's video stream leaves the lit panel without a
++ * picture until Linux's first modeset streams (≈40 ms at boot): the owner saw
++ * a colour flash. Darken the panel's backlight for the hand-over and relight it
++ * 50 ms after the first Linux enable, or after 3 s if no enable ever comes. */
++static void y2_backlight_set(struct backlight_device *bd, int power)
++{
++ mutex_lock(&bd->ops_lock);
++ bd->props.power = power;
++ mutex_unlock(&bd->ops_lock);
++ backlight_update_status(bd);
++}
++static void y2_relight_work(struct work_struct *work)
++{
++ struct mtk_dsi *dsi = container_of(to_delayed_work(work), struct mtk_dsi, y2_relight);
++ if (!dsi->y2_dark) return;
++ dsi->y2_dark = false;
++ y2_backlight_set(dsi->y2_bl, BACKLIGHT_POWER_ON);
++ dev_info(dsi->dev, "handoff: backlight restored\n");
++}
++static void y2_relight_release(void *data)
++{
++ struct mtk_dsi *dsi = data;
++ cancel_delayed_work_sync(&dsi->y2_relight);
++ if (dsi->y2_dark) { dsi->y2_dark = false; y2_backlight_set(dsi->y2_bl, BACKLIGHT_POWER_ON); }
++ put_device(&dsi->y2_bl->dev);
++}
++static void y2_handoff_dark(struct mtk_dsi *dsi)
++{
++ struct device_node *panel = of_get_child_by_name(dsi->dev->of_node, "panel");
++ struct device_node *np = panel ? of_parse_phandle(panel, "backlight", 0) : NULL;
++ of_node_put(panel);
++ if (np) { dsi->y2_bl = of_find_backlight_by_node(np); of_node_put(np); }
++ if (!dsi->y2_bl) { dev_info(dsi->dev, "handoff: no backlight to darken\n"); return; }
++ INIT_DELAYED_WORK(&dsi->y2_relight, y2_relight_work);
++ if (devm_add_action_or_reset(dsi->dev, y2_relight_release, dsi)) { dsi->y2_bl = NULL; return; }
++ if (dsi->y2_bl->props.power != BACKLIGHT_POWER_ON) return; /* not lit: nothing to hide */
++ dsi->y2_dark = true;
++ y2_backlight_set(dsi->y2_bl, BACKLIGHT_POWER_OFF);
++ schedule_delayed_work(&dsi->y2_relight, msecs_to_jiffies(3000));
++ dev_info(dsi->dev, "handoff: backlight off until the first Linux frame\n");
++}
++
++static int mt6582_dsi_park(struct mtk_dsi *dsi)
++{
++ u32 v; int ret;
++ y2_handoff_dark(dsi);
++ /* The PHY adopts live LK power without retuning it. Its rate is unknown
++  * until the stream is parked and the normal modeset owns the PLL. */
++ dev_info(dsi->dev, "handoff: acquire PHY\n");
++ ret = phy_power_on(dsi->phy);
++ if (ret) return ret;
++ ret = clk_prepare_enable(dsi->engine_clk);
++ if (ret) goto phy_off;
++ ret = clk_prepare_enable(dsi->digital_clk);
++ if (ret) goto engine_off;
++ {
++  /* Read-back of LK's timing (POWER-FINAL-44): vact is 360 unless reads lag. */
++  u32 ps = readl(dsi->regs + DSI_PSCTRL), vact = readl(dsi->regs + DSI_VACT_NL);
++  dev_info(dsi->dev, "handoff: clocks on; park video (ps=%08x vact=%08x dcm1=%08x)\n", ps, vact,
++           dsi->y2_mm ? readl(dsi->y2_mm + 0x12c) : 0xdeadbeef);
++ }
++ writel(0, dsi->regs + DSI_INTEN);
++ v = readl(dsi->regs + DSI_MODE_CTRL);
++ if (v & MODE) {
++  writel(v & ~MODE, dsi->regs + DSI_MODE_CTRL);
++  ret = readl_poll_timeout(dsi->regs + DSI_INTSTA, v, !(v & DSI_BUSY), 1000, 100000);
++  if (ret) dev_err(dsi->dev, "inherited DSI failed to park; no OVL takeover\n");
++ }
++ if (!ret) {
++  writel(0, dsi->regs + DSI_START);
++  writel(0, dsi->regs + DSI_INTSTA);
++  dev_info(dsi->dev, "inherited DSI parked; releasing PHY before Linux modeset\n");
++ }
++ clk_disable_unprepare(dsi->digital_clk);
++engine_off:
++ clk_disable_unprepare(dsi->engine_clk);
++phy_off:
++ phy_power_off(dsi->phy);
++ dev_info(dsi->dev, "handoff: released PHY, result=%d\n", ret);
++ return ret;
++}
++
+ static int mtk_dsi_probe(struct platform_device *pdev)
+ {
+ 	struct mtk_dsi *dsi;
+@@ -1230,26 +1634,78 @@
+ 	if (irq_num < 0)
+ 		return irq_num;
+ 
+-	dsi->host.ops = &mtk_dsi_ops;
+-	dsi->host.dev = dev;
+-
+-	init_waitqueue_head(&dsi->irq_wait_queue);
+-
+-	platform_set_drvdata(pdev, dsi);
+-
+-	ret = mipi_dsi_host_register(&dsi->host);
+-	if (ret < 0)
+-		return dev_err_probe(dev, ret, "Failed to register DSI host\n");
+-
+-	ret = devm_request_irq(&pdev->dev, irq_num, mtk_dsi_irq,
+-			       IRQF_TRIGGER_NONE, dev_name(&pdev->dev), dsi);
+-	if (ret) {
+-		mipi_dsi_host_unregister(&dsi->host);
+-		return dev_err_probe(&pdev->dev, ret, "Failed to request DSI irq\n");
+-	}
+-
+-	dsi->bridge.of_node = dev->of_node;
+-	dsi->bridge.type = DRM_MODE_CONNECTOR_DSI;
++ dsi->dev = dev;
++ dsi->host.dev = dev;
++ if (dsi->driver_data->mt6582) {
++  INIT_DELAYED_WORK(&dsi->y2_sample, y2_scanout_sample);
++  dsi->y2_mm = devm_ioremap(dev, 0x14000000, 0x1000);
++  dsi->y2_mutex = devm_ioremap(dev, 0x1400e000, 0x1000);
++  dsi->y2_ovl = devm_ioremap(dev, 0x14007000, 0x1000);
++  dsi->y2_rdma = devm_ioremap(dev, 0x14008000, 0x1000);
++  dsi->y2_color = devm_ioremap(dev, 0x1400b000, 0x1000);
++  dsi->y2_pins = devm_ioremap(dev, 0x10005000, 0x1000);
++  dsi->y2_phy = devm_ioremap(dev, 0x10010000, 0x1000);
++  dsi->y2_larb = devm_ioremap(dev, 0x14010000, 0x1000);
++  dsi->y2_smi = devm_ioremap(dev, 0x14011000, 0x1000);
++  dsi->y2_infra = devm_ioremap(dev, 0x10001000, 0x1000);
++  dsi->y2_top = devm_ioremap(dev, 0x10000000, 0x1000);
++  dsi->y2_spm = devm_ioremap(dev, 0x10006000, 0x1000);
++  dsi->y2_apmixed = devm_ioremap(dev, 0x10209000, 0x1000);
++  {
++   static bool y2_snapshot_file; /* probe may be deferred and repeated */
++   if (!y2_snapshot_file) {
++    debugfs_create_file("y2_display_snapshot", 0400, NULL, NULL, &y2_snapshot_fops);
++    y2_snapshot_file = true;
++   }
++  }
++  if (!dsi->y2_mm || !dsi->y2_mutex || !dsi->y2_ovl || !dsi->y2_rdma ||
++      !dsi->y2_color || !dsi->y2_pins || !dsi->y2_phy) return -ENOMEM;
++  if (dsi->y2_larb && dsi->y2_smi && dsi->y2_infra && dsi->y2_top && dsi->y2_spm && dsi->y2_apmixed) {
++   y2_snapshot(dsi, 2, 0);
++   dev_info(dev, "handoff: snapshot larb0 stat=%08x greq=%08x OVL sta=%08x rdma0=%08x RDMA irq=%08x\n",
++            readl(dsi->y2_larb), readl(dsi->y2_larb + 0x450), readl(dsi->y2_ovl),
++            readl(dsi->y2_ovl + 0xc0), readl(dsi->y2_rdma + 4));
++  }
++  {
++   /* A software (watchdog) restart keeps MMSYS_CG_CON0, so the SMI common
++    * and larb0 gates Linux closed at shutdown stay closed. LK assumes the
++    * cold default (open), shows its logo, and its first fetch through larb0
++    * waits forever: larb0 busy with GREQ pending, no frames for Linux
++    * (POWER-FINAL-40, archives 139/140). Open the two shared bus gates
++    * before Linux takes over and let the pending request drain. CCF
++    * reads the gates from hardware; mutex/Lima keep owning them. */
++   u32 gates = readl(dsi->y2_mm + 0x100) & 0x3;
++   if (gates) {
++    unsigned waited = 0;
++    writel(gates, dsi->y2_mm + 0x108);
++    while (dsi->y2_larb && (readl(dsi->y2_larb) & 1) && waited < 10000) {
++     udelay(10);
++     waited += 10;
++    }
++    dev_info(dev, "handoff: SMI gates %x left closed by a restart, opened; larb0 stat=%08x after %u us\n",
++             gates, dsi->y2_larb ? readl(dsi->y2_larb) : 0, waited);
++   }
++  }
++  ret = mt6582_dsi_park(dsi);
++  if (dsi->y2_larb && dsi->y2_smi && dsi->y2_infra && dsi->y2_top && dsi->y2_spm && dsi->y2_apmixed) {
++   y2_snapshot(dsi, 3, 0);
++   dev_info(dev, "handoff: parked larb0 stat=%08x greq=%08x OVL sta=%08x rdma0=%08x RDMA irq=%08x\n",
++            readl(dsi->y2_larb), readl(dsi->y2_larb + 0x450), readl(dsi->y2_ovl),
++            readl(dsi->y2_ovl + 0xc0), readl(dsi->y2_rdma + 4));
++  }
++  if (ret) return dev_err_probe(dev, ret, "DSI handoff\n");
++ }
++ init_waitqueue_head(&dsi->irq_wait_queue);
++ platform_set_drvdata(pdev, dsi);
++ dsi->bridge.of_node = dev->of_node;
++ dsi->bridge.type = DRM_MODE_CONNECTOR_DSI;
++ ret = devm_request_irq(dev, irq_num, mtk_dsi_irq, IRQF_TRIGGER_NONE, dev_name(dev), dsi);
++ if (ret) return dev_err_probe(dev, ret, "DSI irq\n");
++ dsi->host.ops = &mtk_dsi_ops;
++ dsi->host.dev = dev;
++ if (dsi->driver_data->mt6582) dev_info(dev, "handoff: register host/panel\n");
++ ret = mipi_dsi_host_register(&dsi->host);
++ if (ret) return dev_err_probe(dev, ret, "DSI host\n");
+ 
+ 	return 0;
+ }
+@@ -1258,6 +1714,11 @@
+ {
+ 	struct mtk_dsi *dsi = platform_get_drvdata(pdev);
+ 
++	if (dsi->driver_data->mt6582) {
++        cancel_delayed_work_sync(&dsi->y2_sample);
++        if (dsi->y2_vblank) drm_crtc_vblank_put(dsi->y2_crtc);
++        dsi->y2_vblank = false;
++    }
+ 	mtk_output_dsi_disable(dsi);
+ 	mipi_dsi_host_unregister(&dsi->host);
+ }
+@@ -1272,6 +1733,11 @@
+ 	.reg_cmdq_off = 0x180,
+ 	.reg_vm_cmd_off = 0x130,
+ 	.reg_shadow_dbg_off = 0x190
++};
++
++static const struct mtk_dsi_driver_data mt6582_dsi_driver_data = {
++ .mt6582 = true, .reg_cmdq_off = 0x180, .reg_vm_cmd_off = 0x130,
++ .reg_shadow_dbg_off = 0x190,
+ };
+ 
+ static const struct mtk_dsi_driver_data mt8183_dsi_driver_data = {
+@@ -1301,6 +1767,7 @@
+ };
+ 
+ static const struct of_device_id mtk_dsi_of_match[] = {
++	{ .compatible = "mediatek,mt6582-dsi", .data = &mt6582_dsi_driver_data },
+ 	{ .compatible = "mediatek,mt2701-dsi", .data = &mt2701_dsi_driver_data },
+ 	{ .compatible = "mediatek,mt8167-dsi", .data = &mt2701_dsi_driver_data },
+ 	{ .compatible = "mediatek,mt8173-dsi", .data = &mt8173_dsi_driver_data },

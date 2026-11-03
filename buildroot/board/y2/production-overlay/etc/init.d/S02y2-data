@@ -1,0 +1,34 @@
+#!/bin/sh
+# Rescue already validated and mounted Y2DATA before switch_root.
+[ "$1" = start ] || exit 0
+set -eu
+[ "$(cat /data/.y2data-schema)" = 1 ]
+for dir in settings apps y2player logs cache ssh/authorized_keys.d ssh/host-keys updates music; do
+    mkdir -p "/data/$dir"
+done
+chmod 700 /data/updates /data/ssh /data/ssh/authorized_keys.d /data/ssh/host-keys
+# Application payload area intentionally permits execution; root updates run in rescue.
+
+# Connectivity additions preserve the existing schema and all saved user data.
+umask 077
+for dir in network bluetooth bluetooth/bluez bluetooth/bluealsa connectivity system system/dbus system/entropy; do
+    [ ! -L "/data/$dir" ] || exit 1
+    mkdir -p "/data/$dir"
+done
+chmod 700 /data/network /data/bluetooth /data/bluetooth/bluez /data/bluetooth/bluealsa /data/connectivity /data/system
+chmod 755 /data/system/dbus
+chmod 700 /data/system/entropy
+mkdir -p /run/y2/factory /run/y2/leases /run/wpa_supplicant
+chmod 700 /run/y2/factory /run/y2/leases /run/wpa_supplicant
+for path in /data/network/enabled /data/bluetooth/enabled; do
+    [ -e "$path" ] || printf '0\n' > "$path"
+    chmod 600 "$path"
+done
+if [ ! -e /data/network/wpa_supplicant.conf ]; then
+    printf '%s\n' 'ctrl_interface=/run/wpa_supplicant' 'update_config=1' 'country=00' > /data/network/wpa_supplicant.conf
+fi
+chmod 600 /data/network/wpa_supplicant.conf
+mkdir -p /var/lib/bluetooth /var/lib/bluealsa /tmp/dbus
+mountpoint -q /var/lib/bluetooth || mount --bind /data/bluetooth/bluez /var/lib/bluetooth
+mountpoint -q /var/lib/bluealsa || mount --bind /data/bluetooth/bluealsa /var/lib/bluealsa
+mountpoint -q /tmp/dbus || mount --bind /data/system/dbus /tmp/dbus

@@ -1,0 +1,60 @@
+{
+  "schema": "y2-deepsleep04-trial2-1h/v1",
+  "image": "DEEPSLEEP-FINAL-04",
+  "boot_id": "836f0b1d-eec5-4ecf-9eb8-4daf5a7616dd",
+  "taint": 0,
+  "journal_boottime_s": {
+    "first_short_entry": 1358.0,
+    "first_short_return": 1359.2,
+    "main_first_entry": 1364.1,
+    "last_resume": 5188.7,
+    "last_complete": 5189.1
+  },
+  "product_receipt": {
+    "cycles": 7,
+    "maintenance_wakes": 6,
+    "suspended_seconds": 3805.2513,
+    "state": "restored",
+    "wake_reason": "unknown"
+  },
+  "spm_cumulative_boot": {
+    "entries": 9,
+    "resumes": 9,
+    "aborts": 0,
+    "restore_failures": 0
+  },
+  "maintenance_wakes_s": [
+    1965,
+    2568,
+    3171,
+    3774,
+    4377,
+    4980
+  ],
+  "maintenance_display": "dark (bl_power 4), connectivity runtime-suspended at every sample",
+  "battery_provisional_pre_cable": {
+    "first_entry": {
+      "percent": 71,
+      "voltage_uv": 3965625
+    },
+    "last_dark_entry": {
+      "percent": 69,
+      "voltage_uv": 3947607
+    }
+  },
+  "after_reconnect": "Charging 68% / 4.014V (connected, not an endpoint)",
+  "elapsed_unplugged_s_approx": 3824.6,
+  "residence_fraction": 0.995,
+  "checks": {
+    "ext4_errors": 0,
+    "taint": 0,
+    "pstore": "empty",
+    "application": "ok",
+    "pm_processes": 0
+  },
+  "archives": [
+    "out/deep-sleep-final/evidence/20261008/72-image04-trial2-1h-first-return",
+    "out/deep-sleep-final/evidence/20261008/73-image04-trial2-1h-health"
+  ],
+  "limits": "One uninterrupted hour, one boot, post-charge voltage relaxation present, provisional voltage-derived SOC, no pack current. Not the formal 30-min/2-h gate; says nothing about overnight drain or the intermittent stall rate."
+}

@@ -1,0 +1,25 @@
+#!/bin/sh
+# Reborn starts last. The platform, system bus and (when enabled) the radios are
+# up first, so its first frame is a complete system; the early splash shows each
+# of those steps as a boot milestone and hands off when Reborn is ready.
+case "$1" in
+ start)
+    [ ! -e /data/system/platform/maintenance-pending ] || exit 1
+    mountpoint -q /data || exit 1
+    [ "$(cat /data/.y2data-schema 2>/dev/null)" = 1 ] || exit 1
+    umask 077
+    [ ! -L /data/reborn ] || exit 1
+    for dir in /data/reborn /data/reborn/state /data/reborn/cache /data/reborn/logs /data/reborn/diagnostics /run/reborn; do
+        [ ! -L "$dir" ] || exit 1
+        mkdir -p "$dir" || exit 1
+        chmod 700 "$dir"
+    done
+    [ ! -x /usr/libexec/y2/boot-gate ] || /usr/libexec/y2/boot-gate || :
+    start-stop-daemon -S -b -m -p /run/reborn/supervisor.pid -x /usr/libexec/reborn-supervise
+    ;;
+ stop)
+    start-stop-daemon -K -p /run/reborn/supervisor.pid 2>/dev/null || :
+    ;;
+ restart) "$0" stop; sleep 2; "$0" start;;
+ *) exit 2;;
+esac

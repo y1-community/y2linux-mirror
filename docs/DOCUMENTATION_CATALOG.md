@@ -1,0 +1,560 @@
+# Y2Linux complete document catalog
+
+Updated 2026-10-04 for the installed Platform 1.0 baseline. Every project-owned Markdown page in this repository
+is listed once; vendored upstream package documentation is excluded.
+Platform 1.0 Baseline01 is software-sealed and installed; its smoke/CPU campaign
+was interrupted by an owner restart during the USB-off prerequisite wait; USB
+diagnosis is pending. UART01 retains complete bounded CPU-idle proof and the fallback
+reference. Historical Baseline02 RTC wake failure remains open.
+Start with the current-state page; a historical
+report records its own build/session, not the presently installed image.
+Raw hardware and build evidence is preserved unchanged. The catalogs
+document links, rather than relocating or deleting proof. See the
+[shared knowledge rules](KNOWLEDGE_BASE.md)
+and the other repository's catalog for product-wide context.
+
+Indexed pages: **342**. Explicit scope notices: **228**.
+
+## Entry
+
+| Page | Scope |
+| --- | --- |
+| [Y2Linux working rules](../AGENTS.md) | Repository working rules |
+| [Y2Linux](../readme.md) | Current entry / index |
+| [2026-09-23 platform entry snapshot](CURRENT_PLATFORM_STATE.entry-2026-09-23.md) | Historical entry snapshot |
+| [Current Y2Linux platform state](CURRENT_PLATFORM_STATE.md) | Current entry / index |
+| [Y2Linux complete document catalog](DOCUMENTATION_CATALOG.md) | Current entry / index |
+| [Knowledge-base authority and maintenance](KNOWLEDGE_BASE.md) | Current entry / index |
+| [Y2Linux documentation](README.md) | Current entry / index |
+| [Building Y2Linux from source](BUILDING.md) | Current entry / index |
+| [Installing Y2Linux on the Innioasis Y2](INSTALL.md) | Current entry / index |
+| [Recovery and updates: how the Y2 updates itself](RECOVERY-AND-UPDATES.md) | Current entry: why RECOVERY is flashed once, what an update does |
+
+## Architecture
+
+| Page | Scope |
+| --- | --- |
+| [Platform API v1](architecture/platform-api-v1.md) | Source contract |
+| [Deep suspend — developer architecture](architecture/deep-suspend.md) | Source contract |
+| [Bluetooth platform v1 contract](architecture/platform-bluetooth-v1.md) | Source contract |
+| [Owner reset and state export](architecture/platform-maintenance-v1.md) | Source contract |
+| [Network, clock and entropy contract v1](architecture/platform-network-time-v1.md) | Source contract |
+| [Platform power contract v1](architecture/platform-power-v1.md) | Source contract |
+| [Storage lifecycle, space and measurements](architecture/platform-storage-v1.md) | Source contract |
+| [Over-the-air updates through a Y2 recovery image (OTA-35)](architecture/platform-ota-v2.md) | Source contract |
+| [Installing the Y2 recovery image (one time)](architecture/ota-recovery-install.md) | Owner runbook |
+| [Signed root-only update contract v1](architecture/platform-update-v1.md) | Source contract (superseded by OTA-35) |
+| [USB device and owner file transfer v1](architecture/platform-usb-v1.md) | Source contract |
+| [Manual first installation — Production Storage v1](architecture/production-install.md) | Historical design / runbook |
+| [Production v1 restoration](architecture/production-recovery.md) | Historical design / runbook |
+| [Production Storage / Installation v1 partition audit](architecture/production-storage-v1.md) | Historical design / runbook |
+| [Reborn FFmpeg 9.0.2 production build](architecture/reborn-ffmpeg9-build.md) | Source contract |
+| [Y2Linux update model — layout v1](architecture/update-model.md) | Historical design / runbook |
+
+## Build
+
+| Page | Scope |
+| --- | --- |
+| [Legacy BOOTIMG package contract](build/bootimg-format.md) | Historical build/deployment receipt |
+| [Locked offline build environment](build/environment.md) | Historical build/deployment receipt |
+| [REBORN-BASELINE-01 candidate evidence](build/evidence/reborn-baseline-01/README.md) | Preserved raw/reviewed evidence |
+| [Radio UI correction receipts](build/evidence/reborn-radio-ui-01/README.md) | Preserved raw/reviewed evidence |
+| [Reborn splash receipts](build/evidence/reborn-splash-01/README.md) | Preserved raw/reviewed evidence |
+| [GPU-01 retained build evidence](build/evidence/y2linux-gpu-01/README.md) | Preserved raw/reviewed evidence |
+| [GPU-02 retained build evidence](build/evidence/y2linux-gpu-02/README.md) | Preserved raw/reviewed evidence |
+| [Retained packaging metadata](build/evidence/y2linux-m3-audio-01/README.md) | Preserved raw/reviewed evidence |
+| [Retained packaging metadata](build/evidence/y2linux-m3-audio-02/README.md) | Preserved raw/reviewed evidence |
+| [Y2LINUX-M4-01 build evidence — 2026-09-14](build/evidence/y2linux-m4-01/README.md) | Preserved raw/reviewed evidence |
+| [M4 ADC production update: build and owner boot receipt](build/evidence/y2linux-m4-adc-01/README.md) | Preserved raw/reviewed evidence |
+| [M4 charging candidate: build receipt](build/evidence/y2linux-m4-charge-01/README.md) | Preserved raw/reviewed evidence |
+| [M4-POWER-02 integrated candidate receipt](build/evidence/y2linux-m4-power-02/README.md) | Preserved raw/reviewed evidence |
+| [M4-POWER-03 build receipt — 2026-09-15](build/evidence/y2linux-m4-power-03/README.md) | Preserved raw/reviewed evidence |
+| [M5-CONNECTIVITY-01 build evidence](build/evidence/y2linux-m5-connectivity-01/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-02 build evidence](build/evidence/y2linux-m5-connectivity-02/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-03 build evidence (crashing candidate)](build/evidence/y2linux-m5-connectivity-03/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-04 build evidence](build/evidence/y2linux-m5-connectivity-04/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-05 build and physical result](build/evidence/y2linux-m5-connectivity-05/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-06: build passed, factory provider blocks this boot](build/evidence/y2linux-m5-connectivity-06/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-07 retained build receipt and superseding physical result](build/evidence/y2linux-m5-connectivity-07/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-08 build and targeted validation](build/evidence/y2linux-m5-connectivity-08/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-09: permanent E2 HCI page correction](build/evidence/y2linux-m5-connectivity-09/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-10 validation receipts](build/evidence/y2linux-m5-connectivity-10/README.md) | Preserved raw/reviewed evidence |
+| [Production Storage v1 Storage02 retry evidence](build/evidence/y2linux-production-v1-r2/README.md) | Preserved raw/reviewed evidence |
+| [Storage03 offline validation](build/evidence/y2linux-production-v1-r3/README.md) | Preserved raw/reviewed evidence |
+| [Storage05 integrated production candidate evidence](build/evidence/y2linux-production-v1-r5/README.md) | Preserved raw/reviewed evidence |
+| [Production owner-key data initialization evidence](build/evidence/y2linux-production-v1-r6-owner-key/README.md) | Preserved raw/reviewed evidence |
+| [Storage06 production candidate evidence](build/evidence/y2linux-production-v1-r6/README.md) | Preserved raw/reviewed evidence |
+| [Production Storage v1 candidate evidence](build/evidence/y2linux-production-v1/README.md) | Preserved raw/reviewed evidence |
+| [Storage02 DIAG01 offline evidence](build/evidence/y2linux-storage-diag-01/README.md) | Preserved raw/reviewed evidence |
+| [M1 offline first-boot result](build/first-boot-result.md) | Historical build/deployment receipt |
+| [Reproduce the offline first-boot artifact](build/first-boot.md) | Historical build/deployment receipt |
+| [First-boot kernel and console policy](build/kernel-policy.md) | Historical build/deployment receipt |
+| [M2-BASELINE-01 — integrated Linux 6.18 core development baseline](build/m2-baseline-01-result.md) | Historical build/deployment receipt |
+| [M2-BASELINE-02 — correct live display PHY handoff](build/m2-baseline-02-result.md) | Historical build/deployment receipt |
+| [M2-BASELINE-03 — keep the log reader ahead of display probing](build/m2-baseline-03-result.md) | Historical build/deployment receipt |
+| [M2-CHRDET-01 — owner result received](build/m2-chrdet-01-result.md) | Historical build/deployment receipt |
+| [M2-INPUT-01 — GPIO navigation through evdev and USB logs](build/m2-input-01-result.md) | Historical build/deployment receipt |
+| [M2-PHYWAKE-01 — build and owner test handoff](build/m2-phywake-01-result.md) | Historical build/deployment receipt |
+| [M2-PWRAP-01 — USB power prerequisite ready for device test](build/m2-pwrap-01-result.md) | Historical build/deployment receipt |
+| [M2-USBACM-01 — ready for owner enumeration test](build/m2-usbacm-01-result.md) | Historical build/deployment receipt |
+| [M2-USBACM-02 — retain the failed PMIC poll](build/m2-usbacm-02-result.md) | Historical build/deployment receipt |
+| [M2-USBACM-03 — wait for PMIC synchronization before commands](build/m2-usbacm-03-result.md) | Historical build/deployment receipt |
+| [M2-USBACM-04 — one bounded disconnect/reconnect trial](build/m2-usbacm-04-result.md) | Historical build/deployment receipt |
+| [M2-USBCLK-01 — ready for owner device test](build/m2-usbclk-01-result.md) | Historical build/deployment receipt |
+| [M2-USBGUARD-01 — ready for owner device test](build/m2-usbguard-01-result.md) | Historical build/deployment receipt |
+| [M2-USBSTATE-01 — ready for owner device test](build/m2-usbstate-01-result.md) | Historical build/deployment receipt |
+| [Platform v1 source reconstruction and release boundary](build/platform-v1-reconstruction.md) | Historical build/deployment receipt |
+| [REBORN-BASELINE-01 root-only deployment candidate](build/reborn-baseline-01-deployment.md) | Historical build/deployment receipt |
+| [Reborn radio scan UI correction](build/reborn-radio-ui-01-deployment.md) | Historical build/deployment receipt |
+| [REBORN-SPLASH-01 startup update](build/reborn-splash-01-deployment.md) | Historical build/deployment receipt |
+| [Risk-accepted first-boot diagnostic result](build/risk-diagnostic-result.md) | Historical build/deployment receipt |
+| [Stock console capture runbook](build/stock-console-capture.md) | Historical build/deployment receipt |
+| [Storage02 DIAG01 — manual BOOTIMG-only observation](build/storage-diagnostic-install.md) | Historical build/deployment receipt |
+| [Storage05: corrected SPFT readback coordinates](build/storage05-readback.md) | Historical build/deployment receipt |
+| [Capture Y2 CDC ACM logs](build/usb-log-capture.md) | Historical build/deployment receipt |
+| [Y2B-245 — Offline on-screen diagnostic candidate](build/y2b245-result.md) | Historical build/deployment receipt |
+| [Y2B-250 — ARM time32 nanosleep fix](build/y2b250-result.md) | Historical build/deployment receipt |
+| [Y2LINUX-DEV-01 — owner manual deployment](build/y2linux-dev-01-deployment.md) | Historical build/deployment receipt |
+| [DEV-01 SD preparation from the owner's Mac](build/y2linux-dev-01-mac-sd.md) | Historical build/deployment receipt |
+| [Y2LINUX-DEV-01 integrated development candidate](build/y2linux-dev-01-result.md) | Historical build/deployment receipt |
+| [DEV-02: BOOTIMG-only correction for the existing SD root](build/y2linux-dev-02-deployment.md) | Historical build/deployment receipt |
+| [Y2LINUX-DEV-02 — root handoff ABI and wheel transaction corrections](build/y2linux-dev-02-result.md) | Historical build/deployment receipt |
+| [Y2LINUX-GPU-01 — manual deployment receipt](build/y2linux-gpu-01-deployment.md) | Historical build/deployment receipt |
+| [Y2LINUX-GPU-02 — targeted suspend correction](build/y2linux-gpu-02-deployment.md) | Historical build/deployment receipt |
+| [Y2LINUX-M3-AUDIO-01 — owner deployment](build/y2linux-m3-audio-01-deployment.md) | Historical build/deployment receipt |
+| [M3-AUDIO-01 integrated candidate — offline result](build/y2linux-m3-audio-01-result.md) | Historical build/deployment receipt |
+| [M3-AUDIO-02 — corrected PCM notification candidate](build/y2linux-m3-audio-02-deployment.md) | Historical build/deployment receipt |
+| [Y2LINUX-M4-01 — integrated power candidate, manual deployment pending](build/y2linux-m4-01-deployment.md) | Historical build/deployment receipt |
+| [Y2LINUX-M4-ADC-01 — owner boot confirmed, charging inhibited](build/y2linux-m4-adc-01-deployment.md) | Historical build/deployment receipt |
+| [Y2LINUX-M4-CHARGE-01: manual BOOTIMG handoff](build/y2linux-m4-charge-01-deployment.md) | Historical build/deployment receipt |
+| [M4-POWER-02 integrated physical qualification](build/y2linux-m4-power-02-deployment.md) | Historical build/deployment receipt |
+| [M4-POWER-03 — manual deployment and physical qualification](build/y2linux-m4-power-03-deployment.md) | Historical build/deployment receipt |
+| [M5-CONNECTIVITY-01 — manual deployment handoff](build/y2linux-m5-connectivity-01-deployment.md) | Historical build/deployment receipt |
+| [CONNECTIVITY-08 — targeted RF calibration protocol correction](build/y2linux-m5-connectivity-08-deployment.md) | Historical build/deployment receipt |
+| [CONNECTIVITY-09 — permanent MT6582 E2 HCI page correction](build/y2linux-m5-connectivity-09-deployment.md) | Historical build/deployment receipt |
+| [CONNECTIVITY-10 — installed Wi-Fi regulatory completion correction](build/y2linux-m5-connectivity-10-deployment.md) | Historical build/deployment receipt |
+| [First manual Production Storage v1 deployment](build/y2linux-production-v1-deployment.md) | Historical build/deployment receipt |
+| [Production Storage v1 — Storage02 manual retry](build/y2linux-production-v1-r2-deployment.md) | Historical build/deployment receipt |
+| [Production Storage v1 — Storage03 manual correction candidate](build/y2linux-production-v1-r3-deployment.md) | Historical build/deployment receipt |
+| [Storage05 production BOOTIMG-only correction](build/y2linux-production-v1-r5-deployment.md) | Historical build/deployment receipt |
+| [Storage06 internal boot and owner SSH — accepted on hardware](build/y2linux-production-v1-r6-deployment.md) | Historical build/deployment receipt |
+| [Storage02 DIAG01 deployment](build/y2linux-storage-diag-01-deployment.md) | Historical build/deployment receipt |
+
+## Hardware Evidence
+
+| Page | Scope |
+| --- | --- |
+| [Persistent audio tools — physical SD installation](hardware-evidence/2026-09-10-audio-tools-sd/README.md) | Preserved raw/reviewed evidence |
+| [DEV-02 physical live evidence, 2026-09-10](hardware-evidence/2026-09-10-dev02-live/README.md) | Preserved raw/reviewed evidence |
+| [M3-AUDIO-01 live entry and first playback](hardware-evidence/2026-09-10-m3-audio-01-live/README.md) | Preserved raw/reviewed evidence |
+| [AUDIO-02 first controlled headphone playback](hardware-evidence/2026-09-10-m3-audio-02-playback/README.md) | Preserved raw/reviewed evidence |
+| [M3 entry evidence, 2026-09-10](hardware-evidence/2026-09-10-m3-entry/README.md) | Preserved raw/reviewed evidence |
+| [M4 entry, read-only live Storage06](hardware-evidence/2026-09-13-m4-baseline/README.md) | Preserved raw/reviewed evidence |
+| [Production entry, 2026-09-13](hardware-evidence/2026-09-13-production-entry/README.md) | Preserved raw/reviewed evidence |
+| [Owner first storage flash failure — 2026-09-13](hardware-evidence/2026-09-13-storage-flash-failure/README.md) | Preserved raw/reviewed evidence |
+| [No-SD console photo](hardware-evidence/2026-09-13-storage02-owner-flash/no-sd-console.md) | Preserved raw/reviewed evidence |
+| [Storage02 owner flash and power-on report — 2026-09-13](hardware-evidence/2026-09-13-storage02-owner-flash/README.md) | Preserved raw/reviewed evidence |
+| [Storage02 rescue console with SD present](hardware-evidence/2026-09-13-storage02-owner-flash/rescue-console.md) | Preserved raw/reviewed evidence |
+| [Storage03 owner result](hardware-evidence/2026-09-13-storage03-owner/README.md) | Preserved raw/reviewed evidence |
+| [Storage04 host inspection — 2026-09-13](hardware-evidence/2026-09-13-storage04-live/README.md) | Preserved raw/reviewed evidence |
+| [Storage05 owner boot result — failed internal discovery](hardware-evidence/2026-09-13-storage05-owner/README.md) | Preserved raw/reviewed evidence |
+| [Storage06 owner boot result](hardware-evidence/2026-09-13-storage06-owner/README.md) | Preserved raw/reviewed evidence |
+| [M4-POWER-02: post-reinstall charging fault](hardware-evidence/2026-09-14-m4-power02-charge-fault/README.md) | Preserved raw/reviewed evidence |
+| [Fresh M5 entry: POWER-02 charging fault remains a prerequisite failure](hardware-evidence/2026-09-15-m5-entry/README.md) | Preserved raw/reviewed evidence |
+| [POWER-02 USB reconnect workaround](hardware-evidence/2026-09-15-usb-reconnect/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-01: first inspection after owner installation](hardware-evidence/2026-09-16-m5-connectivity01/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-02: physical inspection after owner installation](hardware-evidence/2026-09-16-m5-connectivity02/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-03: MD completion followed by kernel crash](hardware-evidence/2026-09-16-m5-connectivity03/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-04: stable Linux, first WMT command times out](hardware-evidence/2026-09-16-m5-connectivity04/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-05: two-byte DMA tail stalls initial WMT command](hardware-evidence/2026-09-16-m5-connectivity05/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-08: RF result fixed; native BlueZ reached with scoped E2 quirk](hardware-evidence/2026-09-17-m5-connectivity08/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-09: standard BlueZ verified on normal boot](hardware-evidence/2026-09-17-m5-connectivity09/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-10: Wi-Fi registration and scanning verified](hardware-evidence/2026-09-17-m5-connectivity10/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-07: exact post-identification EPROTO](hardware-evidence/2026-09-17-m5-protocol/README.md) | Preserved raw/reviewed evidence |
+| [CONNECTIVITY-09 Wi-Fi: regulatory OID completion failure](hardware-evidence/2026-09-17-m5-wifi/README.md) | Preserved raw/reviewed evidence |
+| [GPU clock and stock-bin contract, before GPU-01](hardware-evidence/2026-09-18-gpu-contract/README.md) | Preserved raw/reviewed evidence |
+| [GPU-01: accelerated graphics pass; suspend qualification blocked](hardware-evidence/2026-09-18-gpu01/README.md) | Preserved raw/reviewed evidence |
+
+## Knowledge
+
+| Page | Scope |
+| --- | --- |
+| [Stock suspend reverse-engineering ledger (POWER-FINAL-16)](knowledge/stock-suspend-re-ledger.md) | Retained research / scoped evidence |
+| [Audio and FM evidence](knowledge/audio-path.md) | Retained research / scoped evidence |
+| [Persistent ALSA development tools on Y2ROOT](knowledge/audio-tools-sd.md) | Retained research / scoped evidence |
+| [Stock boot structure and loader handoff](knowledge/boot-chain.md) | Retained research / scoped evidence |
+| [Historical exact-backup runbook and current recovery route](knowledge/bootimg-recovery-runbook.md) | Retained research / scoped evidence |
+| [Candidate and fallback identity index](knowledge/candidate-index.md) | Current artifact index |
+| [DEV-01 practical RAM reconciliation](knowledge/development-memory.md) | Retained research / scoped evidence |
+| [Display and input evidence](knowledge/display-input.md) | Retained research / scoped evidence |
+| [Y2 donor audit and Linux 6.18 integration decision](knowledge/donor-audit.md) | Retained research / scoped evidence |
+| [Evidence provenance and review](knowledge/evidence-index.md) | Retained research / scoped evidence |
+| [First-device launch gates after the M1 offline wave](knowledge/first-boot-launch-gates.md) | Retained research / scoped evidence |
+| [Y2B-240 authorized preflight — 2026-09-08](knowledge/first-experiment-preflight.md) | Retained research / scoped evidence |
+| [Y2B-240 result — Linux PID1 evidence and Android recovery](knowledge/first-experiment-result.md) | Retained research / scoped evidence |
+| [Y2B-240 — One risk-accepted BOOTIMG-only diagnostic experiment](knowledge/first-experiment.md) | Retained research / scoped evidence |
+| [Y2 production GPU platform](knowledge/gpu-platform.md) | Retained research / scoped evidence |
+| [Hardware Final: stock CPU DVFS admission and qualification](knowledge/hardware-final-dvfs.md) | Retained research / scoped evidence |
+| [Hardware Final idle source boundary](knowledge/hardware-final-idle-evidence.md) | Retained research / scoped evidence |
+| [Hardware Final power evidence and remaining physical gates](knowledge/hardware-final-power-evidence.md) | Retained research / scoped evidence |
+| [Hardware Final: ECM request alignment and Inventra DMA](knowledge/hardware-final-usb-dma-alignment.md) | Retained research / scoped evidence |
+| [Initial Linux RAM policy](knowledge/initial-ram-map.md) | Retained research / scoped evidence |
+| [First BOOTIMG-only experiment: launch readiness](knowledge/launch-readiness.md) | Retained research / scoped evidence |
+| [Linux 6.18 boot-fundamentals audit](knowledge/linux-6.18-support.md) | Retained research / scoped evidence |
+| [M1 — Continued native PID1 execution on the physical Y2](knowledge/m1-runtime-hardware-result.md) | Retained research / scoped evidence |
+| [M2 integrated baseline — physical results, 2026-09-10](knowledge/m2-baseline-hardware-result.md) | Retained research / scoped evidence |
+| [M2-CHRDET-01 physical result](knowledge/m2-chrdet-hardware-result.md) | Retained research / scoped evidence |
+| [M2-CHRDET-01 — PMIC charger-presence observation](knowledge/m2-chrdet-probe.md) | Retained research / scoped evidence |
+| [M2-PHYWAKE-01 physical result](knowledge/m2-phy-wake-hardware-result.md) | Retained research / scoped evidence |
+| [M2-PHYWAKE-01 — bounded suspend-force release](knowledge/m2-phy-wake-probe.md) | Retained research / scoped evidence |
+| [M2-PWRAP-01 physical result](knowledge/m2-pwrap-hardware-result.md) | Retained research / scoped evidence |
+| [M2 PWRAP/VUSB prerequisite — bounded read-only PMIC probe](knowledge/m2-pwrap-probe.md) | Retained research / scoped evidence |
+| [M2-USBCLK-01 physical result](knowledge/m2-usb-clock-hardware-result.md) | Retained research / scoped evidence |
+| [M2-USBCLK-01 — inherited USB clock state](knowledge/m2-usb-clock-probe.md) | Retained research / scoped evidence |
+| [M2-USBACM-01 — guarded first controller ownership and logging](knowledge/m2-usb-enumeration.md) | Retained research / scoped evidence |
+| [M2-USBGUARD-01 — expose the refused USB handoff](knowledge/m2-usb-guard-diagnostic.md) | Retained research / scoped evidence |
+| [M2-USBSTATE-01 physical result](knowledge/m2-usb-state-hardware-result.md) | Retained research / scoped evidence |
+| [M2-USBSTATE-01 — inherited USB state, read only](knowledge/m2-usb-state-probe.md) | Retained research / scoped evidence |
+| [M2 USB ACM hardware results](knowledge/m2-usbacm-hardware-result.md) | Retained research / scoped evidence |
+| [Native audio physical result — AUDIO-02 supersedes AUDIO-01](knowledge/m3-audio-01-live-result.md) | Retained research / scoped evidence |
+| [M3 headphone-first architecture and source review](knowledge/m3-audio-architecture.md) | Retained research / scoped evidence |
+| [M4 charging prerequisite: this Y2's battery sensor](knowledge/m4-battery-acquisition.md) | Retained research / scoped evidence |
+| [M4 production charging contract](knowledge/m4-charging.md) | Retained research / scoped evidence |
+| [Charging current policy (POWER-FINAL-07)](knowledge/charging-current-policy.md) | Current production policy |
+| [Internal storage and removable media (POWER-FINAL-08)](knowledge/internal-storage.md) | Current production policy |
+| [POWER-FINAL-08 storage validation](validation/Y2-PLATFORM-V1-POWER-FINAL-08-STORAGE.md) | Validation receipt |
+| [POWER-FINAL-07 charging validation](validation/Y2-PLATFORM-V1-POWER-FINAL-07-CHARGING.md) | Validation receipt |
+| [M4 end-user power completion](knowledge/m4-end-user-power.md) | Retained research / scoped evidence |
+| [M4 power platform](knowledge/m4-power-platform.md) | Retained research / scoped evidence |
+| [M5 connectivity entry audit — 2026-09-15](knowledge/m5-connectivity-entry.md) | Retained research / scoped evidence |
+| [M5 production connectivity candidate](knowledge/m5-connectivity-implementation.md) | Retained research / scoped evidence |
+| [CONNECTIVITY-02: correction of the first startup failure](knowledge/m5-connectivity02-corrections.md) | Retained research / scoped evidence |
+| [CONNECTIVITY-03: factory-path normalization](knowledge/m5-connectivity03-corrections.md) | Retained research / scoped evidence |
+| [CONNECTIVITY-04: verify the real CONN EMI remap before startup](knowledge/m5-connectivity04-corrections.md) | Retained research / scoped evidence |
+| [CONNECTIVITY-05: frame the first WMT command over BTIF](knowledge/m5-connectivity05-corrections.md) | Retained research / scoped evidence |
+| [CONNECTIVITY-06: rearm APDMA TX completion for each transfer](knowledge/m5-connectivity06-corrections.md) | Retained research / scoped evidence |
+| [CONNECTIVITY-07: identify factory storage through mounted root/data](knowledge/m5-connectivity07-corrections.md) | Retained research / scoped evidence |
+| [CONNECTIVITY-08: consume the MT6582 E2 RF calibration result](knowledge/m5-connectivity08-corrections.md) | Retained research / scoped evidence |
+| [CONNECTIVITY-09: MT6582 E2 local extended feature page limit](knowledge/m5-connectivity09-corrections.md) | Retained research / scoped evidence |
+| [CONNECTIVITY-10: complete Wi-Fi regulatory TX power requests](knowledge/m5-connectivity10-corrections.md) | Retained research / scoped evidence |
+| [Y2 first-boot observation path](knowledge/observation-path.md) | Retained research / scoped evidence |
+| [D14 — Self-observable initramfs diagnostics](knowledge/on-screen-diagnostics.md) | Retained research / scoped evidence |
+| [Unknowns and architecture decisions](knowledge/open-unknowns.md) | Retained research / scoped evidence |
+| [Partition map and acquisition boundary](knowledge/partition-map.md) | Retained research / scoped evidence |
+| [Platform v1 source and hardware boundaries](knowledge/platform-v1-hardware-gates.md) | Retained research / scoped evidence |
+| [Power evidence and reporting discrepancy](knowledge/power.md) | Retained research / scoped evidence |
+| [Recovery baseline](knowledge/recovery.md) | Retained research / scoped evidence |
+| [Additional Y2 reverse-engineering evidence](knowledge/reverse-engineering-audit.md) | Retained research / scoped evidence |
+| [D11 — Risk-accepted first diagnostic boot policy](knowledge/risk-accepted-diagnostic.md) | Retained research / scoped evidence |
+| [Current non-root system baseline](knowledge/stock-system-baseline.md) | Retained research / scoped evidence |
+| [Storage03 correction candidate](knowledge/storage03-corrections.md) | Retained research / scoped evidence |
+| [Storage04: one production platform](knowledge/storage04-production-platform.md) | Retained research / scoped evidence |
+| [Storage05 integrated production MMC correction](knowledge/storage05-mmc-correction.md) | Retained research / scoped evidence |
+| [Production stock eMMC address compatibility](knowledge/storage06-addressing-correction.md) | Retained research / scoped evidence |
+| [Hardware Final USB DMA observations](knowledge/usb-dma-observation.md) | Retained research / scoped evidence |
+| [Host-readable USB logging — minimal path and controller gate](knowledge/usb-logging.md) | Retained research / scoped evidence |
+| [Wi-Fi, Bluetooth and firmware evidence](knowledge/wifi-bluetooth.md) | Retained research / scoped evidence |
+| [Y2 hardware evidence baseline](knowledge/y2-hardware.md) | Retained research / scoped evidence |
+| [Y2B-245 — Real screen result and sleep failure](knowledge/y2b245-hardware-result.md) | Retained research / scoped evidence |
+| [DEV-02 live platform qualification — 2026-09-10](knowledge/y2linux-dev02-live-qualification.md) | Retained research / scoped evidence |
+| [Y2Linux development hardware results](knowledge/y2linux-development-hardware-result.md) | Retained research / scoped evidence |
+
+## Planning
+
+| Page | Scope |
+| --- | --- |
+| [Next-session handoff](planning/NEXT-SESSION-HANDOFF.md) | Maintainer session handoff (newest entry first) |
+| [Deep suspend investigation prompt, 2026-10-08](planning/CLAUDE-DEEP-SUSPEND-PROMPT.md) | Historical investigation brief |
+| [Handoff for 2026-10-02 — documentation and repository catch-up](planning/HANDOFF-2026-10-02.md) | Current working handoff |
+| [Production Storage / Installation v1 — issue 33](planning/issues/production-storage-v1.md) | Historical issue specification |
+| [Y2A-300 — M3 current state, 2026-09-10](planning/issues/Y2A-300.md) | Historical issue specification |
+| [Y2B-201 — Pin and reproduce the ARMv7 build environment](planning/issues/Y2B-201.md) | Historical issue specification |
+| [Y2B-205 — Enforce D08 layout before packaging](planning/issues/Y2B-205.md) | Historical issue specification |
+| [Y2B-210 — Select the CPU0-only diagnostic kernel configuration](planning/issues/Y2B-210.md) | Historical issue specification |
+| [Y2B-215 — Describe the researched CPU0 first-boot hardware](planning/issues/Y2B-215.md) | Historical issue specification |
+| [Y2B-220 — Build a tiny diagnostic initramfs](planning/issues/Y2B-220.md) | Historical issue specification |
+| [Y2B-225 — Build and validate zImage with appended DTB](planning/issues/Y2B-225.md) | Historical issue specification |
+| [Y2B-230 — Package the legacy MTK BOOTIMG offline](planning/issues/Y2B-230.md) | Historical issue specification |
+| [Y2B-235 — Prove offline reproducibility and publish the launch-gated result](planning/issues/Y2B-235.md) | Historical issue specification |
+| [Y2B-240 — One risk-accepted BOOTIMG-only diagnostic experiment](planning/issues/Y2B-240.md) | Historical issue specification |
+| [Y2B-245 — Useful on-screen Linux diagnostic environment](planning/issues/Y2B-245.md) | Historical issue specification |
+| [Y2B-250 — Restore ARM time32 nanosleep for the diagnostic heartbeat](planning/issues/Y2B-250.md) | Historical issue specification |
+| [Y2B-255 — Add bounded USB CDC ACM kernel and PID1 logging](planning/issues/Y2B-255.md) | Historical issue specification |
+| [Y2E-101 — Inventory existing stock artifacts and establish evidence provenance](planning/issues/Y2E-101.md) | Historical issue specification |
+| [Y2E-105 — Capture the current non-root ADB system and access baseline](planning/issues/Y2E-105.md) | Historical issue specification |
+| [Y2E-110 — Reconcile stock scatter and runtime partition metadata](planning/issues/Y2E-110.md) | Historical issue specification |
+| [Y2E-115 — Inspect stock boot structure and config/device-tree availability offline](planning/issues/Y2E-115.md) | Historical issue specification |
+| [Y2E-120 — Assess recovery capability and propose the next safe acquisition boundary](planning/issues/Y2E-120.md) | Historical issue specification |
+| [Y2E-125 — Stock loader handoff and Linux 6.18 strategy](planning/issues/Y2E-125.md) | Historical issue specification |
+| [Y2E-130 — Establish the safe initial Linux RAM map](planning/issues/Y2E-130.md) | Historical issue specification |
+| [Y2E-140 — Establish a reliable first-boot observation path](planning/issues/Y2E-140.md) | Historical issue specification |
+| [Y2E-145 — Assess authentication, recovery and bounded handoff launch gates](planning/issues/Y2E-145.md) | Historical issue specification |
+| [Y2E-155 — Specify one safe static RAM expansion step](planning/issues/Y2E-155.md) | Historical issue specification |
+| [Y2E-160 — Establish the MT6323 power and supply prerequisite map](planning/issues/Y2E-160.md) | Historical issue specification |
+| [Y2E-165 — Resolve the wheel and select-button event path](planning/issues/Y2E-165.md) | Historical issue specification |
+| [Y2E-170 — Specify a safe display handoff and backlight ownership boundary](planning/issues/Y2E-170.md) | Historical issue specification |
+| [Y2E-175 — Specify a read-only removable-SD controller proof](planning/issues/Y2E-175.md) | Historical issue specification |
+| [Y2H-300 — M2 core platform foundations and boot stability](planning/issues/Y2H-300.md) | Historical issue specification |
+| [Y2N-500 — M5 connectivity, firmware and conditional FM coverage](planning/issues/Y2N-500.md) | Historical issue specification |
+| [Y2P-400 — M4 end-user production power platform](planning/issues/Y2P-400.md) | Historical issue specification |
+| [Y2R-600 — M6 recoverable production userspace, updates and security](planning/issues/Y2R-600.md) | Historical issue specification |
+| [M0 — Evidence & Recovery Baseline](planning/M0-evidence-and-recovery.md) | Decision log / historical roadmap |
+| [M1 — Linux 6.18 First Boot](planning/M1-first-boot.md) | Decision log / historical roadmap |
+| [Whole-platform evidence ledger — 2026-09-23](planning/platform-review-evidence-2026-09-23.md) | Decision log / historical roadmap |
+| [Platform v1 software completion roadmap](planning/platform-v1-roadmap.md) | Decision log / historical roadmap |
+| [Y2Linux roadmap and gap audit](planning/roadmap-gap-audit.md) | Decision log / historical roadmap |
+
+## Validation
+
+| Page | Scope |
+| --- | --- |
+| [POWER-FINAL-34 — all skins shipped, battery level fixed](validation/Y2-PLATFORM-V1-POWER-FINAL-34.md) | Sealed candidate report (Baseline 34) |
+| [POWER-FINAL-35 — over-the-air updates through a Y2 recovery image](validation/Y2-PLATFORM-V1-POWER-FINAL-35.md) | Flashed candidate report (recovery entry passed) |
+| [POWER-FINAL-37 — recovery replay fix and the warm-restart display snapshot](validation/Y2-PLATFORM-V1-POWER-FINAL-37.md) | Flashed candidate report |
+| [POWER-FINAL-38 — stock restart sequence, faster installs, clearer progress](validation/Y2-PLATFORM-V1-POWER-FINAL-38.md) | Installed candidate report (over the air) |
+| [POWER-FINAL-39 — display mutex reset for the software restart](validation/Y2-PLATFORM-V1-POWER-FINAL-39.md) | Flashed candidate report (restart still dark) |
+| [POWER-FINAL-40 — handover snapshot for the restart display defect](validation/Y2-PLATFORM-V1-POWER-FINAL-40.md) | Flashed diagnostic candidate (root cause found) |
+| [POWER-FINAL-41 — software restart keeps the display (SMI gates)](validation/Y2-PLATFORM-V1-POWER-FINAL-41.md) | Flashed candidate report (cause confirmed, still dark) |
+| [POWER-FINAL-42 — reopen the SMI gates before a software restart](validation/Y2-PLATFORM-V1-POWER-FINAL-42.md) | Flashed candidate report (restart still dark) |
+| [POWER-FINAL-43 — hold SMI for LK's display until the display takes over](validation/Y2-PLATFORM-V1-POWER-FINAL-43.md) | Candidate report; software restart fixed (archive 147) |
+| [POWER-FINAL-44 — dark recovery screen: DSI register reads lag one word](validation/Y2-PLATFORM-V1-POWER-FINAL-44.md) | Flashed candidate report (cold start lit, archive 148) |
+| [POWER-FINAL-45 — over-the-air test package for 44's recovery screen](validation/Y2-PLATFORM-V1-POWER-FINAL-45.md) | Installed over the air, PASSED (archive 149) |
+| [POWER-FINAL-46 — space for every update, restart by default; first public release](validation/Y2-PLATFORM-V1-POWER-FINAL-46.md) | Published release baseline-46; installed over Wi-Fi (archive 150), recovery screen dark |
+| [POWER-FINAL-47 — DSI register read lag: keep DCM off for DSI/DPI](validation/Y2-PLATFORM-V1-POWER-FINAL-47.md) | Published release baseline-47; fix confirmed on 48 (archive 151, five probes lit) |
+| [POWER-FINAL-48 — download screen with progress, speed and time left](validation/Y2-PLATFORM-V1-POWER-FINAL-48.md) | Published release baseline-48; installed over Wi-Fi (archive 151) |
+| [POWER-FINAL-49 — firmware-free public images, one-time flash package, public codec set](validation/Y2-PLATFORM-V1-POWER-FINAL-49.md) | Published release baseline-49; installed over Wi-Fi (archive 153) |
+| [Y2Linux 1.0 Beta 1 (Baseline 50)](validation/Y2-LINUX-1.0-BETA-1.md) | First public beta release; installed over Wi-Fi, overnight archive 155 |
+| [Y2Linux 1.0 Beta 2 (Baseline 51)](validation/Y2-LINUX-1.0-BETA-2.md) | Bluetooth/Wi-Fi fixes, automatic audio output |
+| [Y2Linux 1.0 Beta 3 (Baseline 52)](validation/Y2-LINUX-1.0-BETA-3.md) | AAC quality and adaptive rate, first release via release.py |
+| [Y2Linux 1.0 Beta 4 (Baseline 53)](validation/Y2-LINUX-1.0-BETA-4.md) | Internet radio |
+| [Y2Linux 1.0 Beta 4.1 (Baseline 54)](validation/Y2-LINUX-1.0-BETA-4.1.md) | Radio stop hang, Wi-Fi after screen-off, update clock after sleep |
+| [Y2Linux 1.0 Beta 5 (Baseline 55)](validation/Y2-LINUX-1.0-BETA-5.md) | Button keyboard, library search, UI pass |
+| [Y2Linux 1.0 Beta 5.1 (Baseline 56)](validation/Y2-LINUX-1.0-BETA-5.1.md) | Live search, radio section with logos |
+| [Y2Linux 1.0 Beta 6 (Baseline 57)](validation/Y2-LINUX-1.0-BETA-6.md) | Playlists, pause in place, seeking |
+| [Y2Linux 1.0 Beta 6.1 (Baseline 58)](validation/Y2-LINUX-1.0-BETA-6.1.md) | Bluetooth resume, skipping while starting, SD duplicates |
+| [Y2Linux 1.0 Beta 6.2 (Baseline 59)](validation/Y2-LINUX-1.0-BETA-6.2.md) | Clock, skins for the newer screens, Bunny Bow |
+| [Y2Linux 1.0 Beta 6.3 (Baseline 60)](validation/Y2-LINUX-1.0-BETA-6.3.md) | Sleep while paused |
+| [Y2Linux 1.0 Beta 7 (Baseline 61)](validation/Y2-LINUX-1.0-BETA-7.md) | UI v4, CPU thermal after sleep, sleep retry |
+| [Y2Linux 1.0 Beta 7.1 (Baseline 62)](validation/Y2-LINUX-1.0-BETA-7.1.md) | One-step update, USB screen, automatic time zone |
+| [Y2Linux 1.0 Beta 7.2 (Baseline 63)](validation/Y2-LINUX-1.0-BETA-7.2.md) | Motion at 60 fps, the Now Playing wave |
+| [Y2Linux 1.0 Beta 7.3 (Baseline 64)](validation/Y2-LINUX-1.0-BETA-7.3.md) | USB message and symbol instead of a screen |
+| [Y2Linux 1.0 Beta 7.4 (Baseline 65)](validation/Y2-LINUX-1.0-BETA-7.4.md) | Status-bar messages, cooler wave |
+| [Y2Linux 1.0 Beta 7.5 (Baseline 66)](validation/Y2-LINUX-1.0-BETA-7.5.md) | Larger status bar, Home header, Skin in Settings |
+| [Y2Linux 1.0 Beta 7.6 (Baseline 67)](validation/Y2-LINUX-1.0-BETA-7.6.md) | Smooth update screens, step tracker |
+| [Y2Linux 1.0 Beta 7.7 (Baseline 70)](validation/Y2-LINUX-1.0-BETA-7.7.md) | Last.fm scrobbling |
+| [Y2Linux 1.0 Beta 7.8 (Baseline 71)](validation/Y2-LINUX-1.0-BETA-7.8.md) | Last.fm fixes (Now Playing after a pause, log) |
+| [Y2Linux 1.0 Beta 7.9 (Baseline 72)](validation/Y2-LINUX-1.0-BETA-7.9.md) | Internal Storage for every player, radio firmware space (#39), pulled SD cards (#44) |
+| [Y2Linux 1.0 Beta 7.10 (Baseline 73)](validation/Y2-LINUX-1.0-BETA-7.10.md) | USB file operations (crash fix, move and copy on the player) |
+| [Y2Linux 1.0 Beta 7.11 (Baseline 74)](validation/Y2-LINUX-1.0-BETA-7.11.md) | Current entry: faster copies to the player (multi-packet receive DMA) |
+| [Internal Storage setup plan](planning/INTERNAL-STORAGE-SETUP-PLAN.md) | Automatic Internal Storage: cases, safety, layout |
+| [Headphone output](HEADPHONE-OUTPUT.md) | Output level, headphone profiles (AutoEQ), DAC filter, CS43131 facts, measurement plan and player correction |
+| [Last.fm scrobbling](LASTFM.md) | User guide: set-up, what counts, offline, privacy and security |
+| [Audiobooks](AUDIOBOOKS.md) | User guide: where books go, chapters, progress, speed and sleep timer |
+| [Storage](STORAGE.md) | User guide: the layout, the first-start setup of Internal Storage, old files, SD cards, USB copying and speed, going back to stock |
+| [Faster uploads: receive DMA plan](planning/USB-RX-DMA-MODE1-PLAN.md) | Multi-packet (mode 1) receive DMA: evidence, design, tests |
+| [Headphone drive plan](planning/HEADPHONE-DRIVE-PLAN.md) | Loud enough for every headphone: series-resistance check, gain table, volume curve, safe-volume warning |
+| [Last.fm scrobbling plan](planning/LASTFM-SCROBBLE-PLAN.md) | Last.fm sign-in, scrobble queue and offline plays |
+| [Error reports plan](planning/ERROR-REPORTS-PLAN.md) | Opt-in error reports: content, scrubbing, triggers, Cloudflare Worker + R2 receiver |
+| [Error reports](ERROR-REPORTS.md) | User guide: save a report, send it, what is in it and what never is |
+| [Y2Linux 1.0 Beta 8.40 report](validation/Y2-LINUX-1.0-BETA-8.40.md) | Beta 8.40 (Baseline 154): power off on a charger opens the charging screen (F46) |
+| [Plugins plan](planning/PLUGINS-PLAN.md) | One unified kind of plugin (WebAssembly only) for everything optional: extension points, the core after the move, security model, store, SDK, phases P0–P6 |
+| [Coding standard](CODING-STANDARD.md) | How the platform and Reborn are written (functions, workers, dispatchers, records, errors, `unsafe`), what the gate and its code-quality ratchet enforce |
+| [Y2Linux 1.0 Beta 9.2.16 report](validation/Y2-LINUX-1.0-BETA-9.2.16.md) | Beta 9.2.16 (Baseline 207): steadier Bluetooth sound (Y2Reborn #87: lower default AAC/LDAC rates, a codec ceiling while Wi-Fi is on, Auto picks AAC first, a codec choice refused during playback is applied at the next pause) |
+| [Y2Linux 1.0 Beta 9.2.15 report](validation/Y2-LINUX-1.0-BETA-9.2.15.md) | Beta 9.2.15 (Baseline 206): Settings scrolls smoothly with a large library (Y2Reborn #85, contributor fix #86: the song count was recounted every frame) |
+| [Y2Linux 1.0 Beta 9.2.14 report](validation/Y2-LINUX-1.0-BETA-9.2.14.md) | Beta 9.2.14 (Baseline 205): Bluetooth stays connected on quick radio station changes (the Bluetooth output is kept between streams, error report c0fe2638, F61); issue forms instead of blank issues |
+| [Y2Linux 1.0 Beta 9.2.13 report](validation/Y2-LINUX-1.0-BETA-9.2.13.md) | Beta 9.2.13 (Baseline 204): one song from search (Y2Reborn #79), quick resume of long MP3/AAC files (Y2Reborn #80), letter scrolling you can reach (Y2Linux #64), Bluetooth disconnect reasons in error reports; written for players' owners |
+| [Y2Linux 1.0 Beta 9.2.12 report](validation/Y2-LINUX-1.0-BETA-9.2.12.md) | Beta 9.2.12 (Baseline 203): Bluetooth switches off at once, readable grey text in light skins (Y2Reborn #76); written for players' owners |
+| [Y2Linux 1.0 Beta 9.2.11 report](validation/Y2-LINUX-1.0-BETA-9.2.11.md) | Beta 9.2.11 (Baseline 202): Wi-Fi and Bluetooth icons only while connected (#73); written for players' owners |
+| [Y2Linux 1.0 Beta 9.2.10 report](validation/Y2-LINUX-1.0-BETA-9.2.10.md) | Beta 9.2.10 (Baseline 201): Settings in eight places with clearer names, menus that scroll like lists (#74), Cover Flow's year once (#73); written for players' owners |
+| [Y2Linux 1.0 Beta 9.2.8 report](validation/Y2-LINUX-1.0-BETA-9.2.8.md) | Beta 9.2.8 (Baseline 199): error reports record why a Wi-Fi router refuses the player (#83); written for players' owners |
+| [Y2Linux 1.0 Beta 9.2.7 report](validation/Y2-LINUX-1.0-BETA-9.2.7.md) | Beta 9.2.7 (Baseline 198): wheel clicks whenever no music plays, also with no song, without crackle (Y2Reborn #77); written for players' owners |
+| [Y2Linux 1.0 Beta 9.2.6 report](validation/Y2-LINUX-1.0-BETA-9.2.6.md) | Beta 9.2.6 (Baseline 197): the wheel click while paused, Wheel Click On or Off (Y2Reborn #77); written for players' owners |
+| [Y2Linux 1.0 Beta 9.2.5 report](validation/Y2-LINUX-1.0-BETA-9.2.5.md) | Beta 9.2.5 (Baseline 196): Wi-Fi switched off and on by itself when it keeps missing the saved network after a wake (#83); written for players' owners |
+| [Y2Linux 1.0 Beta 9.2.4 report](validation/Y2-LINUX-1.0-BETA-9.2.4.md) | Beta 9.2.4 (Baseline 195): Home and playlists in your own order, an optional wheel click, Cover Flow text travelling with its cover; written for players' owners |
+| [Y2Linux 1.0 Beta 9.2.3 report](validation/Y2-LINUX-1.0-BETA-9.2.3.md) | Beta 9.2.3 (Baseline 194): album years, hidden Wi-Fi networks, Cover Flow position in the title, track numbers in skins, brighter grey text; written for players' owners |
+| [Y2Linux 1.0 Beta 9.2.2 report](validation/Y2-LINUX-1.0-BETA-9.2.2.md) | Beta 9.2.2 (Baseline 193): status icons in every skin, AM/PM, brightness in 5 % steps, fast scroll, 20 equalizer filters, sleep with SD cards that ignore the power-off notice; written for players' owners |
+| [Y2Linux 1.0 Beta 9.2 report](validation/Y2-LINUX-1.0-BETA-9.2.md) | Beta 9.2 (Baseline 191): the screen lights at once on a wake press while saved headphones are off, sleep no longer waits for their reconnect, Reset no longer refuses as "plan changed"; written for players' owners |
+| [Y2Linux 1.0 Beta 9.1 report](validation/Y2-LINUX-1.0-BETA-9.1.md) | Beta 9.1 (Baseline 189): Reborn on the platform's message types, its large files and functions split, platform clean-ups; written for players' owners |
+| [Y2Linux 1.0 Beta 9.0 report](validation/Y2-LINUX-1.0-BETA-9.0.md) | Beta 9.0 (Baseline 186): the platform rewritten from Python into Rust, typed records, fixes; written for players' owners |
+| [Y2Linux 1.0 Beta 8.43 report](validation/Y2-LINUX-1.0-BETA-8.43.md) | Beta 8.43 (Baseline 164): Y2Reborn issue fixes (#25 #28 #30 #45 #46 #51 #52 #55 #56 #57 #60 #62) |
+| [Y2Linux 1.0 Beta 8.42 report](validation/Y2-LINUX-1.0-BETA-8.42.md) | Beta 8.42 (Baseline 163): sleep without relighting, large SD cards, quick scan, error report fixes F17 F23 F34 F39 F50–F57, #62 empty factory partitions |
+| [Y2Linux 1.0 Beta 8.41 report](validation/Y2-LINUX-1.0-BETA-8.41.md) | Beta 8.41 (Baseline 159): internal speaker, headphone detection, haptic feedback |
+| [Platform Rust port plan](planning/PLATFORM-RUST-PORT-PLAN.md) | Port of the Python platform service to Rust in phases, then Python removed from the player; inventory, contract, tests, gates |
+| [Platform Rust port handoff](planning/PLATFORM-RUST-PORT-HANDOFF.md) | State of the Rust platform after the port: measurements, where everything lives, build/test/install, what is owed |
+| [Platform Rust refactor plan](planning/PLATFORM-RUST-REFACTOR-PLAN.md) | Refactor of the ported platform: contract, phases, quick wins, duplication pass, next pass P1–P9 and what still follows Python |
+| [Platform Rust idiomatic plan](planning/PLATFORM-RUST-IDIOMATIC-PLAN.md) | From the port to idiomatic Rust: typed records instead of loose JSON (P0–P7, finishing Q1–Q5), owner decisions, test builds 180–185 |
+| [Platform Rust next-agent handoff](planning/PLATFORM-RUST-NEXT-AGENT-HANDOFF.md) | The remaining Rust-logic, refactor and duplication work for one agent: order, method, owner decisions, build/verify |
+| [Speaker and haptics plan](planning/SPEAKER-HAPTICS-PLAN.md) | Stock REA of the vibrator, AW87559 and CS43131 speaker route; plan and device checks |
+| [Y2Linux 1.0 Beta 8.39 report](validation/Y2-LINUX-1.0-BETA-8.39.md) | Beta 8.39 (Baseline 153): Folders by file name, Shuffle Albums, playlist Sort, a 120 000-song card measured and made fast |
+| [Y2Linux 1.0 Beta 8.38 report](validation/Y2-LINUX-1.0-BETA-8.38.md) | Beta 8.38 (Baseline 146): Bluetooth sound after Pause → Play (F43), a smooth wave that moves with the music |
+| [Y2Linux 1.0 Beta 8.37 report](validation/Y2-LINUX-1.0-BETA-8.37.md) | Beta 8.37 (Baseline 144): sleep timer lengths (#29), search Back/See All/playlists (#44), playlist focus, headers stay and only lists scroll |
+| [Y2Linux 1.0 Beta 8.36 report](validation/Y2-LINUX-1.0-BETA-8.36.md) | Beta 8.36 (Baseline 138): GitHub issue fixes (#43 covers, #60, #32, #40), one menu order and Customize choices, Couldn't Start saves a report |
+| [Y2Linux 1.0 Beta 8.35 report](validation/Y2-LINUX-1.0-BETA-8.35.md) | Beta 8.35 (Baseline 136): louder headphone levels, even volume steps, safe-volume warning (F45) |
+| [Y2Linux 1.0 Beta 8.34 report](validation/Y2-LINUX-1.0-BETA-8.34.md) | Beta 8.34 (Baseline 135): MTP no longer hangs when a computer connects (#61) |
+| [Y2Linux 1.0 Beta 8.33 report](validation/Y2-LINUX-1.0-BETA-8.33.md) | Beta 8.33 (Baseline 134): search as one page, queue redesign (your queue first, no restart on edits, Up Next history, Move, Select Songs, group queue actions), session schema 3 |
+| [Y2Linux 1.0 Beta 8.31 report](validation/Y2-LINUX-1.0-BETA-8.31.md) | Beta 8.31 (Baseline 130): left/right balance in Settings → Sound |
+| [Y2Linux 1.0 Beta 8.30 report](validation/Y2-LINUX-1.0-BETA-8.30.md) | Beta 8.30 (Baseline 129): Bluetooth absolute volume (Y2Reborn #22), Previous restarts the song and Songs plays in list order (Y2Reborn #21), no audiobooks in music queues (#58), no cut-off text (#55), GC9503V panel power-down by default (#42/#45) |
+| [Y2Linux 1.0 Beta 8.29 report](validation/Y2-LINUX-1.0-BETA-8.29.md) | Beta 8.29 (Baseline 128): a player whose PMIC has no die calibration fuse charges again (stock nominal, read 10 °C high) |
+| [Y2Linux 1.0 Beta 8.28 report](validation/Y2-LINUX-1.0-BETA-8.28.md) | Beta 8.28 (Baseline 127): Wi-Fi says when the password is wrong, a join is saved only once it connects, Change Password (Y2Reborn #20) |
+| [Y2Linux 1.0 Beta 8.27 report](validation/Y2-LINUX-1.0-BETA-8.27.md) | Beta 8.27 (Baseline 126): SD cards with errors play read-only, Repair SD Card on the player, healthy cards read-only between writes (F12) |
+| [Y2Linux 1.0 Beta 8.26 report](validation/Y2-LINUX-1.0-BETA-8.26.md) | Beta 8.26 (Baseline 125): report fixes F35–F41 (low-battery power-off loop on a charger, Wi-Fi after sleep, nonstandard chargers, shutdown trail, Wi-Fi roam warning) and evidence for F12/F13 |
+| [Y2Linux 1.0 Beta 8.25 report](validation/Y2-LINUX-1.0-BETA-8.25.md) | Beta 8.25 (Baseline 124): the DAC crystal starts as on stock with the chip powered (amplifier kept down), three tries with rail cycles, a cold start for the first song (#52, #54) |
+| [#52/#54 crystal handoff](planning/ISSUE-52-54-CRYSTAL-HANDOFF.md) | Evidence, stock RE, Fable's analysis and the 8.25 implementation for the CS43131 crystal failures |
+| [Y2Linux 1.0 Beta 8.24 report](validation/Y2-LINUX-1.0-BETA-8.24.md) | Beta 8.24 (Baseline 123): headphone output at 44.1 kHz only, no codec PLL, as stock (#52); codec power cycle after a crystal error |
+| [Y2Linux 1.0 Beta 8.23 report](validation/Y2-LINUX-1.0-BETA-8.23.md) | Beta 8.23 (Baseline 122): recovery watchdog for frozen installs (F34), headphone DAC powered as stock and output kept across track changes (#52, #54) |
+| [Y2Linux 1.0 Beta 8.22 report](validation/Y2-LINUX-1.0-BETA-8.22.md) | Beta 8.22 (Baseline 121): report fixes F23–F32 (update health evidence, wake, Bluetooth, sleep, stuck download) and setting the clock by hand (#53) |
+| [Y2Linux 1.0 Beta 8.21 report](validation/Y2-LINUX-1.0-BETA-8.21.md) | Beta 8.21 (Baseline 120): headphone crystal run as stock (#52, #54): started with the codec, never stopped on a flag, used after 1 s |
+| [Y2Linux 1.0 Beta 8.20 report](validation/Y2-LINUX-1.0-BETA-8.20.md) | Beta 8.20 (Baseline 119): headphone crystal that would not start (#52), 15 µA bias after a failure, 5-s open wait |
+| [Y2Linux 1.0 Beta 8.19 report](validation/Y2-LINUX-1.0-BETA-8.19.md) | Beta 8.19 (Baseline 118): audiobooks (chapters, progress, speed, sleep timer), long M4B books, sharper covers, Customize |
+| [Y2Linux 1.0 Beta 8.17 report](validation/Y2-LINUX-1.0-BETA-8.17.md) | Beta 8.17 (Baseline 114): #51 headphone crystal, SD cards Windows reads, Bluetooth disconnect/search/connect, SBC on weak links, report fixes |
+| [Y2Linux 1.0 Beta 8.16 report](validation/Y2-LINUX-1.0-BETA-8.16.md) | Beta 8.16 (Baseline 113): large libraries — All Songs plays, fast rescans, multi-core tag reading |
+| [Y2Linux 1.0 Beta 8.15 report](validation/Y2-LINUX-1.0-BETA-8.15.md) | Beta 8.15 (Baseline 112): Japanese/Chinese/Korean text, update check after a wake, codec choice while connecting |
+| [Y2Linux 1.0 Beta 8.14 report](validation/Y2-LINUX-1.0-BETA-8.14.md) | Beta 8.14 (Baseline 111): random shuffle, gentler seek, genre Shuffle, long titles, eMMC zero-out |
+| [Y2Linux 1.0 Beta 8.13 report](validation/Y2-LINUX-1.0-BETA-8.13.md) | Beta 8.13 (Baseline 110): songs listed in Strawberry/libmtp over USB, Wi-Fi connect fix, boot log |
+| [Y2Linux 1.0 Beta 8.12 report](validation/Y2-LINUX-1.0-BETA-8.12.md) | Beta 8.12 (Baseline 108): playlist crash loop (#49), silent audio after EQ changes (#48), sleep prepare, display hold, report fixes |
+| [Y2Linux 1.0 Beta 8.11 report](validation/Y2-LINUX-1.0-BETA-8.11.md) | Beta 8.11 (Baseline 106): Internal Storage setup on a low battery (25 % by power-on OCV, "Connect a charger and restart") |
+| [Y2Linux 1.0 Beta 8.10 report](validation/Y2-LINUX-1.0-BETA-8.10.md) | Beta 8.10 (Baseline 105): charging fix (#47), error reports over Wi-Fi, report progress |
+| [Y2Linux 1.0 Beta 8.9 report](validation/Y2-LINUX-1.0-BETA-8.9.md) | Beta 8.9 (label 102, built, not published): Save Report without a topic |
+| [Y2Linux 1.0 Beta 8.8 report](validation/Y2-LINUX-1.0-BETA-8.8.md) | Beta 8.8 (Baseline 101): error reports saved to storage, ≈47 s → ≈10 s |
+| [Y2Linux 1.0 Beta 8.7 report](validation/Y2-LINUX-1.0-BETA-8.7.md) | Beta 8.7 (Baseline 95): GC9503V identified from LK's panel name (#45/#46) |
+| [Y2Linux 1.0 Beta 8.6 report](validation/Y2-LINUX-1.0-BETA-8.6.md) | Beta 8.6 (Baseline 94): audio playback review (level write under DAPM, fades, held pause, CPU floor, hi-res preamp) |
+| [Y2Linux 1.0 Beta 8.5 report](validation/Y2-LINUX-1.0-BETA-8.5.md) | Beta 8.5 (Baseline 93): headphone level, headphone profiles (AutoEq), DAC filter, Output page |
+| [Y2Linux 1.0 Beta 8.4 report](validation/Y2-LINUX-1.0-BETA-8.4.md) | Beta 8.4 (Baseline 90): dark display after a restart (SMI gates reopened at restart) |
+| [Y2Linux 1.0 Beta 8.3 report](validation/Y2-LINUX-1.0-BETA-8.3.md) | Beta 8.3 (Baseline 89): seconds left on the update screens, parallel hashing, phase timings |
+| [Y2Linux 1.0 Beta 8.2 report](validation/Y2-LINUX-1.0-BETA-8.2.md) | Beta 8.2 (Baseline 88): four-core installer, kept package as rollback copy (OTA-50) |
+| [Y2Linux 1.0 Beta 8.1 report](validation/Y2-LINUX-1.0-BETA-8.1.md) | Beta 8.1 (Baseline 86): panel power-down, two panel types (#45) |
+| [Y2Linux 1.0 Beta 8.0 report](validation/Y2-LINUX-1.0-BETA-8.0.md) | Beta 8.0 (Baseline 75): 1.0 review fixes, device check |
+| [1.0 release readiness audit](planning/V1-RELEASE-READINESS.md) | What stands between the betas and a 1.0 (2026-10-17/18) |
+| [1.0 code review](planning/V1-CODE-REVIEW.md) | Six area reviews: bugs B1–B8, fixes, coverage |
+| [POWER-FINAL-33 — Reborn skins (themes)](validation/Y2-PLATFORM-V1-POWER-FINAL-33.md) | Installed candidate report |
+| [POWER-FINAL-32 — deep idle during screen-off playback](validation/Y2-PLATFORM-V1-POWER-FINAL-32.md) | Sealed candidate report (in 33) |
+| [POWER-FINAL-31 — folder-first artwork and metadata formats](validation/Y2-PLATFORM-V1-POWER-FINAL-31.md) | Sealed candidate report (in 33) |
+| [POWER-FINAL-30 — storage and decode performance pass](validation/Y2-PLATFORM-V1-POWER-FINAL-30.md) | Sealed candidate report (in 33) |
+| [POWER-FINAL-29 — finish-stage and discharge-estimate corrections](validation/Y2-PLATFORM-V1-POWER-FINAL-29.md) | Installed candidate report |
+| [POWER-FINAL-28 — stock battery percentage and top-off](validation/Y2-PLATFORM-V1-POWER-FINAL-28.md) | Installed candidate report |
+| [POWER-FINAL-27 — stock sleep-parity gaps C, A, B](validation/Y2-PLATFORM-V1-POWER-FINAL-27.md) | Installed candidate report |
+| [POWER-FINAL-26 — Bluetooth codec auto-selection](validation/Y2-PLATFORM-V1-POWER-FINAL-26.md) | Installed candidate report |
+| [POWER-FINAL-25 — Cover Flow frame gate, card hygiene](validation/Y2-PLATFORM-V1-POWER-FINAL-25.md) | Installed candidate report |
+| [POWER-FINAL-24 — animation frame pacing](validation/Y2-PLATFORM-V1-POWER-FINAL-24.md) | Installed candidate report (Baseline 24, previous baseline) |
+| [POWER-FINAL-23 — Reborn Cover Flow and Genres](validation/Y2-PLATFORM-V1-POWER-FINAL-23.md) | Installed candidate report |
+| [POWER-FINAL-22 — dark DSI hand-over](validation/Y2-PLATFORM-V1-POWER-FINAL-22.md) | Sealed candidate report |
+| [POWER-FINAL-21 — quiet display power transitions](validation/Y2-PLATFORM-V1-POWER-FINAL-21.md) | Installed candidate report (shutdown fixed) |
+| [POWER-FINAL-20 — reclaim the never-initialised UART1 clock](validation/Y2-PLATFORM-V1-POWER-FINAL-20.md) | Installed candidate report |
+| [POWER-FINAL-19 — PMIC_WRAP clock gated for the PCM sleep](validation/Y2-PLATFORM-V1-POWER-FINAL-19.md) | Installed candidate report with a first sleep |
+| [POWER-FINAL-18 — stock PMIC suspend fields](validation/Y2-PLATFORM-V1-POWER-FINAL-18.md) | Installed candidate report (Baseline 18) |
+| [POWER-FINAL-17 — modem request gate and screen-first wake](validation/Y2-PLATFORM-V1-POWER-FINAL-17.md) | Installed candidate report (Baseline 17) with first boot and a short sleep |
+| [POWER-FINAL-16 — stock sleep parity from the stock kernel (REA)](validation/Y2-PLATFORM-V1-POWER-FINAL-16.md) | Installed candidate report (Baseline 16) with overnight result |
+| [POWER-FINAL-15 — newest release of every component](validation/Y2-PLATFORM-V1-POWER-FINAL-15.md) | Sealed candidate report |
+| [POWER-FINAL-14 — persistent sleep and USB diagnostics](validation/Y2-PLATFORM-V1-POWER-FINAL-14.md) | Sealed candidate report |
+| [POWER-FINAL-13 — stock suspend power parity (Baseline 13)](validation/Y2-PLATFORM-V1-POWER-FINAL-13.md) | Installed candidate report with physical result |
+| [POWER-FINAL-11 — remaining screens](validation/Y2-PLATFORM-V1-POWER-FINAL-11-SCREENS.md) | Candidate validation receipt |
+| [POWER-FINAL-10 — Reborn Product UI v3](validation/Y2-PLATFORM-V1-POWER-FINAL-10-UI.md) | Candidate validation receipt |
+| [POWER-FINAL-06 — INFRASYS/DDRPHY power-down bring-up](validation/Y2-PLATFORM-V1-POWER-FINAL-06-BRINGUP.md) | Candidate validation receipt |
+| [Suspend power optimization (POWER-FINAL-05)](validation/Y2-PLATFORM-V1-SUSPEND-POWER-OPTIMIZATION.md) | Dated power campaign |
+| [Final deep-sleep investigation](validation/Y2-PLATFORM-V1-DEEP-SLEEP-FINAL.md) | Deep-sleep report, 01 to 13 |
+| [Power / battery investigation](validation/Y2-PLATFORM-V1-POWER-BATTERY-FINAL.md) | Dated power/battery report |
+| [Suspend state probe — test plan](validation/Y2-SUSPEND-STATE-PROBE-PLAN.md) | Proposed test plan |
+| [Platform v1 capability report](validation/PLATFORM-V1-CAPABILITY-REPORT.md) | Scoped validation record |
+| [Platform v1 completion ledger](validation/PLATFORM-V1-COMPLETION.md) | Scoped validation record |
+| [Hardware 02 — coherent hardware ceiling candidate](validation/PLATFORM-V1-HARDWARE-02.md) | Scoped validation record |
+| [Y2 hardware capability ceiling campaign](validation/PLATFORM-V1-HARDWARE-CEILING.md) | Scoped validation record |
+| [Platform v1 owner qualification](validation/PLATFORM-V1-OWNER-QUALIFICATION.md) | Scoped validation record |
+| [Platform v1 physical bring-up campaign](validation/PLATFORM-V1-PHYSICAL-BRINGUP.md) | Scoped validation record |
+| [Platform v1 physical master issues](validation/PLATFORM-V1-PHYSICAL-ISSUES.md) | Scoped validation record |
+| [Platform v1 physical qualification](validation/PLATFORM-V1-PHYSICAL-QUALIFICATION.md) | Scoped validation record |
+| [Platform v1 telemetry repair — 2026-09-25](validation/PLATFORM-V1-TELEMETRY-01.md) | Scoped validation record |
+| [CPU Final Fix 03 implementation and candidate receipt](validation/Y2-CPU-FINAL-FIX03.md) | Current software candidate receipt |
+| [Reborn Product UI v2 candidate receipt](validation/Y2-REBORN-PRODUCT-UI-V2.md) | Current software candidate receipt |
+| [Y2 storage hardware ceiling — eMMC and SD bus modes](validation/Y2-STORAGE-CEILING.md) | Current software candidate receipt; storage ceiling evidence and implementation |
+| [Y2 SD SDR104 stability — research and diagnostic candidate 3](validation/Y2-SD-SDR104-DIAG.md) | Scoped validation record |
+| [CPU Final Fix03 source and evidence ledger](validation/Y2-CPU-FINAL-FIX03-SOURCES.md) | Scoped validation record |
+| [Y2 CPU Final Fix03 physical qualification — prepared, not run](validation/Y2-CPU-FINAL-FIX03-PHYSICAL-QUALIFICATION.md) | Historical prepared Fix03 owner run; no result for that exact image |
+| [CPU Final Fix 02 implementation and candidate receipt](validation/Y2-CPU-FINAL-FIX02.md) | Scoped validation record (flashed and physically qualified 2026-09-29) |
+| [CPU Final Fix02 source and binary ledger](validation/Y2-CPU-FINAL-FIX02-SOURCES.md) | Scoped validation record |
+| [Y2 CPU Final Fix02 physical qualification — 2026-09-29](validation/Y2-CPU-FINAL-FIX02-PHYSICAL-QUALIFICATION.md) | Historical Fix02 CPU/system-suspend record; UART01 supersedes runtime-idle/affected I/O gaps |
+| [Y2 CPU Final Fix01 physical qualification — 2026-09-27](validation/Y2-CPU-FINAL-FIX01-PHYSICAL-QUALIFICATION.md) | Scoped validation record |
+| [CPU Final Fix01 source and binary ledger](validation/Y2-CPU-FINAL-FIX01-SOURCES.md) | Scoped validation record |
+| [CPU Final Fix 01 implementation and candidate receipt](validation/Y2-CPU-FINAL-FIX01.md) | Scoped validation record |
+| [Y2 CPU Final physical qualification](validation/Y2-CPU-FINAL-PHYSICAL-QUALIFICATION.md) | Scoped validation record |
+| [CPU Final source and register provenance](validation/Y2-CPU-FINAL-SOURCES.md) | Scoped validation record |
+| [Y2 CPU Final](validation/Y2-CPU-FINAL.md) | Scoped validation record |
+| [Current capability evidence and historical ledgers](validation/Y2-HARDWARE-FINAL-CAPABILITIES.md) | Current Baseline02 source / UART01 bounded hardware; historical exact-image inventories |
+| [Hardware Final implementation-first continuation, 2026-09-27](validation/Y2-HARDWARE-FINAL-HANDOFF.md) | Scoped validation record |
+| [Y2 Hardware Final physical qualification](validation/Y2-HARDWARE-FINAL-QUALIFICATION.md) | Scoped validation record |
+| [Hardware Final radio and audio source work](validation/Y2-HARDWARE-FINAL-RADIO-AUDIO.md) | Scoped validation record |
+| [Y2 Hardware Final implementation candidate](validation/Y2-HARDWARE-FINAL.md) | Scoped validation record |
+
+| [Baseline02 sealed integrated preserving candidate](validation/Y2-BASELINE-02.md) | Current seal/source/software receipt; new-image and automatic cold boot PHYSICAL_NOT_RUN |
+| [CPU idle completion implementation and candidate progression](validation/Y2-CPU-IDLE-COMPLETION.md) | Dated source/candidate progression; latest UART01 architecture qualified, newest baseline linked |
+| [CPU idle completion physical progression](validation/Y2-CPU-IDLE-COMPLETION-PHYSICAL.md) | Exact-image progression; points to authoritative UART01 C1/C2/C3 result |
+| [C3 MT6582 UART admission and ownership fix](validation/Y2-CPU-C3-UART.md) | Exact MT6582 source/software receipt; current Baseline02 carries qualified implementation |
+| [UART01 C1/C2/C3 physical qualification](validation/Y2-CPU-C3-UART-PHYSICAL.md) | Latest exact CPU-idle hardware proof: C3 21 bounded cycles plus normal runtime; not new-image cold boot |
+| [Platform 1.0 full suspend implementation](validation/Y2-PLATFORM-V1-SUSPEND.md) | Full-system checked unwind, typed Reborn preparation/restoration and separate physical qualification |
+
+## Tests
+
+| Page | Scope |
+| --- | --- |
+| [Y2Linux host test profiles](../tests/README.md) | Test reference |
+
+## Community beta release planning
+
+Platform 1.0 parallel integration observation (2026-10-04):
+
+- [Master report](release/Y2-PLATFORM-V1-MASTER.md)
+- [Live subsystem/worktree/candidate status](release/Y2-PLATFORM-V1-INTEGRATION-STATUS.md)
+- [Dependency, interface and qualification plan](release/Y2-PLATFORM-V1-INTEGRATION-PLAN.md)
+
+| Page | Scope |
+| --- | --- |
+| [Community beta complete feature audit](release/Y2-COMMUNITY-BETA-FEATURE-AUDIT.md) | Current-state audit; exact snapshot, not hardware acceptance |
+| [Community beta selective RC1 plan](release/Y2-COMMUNITY-BETA-PLAN.md) | Proposed release plan; no implementation authorization |
+
+## Feature completion implementation
+
+| Page | Scope |
+| --- | --- |
+| [Feature completion implementation pass](release/Y2-COMMUNITY-BETA-IMPLEMENTATION-PASS.md) | Current campaign and exact candidate handoff |
+| [Platform implementation](release/implementation-platform.md) | Suspend/idle/storage/USB source fixes and physical gates |
+| [Audio and codecs implementation](release/implementation-audio-codecs.md) | Precision, Classic codecs, software proofs and unresolved hardware |
+| [Reborn and battery implementation](release/implementation-reborn-power.md) | Productv2 controls, power and exact sensor evidence |
+| [Community tester guide](release/Y2-COMMUNITY-TESTER-GUIDE.md) | First install, transfer, redacted report, update/recovery |
+| [Source delivery and distribution gate](release/Y2-COMMUNITY-SOURCE-DELIVERY.md) | Composition, privacy, sources and public-distribution blockers |
+
+## Platform 1.0 integration source and evidence
+
+| Page | Scope |
+| --- | --- |
+| [One Platform 1.0 physical qualification campaign](release/Y2-PLATFORM-V1-PHYSICAL-QUALIFICATION.md) | Source-bound owner handoff or current master plan; physical scope remains explicit |
+| [Y2 + Reborn Bluetooth Platform 1.0 optimization](validation/Y2-PLATFORM-V1-BLUETOOTH-OPTIMIZATION.md) | Source-bound owner handoff or current master plan; physical scope remains explicit |
+| [Y2 Platform 1.0 GPU, display and graphics power pass](validation/Y2-PLATFORM-V1-GRAPHICS.md) | Source-bound owner handoff or current master plan; physical scope remains explicit |
+| [Y2 Platform 1.0 wired PCM precision completion pass](validation/Y2-PLATFORM-V1-HIGHRES-AUDIO.md) | Source-bound owner handoff or current master plan; physical scope remains explicit |
+| [Y2 wired high-resolution PCM completion (route study and serializer-pad measurement)](validation/Y2-HIGHRES-AUDIO-COMPLETION.md) | Current evidence record; MT6582 wired playback measured at 16 meaningful bits maximum |
+| [Y2 Platform 1.0 input validation](validation/Y2-PLATFORM-V1-INPUT.md) | Source-bound owner handoff or current master plan; physical scope remains explicit |
+| [Y2 Platform 1.0 storage and filesystem pass](validation/Y2-PLATFORM-V1-STORAGE.md) | Source-bound owner handoff or current master plan; physical scope remains explicit |
+| [Y2 Platform 1.0 USB / desktop file transfer](validation/Y2-PLATFORM-V1-USB.md) | Source-bound owner handoff or current master plan; physical scope remains explicit |
+| [Y2 Platform 1.0 Wi-Fi optimization](validation/Y2-PLATFORM-V1-WIFI-OPTIMIZATION.md) | Source-bound owner handoff or current master plan; physical scope remains explicit |
+
+| [Platform 1.0 master report](release/Y2-PLATFORM-V1-MASTER.md) | Current master integration state |
+| [Platform 1.0 live source status](release/Y2-PLATFORM-V1-INTEGRATION-STATUS.md) | Timestamped read-only owner/source evidence |
+| [Platform 1.0 integration plan](release/Y2-PLATFORM-V1-INTEGRATION-PLAN.md) | C01–C30 source reconciliation and gates |
+
+## Integrated Platform 1.0 software handoff
+
+| Page | Scope |
+| --- | --- |
+| [Platform 1.0 integrated software qualification](validation/Y2-PLATFORM-V1-INTEGRATION.md) | Current integration software receipt or master plan; hardware scope explicit |
+
+## Independent Platform 1.0 baseline reports
+
+| Page | Scope |
+| --- | --- |
+| [Y2-PLATFORM-V1-FINAL-SESSION-RESULTS.md](release/Y2-PLATFORM-V1-FINAL-SESSION-RESULTS.md) | Independent final source/software/handoff; hardware pending |
+| [Y2-PLATFORM-V1-BASELINE.md](release/Y2-PLATFORM-V1-BASELINE.md) | Independent final source/software/handoff; hardware pending |
+| [Baseline01 installed physical qualification](validation/Y2-PLATFORM-V1-BASELINE-PHYSICAL.md) | Exact-image smoke/CPU results and preserved failures; overall acceptance remains partial |
+| [Y2-PLATFORM-V1-BASELINE-CHANGELOG.md](release/Y2-PLATFORM-V1-BASELINE-CHANGELOG.md) | Independent final source/software/handoff; hardware pending |
+| [Y2-PLATFORM-V1-INDEPENDENT-VERIFICATION.md](release/Y2-PLATFORM-V1-INDEPENDENT-VERIFICATION.md) | Independent final source/software/handoff; hardware pending |
+## Storage optimization pass
+
+| Page | Scope |
+| --- | --- |

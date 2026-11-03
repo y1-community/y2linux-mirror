@@ -1,0 +1,39 @@
+{
+  "schema": "y2-deepsleep04-trial1/v1",
+  "image": "DEEPSLEEP-FINAL-04",
+  "linux": "5e267571d584da7fbe356d3161801ba15f87fa57",
+  "boot_id": "836f0b1d-eec5-4ecf-9eb8-4daf5a7616dd",
+  "taint": 0,
+  "host_times_utc": {
+    "unplug_reported": "2026-10-08T16:15:30Z",
+    "reconnect_archive_started": "2026-10-08T16:24:05Z"
+  },
+  "journal_boottime_s": {
+    "suspend_requested": 556.0,
+    "kernel_suspend": 557.8,
+    "kernel_resumed": 1027.8,
+    "complete": 1028.1
+  },
+  "spm": {
+    "entries": 1,
+    "resumes": 1,
+    "aborts": 0,
+    "restore_failures": 0,
+    "ticks32k": 15376821,
+    "seconds": 469.2633361816406,
+    "wake": "0x20 (USB cable; product label unknown)"
+  },
+  "pm_record": "COMPLETE seq48 error0",
+  "reborn_restored": true,
+  "ext4_errors": 0,
+  "guard": "pending:false after success; 04 identity",
+  "stall_records": "none expected or seen; WAIT/LOCK entries are overwritten by the 24-entry resume tail on a passing cycle",
+  "battery_provisional": "66% at entry, Charging 66% after reconnect; no drain conclusion (connected, 7.8 min)",
+  "archives": [
+    "out/deep-sleep-final/evidence/20261008/68-image04-first-check",
+    "out/deep-sleep-final/evidence/20261008/69-image04-pretrial-health",
+    "out/deep-sleep-final/evidence/20261008/70-image04-trial1-first-return",
+    "out/deep-sleep-final/evidence/20261008/71-image04-trial1-health"
+  ],
+  "limits": "One passing cycle does not supersede the intermittent pre-SPM stall; no repeat, maintenance wake, Power/RTC or 30-minute evidence yet."
+}

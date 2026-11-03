@@ -1,0 +1,1830 @@
+{
+  "schema": 1,
+  "date": "2026-10-04",
+  "scope": "Y2 Platform 1.0 Wi-Fi optimization; no flash/push/merge",
+  "source": {
+    "linux": "7056977dc534a655f0ca8d1a4c1f4353e8131d27",
+    "reborn": "2cdb9cce8df1b9a65a4f88f8cd39dd05f851093e"
+  },
+  "method": {
+    "device_lock": "/tmp/y2-platform-v1-device.lock, exclusive nonblocking flock, held for all SSH/LAN requests",
+    "cpu": "aggregate busy percent of one CPU, SC_CLK_TCK=100; excludes idle/iowait",
+    "idle_seconds": 20,
+    "tcp_seconds_each": 8,
+    "http_bytes_each": 8388608,
+    "http_repeats_each_direction": 2,
+    "usb_charging_present": true,
+    "bt_state": "Powered=false, peer disconnected, no PCM at admission",
+    "after_scope": "NOT_RUN: prepared RAM-only readiness runner could not obtain lock; installed DHCP action handler and Reborn app unchanged",
+    "after_lock_retry_windows_s": [
+      900,
+      900
+    ],
+    "preparation_failure": "BusyBox tar gzip unsupported; failed before service stop, corrected to uncompressed USTAR",
+    "isolated_tx_followup": "NOT_RUN; shared lock busy"
+  },
+  "baseline": {
+    "status": "MEASURED",
+    "raw_sha256": "e3eb272ac43be0819ae030e34a995572e5425deb991a0651eb361cdc59abba4f",
+    "identity": {
+      "release_version": "1.0.0-baseline-candidate.2",
+      "rootfs_version": "2025.02.18-platform-v1.21",
+      "build_id": "Y2LINUX-BASELINE-02",
+      "platform_api_version": 1,
+      "feature_contract_version": 2,
+      "battery_profile_schema": 1,
+      "low_battery_policy_schema": 2,
+      "layout_version": 1,
+      "kernel_version": "6.18.0-y2linux-baseline-02",
+      "data_schema_version": 1,
+      "reborn_version": "0.2.0",
+      "build_git_commit": "8584ccd85f052f351fe51650b2348c83ca894ed4",
+      "reborn_source_commit": "b71b468860233faa0a42b8448ec5777fa952b8e3"
+    },
+    "boot_id": "27e6d684-3794-4490-95db-a489027cd4f4",
+    "taint": "0",
+    "final_boot_id": "27e6d684-3794-4490-95db-a489027cd4f4",
+    "final_taint": "0",
+    "screen_off": true,
+    "power_save_initial": "Power save: off",
+    "observer_source_sha256": null,
+    "idle": [
+      {
+        "label": "associated_screen_off_CAM",
+        "seconds": 20.139506581000205,
+        "online_before": "0-3",
+        "online_after": "0-3",
+        "freq_khz_before": "1300000",
+        "freq_khz_after": "1300000",
+        "busy_one_core_percent": 11.221724777170582,
+        "irq_per_s": 289.23250808415327,
+        "ctxt_per_s": 382.73033001075595,
+        "irq_delta": {
+          "24::timer@10008000": 591,
+          "25::arch_timer": 4180,
+          "220::11230000.mmc": 20,
+          "221::11240000.mmc": 19,
+          "222::y2-wifi": 14,
+          "223::musb-hdrc.4.auto": 21,
+          "IPI2::interrupts": 81,
+          "IPI3::interrupts": 778,
+          "IPI5::interrupts": 121
+        },
+        "cpuidle": {
+          "SLIDLE": {
+            "entries": 0,
+            "time_us": 0
+          },
+          "DORMANT": {
+            "entries": 0,
+            "time_us": 0
+          },
+          "WFI": {
+            "entries": 5206,
+            "time_us": 77726241
+          }
+        },
+        "c1_completed_cycles_per_s": 258.49689907057547,
+        "network_delta": {
+          "rx_nohandler": 0,
+          "tx_fifo_errors": 0,
+          "rx_frame_errors": 0,
+          "rx_missed_errors": 0,
+          "collisions": 0,
+          "tx_aborted_errors": 0,
+          "tx_dropped": 0,
+          "tx_carrier_errors": 0,
+          "rx_crc_errors": 0,
+          "tx_errors": 0,
+          "tx_packets": 0,
+          "rx_compressed": 0,
+          "rx_fifo_errors": 0,
+          "tx_bytes": 0,
+          "rx_over_errors": 0,
+          "rx_length_errors": 0,
+          "rx_dropped": 0,
+          "rx_errors": 0,
+          "multicast": 0,
+          "tx_window_errors": 0,
+          "rx_packets": 10,
+          "tx_heartbeat_errors": 0,
+          "rx_bytes": 420,
+          "tx_compressed": 0
+        },
+        "spm_preflight_before": {
+          "/sys/bus/platform/devices/10006000.power-controller/dormant_preflight": "deep_idle_enabled=1 local_events=1 cirq=1 online=4 cpu_khz=1300000 spm_broken=0 dormant_broken=0\npower_status=0x3f4e/0x3f4e secondary_power=0xe00 domain_blockers=0xe02 clocks=0 peri_blockers=0x100c00 infra_blockers=0x0 bus=0x0 display=0 disp0=0x0 disp1=0x0\nresume_vector=0x80012000 expected_vector=0x80483fa0 resume_enable=0x80000000 context_stash=0x81433140 context_last=0x0 pcm_address=0x848649c4 pcm_words=480 pcm_origin=MT6582_d53dd75c_dpidle\ndeadline_rule=architectural_future_2ms_and_GPT4_future_26000_ticks checked_at=admission_and_finisher\nuart_sleep_admission=conditional_MT6582_PIO_owner_then_global_ACK uart_sleep_ack_checked_at=PCM_fetch_before_power_run_WFI\nprerequisite_system_running=1\nprerequisite_boot_policy=1\nprerequisite_spm=1\nprerequisite_local_events=1\nprerequisite_cirq=1\nprerequisite_topology=0\nprerequisite_frequency=0\nprerequisite_screen_off=1\nprerequisite_workload=1\nprerequisite_runtime_budget=1\nprerequisite_qualification_backstop=1\nprerequisite_linux_context=1\nprerequisite_timer_context=1\nprerequisite_usb_restore=1\nprerequisite_broken=1\nprerequisite_clocks=0\nprerequisite_display_clocks=1\nprerequisite_bus=1\nunmet=topology,frequency,clocks,secondary_power,domains,"
+        },
+        "spm_preflight_after": {
+          "/sys/bus/platform/devices/10006000.power-controller/dormant_preflight": "deep_idle_enabled=1 local_events=1 cirq=1 online=4 cpu_khz=1300000 spm_broken=0 dormant_broken=0\npower_status=0x3f4e/0x3f4e secondary_power=0xe00 domain_blockers=0xe02 clocks=0 peri_blockers=0x102c00 infra_blockers=0x0 bus=0x0 display=0 disp0=0x0 disp1=0x0\nresume_vector=0x80012000 expected_vector=0x80483fa0 resume_enable=0x80000000 context_stash=0x81433140 context_last=0x0 pcm_address=0x848649c4 pcm_words=480 pcm_origin=MT6582_d53dd75c_dpidle\ndeadline_rule=architectural_future_2ms_and_GPT4_future_26000_ticks checked_at=admission_and_finisher\nuart_sleep_admission=conditional_MT6582_PIO_owner_then_global_ACK uart_sleep_ack_checked_at=PCM_fetch_before_power_run_WFI\nprerequisite_system_running=1\nprerequisite_boot_policy=1\nprerequisite_spm=1\nprerequisite_local_events=1\nprerequisite_cirq=1\nprerequisite_topology=0\nprerequisite_frequency=0\nprerequisite_screen_off=1\nprerequisite_workload=1\nprerequisite_runtime_budget=1\nprerequisite_qualification_backstop=1\nprerequisite_linux_context=1\nprerequisite_timer_context=1\nprerequisite_usb_restore=1\nprerequisite_broken=1\nprerequisite_clocks=0\nprerequisite_display_clocks=1\nprerequisite_bus=1\nunmet=topology,frequency,clocks,secondary_power,domains,"
+        },
+        "wakeup_measurement": "NOT_MEASURED; idle cycles are only a proxy"
+      },
+      {
+        "label": "radio_off_screen_off",
+        "seconds": 20.091273815000022,
+        "online_before": "0-3",
+        "online_after": "0-3",
+        "freq_khz_before": "1300000",
+        "freq_khz_after": "1300000",
+        "busy_one_core_percent": 9.904797566963017,
+        "irq_per_s": 277.9813789522033,
+        "ctxt_per_s": 375.68548761526057,
+        "irq_delta": {
+          "24::timer@10008000": 653,
+          "25::arch_timer": 3953,
+          "220::11230000.mmc": 36,
+          "221::11240000.mmc": 20,
+          "223::musb-hdrc.4.auto": 13,
+          "IPI2::interrupts": 67,
+          "IPI3::interrupts": 731,
+          "IPI5::interrupts": 111
+        },
+        "cpuidle": {
+          "SLIDLE": {
+            "entries": 0,
+            "time_us": 0
+          },
+          "DORMANT": {
+            "entries": 0,
+            "time_us": 0
+          },
+          "WFI": {
+            "entries": 5062,
+            "time_us": 78907064
+          }
+        },
+        "c1_completed_cycles_per_s": 251.9501773063658,
+        "network_delta": {},
+        "spm_preflight_before": {
+          "/sys/bus/platform/devices/10006000.power-controller/dormant_preflight": "deep_idle_enabled=1 local_events=1 cirq=1 online=4 cpu_khz=1300000 spm_broken=0 dormant_broken=0\npower_status=0x3f4c/0x3f4c secondary_power=0xe00 domain_blockers=0xe00 clocks=0 peri_blockers=0x400 infra_blockers=0x0 bus=0x0 display=0 disp0=0x0 disp1=0x0\nresume_vector=0x80012000 expected_vector=0x80483fa0 resume_enable=0x80000000 context_stash=0x81433140 context_last=0x0 pcm_address=0x848649c4 pcm_words=480 pcm_origin=MT6582_d53dd75c_dpidle\ndeadline_rule=architectural_future_2ms_and_GPT4_future_26000_ticks checked_at=admission_and_finisher\nuart_sleep_admission=conditional_MT6582_PIO_owner_then_global_ACK uart_sleep_ack_checked_at=PCM_fetch_before_power_run_WFI\nprerequisite_system_running=1\nprerequisite_boot_policy=1\nprerequisite_spm=1\nprerequisite_local_events=1\nprerequisite_cirq=1\nprerequisite_topology=0\nprerequisite_frequency=0\nprerequisite_screen_off=1\nprerequisite_workload=1\nprerequisite_runtime_budget=1\nprerequisite_qualification_backstop=1\nprerequisite_linux_context=1\nprerequisite_timer_context=1\nprerequisite_usb_restore=1\nprerequisite_broken=1\nprerequisite_clocks=0\nprerequisite_display_clocks=1\nprerequisite_bus=1\nunmet=topology,frequency,clocks,secondary_power,"
+        },
+        "spm_preflight_after": {
+          "/sys/bus/platform/devices/10006000.power-controller/dormant_preflight": "deep_idle_enabled=1 local_events=1 cirq=1 online=4 cpu_khz=1300000 spm_broken=0 dormant_broken=0\npower_status=0x3f4c/0x3f4c secondary_power=0xe00 domain_blockers=0xe00 clocks=0 peri_blockers=0x400 infra_blockers=0x0 bus=0x0 display=0 disp0=0x0 disp1=0x0\nresume_vector=0x80012000 expected_vector=0x80483fa0 resume_enable=0x80000000 context_stash=0x81433140 context_last=0x0 pcm_address=0x848649c4 pcm_words=480 pcm_origin=MT6582_d53dd75c_dpidle\ndeadline_rule=architectural_future_2ms_and_GPT4_future_26000_ticks checked_at=admission_and_finisher\nuart_sleep_admission=conditional_MT6582_PIO_owner_then_global_ACK uart_sleep_ack_checked_at=PCM_fetch_before_power_run_WFI\nprerequisite_system_running=1\nprerequisite_boot_policy=1\nprerequisite_spm=1\nprerequisite_local_events=1\nprerequisite_cirq=1\nprerequisite_topology=0\nprerequisite_frequency=0\nprerequisite_screen_off=1\nprerequisite_workload=1\nprerequisite_runtime_budget=1\nprerequisite_qualification_backstop=1\nprerequisite_linux_context=1\nprerequisite_timer_context=1\nprerequisite_usb_restore=1\nprerequisite_broken=1\nprerequisite_clocks=0\nprerequisite_display_clocks=1\nprerequisite_bus=1\nunmet=topology,frequency,clocks,secondary_power,"
+        },
+        "wakeup_measurement": "NOT_MEASURED; idle cycles are only a proxy"
+      },
+      {
+        "label": "associated_screen_off_FAST_PSP",
+        "seconds": 20.121478993999972,
+        "online_before": "0-3",
+        "online_after": "0-3",
+        "freq_khz_before": "1300000",
+        "freq_khz_after": "1300000",
+        "busy_one_core_percent": 11.331175012929585,
+        "irq_per_s": 293.31839879960705,
+        "ctxt_per_s": 386.0054224799302,
+        "irq_delta": {
+          "24::timer@10008000": 974,
+          "25::arch_timer": 3816,
+          "220::11230000.mmc": 30,
+          "221::11240000.mmc": 19,
+          "222::y2-wifi": 20,
+          "223::musb-hdrc.4.auto": 12,
+          "IPI2::interrupts": 81,
+          "IPI3::interrupts": 838,
+          "IPI5::interrupts": 115
+        },
+        "cpuidle": {
+          "SLIDLE": {
+            "entries": 0,
+            "time_us": 0
+          },
+          "DORMANT": {
+            "entries": 0,
+            "time_us": 0
+          },
+          "WFI": {
+            "entries": 5289,
+            "time_us": 77695925
+          }
+        },
+        "c1_completed_cycles_per_s": 262.8534414183534,
+        "network_delta": {
+          "rx_nohandler": 0,
+          "tx_fifo_errors": 0,
+          "rx_frame_errors": 0,
+          "rx_missed_errors": 0,
+          "collisions": 0,
+          "tx_aborted_errors": 0,
+          "tx_dropped": 0,
+          "tx_carrier_errors": 0,
+          "rx_crc_errors": 0,
+          "tx_errors": 0,
+          "tx_packets": 0,
+          "rx_compressed": 0,
+          "rx_fifo_errors": 0,
+          "tx_bytes": 0,
+          "rx_over_errors": 0,
+          "rx_length_errors": 0,
+          "rx_dropped": 0,
+          "rx_errors": 0,
+          "multicast": 0,
+          "tx_window_errors": 0,
+          "rx_packets": 9,
+          "tx_heartbeat_errors": 0,
+          "rx_bytes": 386,
+          "tx_compressed": 0
+        },
+        "spm_preflight_before": {
+          "/sys/bus/platform/devices/10006000.power-controller/dormant_preflight": "deep_idle_enabled=1 local_events=1 cirq=1 online=4 cpu_khz=1300000 spm_broken=0 dormant_broken=0\npower_status=0x3f4e/0x3f4e secondary_power=0xe00 domain_blockers=0xe02 clocks=0 peri_blockers=0x100c00 infra_blockers=0x0 bus=0x0 display=0 disp0=0x0 disp1=0x0\nresume_vector=0x80012000 expected_vector=0x80483fa0 resume_enable=0x80000000 context_stash=0x81433140 context_last=0x0 pcm_address=0x848649c4 pcm_words=480 pcm_origin=MT6582_d53dd75c_dpidle\ndeadline_rule=architectural_future_2ms_and_GPT4_future_26000_ticks checked_at=admission_and_finisher\nuart_sleep_admission=conditional_MT6582_PIO_owner_then_global_ACK uart_sleep_ack_checked_at=PCM_fetch_before_power_run_WFI\nprerequisite_system_running=1\nprerequisite_boot_policy=1\nprerequisite_spm=1\nprerequisite_local_events=1\nprerequisite_cirq=1\nprerequisite_topology=0\nprerequisite_frequency=0\nprerequisite_screen_off=1\nprerequisite_workload=1\nprerequisite_runtime_budget=1\nprerequisite_qualification_backstop=1\nprerequisite_linux_context=1\nprerequisite_timer_context=1\nprerequisite_usb_restore=1\nprerequisite_broken=1\nprerequisite_clocks=0\nprerequisite_display_clocks=1\nprerequisite_bus=1\nunmet=topology,frequency,clocks,secondary_power,domains,"
+        },
+        "spm_preflight_after": {
+          "/sys/bus/platform/devices/10006000.power-controller/dormant_preflight": "deep_idle_enabled=1 local_events=1 cirq=1 online=4 cpu_khz=1300000 spm_broken=0 dormant_broken=0\npower_status=0x3f4e/0x3f4e secondary_power=0xe00 domain_blockers=0xe02 clocks=0 peri_blockers=0x102c00 infra_blockers=0x0 bus=0x0 display=0 disp0=0x0 disp1=0x0\nresume_vector=0x80012000 expected_vector=0x80483fa0 resume_enable=0x80000000 context_stash=0x81433140 context_last=0x0 pcm_address=0x848649c4 pcm_words=480 pcm_origin=MT6582_d53dd75c_dpidle\ndeadline_rule=architectural_future_2ms_and_GPT4_future_26000_ticks checked_at=admission_and_finisher\nuart_sleep_admission=conditional_MT6582_PIO_owner_then_global_ACK uart_sleep_ack_checked_at=PCM_fetch_before_power_run_WFI\nprerequisite_system_running=1\nprerequisite_boot_policy=1\nprerequisite_spm=1\nprerequisite_local_events=1\nprerequisite_cirq=1\nprerequisite_topology=0\nprerequisite_frequency=0\nprerequisite_screen_off=1\nprerequisite_workload=1\nprerequisite_runtime_budget=1\nprerequisite_qualification_backstop=1\nprerequisite_linux_context=1\nprerequisite_timer_context=1\nprerequisite_usb_restore=1\nprerequisite_broken=1\nprerequisite_clocks=0\nprerequisite_display_clocks=1\nprerequisite_bus=1\nunmet=topology,frequency,clocks,secondary_power,domains,"
+        },
+        "wakeup_measurement": "NOT_MEASURED; idle cycles are only a proxy"
+      }
+    ],
+    "reconnect": [
+      {
+        "kind": "reconnect",
+        "observed_marks_s": {
+          "SCANNING": 0.0015666889999010891,
+          "COMPLETED": 2.544746116999704,
+          "IP": 4.378828624000107,
+          "DNS": 24.321738084000117,
+          "platform_ready": 32.241312065999864
+        },
+        "observed_states": [
+          [
+            0.0015666889999010891,
+            "SCANNING"
+          ],
+          [
+            0.20704151900008583,
+            "SCANNING"
+          ],
+          [
+            2.338425672000085,
+            "SCANNING"
+          ],
+          [
+            2.544746116999704,
+            "COMPLETED"
+          ],
+          [
+            2.748100182000144,
+            "COMPLETED"
+          ],
+          [
+            2.952085015999728,
+            "COMPLETED"
+          ],
+          [
+            3.1552478509997854,
+            "COMPLETED"
+          ],
+          [
+            3.358590300999822,
+            "COMPLETED"
+          ],
+          [
+            3.5622389049999583,
+            "COMPLETED"
+          ],
+          [
+            3.766117507999752,
+            "COMPLETED"
+          ],
+          [
+            3.9714851849998922,
+            "COMPLETED"
+          ],
+          [
+            4.174754559000121,
+            "COMPLETED"
+          ],
+          [
+            4.378828624000107,
+            "COMPLETED"
+          ],
+          [
+            4.584196917000099,
+            "COMPLETED"
+          ],
+          [
+            4.789430056000128,
+            "COMPLETED"
+          ],
+          [
+            4.994595349000065,
+            "COMPLETED"
+          ],
+          [
+            5.199662565999915,
+            "COMPLETED"
+          ],
+          [
+            5.4048882439997215,
+            "COMPLETED"
+          ],
+          [
+            5.610289999000088,
+            "COMPLETED"
+          ],
+          [
+            5.815481984000144,
+            "COMPLETED"
+          ],
+          [
+            6.0195003569997425,
+            "COMPLETED"
+          ],
+          [
+            6.224948035000125,
+            "COMPLETED"
+          ],
+          [
+            6.428046640000048,
+            "COMPLETED"
+          ],
+          [
+            6.631609860000026,
+            "COMPLETED"
+          ],
+          [
+            6.837070537999807,
+            "COMPLETED"
+          ],
+          [
+            7.042332600999998,
+            "COMPLETED"
+          ],
+          [
+            7.247273048999887,
+            "COMPLETED"
+          ],
+          [
+            7.452471650999996,
+            "COMPLETED"
+          ],
+          [
+            7.6577844059997915,
+            "COMPLETED"
+          ],
+          [
+            7.862953239000035,
+            "COMPLETED"
+          ],
+          [
+            8.066377612999986,
+            "COMPLETED"
+          ],
+          [
+            8.271762214999853,
+            "COMPLETED"
+          ],
+          [
+            8.478067352999915,
+            "COMPLETED"
+          ],
+          [
+            8.683331570000064,
+            "COMPLETED"
+          ],
+          [
+            8.88876032600001,
+            "COMPLETED"
+          ],
+          [
+            9.094047851000141,
+            "COMPLETED"
+          ],
+          [
+            9.299057298999742,
+            "COMPLETED"
+          ],
+          [
+            9.511660579999898,
+            "COMPLETED"
+          ],
+          [
+            9.717106488999889,
+            "COMPLETED"
+          ],
+          [
+            9.922500399,
+            "COMPLETED"
+          ],
+          [
+            10.127652385000147,
+            "COMPLETED"
+          ],
+          [
+            12.323206903000028,
+            "COMPLETED"
+          ],
+          [
+            12.527866122999967,
+            "COMPLETED"
+          ],
+          [
+            12.73332626399997,
+            "COMPLETED"
+          ],
+          [
+            12.938405558999875,
+            "COMPLETED"
+          ],
+          [
+            13.143671469999845,
+            "COMPLETED"
+          ],
+          [
+            13.350879530999919,
+            "COMPLETED"
+          ],
+          [
+            13.556177672000103,
+            "COMPLETED"
+          ],
+          [
+            13.761702043999776,
+            "COMPLETED"
+          ],
+          [
+            13.967038570000113,
+            "COMPLETED"
+          ],
+          [
+            14.17087963799986,
+            "COMPLETED"
+          ],
+          [
+            14.376397933000135,
+            "COMPLETED"
+          ],
+          [
+            14.581428305999907,
+            "COMPLETED"
+          ],
+          [
+            14.786998678000145,
+            "COMPLETED"
+          ],
+          [
+            14.992593973000112,
+            "COMPLETED"
+          ],
+          [
+            15.197686808000071,
+            "COMPLETED"
+          ],
+          [
+            15.403202564999901,
+            "COMPLETED"
+          ],
+          [
+            15.608377398999892,
+            "COMPLETED"
+          ],
+          [
+            15.813661695000064,
+            "COMPLETED"
+          ],
+          [
+            16.018997222000053,
+            "COMPLETED"
+          ],
+          [
+            16.224507671000083,
+            "COMPLETED"
+          ],
+          [
+            16.429632890999983,
+            "COMPLETED"
+          ],
+          [
+            16.635098264000135,
+            "COMPLETED"
+          ],
+          [
+            16.840355098000146,
+            "COMPLETED"
+          ],
+          [
+            17.046033239999815,
+            "COMPLETED"
+          ],
+          [
+            17.25161445899994,
+            "COMPLETED"
+          ],
+          [
+            17.457053524000003,
+            "COMPLETED"
+          ],
+          [
+            17.660845977000008,
+            "COMPLETED"
+          ],
+          [
+            17.865983351000068,
+            "COMPLETED"
+          ],
+          [
+            18.071747416000107,
+            "COMPLETED"
+          ],
+          [
+            18.277021481999782,
+            "COMPLETED"
+          ],
+          [
+            18.48223985499999,
+            "COMPLETED"
+          ],
+          [
+            18.685781616999975,
+            "COMPLETED"
+          ],
+          [
+            18.891180836999865,
+            "COMPLETED"
+          ],
+          [
+            19.09631159499986,
+            "COMPLETED"
+          ],
+          [
+            19.30198004499971,
+            "COMPLETED"
+          ],
+          [
+            19.507171880999977,
+            "COMPLETED"
+          ],
+          [
+            19.71272133100001,
+            "COMPLETED"
+          ],
+          [
+            19.92041023899992,
+            "COMPLETED"
+          ],
+          [
+            20.125973842999883,
+            "COMPLETED"
+          ],
+          [
+            22.241557234000084,
+            "COMPLETED"
+          ],
+          [
+            24.321738084000117,
+            "COMPLETED"
+          ],
+          [
+            26.402755092000007,
+            "COMPLETED"
+          ],
+          [
+            26.60827600499988,
+            "COMPLETED"
+          ],
+          [
+            26.813987148999786,
+            "COMPLETED"
+          ],
+          [
+            27.019141986999784,
+            "COMPLETED"
+          ],
+          [
+            27.224417516999893,
+            "COMPLETED"
+          ],
+          [
+            27.429618122999727,
+            "COMPLETED"
+          ],
+          [
+            27.635330574999898,
+            "COMPLETED"
+          ],
+          [
+            27.842661408999902,
+            "COMPLETED"
+          ],
+          [
+            28.060613914999976,
+            "COMPLETED"
+          ],
+          [
+            28.266093674999865,
+            "COMPLETED"
+          ],
+          [
+            28.47201089600003,
+            "COMPLETED"
+          ],
+          [
+            28.67734250300009,
+            "COMPLETED"
+          ],
+          [
+            28.882943493999846,
+            "COMPLETED"
+          ],
+          [
+            29.088143485999808,
+            "COMPLETED"
+          ],
+          [
+            29.29358109299983,
+            "COMPLETED"
+          ],
+          [
+            29.499226775999887,
+            "COMPLETED"
+          ],
+          [
+            29.705277382000077,
+            "COMPLETED"
+          ],
+          [
+            29.911271141999805,
+            "COMPLETED"
+          ],
+          [
+            30.12020950899978,
+            "COMPLETED"
+          ],
+          [
+            32.241312065999864,
+            "COMPLETED"
+          ]
+        ],
+        "end_state": "Online",
+        "supplicant_observation": {
+          "duration_ns": 12217823,
+          "ok": true,
+          "reason": null
+        },
+        "dns_ready": true,
+        "ip_present": true,
+        "default_route_present": true,
+        "dns_proof_ok": true,
+        "action_events": {
+          "boot_id": "27e6d684-3794-4490-95db-a489027cd4f4",
+          "connected": 7,
+          "disconnected": 9,
+          "last_event": "CONNECTED",
+          "monotonic_s": 2742.06953879,
+          "schema": 1
+        },
+        "status_query_failures": null
+      },
+      {
+        "kind": "reconnect",
+        "observed_marks_s": {
+          "SCANNING": 0.006205449000390217,
+          "ASSOCIATED": 0.619379102000039,
+          "COMPLETED": 0.828556079000009,
+          "IP": 2.6762940230000822,
+          "DNS": 21.13129258700019,
+          "platform_ready": 29.051160179000362
+        },
+        "observed_states": [
+          [
+            0.006205449000390217,
+            "SCANNING"
+          ],
+          [
+            0.20939920800037726,
+            "SCANNING"
+          ],
+          [
+            0.41457450000007157,
+            "SCANNING"
+          ],
+          [
+            0.619379102000039,
+            "ASSOCIATED"
+          ],
+          [
+            0.828556079000009,
+            "COMPLETED"
+          ],
+          [
+            1.0329749120000997,
+            "COMPLETED"
+          ],
+          [
+            1.2402365090001695,
+            "COMPLETED"
+          ],
+          [
+            1.4433958060003533,
+            "COMPLETED"
+          ],
+          [
+            1.6515956309999638,
+            "COMPLETED"
+          ],
+          [
+            1.860521455000253,
+            "COMPLETED"
+          ],
+          [
+            2.0646709820002798,
+            "COMPLETED"
+          ],
+          [
+            2.2696454290003203,
+            "COMPLETED"
+          ],
+          [
+            2.4729278029999477,
+            "COMPLETED"
+          ],
+          [
+            2.6762940230000822,
+            "COMPLETED"
+          ],
+          [
+            2.8818411620000006,
+            "COMPLETED"
+          ],
+          [
+            3.086437226000271,
+            "COMPLETED"
+          ],
+          [
+            3.292006519000097,
+            "COMPLETED"
+          ],
+          [
+            3.497151120000126,
+            "COMPLETED"
+          ],
+          [
+            3.7027399510002397,
+            "COMPLETED"
+          ],
+          [
+            3.9079621680002674,
+            "COMPLETED"
+          ],
+          [
+            4.1132029230002445,
+            "COMPLETED"
+          ],
+          [
+            4.318302602000131,
+            "COMPLETED"
+          ],
+          [
+            4.523758280000038,
+            "COMPLETED"
+          ],
+          [
+            4.729447187999995,
+            "COMPLETED"
+          ],
+          [
+            4.934606327999973,
+            "COMPLETED"
+          ],
+          [
+            5.1380433180002,
+            "COMPLETED"
+          ],
+          [
+            5.343379304000337,
+            "COMPLETED"
+          ],
+          [
+            5.548567906000244,
+            "COMPLETED"
+          ],
+          [
+            5.7541035839999495,
+            "COMPLETED"
+          ],
+          [
+            5.959180801000002,
+            "COMPLETED"
+          ],
+          [
+            6.164301249000346,
+            "COMPLETED"
+          ],
+          [
+            6.369481390000146,
+            "COMPLETED"
+          ],
+          [
+            6.574654530000316,
+            "COMPLETED"
+          ],
+          [
+            6.77989851700022,
+            "COMPLETED"
+          ],
+          [
+            9.052635883000221,
+            "COMPLETED"
+          ],
+          [
+            9.256751487000201,
+            "COMPLETED"
+          ],
+          [
+            9.462229936000313,
+            "COMPLETED"
+          ],
+          [
+            9.667522537999957,
+            "COMPLETED"
+          ],
+          [
+            9.872758910000357,
+            "COMPLETED"
+          ],
+          [
+            10.077940590000253,
+            "COMPLETED"
+          ],
+          [
+            10.283241039000131,
+            "COMPLETED"
+          ],
+          [
+            10.488364642000306,
+            "COMPLETED"
+          ],
+          [
+            10.693586015000164,
+            "COMPLETED"
+          ],
+          [
+            10.898843002000376,
+            "COMPLETED"
+          ],
+          [
+            11.104206298000008,
+            "COMPLETED"
+          ],
+          [
+            11.309269516000313,
+            "COMPLETED"
+          ],
+          [
+            11.514521274000344,
+            "COMPLETED"
+          ],
+          [
+            11.719919723000203,
+            "COMPLETED"
+          ],
+          [
+            11.925055095000062,
+            "COMPLETED"
+          ],
+          [
+            12.130197699000291,
+            "COMPLETED"
+          ],
+          [
+            12.335317918000328,
+            "COMPLETED"
+          ],
+          [
+            12.54041152200034,
+            "COMPLETED"
+          ],
+          [
+            12.745540894999976,
+            "COMPLETED"
+          ],
+          [
+            12.950915960000202,
+            "COMPLETED"
+          ],
+          [
+            13.156127948000176,
+            "COMPLETED"
+          ],
+          [
+            13.361385167000208,
+            "COMPLETED"
+          ],
+          [
+            13.566541771000175,
+            "COMPLETED"
+          ],
+          [
+            13.772041297000214,
+            "COMPLETED"
+          ],
+          [
+            13.97704459400029,
+            "COMPLETED"
+          ],
+          [
+            14.18238996700029,
+            "COMPLETED"
+          ],
+          [
+            14.387462185999993,
+            "COMPLETED"
+          ],
+          [
+            14.592569791000187,
+            "COMPLETED"
+          ],
+          [
+            14.797626472000047,
+            "COMPLETED"
+          ],
+          [
+            15.003409537000152,
+            "COMPLETED"
+          ],
+          [
+            15.208665218000078,
+            "COMPLETED"
+          ],
+          [
+            15.413951129999987,
+            "COMPLETED"
+          ],
+          [
+            15.619081887999982,
+            "COMPLETED"
+          ],
+          [
+            15.824451645999943,
+            "COMPLETED"
+          ],
+          [
+            16.029475943000307,
+            "COMPLETED"
+          ],
+          [
+            16.234738163000202,
+            "COMPLETED"
+          ],
+          [
+            16.439950152000165,
+            "COMPLETED"
+          ],
+          [
+            16.64513437200003,
+            "COMPLETED"
+          ],
+          [
+            16.85045882200029,
+            "COMPLETED"
+          ],
+          [
+            19.052538045000347,
+            "COMPLETED"
+          ],
+          [
+            21.13129258700019,
+            "COMPLETED"
+          ],
+          [
+            23.220806729000287,
+            "COMPLETED"
+          ],
+          [
+            23.424555415000214,
+            "COMPLETED"
+          ],
+          [
+            23.629981021000276,
+            "COMPLETED"
+          ],
+          [
+            23.835247704000267,
+            "COMPLETED"
+          ],
+          [
+            24.040380541000104,
+            "COMPLETED"
+          ],
+          [
+            24.245637456000168,
+            "COMPLETED"
+          ],
+          [
+            24.451262061000307,
+            "COMPLETED"
+          ],
+          [
+            24.65658028300004,
+            "COMPLETED"
+          ],
+          [
+            24.862012812000103,
+            "COMPLETED"
+          ],
+          [
+            25.067178573000092,
+            "COMPLETED"
+          ],
+          [
+            25.272676256000068,
+            "COMPLETED"
+          ],
+          [
+            25.47810078600014,
+            "COMPLETED"
+          ],
+          [
+            25.683614700000362,
+            "COMPLETED"
+          ],
+          [
+            25.888816229999975,
+            "COMPLETED"
+          ],
+          [
+            26.09423275900008,
+            "COMPLETED"
+          ],
+          [
+            26.299466905000372,
+            "COMPLETED"
+          ],
+          [
+            26.504966358000274,
+            "COMPLETED"
+          ],
+          [
+            26.710470732999966,
+            "COMPLETED"
+          ],
+          [
+            26.915878494000026,
+            "COMPLETED"
+          ],
+          [
+            29.051160179000362,
+            "COMPLETED"
+          ]
+        ],
+        "end_state": "Online",
+        "supplicant_observation": {
+          "duration_ns": 11746593,
+          "ok": true,
+          "reason": null
+        },
+        "dns_ready": true,
+        "ip_present": true,
+        "default_route_present": true,
+        "dns_proof_ok": true,
+        "action_events": {
+          "boot_id": "27e6d684-3794-4490-95db-a489027cd4f4",
+          "connected": 8,
+          "disconnected": 10,
+          "last_event": "CONNECTED",
+          "monotonic_s": 2773.567468539,
+          "schema": 1
+        },
+        "status_query_failures": null
+      },
+      {
+        "kind": "toggle",
+        "observed_marks_s": {
+          "interface": 0.025175028999910865,
+          "IP": 5.877205947999755,
+          "DNS": 20.205873113000052,
+          "platform_ready": 27.986931398999786
+        },
+        "observed_states": [
+          [
+            3.028490681999756,
+            null
+          ],
+          [
+            3.2332541380001203,
+            null
+          ],
+          [
+            3.4359840590000204,
+            null
+          ],
+          [
+            3.640568746000099,
+            null
+          ],
+          [
+            3.84512043299992,
+            null
+          ],
+          [
+            4.050375810999867,
+            null
+          ],
+          [
+            4.252939118000086,
+            null
+          ],
+          [
+            4.4554974239999865,
+            null
+          ],
+          [
+            4.658370960999946,
+            null
+          ],
+          [
+            4.861209035999764,
+            null
+          ],
+          [
+            5.064372956999705,
+            null
+          ],
+          [
+            5.268842337000024,
+            null
+          ],
+          [
+            5.471608642999854,
+            null
+          ],
+          [
+            5.674329334000049,
+            null
+          ],
+          [
+            5.877205947999755,
+            null
+          ],
+          [
+            6.0821072509997975,
+            null
+          ],
+          [
+            6.286603245999686,
+            null
+          ],
+          [
+            6.4911802419997,
+            null
+          ],
+          [
+            6.69576946799998,
+            null
+          ],
+          [
+            6.900558693999756,
+            null
+          ],
+          [
+            7.106096302999958,
+            null
+          ],
+          [
+            7.31064560599998,
+            null
+          ],
+          [
+            7.513523143999919,
+            null
+          ],
+          [
+            7.718146909000097,
+            null
+          ],
+          [
+            7.922793365999951,
+            null
+          ],
+          [
+            8.127466207999987,
+            null
+          ],
+          [
+            8.33216774199991,
+            null
+          ],
+          [
+            8.536694199000067,
+            null
+          ],
+          [
+            8.74212973199974,
+            null
+          ],
+          [
+            8.946845650999876,
+            null
+          ],
+          [
+            9.151533030999872,
+            null
+          ],
+          [
+            9.356169103999946,
+            null
+          ],
+          [
+            9.559361410999827,
+            null
+          ],
+          [
+            9.764142713999718,
+            null
+          ],
+          [
+            9.969061018000048,
+            null
+          ],
+          [
+            10.173999551999714,
+            null
+          ],
+          [
+            10.378516471999774,
+            null
+          ],
+          [
+            10.58302423699979,
+            null
+          ],
+          [
+            10.78764184900001,
+            null
+          ],
+          [
+            10.99222007599974,
+            null
+          ],
+          [
+            11.19688861099985,
+            null
+          ],
+          [
+            11.401768453999921,
+            null
+          ],
+          [
+            11.606441987999915,
+            null
+          ],
+          [
+            11.810999447000086,
+            null
+          ],
+          [
+            12.015388289999919,
+            null
+          ],
+          [
+            12.220214055999804,
+            null
+          ],
+          [
+            12.424812205999842,
+            null
+          ],
+          [
+            12.629271587999938,
+            null
+          ],
+          [
+            12.834072431000095,
+            null
+          ],
+          [
+            13.038523119999809,
+            null
+          ],
+          [
+            13.248755261000042,
+            null
+          ],
+          [
+            13.453728719000082,
+            null
+          ],
+          [
+            13.658591791999697,
+            null
+          ],
+          [
+            13.863338019999901,
+            null
+          ],
+          [
+            14.067751247999695,
+            null
+          ],
+          [
+            14.272769476000121,
+            null
+          ],
+          [
+            14.477275781000117,
+            null
+          ],
+          [
+            14.681866624000122,
+            null
+          ],
+          [
+            14.886518544999944,
+            null
+          ],
+          [
+            15.091173849999905,
+            null
+          ],
+          [
+            15.295868923999933,
+            null
+          ],
+          [
+            15.500655382999867,
+            null
+          ],
+          [
+            15.705338457999915,
+            null
+          ],
+          [
+            15.909728686000108,
+            null
+          ],
+          [
+            16.114249760999883,
+            null
+          ],
+          [
+            16.318816682000033,
+            null
+          ],
+          [
+            16.523372526000003,
+            null
+          ],
+          [
+            16.727799370999946,
+            null
+          ],
+          [
+            16.932618753000042,
+            null
+          ],
+          [
+            17.137306827999964,
+            null
+          ],
+          [
+            17.34202497899969,
+            null
+          ],
+          [
+            17.546696285000053,
+            null
+          ],
+          [
+            17.751609975000065,
+            null
+          ],
+          [
+            17.955977435000023,
+            null
+          ],
+          [
+            18.158953282999846,
+            null
+          ],
+          [
+            18.362440051999783,
+            null
+          ],
+          [
+            18.567130049999832,
+            null
+          ],
+          [
+            18.771941432999938,
+            null
+          ],
+          [
+            18.976398663000055,
+            null
+          ],
+          [
+            19.18267804299967,
+            null
+          ],
+          [
+            19.387412348999987,
+            null
+          ],
+          [
+            19.592076577999705,
+            null
+          ],
+          [
+            19.796753114999774,
+            null
+          ],
+          [
+            20.00130557500006,
+            null
+          ],
+          [
+            20.205873113000052,
+            null
+          ],
+          [
+            20.41070857199975,
+            null
+          ],
+          [
+            20.615330493999863,
+            null
+          ],
+          [
+            20.82025464599974,
+            null
+          ],
+          [
+            21.024845645999903,
+            null
+          ],
+          [
+            21.22947487500005,
+            null
+          ],
+          [
+            21.43431564299999,
+            null
+          ],
+          [
+            21.639237641999898,
+            null
+          ],
+          [
+            21.84430317799979,
+            null
+          ],
+          [
+            22.04889825500004,
+            null
+          ],
+          [
+            22.253923407000002,
+            null
+          ],
+          [
+            22.45975471199972,
+            null
+          ],
+          [
+            22.664538941000046,
+            null
+          ],
+          [
+            22.869361247999677,
+            null
+          ],
+          [
+            23.07398817100011,
+            null
+          ],
+          [
+            23.27886932299998,
+            null
+          ],
+          [
+            23.48387209099974,
+            null
+          ],
+          [
+            23.68891755200002,
+            null
+          ],
+          [
+            23.89381047400002,
+            null
+          ],
+          [
+            24.098324474000037,
+            null
+          ],
+          [
+            24.303065396999955,
+            null
+          ],
+          [
+            24.507721626999682,
+            null
+          ],
+          [
+            24.712576549000005,
+            null
+          ],
+          [
+            24.917314086999795,
+            null
+          ],
+          [
+            25.121905625999716,
+            null
+          ],
+          [
+            25.326606933999756,
+            null
+          ],
+          [
+            25.53149847199984,
+            null
+          ],
+          [
+            25.736366779000036,
+            null
+          ],
+          [
+            25.94134016299995,
+            null
+          ],
+          [
+            26.14585785600002,
+            null
+          ],
+          [
+            26.350654162999945,
+            null
+          ],
+          [
+            26.55537739400006,
+            null
+          ],
+          [
+            26.760126239999863,
+            null
+          ],
+          [
+            26.96480300999974,
+            null
+          ],
+          [
+            27.16968754799973,
+            null
+          ],
+          [
+            27.374510240999825,
+            null
+          ],
+          [
+            27.579192780000085,
+            null
+          ],
+          [
+            27.78219178299969,
+            null
+          ],
+          [
+            27.986931398999786,
+            null
+          ]
+        ],
+        "end_state": "Online",
+        "supplicant_observation": {
+          "duration_ns": 11417517,
+          "ok": true,
+          "reason": null
+        },
+        "dns_ready": true,
+        "ip_present": true,
+        "default_route_present": true,
+        "dns_proof_ok": true,
+        "action_events": {
+          "boot_id": "27e6d684-3794-4490-95db-a489027cd4f4",
+          "connected": 9,
+          "disconnected": 12,
+          "last_event": "CONNECTED",
+          "monotonic_s": 2806.78421643,
+          "schema": 1
+        },
+        "status_query_failures": null
+      }
+    ],
+    "tcp": [
+      {
+        "direction_at_y2": "RX",
+        "exit_code": 0,
+        "error": null,
+        "sum_sent": {
+          "seconds": 8.00175,
+          "bytes": 42205184,
+          "bits_per_second": 42195953.63514232,
+          "retransmits": 0
+        },
+        "sum_received": {
+          "seconds": 8.019049,
+          "bytes": 40763392,
+          "bits_per_second": 40666559.83770644
+        }
+      },
+      {
+        "direction_at_y2": "TX",
+        "exit_code": 1,
+        "error": "unable to receive control message - port may not be available, the other side may have stopped running, etc.: Connection reset by peer"
+      },
+      {
+        "direction_at_y2": "BIDIR",
+        "exit_code": 0,
+        "error": null,
+        "sum_sent": {
+          "seconds": 8.000501,
+          "bytes": 43122688,
+          "bits_per_second": 43119987.61077587,
+          "retransmits": 0
+        },
+        "sum_received": {
+          "seconds": 8.032309,
+          "bytes": 41680896,
+          "bits_per_second": 41513239.59274973
+        },
+        "sum_sent_bidir_reverse": {
+          "seconds": 8.000501,
+          "bytes": 4325376,
+          "bits_per_second": 4325105.14029059,
+          "retransmits": 0
+        },
+        "sum_received_bidir_reverse": {
+          "seconds": 8.032309,
+          "bytes": 3932160,
+          "bits_per_second": 3916343.3578065787
+        }
+      }
+    ],
+    "tcp_snapshot": {
+      "seconds": 17.16260681699987,
+      "busy_one_core_percent": 67.41400140064799,
+      "irq_per_s": 12056.967930712783,
+      "ctxt_per_s": 14416.050116287057,
+      "network_delta": {
+        "rx_nohandler": 0,
+        "tx_fifo_errors": 0,
+        "rx_frame_errors": 0,
+        "rx_missed_errors": 0,
+        "collisions": 0,
+        "tx_aborted_errors": 0,
+        "tx_dropped": 0,
+        "tx_carrier_errors": 0,
+        "rx_crc_errors": 0,
+        "tx_errors": 0,
+        "tx_packets": 34852,
+        "rx_compressed": 0,
+        "rx_fifo_errors": 0,
+        "tx_bytes": 6451013,
+        "rx_over_errors": 0,
+        "rx_length_errors": 0,
+        "rx_dropped": 0,
+        "rx_errors": 0,
+        "multicast": 0,
+        "tx_window_errors": 0,
+        "rx_packets": 60634,
+        "tx_heartbeat_errors": 0,
+        "rx_bytes": 89500629,
+        "tx_compressed": 0
+      }
+    },
+    "http_snapshot": {
+      "seconds": 6.519627082999705,
+      "busy_one_core_percent": 82.82682324086917,
+      "irq_per_s": 7519.601869228909,
+      "ctxt_per_s": 8101.690377005018,
+      "network_delta": {
+        "rx_nohandler": 0,
+        "tx_fifo_errors": 0,
+        "rx_frame_errors": 0,
+        "rx_missed_errors": 0,
+        "collisions": 0,
+        "tx_aborted_errors": 0,
+        "tx_dropped": 0,
+        "tx_carrier_errors": 0,
+        "rx_crc_errors": 0,
+        "tx_errors": 0,
+        "tx_packets": 17232,
+        "rx_compressed": 0,
+        "rx_fifo_errors": 0,
+        "tx_bytes": 17917772,
+        "rx_over_errors": 0,
+        "rx_length_errors": 0,
+        "rx_dropped": 0,
+        "rx_errors": 0,
+        "multicast": 0,
+        "tx_window_errors": 0,
+        "rx_packets": 16776,
+        "tx_heartbeat_errors": 0,
+        "rx_bytes": 17887768,
+        "tx_compressed": 0
+      }
+    },
+    "tcp_buffers": {
+      "/proc/sys/net/ipv4/tcp_rmem": "4096\t131072\t5724160",
+      "/proc/sys/net/ipv4/tcp_wmem": "4096\t16384\t4194304"
+    },
+    "temporary_fast_psp": {
+      "set": {
+        "ok": true,
+        "out": "",
+        "err": ""
+      },
+      "before": {
+        "ok": true,
+        "out": "Power save: on",
+        "err": ""
+      },
+      "after": {
+        "ok": true,
+        "out": "Power save: off",
+        "err": ""
+      },
+      "valid_mode_comparison": false
+    },
+    "http": {
+      "raw_sha256": "c1c96f6945cdd59924f2068bc7390654960d65e82c571a9c3dc03a1536fef6d8",
+      "small_count": 20,
+      "small_median_s": 0.006961448500078404,
+      "small_max_s": 0.01725112399981299,
+      "large": [
+        {
+          "direction": "TX",
+          "bytes": 8388608,
+          "seconds": 1.4296085559999483,
+          "sha256": "7d212b9c884f5c77896de960ae17cc341cda43b14d6a971f34ca29ebd4badf7f",
+          "mbps": 46.942125323991434
+        },
+        {
+          "direction": "RX",
+          "bytes": 8388608,
+          "seconds": 1.5272510430004331,
+          "sha256": "7d212b9c884f5c77896de960ae17cc341cda43b14d6a971f34ca29ebd4badf7f",
+          "mbps": 43.94095149423379
+        },
+        {
+          "direction": "TX",
+          "bytes": 8388608,
+          "seconds": 1.4470514320000802,
+          "sha256": "7d212b9c884f5c77896de960ae17cc341cda43b14d6a971f34ca29ebd4badf7f",
+          "mbps": 46.37628111617547
+        },
+        {
+          "direction": "RX",
+          "bytes": 8388608,
+          "seconds": 1.4938843489999272,
+          "sha256": "7d212b9c884f5c77896de960ae17cc341cda43b14d6a971f34ca29ebd4badf7f",
+          "mbps": 44.9223957965191
+        }
+      ]
+    }
+  },
+  "after": {
+    "status": "NOT_RUN",
+    "reason": "Shared device lock unavailable for this phase."
+  },
+  "not_measured": [
+    "electrical battery",
+    "exact runtime CPU wakeups",
+    "real AP loss",
+    "reboot to ready",
+    "end-to-end Reborn UI after-binary acceptance",
+    "Bluetooth connected idle/SBC: owner reports headset unavailable"
+  ],
+  "host_validation": {
+    "linux_tests": {
+      "passed": 94,
+      "skipped": 0,
+      "log_sha256": "2645ef90fdb3e7a402aee1e8ee79c9af2d808b677f7025022ff66710baebb7bc"
+    },
+    "d08_bootimg_tests": {
+      "passed": 5,
+      "log_sha256": "06c4423b811ba5e175ab47bb0a1a3780481c391a17335b80d6e62ec3d56a0565"
+    },
+    "diagnostic_export_tests": {
+      "passed": 6,
+      "log_sha256": "22beba721c8decde8c720627166c48dceeb1a5aeedd333b21f5cdfbe12a617f8"
+    },
+    "reborn_platform_tests": {
+      "passed": 74,
+      "log_sha256": "eb43d90a7ee490ca34c541535fd611d1d1af9c62b733d249cb7dd79c038c62ab"
+    },
+    "checks": [
+      "Python compileall",
+      "rustfmt",
+      "clippy -D warnings",
+      "native platform build",
+      "ARMv7 platform build",
+      "git diff --check"
+    ]
+  },
+  "limitations": [
+    "Baseline iperf TX control reset retained as FAIL; successful HTTP does not erase it",
+    "Single windows; no electrical power or hardware-ceiling claim",
+    "FAST_PSP sample invalid if policy readback changes during window",
+    "No kernel driver, checksum, CPU policy or Bluetooth changes"
+  ]
+}

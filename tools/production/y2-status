@@ -1,0 +1,37 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Observe the same platform in normal userspace and rescue. No hardware writes.
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin
+case "${1:-storage}" in
+ storage)
+    for entry in /sys/class/block/*; do
+        case "$(readlink -f "$entry")" in
+        */11230000.mmc/*)
+            if [ -f "$entry/partition" ]; then
+                echo "${entry##*/}: start=$(cat "$entry/start") sectors=$(cat "$entry/size")"
+            else
+                echo "${entry##*/}: $(cat "$entry/device/type") sectors=$(cat "$entry/size")"
+            fi;;
+        esac
+    done
+    dmesg | grep -E '11230000.*(partition read|protected eMMC|cmd=)|mmcblk' | tail -n 6
+    ;;
+ usb)
+    for status in /sys/bus/platform/devices/*/status; do
+        case "$status" in *11200000*) cat "$status";; esac
+    done
+    y2-usb-status
+    ;;
+ audio) cat /proc/asound/cards; cat /proc/asound/pcm;;
+ power)
+    echo 'Native charging policy is implemented; qualification is image-specific.'
+    echo 'Configured current is not measured current; SOC and pack temperature unavailable.'
+    for supply in /sys/class/power_supply/*; do
+        [ -f "$supply/type" ] || continue
+        echo "${supply##*/}: $(cat "$supply/type")"
+        for field in online present status health usb_type voltage_now constant_charge_current constant_charge_voltage input_current_limit; do
+            [ ! -f "$supply/$field" ] || echo "$field=$(cat "$supply/$field")"
+        done
+    done;;
+ *) echo 'Usage: y2-status storage|usb|audio|power' >&2; exit 2;;
+esac

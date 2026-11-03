@@ -1,0 +1,294 @@
+{
+  "evidence_origin": "parallel Reborn performance pass; instrumented base binary",
+  "source_receipt": "/home/luca/Dokumente/Code/worktrees/platform-v1-reborn-performance/Y2Reborn/out/performance/before/device/receipt.json",
+  "boot": "27e6d684-3794-4490-95db-a489027cd4f4",
+  "versions": {
+    "release_version": "1.0.0-baseline-candidate.2",
+    "rootfs_version": "2025.02.18-platform-v1.21",
+    "build_id": "Y2LINUX-BASELINE-02",
+    "platform_api_version": 1,
+    "feature_contract_version": 2,
+    "battery_profile_schema": 1,
+    "low_battery_policy_schema": 2,
+    "layout_version": 1,
+    "kernel_version": "6.18.0-y2linux-baseline-02",
+    "data_schema_version": 1,
+    "reborn_version": "0.2.0",
+    "build_git_commit": "8584ccd85f052f351fe51650b2348c83ca894ed4",
+    "reborn_source_commit": "b71b468860233faa0a42b8448ec5777fa952b8e3"
+  },
+  "same_boot": true,
+  "taint": "0",
+  "restored_build": "b71b468860233faa0a42b8448ec5777fa952b8e3",
+  "idle": [
+    {
+      "state": "home_static_paused",
+      "duration_s": 10.089621838999847,
+      "frames": 13.0,
+      "main_cpu_percent": 4.1626931782176015
+    },
+    {
+      "state": "now_playing_paused",
+      "duration_s": 10.089176087999931,
+      "frames": 13.0,
+      "main_cpu_percent": 4.55934157544464
+    },
+    {
+      "state": "playing",
+      "duration_s": 5.074750517999746,
+      "frames": 8.0,
+      "main_cpu_percent": 5.714566636751748
+    },
+    {
+      "state": "settings_menu_idle",
+      "duration_s": 10.100012101000175,
+      "frames": 15.0,
+      "main_cpu_percent": 4.752469553501495
+    },
+    {
+      "state": "screen_off_paused",
+      "duration_s": 10.079095793000306,
+      "frames": 0.0,
+      "main_cpu_percent": 3.6709642174147827
+    }
+  ],
+  "frame_evidence": {
+    "source": "/home/luca/Dokumente/Code/worktrees/platform-v1-reborn-performance/Y2Reborn/out/performance/before/device/trace.json",
+    "dropped": 0,
+    "scope": "instrumented rendering, 10k synthetic product library; injected/playing latency from this exploratory run rejected by performance owner; frame render cost retained",
+    "screens": {
+      "home": {
+        "frames": 56,
+        "layout_ms": {
+          "median": 0.186153,
+          "p95_nearest_rank": 0.29500000000000004
+        },
+        "render_cpu_ms": {
+          "median": 7.469075999999298,
+          "p95_nearest_rank": 11.728230999999978
+        },
+        "submit_ms": {
+          "median": 5.698256499999999,
+          "p95_nearest_rank": 9.771972
+        },
+        "present_ms": {
+          "median": 11.403398000000001,
+          "p95_nearest_rank": 16.65004
+        },
+        "frame_ms": {
+          "median": 16.872885500000002,
+          "p95_nearest_rank": 23.525471
+        }
+      },
+      "music": {
+        "frames": 82,
+        "layout_ms": {
+          "median": 0.12484600000000001,
+          "p95_nearest_rank": 0.16323
+        },
+        "render_cpu_ms": {
+          "median": 4.368115500000047,
+          "p95_nearest_rank": 5.46392299999976
+        },
+        "submit_ms": {
+          "median": 3.262337,
+          "p95_nearest_rank": 4.037912
+        },
+        "present_ms": {
+          "median": 14.951000999999998,
+          "p95_nearest_rank": 16.291031
+        },
+        "frame_ms": {
+          "median": 18.650487,
+          "p95_nearest_rank": 20.113789999999998
+        }
+      },
+      "albums": {
+        "frames": 67,
+        "layout_ms": {
+          "median": 0.102077,
+          "p95_nearest_rank": 0.24899900000000003
+        },
+        "render_cpu_ms": {
+          "median": 4.156231000000066,
+          "p95_nearest_rank": 4.970461999999731
+        },
+        "submit_ms": {
+          "median": 3.05253,
+          "p95_nearest_rank": 3.793528
+        },
+        "present_ms": {
+          "median": 13.043502,
+          "p95_nearest_rank": 16.560953
+        },
+        "frame_ms": {
+          "median": 16.168723999999997,
+          "p95_nearest_rank": 19.886405999999997
+        }
+      },
+      "album": {
+        "frames": 55,
+        "layout_ms": {
+          "median": 0.168077,
+          "p95_nearest_rank": 0.19761499999999999
+        },
+        "render_cpu_ms": {
+          "median": 7.436846999999913,
+          "p95_nearest_rank": 8.835384000000168
+        },
+        "submit_ms": {
+          "median": 5.686676,
+          "p95_nearest_rank": 7.002596
+        },
+        "present_ms": {
+          "median": 10.779663,
+          "p95_nearest_rank": 14.094807000000001
+        },
+        "frame_ms": {
+          "median": 17.150953,
+          "p95_nearest_rank": 19.90256
+        }
+      },
+      "artists": {
+        "frames": 49,
+        "layout_ms": {
+          "median": 0.100384,
+          "p95_nearest_rank": 0.19484600000000002
+        },
+        "render_cpu_ms": {
+          "median": 3.927000000000014,
+          "p95_nearest_rank": 4.676232000000002
+        },
+        "submit_ms": {
+          "median": 2.873146,
+          "p95_nearest_rank": 3.507067
+        },
+        "present_ms": {
+          "median": 13.218502,
+          "p95_nearest_rank": 16.680877
+        },
+        "frame_ms": {
+          "median": 16.182955999999997,
+          "p95_nearest_rank": 19.672176
+        }
+      },
+      "artist": {
+        "frames": 42,
+        "layout_ms": {
+          "median": 0.16380699999999998,
+          "p95_nearest_rank": 0.24592199999999997
+        },
+        "render_cpu_ms": {
+          "median": 7.637115000000083,
+          "p95_nearest_rank": 8.125999999999856
+        },
+        "submit_ms": {
+          "median": 5.8142914999999995,
+          "p95_nearest_rank": 6.20706
+        },
+        "present_ms": {
+          "median": 10.553663,
+          "p95_nearest_rank": 14.320421999999999
+        },
+        "frame_ms": {
+          "median": 16.0596095,
+          "p95_nearest_rank": 20.392097
+        }
+      },
+      "tracks": {
+        "frames": 1072,
+        "layout_ms": {
+          "median": 0.119077,
+          "p95_nearest_rank": 0.159307
+        },
+        "render_cpu_ms": {
+          "median": 5.729076999999805,
+          "p95_nearest_rank": 6.148692000000011
+        },
+        "submit_ms": {
+          "median": 4.332834999999999,
+          "p95_nearest_rank": 4.642988
+        },
+        "present_ms": {
+          "median": 11.872473,
+          "p95_nearest_rank": 13.145431
+        },
+        "frame_ms": {
+          "median": 16.329848,
+          "p95_nearest_rank": 17.50696
+        }
+      },
+      "now_playing": {
+        "frames": 54,
+        "layout_ms": {
+          "median": 0.1186535,
+          "p95_nearest_rank": 0.32092299999999996
+        },
+        "render_cpu_ms": {
+          "median": 4.926845499999999,
+          "p95_nearest_rank": 8.490768999999787
+        },
+        "submit_ms": {
+          "median": 3.7012994999999997,
+          "p95_nearest_rank": 6.435601
+        },
+        "present_ms": {
+          "median": 12.1590885,
+          "p95_nearest_rank": 16.472655999999997
+        },
+        "frame_ms": {
+          "median": 15.985503,
+          "p95_nearest_rank": 20.062955
+        }
+      },
+      "queue": {
+        "frames": 5,
+        "layout_ms": {
+          "median": 0.233769,
+          "p95_nearest_rank": 0.290692
+        },
+        "render_cpu_ms": {
+          "median": 10.684537999999577,
+          "p95_nearest_rank": 11.945384000000558
+        },
+        "submit_ms": {
+          "median": 8.367751,
+          "p95_nearest_rank": 9.25898
+        },
+        "present_ms": {
+          "median": 9.734594,
+          "p95_nearest_rank": 11.294129
+        },
+        "frame_ms": {
+          "median": 17.537961000000003,
+          "p95_nearest_rank": 20.00211
+        }
+      },
+      "settings": {
+        "frames": 22,
+        "layout_ms": {
+          "median": 0.24503750000000002,
+          "p95_nearest_rank": 0.43523
+        },
+        "render_cpu_ms": {
+          "median": 7.301768499999639,
+          "p95_nearest_rank": 10.599076999998402
+        },
+        "submit_ms": {
+          "median": 5.5801415,
+          "p95_nearest_rank": 6.117217
+        },
+        "present_ms": {
+          "median": 10.076208999999999,
+          "p95_nearest_rank": 13.862585000000001
+        },
+        "frame_ms": {
+          "median": 16.022927,
+          "p95_nearest_rank": 20.162187000000003
+        }
+      }
+    }
+  },
+  "binary_sha256": "78c79472a87029b51573660f69afdba63da76aadc97a9a9031f544287ddc076e",
+  "trace_sha256": "75d1fd820dc41c9127fc8746bdad4f506742eefcf338d56c9a45d4ab6855f6a5"
+}

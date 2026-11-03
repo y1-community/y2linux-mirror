@@ -1,0 +1,343 @@
+Adaptive bit rate for CBR AAC and frames that fit one packet (Y2Linux).
+
+BlueALSA keeps a three-packet Bluetooth socket buffer and blocks while the
+radio cannot deliver; only LDAC adapts its rate. AAC kept its full CBR rate on
+a weak link and the headphones ran dry. With --aac-abr the encoder steps down
+(8/8, 6/8, 5/8, 4/8 of the rate, not below 128 kbit/s) when two packets are
+queued or a write had to wait, and back up after ~10 s with an empty queue.
+The configured CBR rate is also capped so a 1024-sample frame fits one packet
+of the link's MTU: some headsets cannot reassemble fragmented AAC frames, the
+reason BlueALSA defaults to 220 kbit/s. EncoderStats reports AAC bit rate,
+ABR level and adjustments (patch 0001). Decisions: src/y2-aac-abr.h.
+
+Ceiling while Wi-Fi shares the radio (Y2Reborn #87): the MT6582 has one
+2.4 GHz antenna for Wi-Fi and Bluetooth, and losses in the air never back up
+the socket queue, so the adaptive rate cannot see them. While the platform
+keeps /run/y2/bt-codec-ceiling (src/y2-codec-ceiling.h), looked at on the
+first frame and then about once a second, CBR AAC runs at no more than
+192 kbit/s; its levels are taken from the ceiling and the link's level is
+kept. The rate changes in place, without renegotiation. VBR is untouched.
+
+--- a/src/ba-config.h
++++ b/src/ba-config.h
+@@ -165,6 +165,8 @@
+ 	bool aac_afterburner;
+ 	bool aac_prefer_vbr;
+ 	bool aac_true_bps;
++	/* Y2: adaptive CBR bit rate (y2-aac-abr.h) */
++	bool aac_abr;
+ 	unsigned int aac_bitrate;
+ 	unsigned int aac_latm_version;
+ #endif
+--- a/src/ba-config.c
++++ b/src/ba-config.c
+@@ -104,6 +104,8 @@
+ 	/* Do not enable true "bit per second" bit rate by default because it
+ 	 * violates A2DP AAC specification. */
+ 	.aac_true_bps = false,
++	/* Y2: adaptive bit rate for CBR AAC is opt-in (--aac-abr). */
++	.aac_abr = false,
+ 	/* For CBR mode the 220 kbps bitrate should result in an A2DP frame equal
+ 	 * to 651 bytes. Such frame size should fit within writing MTU of most BT
+ 	 * headsets, so it will prevent RTP fragmentation which seems not to be
+--- a/src/main.c
++++ b/src/main.c
+@@ -191,6 +191,7 @@
+ 		{ "aac-latm-version", required_argument, NULL, 15 },
+ 		{ "aac-true-bps", no_argument, NULL, 18 },
+ 		{ "aac-vbr", no_argument, NULL, 19 },
++		{ "aac-abr", no_argument, NULL, 200 },
+ #endif
+ #if ENABLE_LC3PLUS
+ 		{ "lc3plus-bitrate", required_argument, NULL, 20 },
+@@ -345,6 +346,7 @@
+ 					"      --aac-latm-version=NUM\tselect AAC LATM syntax version; default: %u\n"
+ 					"      --aac-true-bps\t\tenable true bit-per-second bit rate for AAC codec\n"
+ 					"      --aac-vbr\t\t\tprefer AAC VBR mode over CBR mode for A2DP source\n"
++					"      --aac-abr\t\t\tadapt the AAC CBR bit rate to the link (Y2)\n"
+ #endif
+ #if ENABLE_LC3PLUS
+ 					"      --lc3plus-bitrate=BPS\tset LC3plus encoder CBR bitrate; default: %u\n"
+@@ -648,6 +650,9 @@
+ 		case 19 /* --aac-vbr */ :
+ 			config.aac_prefer_vbr = true;
+ 			break;
++		case 200 /* --aac-abr */ :
++			config.aac_abr = true;
++			break;
+ #endif
+ 
+ #if ENABLE_LC3PLUS
+--- a/src/a2dp-aac.c
++++ b/src/a2dp-aac.c
+@@ -12,12 +12,15 @@
+ #include <stdbool.h>
+ #include <stddef.h>
+ #include <stdint.h>
++#include <stdlib.h>
+ #include <string.h>
++#include <sys/ioctl.h>
+ #include <sys/param.h>
+ #include <sys/types.h>
+ 
+ #include <fdk-aac/aacdecoder_lib.h>
+ #include <fdk-aac/aacenc_lib.h>
++#include <glib.h>
+ #define AACENCODER_LIB_VERSION LIB_VERSION( \
+ 		AACENCODER_LIB_VL0, AACENCODER_LIB_VL1, AACENCODER_LIB_VL2)
+ 
+@@ -34,6 +37,8 @@
+ #include "shared/ffb.h"
+ #include "shared/log.h"
+ #include "shared/rt.h"
++#include "y2-aac-abr.h"
++#include "y2-codec-ceiling.h"
+ 
+ static const struct a2dp_bit_mapping a2dp_aac_channels[] = {
+ 	{ AAC_CHANNEL_MODE_MONO, .ch = { 1, a2dp_channel_map_mono } },
+@@ -156,10 +161,29 @@
+ 	AACENC_ERROR err;
+ 
+ 	const a2dp_aac_t * configuration = &t->media.a2dp.configuration.aac;
+-	const unsigned int bitrate = A2DP_AAC_GET_BITRATE(*configuration);
++	unsigned int bitrate = A2DP_AAC_GET_BITRATE(*configuration);
+ 	const unsigned int channels = t_pcm->channels;
+ 	const unsigned int rate = t_pcm->rate;
+ 
++	/* Y2: CBR frames stay within one packet (y2-aac-abr.h): a higher
++	 * configured rate is used only where the link's MTU allows it. */
++	const unsigned int mtu_bitrate = y2_aac_mtu_bitrate(t->mtu_write, rate);
++	if (!configuration->vbr && mtu_bitrate > 0 && bitrate > mtu_bitrate)
++		bitrate = mtu_bitrate;
++	struct y2_aac_abr abr;
++	y2_aac_abr_init(&abr, bitrate, config.aac_abr, !configuration->vbr);
++	unsigned int current_bitrate = bitrate;
++	/* PCM frames since the ceiling was last looked at: the first frame looks
++	 * (y2-codec-ceiling.h), then about once a second. */
++	unsigned int ceiling_elapsed = rate;
++	g_atomic_int_set(&t_pcm->encoder_active, 0);
++	g_atomic_int_set(&t_pcm->encoder_adjustments, 0);
++	g_atomic_int_set(&t_pcm->encoder_errors, 0);
++	g_atomic_int_set(&t_pcm->encoder_bitpool, 0);
++	g_atomic_int_set(&t_pcm->encoder_abr, abr.enabled);
++	g_atomic_int_set(&t_pcm->encoder_quality, 0);
++	g_atomic_int_set(&t_pcm->encoder_bitrate_kbps, bitrate / 1000);
++
+ 	/* create AAC encoder without the Meta Data module */
+ 	if ((err = aacEncOpen(&handle, 0x0F, channels)) != AACENC_OK) {
+ 		error("Couldn't open AAC encoder: %s", aacenc_strerror(err));
+@@ -346,6 +370,12 @@
+ 
+ 			if (out_args.numOutBytes > 0) {
+ 
++				/* Y2: socket queue before this frame, as for LDAC ABR. */
++				int queued_bytes = 0;
++				if (ioctl(t->bt_fd, TIOCOUTQ, &queued_bytes) != -1)
++					queued_bytes = abs(t->media.bt_fd_coutq_init - queued_bytes);
++				errno = 0;
++
+ 				size_t payload_len_max = t->mtu_write - RTP_HEADER_LEN;
+ 				size_t payload_len = out_args.numOutBytes;
+ 
+@@ -390,6 +420,33 @@
+ 
+ 				}
+ 
++				/* io_bt_write() leaves EAGAIN when it had to wait for room. */
++				unsigned int next = y2_aac_abr_update(&abr,
++						(unsigned int)queued_bytes / t->mtu_write, errno == EAGAIN);
++				if ((ceiling_elapsed += info.frameLength) >= rate) {
++					ceiling_elapsed = 0;
++					const unsigned int capped = y2_aac_abr_ceiling(&abr, y2_codec_ceiling());
++					if (capped != 0)
++						next = capped;
++					g_atomic_int_set(&t_pcm->encoder_abr, abr.enabled);
++				}
++				if (next != 0) {
++					if (aacEncoder_SetParam(handle, AACENC_BITRATE, next) != AACENC_OK
++#if AACENCODER_LIB_VERSION >= 0x03041600 /* 3.4.22 */
++							|| (!config.aac_true_bps &&
++								aacEncoder_SetParam(handle, AACENC_PEAK_BITRATE, next) != AACENC_OK)
++#endif
++							)
++						g_atomic_int_inc(&t_pcm->encoder_errors);
++					else {
++						current_bitrate = next;
++						g_atomic_int_inc(&t_pcm->encoder_adjustments);
++					}
++				}
++				g_atomic_int_set(&t_pcm->encoder_quality, abr.level);
++				g_atomic_int_set(&t_pcm->encoder_bitrate_kbps, current_bitrate / 1000);
++				g_atomic_int_set(&t_pcm->encoder_active, 1);
++
+ 			}
+ 
+ 			const size_t pcm_frames = out_args.numInSamples / info.inputChannels;
+--- /dev/null
++++ b/src/y2-aac-abr.h
+@@ -0,0 +1,135 @@
++/*
++ * Y2Linux: adaptive bit rate for CBR AAC, the counterpart of LDAC ABR.
++ *
++ * BlueALSA keeps a three-packet socket buffer and otherwise blocks while the
++ * radio cannot deliver, so a weak link starved the headphones of audio at a
++ * full bit rate. This steps the encoder down while the socket queue backs up
++ * and back up after a quiet stretch. While the platform's ceiling is on
++ * (y2-codec-ceiling.h: Wi-Fi shares the radio) the levels are taken from
++ * the ceiling instead of the configured rate. Pure decisions, no I/O:
++ * unit-tested.
++ *
++ * This file is free software; you can redistribute it and/or modify it under
++ * the terms of the MIT license. See the COPYING file for details.
++ */
++#ifndef Y2_AAC_ABR_H_
++#define Y2_AAC_ABR_H_
++
++#include <stdbool.h>
++
++#define Y2_AAC_ABR_LEVELS 4
++/* Lowest rate used, comparable to common SBC "high" quality. */
++#define Y2_AAC_ABR_FLOOR 128000u
++/* Never step twice within this many frames (~0.2 s at 44.1 kHz). */
++#define Y2_AAC_ABR_HOLD 8
++/* Frames with an empty socket queue before stepping up (~10 s). */
++#define Y2_AAC_ABR_CALM 430
++/* RTP header plus LATM mux config and payload length bytes. */
++#define Y2_AAC_FRAME_OVERHEAD 28
++/* Highest rate while the platform's ceiling is on. */
++#define Y2_AAC_CEILING 192000u
++
++struct y2_aac_abr {
++	/* adapting to the link now (asked, CBR and levels that differ) */
++	bool enabled;
++	/* asked to adapt (--aac-abr) */
++	bool adapt;
++	/* a VBR stream keeps its rate: no levels, no ceiling */
++	bool cbr;
++	/* the configured rate, the top level without a ceiling */
++	unsigned int bitrate;
++	/* the ceiling's rate, 0 while it is off */
++	unsigned int cap;
++	/* the rate the encoder runs at */
++	unsigned int current;
++	unsigned int level;
++	unsigned int rates[Y2_AAC_ABR_LEVELS];
++	unsigned int calm;
++	unsigned int since_change;
++};
++
++/* Highest CBR rate whose 1024-sample frames fit one packet of `mtu` bytes:
++ * some headsets cannot reassemble fragmented AAC frames. */
++static inline unsigned int y2_aac_mtu_bitrate(unsigned int mtu, unsigned int rate) {
++	if (mtu <= Y2_AAC_FRAME_OVERHEAD || rate == 0)
++		return 0;
++	return (unsigned int)((unsigned long long)(mtu - Y2_AAC_FRAME_OVERHEAD) * 8 * rate / 1024);
++}
++
++/* The level rates from the configured rate or the lower ceiling. */
++static inline void y2_aac_abr_levels(struct y2_aac_abr *abr) {
++	static const unsigned int eighths[Y2_AAC_ABR_LEVELS] = { 8, 6, 5, 4 };
++	const unsigned int top = abr->cap != 0 && abr->cap < abr->bitrate ? abr->cap : abr->bitrate;
++	for (unsigned int i = 0; i < Y2_AAC_ABR_LEVELS; i++) {
++		unsigned int value = (unsigned int)((unsigned long long)top * eighths[i] / 8);
++		if (value < Y2_AAC_ABR_FLOOR)
++			value = top < Y2_AAC_ABR_FLOOR ? top : Y2_AAC_ABR_FLOOR;
++		abr->rates[i] = value;
++	}
++	/* Nothing to adapt when every level is the same rate. */
++	abr->enabled = abr->adapt && abr->rates[Y2_AAC_ABR_LEVELS - 1] < abr->rates[0];
++	if (!abr->enabled)
++		abr->level = 0;
++}
++
++static inline void y2_aac_abr_init(struct y2_aac_abr *abr, unsigned int bitrate,
++		bool adapt, bool cbr) {
++	abr->adapt = adapt && cbr;
++	abr->cbr = cbr;
++	abr->bitrate = bitrate;
++	abr->cap = abr->level = abr->calm = abr->since_change = 0;
++	y2_aac_abr_levels(abr);
++	abr->current = abr->rates[0];
++}
++
++/* The rate of the current level when it differs from the running one,
++ * otherwise 0. */
++static inline unsigned int y2_aac_abr_commit(struct y2_aac_abr *abr) {
++	const unsigned int rate = abr->rates[abr->level];
++	if (rate == abr->current)
++		return 0;
++	abr->current = rate;
++	return rate;
++}
++
++/* Call once per encoded frame with the socket queue depth (in packets) seen
++ * before writing it and whether the write had to wait. Returns the new bit
++ * rate when it changes, otherwise 0. */
++static inline unsigned int y2_aac_abr_update(struct y2_aac_abr *abr,
++		unsigned int queued_packets, bool blocked) {
++	if (!abr->enabled)
++		return 0;
++	if (abr->since_change < Y2_AAC_ABR_HOLD)
++		abr->since_change++;
++	if (blocked || queued_packets >= 2) {
++		abr->calm = 0;
++		if (abr->level + 1 < Y2_AAC_ABR_LEVELS && abr->since_change >= Y2_AAC_ABR_HOLD) {
++			abr->level++;
++			abr->since_change = 0;
++			return y2_aac_abr_commit(abr);
++		}
++		return 0;
++	}
++	abr->calm = queued_packets == 0 ? abr->calm + 1 : 0;
++	if (abr->level > 0 && abr->calm >= Y2_AAC_ABR_CALM) {
++		abr->level--;
++		abr->calm = 0;
++		abr->since_change = 0;
++		return y2_aac_abr_commit(abr);
++	}
++	return 0;
++}
++
++/* The platform's ceiling turned on (`on`) or off: the levels follow it, the
++ * level the link earned stays. Returns the new bit rate when it changes,
++ * otherwise 0. */
++static inline unsigned int y2_aac_abr_ceiling(struct y2_aac_abr *abr, bool on) {
++	const unsigned int cap = on ? Y2_AAC_CEILING : 0;
++	if (!abr->cbr || cap == abr->cap)
++		return 0;
++	abr->cap = cap;
++	y2_aac_abr_levels(abr);
++	return y2_aac_abr_commit(abr);
++}
++
++#endif
+--- /dev/null
++++ b/src/y2-codec-ceiling.h
+@@ -0,0 +1,27 @@
++/*
++ * Y2Linux: the platform's Bluetooth codec ceiling.
++ *
++ * The MT6582 shares one 2.4 GHz antenna between Wi-Fi and Bluetooth. While
++ * the Wi-Fi radio is on, the platform's service daemon creates this file and
++ * removes it when Wi-Fi is off. The encoders look about once a second and
++ * keep their rate at or below a ceiling meanwhile (y2-aac-abr.h,
++ * y2-sbc-abr.h): air-time losses never back up the host's socket queue, so
++ * the adaptive rate alone cannot see them (Y2Reborn #87).
++ *
++ * This file is free software; you can redistribute it and/or modify it under
++ * the terms of the MIT license. See the COPYING file for details.
++ */
++#ifndef Y2_CODEC_CEILING_H_
++#define Y2_CODEC_CEILING_H_
++
++#include <stdbool.h>
++#include <unistd.h>
++
++#define Y2_CODEC_CEILING_PATH "/run/y2/bt-codec-ceiling"
++
++/* Whether the ceiling is on now. */
++static inline bool y2_codec_ceiling(void) {
++	return access(Y2_CODEC_CEILING_PATH, F_OK) == 0;
++}
++
++#endif

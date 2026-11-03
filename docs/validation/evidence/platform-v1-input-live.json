@@ -1,0 +1,108 @@
+{
+  "boot_id": "27e6d684-3794-4490-95db-a489027cd4f4",
+  "linux_compiled": "8584ccd85f052f351fe51650b2348c83ca894ed4",
+  "reborn_compiled": "b71b468860233faa0a42b8448ec5777fa952b8e3",
+  "kernel": "6.18.0-y2linux-baseline-02",
+  "taint": 0,
+  "installed_reborn_sha256": "4cf77a6b94e6efa298bf43d9b530f36998535c308ddee8542b1c3ae7ddb6e463",
+  "candidate_executed": false,
+  "helper_removed": true,
+  "physical_detent_accuracy": "NOT_RUN; no owner count or confirmed operation in capture window",
+  "idle_capture": {
+    "collection_valid": true,
+    "duration_us": 120289278,
+    "records": 0,
+    "devices": [
+      {
+        "device": "Y2 navigation buttons",
+        "event": 0,
+        "monotonic": true
+      },
+      {
+        "device": "mtk-pmic-keys",
+        "event": 1,
+        "monotonic": true
+      },
+      {
+        "device": "APT32F click-wheel",
+        "event": 2,
+        "monotonic": true
+      },
+      {
+        "device": "mt6582-keypad",
+        "event": 3,
+        "monotonic": true
+      }
+    ],
+    "key_counts": {},
+    "press_duration_us": {},
+    "kernel_to_observer_us": {},
+    "wheel_presses": {},
+    "same_direction_gap_us": {
+      "n": 0,
+      "median_us": null,
+      "p95_us": null,
+      "worst_us": null,
+      "min_us": null
+    },
+    "reversal_gap_us": {
+      "n": 0,
+      "median_us": null,
+      "p95_us": null,
+      "worst_us": null,
+      "min_us": null
+    },
+    "same_direction_gaps_below_8ms": 0,
+    "same_direction_gaps_below_8ms_values": [],
+    "held_at_capture_end": 0,
+    "issues": {},
+    "physical_detent_accuracy": "REQUIRES_OWNER_COUNT",
+    "physical_to_kernel_and_kernel_to_ui_frame": "NOT_MEASURED_BY_THIS_OBSERVER"
+  },
+  "idle_snapshots": {
+    "duration": "not synchronized; aggregate CPU ticks 9324 at USER_HZ=100/four online CPUs (~23.31 s)",
+    "wheel_IRQ_delta": 0,
+    "I2C0_IRQ_delta": 0,
+    "PMIC_Power_IRQ_delta": 0,
+    "keypad_IRQ_delta": 0,
+    "context_switch_delta": 9174,
+    "aggregate_cpu_ticks": {
+      "user": 211,
+      "system": 86,
+      "idle": 9027
+    },
+    "online": "0-3",
+    "cpu0_C1_usage_delta": 1290,
+    "cpu0_C2_usage_delta": 0,
+    "cpu0_C3_usage_delta": 0,
+    "dormant_attempts_delta": 957,
+    "dormant_successes_delta": 0,
+    "dormant_rejection": "topology",
+    "causality": "not attributed to input; installed baseline policy left unchanged"
+  },
+  "evidence": [
+    {
+      "file": "out/input-validation/slow-cw.jsonl",
+      "sha256": "972465d7e02ed7751f43d143c52d63a63a8855e499db3c6296ada933e380a180",
+      "bytes": 350
+    },
+    {
+      "file": "out/input-validation/live-idle-before.txt",
+      "sha256": "3271689c93ecaf753ec83fe140e4e3142eb7813099e98eb44085458d6e3185d1",
+      "bytes": 4977
+    },
+    {
+      "file": "out/input-validation/live-idle-after.txt",
+      "sha256": "1f6e8b562471812c1a13fad445dfec7a68c31420ba331d02d3a843f1305d14ea",
+      "bytes": 4977
+    },
+    {
+      "file": "out/input-validation/live-closing.txt",
+      "sha256": "f3b017324cdacdb855a54c9cbe5894775d5e0a4a1e3925b059effdba5c865045",
+      "bytes": 127
+    }
+  ],
+  "pass_status": "Owner ended waiting; MORE_WORK_REQUIRED",
+  "input_reservation_cancelled": true,
+  "lock_released": true
+}

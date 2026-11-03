@@ -1,0 +1,1478 @@
+--- a/sound/soc/codecs/cs43130.c
++++ b/sound/soc/codecs/cs43130.c
+@@ -34,6 +34,8 @@
+ 
+ #include "cs43130.h"
+ #include "cirrus_legacy.h"
++#include <linux/suspend.h>
++#include "/project/kernel/platform/pm-journal.h"
+ 
+ static const struct reg_default cs43130_reg_defaults[] = {
+ 	{CS43130_SYS_CLK_CTL_1, 0x06},
+@@ -112,6 +114,9 @@
+ 	case CS43130_INT_STATUS_1 ... CS43130_INT_STATUS_5:
+ 	case CS43130_HP_DC_STAT_1 ... CS43130_HP_DC_STAT_2:
+ 	case CS43130_HP_AC_STAT_1 ... CS43130_HP_AC_STAT_2:
++	/* Read-only live status: a cached value never shows a plug. */
++	case CS43130_HP_STATUS:
++	case CS43130_HP_LOAD_STAT:
+ 		return true;
+ 	default:
+ 		return false;
+@@ -352,6 +357,335 @@
+ 					1000, time * 1000);
+ }
+ 
++/*
++ * Y2: the crystal, run as stock runs it. Stock cs43131_hw_init powers the
++ * crystal with the rest of the codec, waits 20 ms and selects it; XTAL_RDY
++ * and XTAL_ERR stay masked and are never read, and the crystal runs until the
++ * codec loses power. Upstream started it at each hw_params and refused the
++ * stream when XTAL_RDY took longer than 100 ms; earlier Y2 versions also
++ * stopped it before every retry and after a sticky XTAL_ERR. Some players'
++ * crystals take longer than that to report ready (#52 when warm, #54 always)
++ * yet play on stock: every stop threw away the time they had already run.
++ * So the crystal:
++ *  - starts when the codec powers up (runtime resume), or at the first
++ *    stream if the codec has kept power since probe;
++ *  - stops only with the rails (runtime suspend);
++ *  - is waited for until it has run Y2_XTAL_WAIT_MS, and then used anyway,
++ *    as stock does.
++ * Without an IRQ line the ready flag is polled.
++ *
++ * #52/#54 on 8.24: two players' crystals flag XTAL_ERR within 20 ms of a
++ * power-up and never report ready, yet start on stock. Stock starts the
++ * crystal with the whole chip powered (PWDN_CTL=0); we powered only the
++ * clocks (0xF0). So each power-up now starts it with the chip powered as
++ * stock, except the headphone amplifier (powered outside its DAPM sequence,
++ * stock's start was audible as static on the owner's player), checks it
++ * for Y2_XTAL_START_MS and, on an error or no ready flag, cuts the rails
++ * and tries again, Y2_XTAL_TRIES times in all; a stream may add one more
++ * cold start (Y2_XTAL_STREAM_CYCLES). The crystal is used after the last
++ * try in any case, as stock.
++ */
++#define Y2_XTAL_WAIT_MS		1000
++/* One power-up attempt: a good crystal is ready after 20-30 ms. */
++#define Y2_XTAL_START_MS	100
++#define Y2_XTAL_TRIES		3
++#define Y2_XTAL_STREAM_CYCLES	1
++/* Stock never reads the chip while its crystal starts: look every 20 ms. */
++#define Y2_XTAL_POLL_US		20000
++/* A ready flag later than this is worth a log line. */
++#define Y2_XTAL_SLOW_MS		100
++/* Under clk_mutex, or with the codec resuming or suspended. */
++static bool y2_xtal_on;			/* PDN_XTAL cleared on the chip */
++static bool y2_xtal_ready;		/* XTAL_RDY seen since then */
++static bool y2_xtal_assumed;		/* used without XTAL_RDY since then */
++static unsigned long y2_xtal_on_since;	/* jiffies */
++static unsigned int y2_xtal_unconfirmed, y2_xtal_errors;
++/* How long the last start took to report ready: the crystal's margin. */
++static unsigned int y2_xtal_ready_ms;
++/* Tests: 15 uA from the next power-up (stock leaves the 12.5 uA reset value). */
++static bool y2_xtal_boosted;
++/* #52: how long the rails stay off for a cold start, and how often a crystal
++ * error power-cycled the codec / the probe found its rails left on. */
++#define Y2_CODEC_OFF_MS		500
++static unsigned int y2_codec_cycles;
++static bool y2_cold_start;
++/* Attempts in the last power-up, its ready time, cold starts streams added
++ * since the codec last powered up. */
++static unsigned int y2_xtal_tries, y2_xtal_start_ms, y2_xtal_stream_cycles;
++/* Tests on the affected players, switchable without a rebuild: start the
++ * crystal with the chip powered (stock, amplifier only with start_hp) or with
++ * the clocks only (8.24), and skip the bias write and status read before the
++ * start (stock is silent on the bus then). */
++static bool y2_xtal_full_power = true;
++module_param(y2_xtal_full_power, bool, 0644);
++static bool y2_xtal_start_hp;
++module_param(y2_xtal_start_hp, bool, 0644);
++static bool y2_xtal_quiet_start;
++module_param(y2_xtal_quiet_start, bool, 0644);
++
++static void y2_xtal_boost(struct cs43130_private *cs43130)
++{
++	if (y2_xtal_boosted)
++		return;
++	y2_xtal_boosted = true;
++	cs43130->xtal_ibias = CS43130_XTAL_IBIAS_15UA;
++	dev_warn(cs43130->dev, "XTAL bias 15 uA from the next codec power-up\n");
++}
++
++static unsigned int y2_xtal_ran_ms(void)
++{
++	return jiffies_to_msecs(jiffies - y2_xtal_on_since);
++}
++
++static int y2_xtal_wait(struct cs43130_private *cs43130, unsigned int ms);
++static int y2_rails_cycle(struct cs43130_private *cs43130);
++
++/* One crystal start, the crystal down (reset, or the cache replay after a
++ * runtime suspend). As stock cs43131_hw_init (#52, #54): the chip powers up
++ * (stock writes PWDN_CTL=0; the headphone amplifier only with
++ * y2_xtal_start_hp), the crystal, the PLL and CLKOUT stay on, the
++ * other blocks go back to DAPM's state once the crystal answered. 0 when it
++ * reported ready, -EIO on XTAL_ERR, -ETIMEDOUT on neither. */
++static int y2_xtal_attempt(struct cs43130_private *cs43130)
++{
++	unsigned int val, keep = 0;
++	int ret;
++
++	if (!y2_xtal_quiet_start) {
++		/* The bias changes only with the crystal down. */
++		regmap_write_bits(cs43130->regmap, CS43130_CRYSTAL_SET,
++				  CS43130_XTAL_IBIAS_MASK, cs43130->xtal_ibias);
++		/* The status is sticky and clears on read: drop an old flag. */
++		regmap_read(cs43130->regmap, CS43130_INT_STATUS_1, &val);
++	}
++	reinit_completion(&cs43130->xtal_rdy);
++	regmap_read(cs43130->regmap, CS43130_PWDN_CTL, &keep);
++	if (y2_xtal_full_power)
++		regmap_write(cs43130->regmap, CS43130_PWDN_CTL,
++			     y2_xtal_start_hp ? 0 : CS43130_PDN_HP_MASK);
++	else
++		regmap_write_bits(cs43130->regmap, CS43130_PWDN_CTL,
++				  CS43130_PDN_XTAL_MASK | CS43130_PDN_PLL_MASK |
++				  CS43130_PDN_CLKOUT_MASK, 0);
++	y2_xtal_on = true;
++	y2_xtal_ready = false;
++	y2_xtal_assumed = false;
++	y2_xtal_on_since = jiffies;
++	y2_xtal_tries++;
++	/* Stock leaves the bus alone for 20 ms after the start. */
++	msleep(20);
++	ret = y2_xtal_wait(cs43130, Y2_XTAL_START_MS - 20);
++	if (y2_xtal_full_power)
++		regmap_update_bits(cs43130->regmap, CS43130_PWDN_CTL, 0xf0,
++				   keep & 0xf0);
++	if (!ret) {
++		y2_xtal_ready = true;
++		y2_xtal_ready_ms = y2_xtal_ran_ms();
++		y2_xtal_start_ms = y2_xtal_ready_ms;
++	}
++	return ret;
++}
++
++/* Starts the crystal, with up to Y2_XTAL_TRIES - 1 cold starts, and with
++ * `select` makes it MCLK at 22.5792 MHz until the codec powers down, ready or
++ * not (stock never checks). A clock switch under way selects its own source. */
++static int y2_xtal_power_on(struct cs43130_private *cs43130, bool select)
++{
++	int i, ret;
++
++	y2_xtal_tries = 0;
++	y2_xtal_start_ms = 0;
++	for (i = 1; ; i++) {
++		ret = y2_xtal_attempt(cs43130);
++		if (!ret || i == Y2_XTAL_TRIES)
++			break;
++		dev_warn(cs43130->dev, "XTAL start %d/%d failed (%d), cold start\n",
++			 i, Y2_XTAL_TRIES, ret);
++		if (y2_rails_cycle(cs43130))
++			break;
++	}
++	if (ret)
++		dev_warn(cs43130->dev, "XTAL not ready after %u starts (%d), used as stock does\n",
++			 y2_xtal_tries, ret);
++	if (!select)
++		return ret;
++	regmap_update_bits(cs43130->regmap, CS43130_SYS_CLK_CTL_1,
++			   CS43130_MCLK_SRC_SEL_MASK | CS43130_MCLK_INT_MASK,
++			   CS43130_MCLK_SRC_EXT << CS43130_MCLK_SRC_SEL_SHIFT |
++			   CS43130_MCLK_22P5 << CS43130_MCLK_INT_SHIFT);
++	cs43130->mclk_int_src = CS43130_MCLK_SRC_EXT;
++	cs43130->mclk_int = CS43130_MCLK_22M;
++	cs43130->pll_bypass = true;
++	return ret;
++}
++
++static void y2_xtal_report(struct cs43130_private *cs43130, unsigned int ran_ms)
++{
++	unsigned int status = 0, pwdn = 0, cached = 0, clk = 0, bias = 0, mask = 0;
++
++	regmap_read(cs43130->regmap, CS43130_INT_STATUS_1, &status);
++	regmap_read_bypassed(cs43130->regmap, CS43130_PWDN_CTL, &pwdn);
++	regmap_read(cs43130->regmap, CS43130_PWDN_CTL, &cached);
++	regmap_read_bypassed(cs43130->regmap, CS43130_SYS_CLK_CTL_1, &clk);
++	regmap_read_bypassed(cs43130->regmap, CS43130_CRYSTAL_SET, &bias);
++	regmap_read_bypassed(cs43130->regmap, CS43130_INT_MASK_1, &mask);
++	dev_warn(cs43130->dev,
++		 "XTAL not ready %u ms after power-up, used as stock does: status1=%02x pwdn=%02x (cache %02x) clk1=%02x crystal=%02x mask1=%02x unconfirmed=%u\n",
++		 ran_ms, status, pwdn, cached, clk, bias, mask, y2_xtal_unconfirmed);
++}
++
++/* XTAL_RDY unmasked for the wait: 0 when the crystal reported ready, -EIO on
++ * XTAL_ERR (counted), -ETIMEDOUT on neither. */
++static int y2_xtal_wait(struct cs43130_private *cs43130, unsigned int ms)
++{
++	unsigned int status = 0;
++	int ret;
++
++	regmap_update_bits(cs43130->regmap, CS43130_INT_MASK_1,
++			   CS43130_XTAL_RDY_INT_MASK, 0);
++	if (cs43130->has_irq_line)
++		ret = cs43130_wait_for_completion(cs43130, &cs43130->xtal_rdy, ms);
++	else
++		ret = regmap_read_poll_timeout(cs43130->regmap, CS43130_INT_STATUS_1,
++					       status, status & (CS43130_XTAL_RDY_INT |
++								 CS43130_XTAL_ERR_INT),
++					       Y2_XTAL_POLL_US, ms * 1000);
++	regmap_update_bits(cs43130->regmap, CS43130_INT_MASK_1,
++			   CS43130_XTAL_RDY_INT_MASK,
++			   1 << CS43130_XTAL_RDY_INT_SHIFT);
++	if (ret || cs43130->has_irq_line)
++		return ret;
++	if (status & CS43130_XTAL_ERR_INT)
++		y2_xtal_errors++;
++	return status & CS43130_XTAL_RDY_INT ? 0 : -EIO;
++}
++
++static int cs43130_runtime_suspend(struct device *dev);
++static int y2_codec_up(struct cs43130_private *cs43130);
++
++/* Rails off for Y2_CODEC_OFF_MS and on again with the cache replayed: the
++ * crystal comes back down, ready for a start. */
++static int y2_rails_cycle(struct cs43130_private *cs43130)
++{
++	int ret;
++
++	ret = cs43130_runtime_suspend(cs43130->dev);
++	if (ret)
++		return ret;
++	msleep(Y2_CODEC_OFF_MS);
++	return y2_codec_up(cs43130);
++}
++
++/* #52: a crystal that flagged an error gets the cold start a power-on gives
++ * it: the rails go off for Y2_CODEC_OFF_MS and the codec powers up as after a
++ * runtime suspend (crystal selected again). Under clk_mutex with no stream on
++ * the codec; runtime PM keeps counting it active. */
++static void y2_codec_cycle(struct cs43130_private *cs43130)
++{
++	int ret;
++
++	ret = y2_rails_cycle(cs43130);
++	if (!ret)
++		ret = y2_xtal_power_on(cs43130, true);
++	y2_codec_cycles++;
++	dev_warn(cs43130->dev, "codec power-cycled after a crystal error: %d, ready=%d, cycles=%u\n",
++		 ret, y2_xtal_ready, y2_codec_cycles);
++}
++
++/* Under clk_mutex, before a stream selects the crystal. */
++static void y2_xtal_start(struct cs43130_private *cs43130)
++{
++	unsigned int status = 0, ran, waited;
++	int ret;
++
++	if (!y2_xtal_on)
++		y2_xtal_power_on(cs43130, false);
++
++	if (y2_xtal_ready || y2_xtal_assumed) {
++		/* Count what the chip flags while it runs; stock never looks. */
++		if (regmap_read(cs43130->regmap, CS43130_INT_STATUS_1, &status))
++			return;
++		if (status & CS43130_XTAL_ERR_INT) {
++			y2_xtal_errors++;
++			dev_warn_ratelimited(cs43130->dev,
++					     "XTAL error flag while running (status1=%02x)\n",
++					     status);
++			y2_codec_cycle(cs43130);
++			if (y2_xtal_ready)
++				return;
++			/* Wait for the restarted crystal below. */
++		} else {
++			if (!y2_xtal_ready && (status & CS43130_XTAL_RDY_INT)) {
++				y2_xtal_ready = true;
++				y2_xtal_ready_ms = y2_xtal_ran_ms();
++				dev_warn(cs43130->dev, "XTAL ready, %u ms after power-up\n",
++					 y2_xtal_ready_ms);
++			}
++			return;
++		}
++	} else if (!regmap_read(cs43130->regmap, CS43130_INT_STATUS_1, &status)) {
++		/* #52/#54 on 8.24: the first stream after a failed power-up got
++		 * no cold start (the power-up's read had cleared the flag). */
++		if (status & CS43130_XTAL_ERR_INT) {
++			y2_xtal_errors++;
++			if (y2_xtal_stream_cycles < Y2_XTAL_STREAM_CYCLES) {
++				y2_xtal_stream_cycles++;
++				y2_codec_cycle(cs43130);
++			}
++		} else if (status & CS43130_XTAL_RDY_INT) {
++			y2_xtal_ready = true;
++			y2_xtal_ready_ms = y2_xtal_ran_ms();
++		}
++		if (y2_xtal_ready)
++			return;
++	}
++
++	ran = y2_xtal_ran_ms();
++	waited = ran;
++	ret = y2_xtal_wait(cs43130, ran < Y2_XTAL_WAIT_MS ? Y2_XTAL_WAIT_MS - ran : 1);
++	ran = y2_xtal_ran_ms();
++	waited = ran - waited;
++	if (!ret) {
++		/* Seen at once after a long run (started at probe): at most `ran`. */
++		y2_xtal_ready = true;
++		y2_xtal_ready_ms = ran;
++		if (waited > Y2_XTAL_SLOW_MS)
++			dev_warn(cs43130->dev, "XTAL ready %u ms after power-up\n", ran);
++		return;
++	}
++	if (y2_xtal_stream_cycles < Y2_XTAL_STREAM_CYCLES) {
++		y2_xtal_stream_cycles++;
++		y2_codec_cycle(cs43130);
++		if (y2_xtal_ready)
++			return;
++	}
++	y2_xtal_assumed = true;
++	y2_xtal_unconfirmed++;
++	y2_xtal_report(cs43130, ran);
++}
++
++static int cs43130_change_clksrc(struct snd_soc_component *component,
++				 enum cs43130_mclk_src_sel src);
++
++/*
++ * Y2: a failed switch (the PLL never locked) must not leave mclk_int_src
++ * naming a clock that never started (upstream set it first, so hw_free's RCO
++ * request was skipped). Run from RCO with the PLL off, as after hw_free; the
++ * crystal keeps running.
++ */
++static int y2_clksrc_failed(struct snd_soc_component *component, int ret)
++{
++	struct cs43130_private *cs43130 = snd_soc_component_get_drvdata(component);
++
++	if (cs43130->mclk_int_src != CS43130_MCLK_SRC_RCO)
++		cs43130_change_clksrc(component, CS43130_MCLK_SRC_RCO);
++	else
++		regmap_update_bits(cs43130->regmap, CS43130_PWDN_CTL,
++				   CS43130_PDN_PLL_MASK,
++				   1 << CS43130_PDN_PLL_SHIFT);
++	return ret;
++}
++
+ static int cs43130_change_clksrc(struct snd_soc_component *component,
+ 				 enum cs43130_mclk_src_sel src)
+ {
+@@ -379,25 +713,12 @@
+ 	switch (src) {
+ 	case CS43130_MCLK_SRC_EXT:
+ 		cs43130->pll_bypass = true;
+-		cs43130->mclk_int_src = CS43130_MCLK_SRC_EXT;
+ 		if (cs43130->xtal_ibias == CS43130_XTAL_UNUSED) {
+ 			regmap_update_bits(cs43130->regmap, CS43130_PWDN_CTL,
+ 					   CS43130_PDN_XTAL_MASK,
+ 					   1 << CS43130_PDN_XTAL_SHIFT);
+ 		} else {
+-			reinit_completion(&cs43130->xtal_rdy);
+-			regmap_update_bits(cs43130->regmap, CS43130_INT_MASK_1,
+-					   CS43130_XTAL_RDY_INT_MASK, 0);
+-			regmap_update_bits(cs43130->regmap, CS43130_PWDN_CTL,
+-					   CS43130_PDN_XTAL_MASK, 0);
+-			ret = cs43130_wait_for_completion(cs43130, &cs43130->xtal_rdy, 100);
+-			regmap_update_bits(cs43130->regmap, CS43130_INT_MASK_1,
+-					   CS43130_XTAL_RDY_INT_MASK,
+-					   1 << CS43130_XTAL_RDY_INT_SHIFT);
+-			if (ret) {
+-				dev_err(cs43130->dev, "Error waiting for XTAL_READY interrupt: %d\n", ret);
+-				return ret;
+-			}
++			y2_xtal_start(cs43130);
+ 		}
+ 
+ 		regmap_update_bits(cs43130->regmap, CS43130_SYS_CLK_CTL_1,
+@@ -411,28 +732,16 @@
+ 		regmap_update_bits(cs43130->regmap, CS43130_PWDN_CTL,
+ 				   CS43130_PDN_PLL_MASK,
+ 				   1 << CS43130_PDN_PLL_SHIFT);
++		cs43130->mclk_int_src = CS43130_MCLK_SRC_EXT;
+ 		break;
+ 	case CS43130_MCLK_SRC_PLL:
+ 		cs43130->pll_bypass = false;
+-		cs43130->mclk_int_src = CS43130_MCLK_SRC_PLL;
+ 		if (cs43130->xtal_ibias == CS43130_XTAL_UNUSED) {
+ 			regmap_update_bits(cs43130->regmap, CS43130_PWDN_CTL,
+ 					   CS43130_PDN_XTAL_MASK,
+ 					   1 << CS43130_PDN_XTAL_SHIFT);
+ 		} else {
+-			reinit_completion(&cs43130->xtal_rdy);
+-			regmap_update_bits(cs43130->regmap, CS43130_INT_MASK_1,
+-					   CS43130_XTAL_RDY_INT_MASK, 0);
+-			regmap_update_bits(cs43130->regmap, CS43130_PWDN_CTL,
+-					   CS43130_PDN_XTAL_MASK, 0);
+-			ret = cs43130_wait_for_completion(cs43130, &cs43130->xtal_rdy, 100);
+-			regmap_update_bits(cs43130->regmap, CS43130_INT_MASK_1,
+-					   CS43130_XTAL_RDY_INT_MASK,
+-					   1 << CS43130_XTAL_RDY_INT_SHIFT);
+-			if (ret) {
+-				dev_err(cs43130->dev, "Error waiting for XTAL_READY interrupt: %d\n", ret);
+-				return ret;
+-			}
++			y2_xtal_start(cs43130);
+ 		}
+ 
+ 		reinit_completion(&cs43130->pll_rdy);
+@@ -446,7 +755,7 @@
+ 				   1 << CS43130_PLL_RDY_INT_SHIFT);
+ 		if (ret) {
+ 			dev_err(cs43130->dev, "Error waiting for PLL_READY interrupt: %d\n", ret);
+-			return ret;
++			return y2_clksrc_failed(component, ret);
+ 		}
+ 
+ 		regmap_update_bits(cs43130->regmap, CS43130_SYS_CLK_CTL_1,
+@@ -456,6 +765,7 @@
+ 				   CS43130_MCLK_INT_MASK,
+ 				   mclk_int_decoded << CS43130_MCLK_INT_SHIFT);
+ 		usleep_range(150, 200);
++		cs43130->mclk_int_src = CS43130_MCLK_SRC_PLL;
+ 		break;
+ 	case CS43130_MCLK_SRC_RCO:
+ 		cs43130->mclk_int_src = CS43130_MCLK_SRC_RCO;
+@@ -468,9 +778,7 @@
+ 				   CS43130_MCLK_22P5 << CS43130_MCLK_INT_SHIFT);
+ 		usleep_range(150, 200);
+ 
+-		regmap_update_bits(cs43130->regmap, CS43130_PWDN_CTL,
+-				   CS43130_PDN_XTAL_MASK,
+-				   1 << CS43130_PDN_XTAL_SHIFT);
++		/* Y2: the crystal runs until the codec powers down. */
+ 		regmap_update_bits(cs43130->regmap, CS43130_PWDN_CTL,
+ 				   CS43130_PDN_PLL_MASK,
+ 				   1 << CS43130_PDN_PLL_SHIFT);
+@@ -809,34 +1117,96 @@
+ 	return 0;
+ }
+ 
++/*
++ * Y2: DAIs holding a clock request (bit = DAI id), under clk_mutex. ALSA
++ * calls hw_free after a failed hw_params and may repeat hw_params without
++ * hw_free, so a bare counter could drift and skip the clock setup (or the
++ * return to RCO) for every later stream.
++ */
++static unsigned long y2_clk_holders;
++
++/* Caller holds clk_mutex. */
++static void y2_clk_put(struct snd_soc_component *component, int dai_id)
++{
++	struct cs43130_private *cs43130 = snd_soc_component_get_drvdata(component);
++
++	if (!test_and_clear_bit(dai_id, &y2_clk_holders))
++		return;
++	cs43130->clk_req--;
++	/* Y2 (#52): the running clock stays selected until the codec powers
++	 * down (runtime suspend returns it to RCO). Upstream switched to RCO at
++	 * every hw_free and back at the next hw_params: with Reborn reopening
++	 * at each track change, one player's marginal crystal stopped during
++	 * quick skipping. Stock selects the crystal once and never switches. */
++	if (!cs43130->clk_req)
++		cs43130_pcm_dsd_mix(false, cs43130->regmap);
++}
++
++/*
++ * Y2 (#52): only rates the 22.5792 MHz crystal clocks directly. The others
++ * need the PLL, which the stock firmware never runs (its only output rate is
++ * 44.1 kHz) and which stopped one player's crystal at every 48 kHz start.
++ */
++static int y2_clk_get(struct snd_soc_component *component, int dai_id,
++		      unsigned int rate)
++{
++	struct cs43130_private *cs43130 = snd_soc_component_get_drvdata(component);
++	unsigned int required_clk = CS43130_MCLK_22M;
++	int ret = 0;
++
++	if (CS43130_MCLK_22M % rate) {
++		dev_warn_ratelimited(cs43130->dev,
++				     "%u Hz refused: it needs the PLL, which stock never runs\n",
++				     rate);
++		return -EINVAL;
++	}
++
++	mutex_lock(&cs43130->clk_mutex);
++	if (test_bit(dai_id, &y2_clk_holders)) {
++		/* A repeated hw_params: keep a running clock that fits the rate. */
++		if (required_clk == cs43130->mclk_int)
++			goto unlock;
++		y2_clk_put(component, dai_id);
++	}
++	if (!cs43130->clk_req && (cs43130->mclk_int_src == CS43130_MCLK_SRC_RCO ||
++				  required_clk != cs43130->mclk_int)) {
++		/* no DAI is using clk, and the one still running does not fit:
++		 * leave it first. set_pll() stops the PLL, and a PLL still
++		 * selected as MCLK took the chip's control port down with it
++		 * (I2C NACK until a restart; 8.22 test build, 48 -> 44.1 kHz). */
++		if (cs43130->mclk_int_src != CS43130_MCLK_SRC_RCO)
++			cs43130_change_clksrc(component, CS43130_MCLK_SRC_RCO);
++		cs43130_set_pll(component, 0, 0, cs43130->mclk, required_clk);
++		ret = cs43130_change_clksrc(component, cs43130->pll_bypass ?
++					    CS43130_MCLK_SRC_EXT :
++					    CS43130_MCLK_SRC_PLL);
++	} else if (!cs43130->clk_req && cs43130->xtal_ibias != CS43130_XTAL_UNUSED) {
++		/* The running clock fits: only count what the crystal flagged. */
++		y2_xtal_start(cs43130);
++	}
++	if (!ret) {
++		set_bit(dai_id, &y2_clk_holders);
++		cs43130->clk_req++;
++		if (cs43130->clk_req == 2)
++			cs43130_pcm_dsd_mix(true, cs43130->regmap);
++	}
++unlock:
++	mutex_unlock(&cs43130->clk_mutex);
++	return ret;
++}
++
+ static int cs43130_dsd_hw_params(struct snd_pcm_substream *substream,
+ 				 struct snd_pcm_hw_params *params,
+ 				 struct snd_soc_dai *dai)
+ {
+ 	struct snd_soc_component *component = dai->component;
+ 	struct cs43130_private *cs43130 = snd_soc_component_get_drvdata(component);
+-	unsigned int required_clk;
+ 	u8 dsd_speed;
+-
+-	mutex_lock(&cs43130->clk_mutex);
+-	if (!cs43130->clk_req) {
+-		/* no DAI is currently using clk */
+-		if (!(CS43130_MCLK_22M % params_rate(params)))
+-			required_clk = CS43130_MCLK_22M;
+-		else
+-			required_clk = CS43130_MCLK_24M;
+-
+-		cs43130_set_pll(component, 0, 0, cs43130->mclk, required_clk);
+-		if (cs43130->pll_bypass)
+-			cs43130_change_clksrc(component, CS43130_MCLK_SRC_EXT);
+-		else
+-			cs43130_change_clksrc(component, CS43130_MCLK_SRC_PLL);
+-	}
+-
+-	cs43130->clk_req++;
+-	if (cs43130->clk_req == 2)
+-		cs43130_pcm_dsd_mix(true, cs43130->regmap);
+-	mutex_unlock(&cs43130->clk_mutex);
++	int ret;
++
++	ret = y2_clk_get(component, dai->id, params_rate(params));
++	if (ret)
++		return ret;
+ 
+ 	switch (params_rate(params)) {
+ 	case 176400:
+@@ -878,28 +1248,12 @@
+ 	unsigned int sclk = cs43130->dais[dai->id].sclk;
+ 	unsigned int bitwidth_sclk;
+ 	unsigned int bitwidth_dai = (unsigned int)(params_width(params));
+-	unsigned int required_clk;
+ 	u8 dsd_speed;
+-
+-	mutex_lock(&cs43130->clk_mutex);
+-	if (!cs43130->clk_req) {
+-		/* no DAI is currently using clk */
+-		if (!(CS43130_MCLK_22M % params_rate(params)))
+-			required_clk = CS43130_MCLK_22M;
+-		else
+-			required_clk = CS43130_MCLK_24M;
+-
+-		cs43130_set_pll(component, 0, 0, cs43130->mclk, required_clk);
+-		if (cs43130->pll_bypass)
+-			cs43130_change_clksrc(component, CS43130_MCLK_SRC_EXT);
+-		else
+-			cs43130_change_clksrc(component, CS43130_MCLK_SRC_PLL);
+-	}
+-
+-	cs43130->clk_req++;
+-	if (cs43130->clk_req == 2)
+-		cs43130_pcm_dsd_mix(true, cs43130->regmap);
+-	mutex_unlock(&cs43130->clk_mutex);
++	int ret;
++
++	ret = y2_clk_get(component, dai->id, params_rate(params));
++	if (ret)
++		return ret;
+ 
+ 	switch (dai->id) {
+ 	case CS43130_ASP_DOP_DAI:
+@@ -989,12 +1343,7 @@
+ 	struct cs43130_private *cs43130 = snd_soc_component_get_drvdata(component);
+ 
+ 	mutex_lock(&cs43130->clk_mutex);
+-	cs43130->clk_req--;
+-	if (!cs43130->clk_req) {
+-		/* no DAI is currently using clk */
+-		cs43130_change_clksrc(component, CS43130_MCLK_SRC_RCO);
+-		cs43130_pcm_dsd_mix(false, cs43130->regmap);
+-	}
++	y2_clk_put(component, dai->id);
+ 	mutex_unlock(&cs43130->clk_mutex);
+ 
+ 	return 0;
+@@ -1111,6 +1460,155 @@
+ static SOC_VALUE_ENUM_SINGLE_DECL(dsd_enum, CS43130_DSD_INT_CFG, 0, 0x03,
+ 				  dsd_texts, dsd_values);
+ 
++/*
++ * Y2: headphone output level (HP_OUT_CTL_1 OUT_FS, full scale 1.0, 1.41 or
++ * 1.73 Vrms), paired with the HV_EN choice of upstream's load-based hv_seq:
++ * CLASS_H 0x1C (HV_EN off) for Low, 0x1E for Medium and High. Stock drives
++ * headphones at Low. The datasheet allows OUT_FS changes only while PDN_HP is
++ * set, so a level chosen during playback waits for the next HP power-up (the
++ * card ignores pmdown_time: the amplifier powers down when a stream closes).
++ * The requested level lives here, not in the regcache, and is written before
++ * every power-up, so it survives runtime and system suspend.
++ */
++#define Y2_HP_OUT_FS_MASK	0x30
++#define Y2_CLASS_H_HV_EN	0x02
++#define Y2_HP_LEVELS		3
++static const u8 y2_hp_out_fs[Y2_HP_LEVELS] = { 0x10, 0x20, 0x30 };
++static const u8 y2_hp_hv_en[Y2_HP_LEVELS] = { 0, Y2_CLASS_H_HV_EN, Y2_CLASS_H_HV_EN };
++static unsigned int y2_hp_level;	/* Low */
++static DEFINE_MUTEX(y2_hp_level_lock);
++
++/*
++ * Y2 speaker: the AW87559 amplifier takes HPOUTA/HPOUTB as one differential
++ * input. Stock cs43131_apply_route (FM kernel 0xc054baa8) sets, for the
++ * speaker, PCM_PATH_CTL_2 = 0x05 (both channels left, B inverted),
++ * ASP_CH_2_SZ_EN = 0x06 (channel 2 also takes the left slot) and OUT_FS 0x30
++ * (1.73 Vrms); for headphones 0x00, 0x0E and the headphone level. The card's
++ * "Speaker" pin decides, read under the DAPM mutex at every HP power-up.
++ */
++#define Y2_PCM_PATH_MASK	0x07
++#define Y2_PCM_PATH_SPEAKER	0x05
++#define Y2_ASP_CH2_LEFT_SLOT	0x08
++#define Y2_SPEAKER_OUT_FS	0x30
++
++static bool y2_speaker_pin(struct cs43130_private *cs43130)
++{
++	struct snd_soc_card *card = cs43130->component ? cs43130->component->card : NULL;
++
++	return card && snd_soc_dapm_get_pin_status(&card->dapm, "Speaker");
++}
++
++/* Caller holds y2_hp_level_lock and knows PDN_HP is set. */
++static int y2_hp_level_write(struct cs43130_private *cs43130)
++{
++	bool speaker = y2_speaker_pin(cs43130);
++	int ret;
++
++	ret = regmap_update_bits(cs43130->regmap, CS43130_PCM_PATH_CTL_2, Y2_PCM_PATH_MASK,
++				 speaker ? Y2_PCM_PATH_SPEAKER : 0);
++	if (!ret)
++		ret = regmap_update_bits(cs43130->regmap, CS43130_ASP_CH_2_SZ_EN,
++					 Y2_ASP_CH2_LEFT_SLOT, speaker ? 0 : Y2_ASP_CH2_LEFT_SLOT);
++	if (!ret)
++		ret = regmap_update_bits(cs43130->regmap, CS43130_CLASS_H_CTL, Y2_CLASS_H_HV_EN,
++					 speaker ? Y2_CLASS_H_HV_EN : y2_hp_hv_en[y2_hp_level]);
++	if (ret)
++		return ret;
++	return regmap_update_bits(cs43130->regmap, CS43130_HP_OUT_CTL_1, Y2_HP_OUT_FS_MASK,
++				  speaker ? Y2_SPEAKER_OUT_FS : y2_hp_out_fs[y2_hp_level]);
++}
++
++/* DAPM clears PDN_HP under the card's DAPM mutex, right after the "HiFi DAC"
++ * PRE_PMU has written the level. Holding it makes a PDN_HP check and the
++ * write after it one step. NULL before the card binds: nothing can power the
++ * amplifier then. Lock order: DAPM mutex, then y2_hp_level_lock. */
++static struct snd_soc_card *y2_hp_dapm_lock(struct cs43130_private *cs43130)
++{
++	struct snd_soc_card *card = cs43130->component ? cs43130->component->card : NULL;
++
++	if (card)
++		snd_soc_dapm_mutex_lock(card);
++	return card;
++}
++
++static void y2_hp_dapm_unlock(struct snd_soc_card *card)
++{
++	if (card)
++		snd_soc_dapm_mutex_unlock(card);
++}
++
++/* Request a level: written now while the amplifier is down, otherwise at its
++ * next power-up. Returns 1 when the request changed. */
++static int y2_hp_level_set(struct cs43130_private *cs43130, unsigned int level)
++{
++	struct snd_soc_card *card;
++	unsigned int pwdn;
++	int changed, ret = 0;
++
++	if (level >= Y2_HP_LEVELS)
++		return -EINVAL;
++	card = y2_hp_dapm_lock(cs43130);
++	mutex_lock(&y2_hp_level_lock);
++	changed = y2_hp_level != level;
++	y2_hp_level = level;
++	/* An unreadable state counts as powered: never write a live amplifier. */
++	if (!regmap_read(cs43130->regmap, CS43130_PWDN_CTL, &pwdn) &&
++	    (pwdn & CS43130_PDN_HP_MASK))
++		ret = y2_hp_level_write(cs43130);
++	mutex_unlock(&y2_hp_level_lock);
++	y2_hp_dapm_unlock(card);
++	return ret ? ret : changed;
++}
++
++/* The level the output runs at (or will run at when it powers up next):
++ * 0..2, or Y2_HP_LEVELS when the registers hold another combination. */
++static unsigned int y2_hp_level_live(struct cs43130_private *cs43130)
++{
++	unsigned int out = 0, class_h = 0, i;
++
++	if (regmap_read(cs43130->regmap, CS43130_HP_OUT_CTL_1, &out) ||
++	    regmap_read(cs43130->regmap, CS43130_CLASS_H_CTL, &class_h))
++		return Y2_HP_LEVELS;
++	for (i = 0; i < Y2_HP_LEVELS; i++)
++		if ((out & Y2_HP_OUT_FS_MASK) == y2_hp_out_fs[i] &&
++		    (class_h & Y2_CLASS_H_HV_EN) == y2_hp_hv_en[i])
++			return i;
++	return Y2_HP_LEVELS;
++}
++
++static const char *const y2_hp_level_texts[] = { "Low", "Medium", "High" };
++static const char *const y2_hp_live_texts[] = { "Low", "Medium", "High", "Other" };
++static SOC_ENUM_SINGLE_EXT_DECL(y2_hp_level_enum, y2_hp_level_texts);
++static SOC_ENUM_SINGLE_EXT_DECL(y2_hp_live_enum, y2_hp_live_texts);
++
++static int y2_hp_level_get(struct snd_kcontrol *kcontrol,
++			   struct snd_ctl_elem_value *ucontrol)
++{
++	mutex_lock(&y2_hp_level_lock);
++	ucontrol->value.enumerated.item[0] = y2_hp_level;
++	mutex_unlock(&y2_hp_level_lock);
++	return 0;
++}
++
++static int y2_hp_level_put(struct snd_kcontrol *kcontrol,
++			   struct snd_ctl_elem_value *ucontrol)
++{
++	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
++
++	return y2_hp_level_set(snd_soc_component_get_drvdata(component),
++			       ucontrol->value.enumerated.item[0]);
++}
++
++static int y2_hp_live_get(struct snd_kcontrol *kcontrol,
++			  struct snd_ctl_elem_value *ucontrol)
++{
++	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
++
++	ucontrol->value.enumerated.item[0] =
++		y2_hp_level_live(snd_soc_component_get_drvdata(component));
++	return 0;
++}
++
+ static const struct snd_kcontrol_new cs43130_snd_controls[] = {
+ 	SOC_DOUBLE_R_TLV("Master Playback Volume",
+ 			 CS43130_PCM_VOL_A, CS43130_PCM_VOL_B, 0, 0xFF, 1,
+@@ -1126,6 +1624,16 @@
+ 	SOC_SINGLE("PCM High-pass Filter", CS43130_PCM_FILT_OPT, 1, 1, 0),
+ 	SOC_SINGLE("PCM De-emphasis Filter", CS43130_PCM_FILT_OPT, 0, 1, 0),
+ 	SOC_ENUM("DSD Phase Modulation", dsd_enum),
++	SOC_ENUM_EXT("HP Output Level", y2_hp_level_enum, y2_hp_level_get,
++		     y2_hp_level_put),
++	{
++		.iface = SNDRV_CTL_ELEM_IFACE_MIXER,
++		.name = "HP Output Level Live",
++		.access = SNDRV_CTL_ELEM_ACCESS_READ | SNDRV_CTL_ELEM_ACCESS_VOLATILE,
++		.info = snd_soc_info_enum_double,
++		.get = y2_hp_live_get,
++		.private_value = (unsigned long)&y2_hp_live_enum,
++	},
+ };
+ 
+ static const struct reg_sequence pcm_seq[] = {
+@@ -1314,6 +1822,10 @@
+ 
+ 	switch (event) {
+ 	case SND_SOC_DAPM_PRE_PMU:
++		/* Y2: PDN_HP is still set here; apply the requested level. */
++		mutex_lock(&y2_hp_level_lock);
++		y2_hp_level_write(cs43130);
++		mutex_unlock(&y2_hp_level_lock);
+ 		switch (cs43130->dev_id) {
+ 		case CS43130_CHIP_ID:
+ 		case CS4399_CHIP_ID:
+@@ -2062,16 +2574,41 @@
+ 				   ac_reg_val >> CS43130_HP_MEAS_LOAD_2_SHIFT);
+ 	}
+ 
++	if (!cs43130->has_irq_line) {
++		unsigned int stat;
++
++		/* Y2: no codec IRQ. Sticky status clears on read: drop stale
++		 * bits, start the step, then poll for its result or an error. */
++		regmap_read(cs43130->regmap, CS43130_INT_STATUS_4, &stat);
++		regmap_multi_reg_write(cs43130->regmap, seq, seq_size);
++		ret = regmap_read_poll_timeout(cs43130->regmap,
++					       CS43130_INT_STATUS_4, stat,
++					       stat & (rslt_msk |
++						       CS43130_HPLOAD_NO_DC_INT |
++						       CS43130_HPLOAD_UNPLUG_INT |
++						       CS43130_HPLOAD_OOR_INT),
++					       1000, 1000 * 1000);
++		if (ret) {
++			dev_err(cs43130->dev,
++				"Timeout polling HPLOAD status (want %x, last %x)\n",
++				rslt_msk, stat);
++			return -ETIMEDOUT;
++		}
++		cs43130->hpload_stat = stat;
++		goto check;
++	}
++
+ 	regmap_multi_reg_write(cs43130->regmap, seq,
+ 			       seq_size);
+ 
+ 	ret = wait_for_completion_timeout(&cs43130->hpload_evt,
+ 					  msecs_to_jiffies(1000));
+-	regmap_read(cs43130->regmap, CS43130_INT_MASK_4, &msk);
+ 	if (!ret) {
+ 		dev_err(cs43130->dev, "Timeout waiting for HPLOAD interrupt\n");
+ 		return -ETIMEDOUT;
+ 	}
++check:
++	regmap_read(cs43130->regmap, CS43130_INT_MASK_4, &msk);
+ 
+ 	dev_dbg(cs43130->dev, "HP load stat: %x, INT_MASK_4: %x\n",
+ 		cs43130->hpload_stat, msk);
+@@ -2116,6 +2653,12 @@
+ 	return 0;
+ }
+ 
++/* Y2 board offset subtracted from the measured DC load, in ohms (see below). */
++static unsigned int y2_hpload_offset_ohm = 102;
++module_param(y2_hpload_offset_ohm, uint, 0644);
++MODULE_PARM_DESC(y2_hpload_offset_ohm, "Y2: ohms subtracted from the measured DC load");
++static u16 y2_hp_raw_dc[2];
++
+ static void cs43130_imp_meas(struct work_struct *wk)
+ {
+ 	unsigned int reg, seq_size;
+@@ -2164,6 +2707,13 @@
+ 	i = 0;
+ 	ac_idx = 0;
+ 	while (i < seq_size) {
++		/* Y2: without cirrus,ac-measure only the DC load is wanted (it
++		 * alone selects the output level); the AC steps never complete
++		 * on this board. */
++		if (!cs43130->ac_meas && hpload_seq[i].msk == CS43130_HPLOAD_AC_INT) {
++			i++;
++			continue;
++		}
+ 		ret = cs43130_hpload_proc(cs43130, hpload_seq[i].seq,
+ 					  hpload_seq[i].size,
+ 					  hpload_seq[i].msk, ac_idx);
+@@ -2183,6 +2733,16 @@
+ 	}
+ 	cs43130->hpload_done = true;
+ 
++	/* Y2: the measured DC load reads a fixed amount high on this board
++	 * (owner calibration, 2026-10-11: 18 ohm IEM -> 121/120, 32 ohm
++	 * headphone -> 135; slope 1, offset ~102.5). Thresholds and reports
++	 * use the corrected load; the raw reading stays in y2_hp_raw_dc. */
++	for (i = 0; i < 2; i++) {
++		y2_hp_raw_dc[i] = cs43130->hpload_dc[i];
++		cs43130->hpload_dc[i] = cs43130->hpload_dc[i] > y2_hpload_offset_ohm ?
++			cs43130->hpload_dc[i] - y2_hpload_offset_ohm : 0;
++	}
++
+ 	if (cs43130->hpload_dc[HP_LEFT] >= CS43130_LINEOUT_LOAD)
+ 		snd_soc_jack_report(&cs43130->jack, CS43130_JACK_LINEOUT,
+ 				    CS43130_JACK_MASK);
+@@ -2216,12 +2776,289 @@
+ 			       ARRAY_SIZE(hp_cln_seq));
+ 
+ 	mutex_lock(&cs43130->clk_mutex);
++	/* Y2: the clock keeps running until runtime suspend (see y2_clk_put). */
+ 	cs43130->clk_req--;
+-	/* clk not in use */
+-	if (!cs43130->clk_req)
+-		cs43130_change_clksrc(component, CS43130_MCLK_SRC_RCO);
+ 	mutex_unlock(&cs43130->clk_mutex);
+ }
++
++/*
++ * Y2: headphone load measurement on demand. The Y2 powers the codec only
++ * while it is used and has no codec interrupt wired, so measurement runs on
++ * request (never during playback) and polls the HPLOAD status. It reports the
++ * load; the output level stays the requested one (hp_gain or the ALSA control
++ * "HP Output Level"), written again after the measurement's own choice.
++ */
++static const char *const y2_hp_gain_names[] = { "low", "mid", "high" };
++static DEFINE_MUTEX(y2_hp_lock);
++
++static ssize_t hp_gain_show(struct device *dev, struct device_attribute *attr,
++			    char *buf)
++{
++	struct cs43130_private *cs43130 = dev_get_drvdata(dev);
++	unsigned int live = y2_hp_level_live(cs43130), reg = 0;
++
++	if (live < Y2_HP_LEVELS)
++		return sysfs_emit(buf, "%s\n", y2_hp_gain_names[live]);
++	regmap_read(cs43130->regmap, CS43130_HP_OUT_CTL_1, &reg);
++	return sysfs_emit(buf, "raw:%02x\n", reg);
++}
++
++static ssize_t hp_gain_store(struct device *dev, struct device_attribute *attr,
++			     const char *buf, size_t count)
++{
++	struct cs43130_private *cs43130 = dev_get_drvdata(dev);
++	int i = sysfs_match_string(y2_hp_gain_names, buf);
++
++	if (i < 0)
++		return -EINVAL;
++	i = y2_hp_level_set(cs43130, i);
++	return i < 0 ? i : count;
++}
++static DEVICE_ATTR_RW(hp_gain);
++
++/* Stock Y2 HP_DETECT (cs43131_hw_init writes 0x0D0000 = 0xCA); upstream 0xC4. */
++#define Y2_HP_DETECT_STOCK	0xCA
++#define Y2_HP_STATUS_PLUGGED	BIT(6)
++static char y2_hp_debug[256];
++
++static void y2_hp_snapshot(struct cs43130_private *cs43130, const char *when)
++{
++	static const unsigned int regs[] = {
++		CS43130_PWDN_CTL, CS43130_HP_DETECT, CS43130_HP_STATUS,
++		CS43130_HP_LOAD_1, CS43130_HP_LOAD_STAT, CS43130_INT_MASK_4,
++		CS43130_HP_OUT_CTL_1, CS43130_CLASS_H_CTL,
++	};
++	unsigned int v[ARRAY_SIZE(regs)] = {};
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(regs); i++)
++		regmap_read(cs43130->regmap, regs[i], &v[i]);
++	snprintf(y2_hp_debug, sizeof(y2_hp_debug),
++		 "%s pwdn=%02x det=%02x hpstat=%02x load1=%02x loadstat=%02x mask4=%02x out=%02x classh=%02x\n",
++		 when, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]);
++	dev_info(cs43130->dev, "Y2 HP %s", y2_hp_debug);
++}
++
++static ssize_t hpload_measure_store(struct device *dev,
++				    struct device_attribute *attr,
++				    const char *buf, size_t count)
++{
++	struct cs43130_private *cs43130 = dev_get_drvdata(dev);
++	struct snd_soc_card *card;
++	unsigned int status = 0;
++	int ret;
++
++	if (!cs43130->component || !cs43130->mclk)
++		return -ENODEV;
++	mutex_lock(&y2_hp_lock);
++	ret = pm_runtime_resume_and_get(dev);
++	if (ret < 0)
++		goto unlock;
++	/* Held for the whole measurement: no stream powers the amplifier while
++	 * imp_meas and the level below write HP_OUT_CTL_1. */
++	card = y2_hp_dapm_lock(cs43130);
++	mutex_lock(&cs43130->clk_mutex);
++	/* A stream owns the clocks, or one is open and may start any moment. */
++	ret = cs43130->clk_req || snd_soc_component_active(cs43130->component) ?
++		-EBUSY : 0;
++	mutex_unlock(&cs43130->clk_mutex);
++	if (!ret) {
++		/* The codec was powered from off: let its plug detector (stock
++		 * configuration) settle and see the jack before measuring. */
++		regmap_write(cs43130->regmap, CS43130_HP_DETECT, Y2_HP_DETECT_STOCK);
++		ret = regmap_read_poll_timeout(cs43130->regmap, CS43130_HP_STATUS,
++					       status, status & Y2_HP_STATUS_PLUGGED,
++					       10 * 1000, 1000 * 1000);
++		y2_hp_snapshot(cs43130, ret ? "no-plug" : "plugged");
++		if (ret) {
++			ret = -ENXIO; /* nothing in the jack, per the detector */
++		} else {
++			cs43130_imp_meas(&cs43130->work);
++			/* imp_meas wrote its load-based hv_seq; PDN_HP is set. */
++			mutex_lock(&y2_hp_level_lock);
++			y2_hp_level_write(cs43130);
++			mutex_unlock(&y2_hp_level_lock);
++			if (!cs43130->hpload_done) {
++				y2_hp_snapshot(cs43130, "failed");
++				ret = -EIO;
++			}
++		}
++	}
++	y2_hp_dapm_unlock(card);
++	pm_runtime_put(dev);
++unlock:
++	mutex_unlock(&y2_hp_lock);
++	return ret < 0 ? ret : count;
++}
++static DEVICE_ATTR_WO(hpload_measure);
++
++static ssize_t hpload_dc_show(struct device *dev, struct device_attribute *attr,
++			      char *buf)
++{
++	struct cs43130_private *cs43130 = dev_get_drvdata(dev);
++
++	if (!cs43130->hpload_done)
++		return sysfs_emit(buf, "none\n");
++	return sysfs_emit(buf, "%u %u raw %u %u\n", cs43130->hpload_dc[HP_LEFT],
++			  cs43130->hpload_dc[HP_RIGHT], y2_hp_raw_dc[0], y2_hp_raw_dc[1]);
++}
++static DEVICE_ATTR_RO(hpload_dc);
++
++static ssize_t hpload_debug_show(struct device *dev,
++				 struct device_attribute *attr, char *buf)
++{
++	return sysfs_emit(buf, "%s", y2_hp_debug[0] ? y2_hp_debug : "none\n");
++}
++static DEVICE_ATTR_RO(hpload_debug);
++
++static ssize_t xtal_show(struct device *dev, struct device_attribute *attr,
++			 char *buf)
++{
++	return sysfs_emit(buf, "running=%d ready=%d ready_ms=%u unconfirmed=%u errors=%u boosted=%d cycles=%u cold_start=%d tries=%u start_ms=%u stream_cycles=%u full_power=%d start_hp=%d quiet=%d\n",
++			  y2_xtal_on, y2_xtal_ready, y2_xtal_ready_ms,
++			  y2_xtal_unconfirmed, y2_xtal_errors, y2_xtal_boosted,
++			  y2_codec_cycles, y2_cold_start, y2_xtal_tries,
++			  y2_xtal_start_ms, y2_xtal_stream_cycles,
++			  y2_xtal_full_power, y2_xtal_start_hp,
++			  y2_xtal_quiet_start);
++}
++
++/* "boost": 15 uA from the next codec power-up (tests). "cycle": one cold
++ * start now, refused while a stream holds the clock (#52/#54 start-rate
++ * tests). */
++static ssize_t xtal_store(struct device *dev, struct device_attribute *attr,
++			  const char *buf, size_t count)
++{
++	struct cs43130_private *cs43130 = dev_get_drvdata(dev);
++	int ret = 0;
++
++	if (sysfs_streq(buf, "boost")) {
++		mutex_lock(&cs43130->clk_mutex);
++		y2_xtal_boost(cs43130);
++		mutex_unlock(&cs43130->clk_mutex);
++		return count;
++	}
++	if (!sysfs_streq(buf, "cycle"))
++		return -EINVAL;
++	ret = pm_runtime_resume_and_get(dev);
++	if (ret)
++		return ret;
++	mutex_lock(&cs43130->clk_mutex);
++	if (cs43130->clk_req)
++		ret = -EBUSY;
++	else
++		y2_codec_cycle(cs43130);
++	mutex_unlock(&cs43130->clk_mutex);
++	pm_runtime_mark_last_busy(dev);
++	pm_runtime_put_autosuspend(dev);
++	return ret ? ret : count;
++}
++static DEVICE_ATTR_RW(xtal);
++
++/* "1" keeps the codec, and its running crystal, powered (Reborn: while the
++ * screen is on, as stock keeps it from screen-on to screen-off); "0" lets it
++ * power down two idle minutes later (#52, #54). */
++static DEFINE_MUTEX(y2_hold_lock);
++static bool y2_hold;
++
++static ssize_t hold_show(struct device *dev, struct device_attribute *attr,
++			 char *buf)
++{
++	return sysfs_emit(buf, "%d\n", y2_hold);
++}
++
++static ssize_t hold_store(struct device *dev, struct device_attribute *attr,
++			  const char *buf, size_t count)
++{
++	bool on;
++	int ret = kstrtobool(buf, &on);
++
++	if (ret)
++		return ret;
++	mutex_lock(&y2_hold_lock);
++	if (on && !y2_hold) {
++		ret = pm_runtime_resume_and_get(dev);
++		y2_hold = !ret;
++	} else if (!on && y2_hold) {
++		pm_runtime_mark_last_busy(dev);
++		pm_runtime_put_autosuspend(dev);
++		y2_hold = false;
++	}
++	mutex_unlock(&y2_hold_lock);
++	return ret ? ret : count;
++}
++static DEVICE_ATTR_RW(hold);
++
++/*
++ * Y2 jack detection without the codec IRQ: EINT16 stays unwired, because its
++ * handler would consume the sticky status bits the crystal start polls (#52).
++ * While the codec is powered (screen on: Reborn's hold; or a stream) the stock
++ * detector's HP_STATUS bit is read every 200 ms (stock reads it 200 ms after
++ * its EINT16). A plug is reported at once and first turns a playing speaker
++ * off, before the headphones get the speaker's level; an unplug needs two
++ * reads. Powered down, nothing polls and the last state stays reported.
++ */
++#define Y2_JACK_POLL_MS		200
++static struct cs43130_private *y2_jack_codec;
++static int y2_jack_state = -1;	/* unknown, then 0 empty or 1 plugged */
++static unsigned int y2_jack_empty_reads, y2_jack_speaker_offs;
++static void y2_jack_poll(struct work_struct *work);
++static DECLARE_DELAYED_WORK(y2_jack_work, y2_jack_poll);
++
++static void y2_jack_poll(struct work_struct *work)
++{
++	struct cs43130_private *cs43130 = y2_jack_codec;
++	struct snd_soc_card *card;
++	unsigned int status;
++	bool plugged;
++
++	/* Powered down: stop; the next runtime resume starts polling again. */
++	if (!cs43130 || pm_runtime_get_if_active(cs43130->dev) <= 0)
++		return;
++	if (!regmap_read(cs43130->regmap, CS43130_HP_STATUS, &status)) {
++		plugged = status & Y2_HP_STATUS_PLUGGED;
++		y2_jack_empty_reads = plugged ? 0 : y2_jack_empty_reads + 1;
++		card = cs43130->component ? cs43130->component->card : NULL;
++		if (plugged && card && y2_speaker_pin(cs43130)) {
++			snd_soc_dapm_disable_pin(&card->dapm, "Speaker");
++			snd_soc_dapm_sync(&card->dapm);
++			y2_jack_speaker_offs++;
++			dev_info(cs43130->dev, "Y2 headphones plugged: speaker off\n");
++		}
++		if (plugged ? y2_jack_state != 1 :
++		    y2_jack_state != 0 && (y2_jack_state < 0 || y2_jack_empty_reads >= 2)) {
++			y2_jack_state = plugged;
++			snd_soc_jack_report(&cs43130->jack, plugged ? SND_JACK_HEADPHONE : 0,
++					    CS43130_JACK_MASK);
++		}
++	}
++	/* Not pm_runtime_put_autosuspend(): it marks the codec busy, and a poll
++	 * every 200 ms would then keep it powered for good. */
++	__pm_runtime_put_autosuspend(cs43130->dev);
++	schedule_delayed_work(&y2_jack_work, msecs_to_jiffies(Y2_JACK_POLL_MS));
++}
++
++static ssize_t jack_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	return sysfs_emit(buf, "state=%d empty_reads=%u speaker_offs=%u\n",
++			  y2_jack_state, y2_jack_empty_reads, y2_jack_speaker_offs);
++}
++static DEVICE_ATTR_RO(jack);
++
++static struct attribute *y2_hp_attrs[] = {
++	&dev_attr_hp_gain.attr,
++	&dev_attr_jack.attr,
++	&dev_attr_xtal.attr,
++	&dev_attr_hold.attr,
++	&dev_attr_hpload_measure.attr,
++	&dev_attr_hpload_dc.attr,
++	&dev_attr_hpload_debug.attr,
++	NULL,
++};
++static const struct attribute_group y2_hp_group = {
++	.name = "y2_hp",
++	.attrs = y2_hp_attrs,
++};
+ 
+ static irqreturn_t cs43130_irq_thread(int irq, void *data)
+ {
+@@ -2357,6 +3194,12 @@
+ 		regmap_update_bits(cs43130->regmap, CS43130_INT_MASK_1,
+ 				   CS43130_XTAL_ERR_INT, 0);
+ 	}
++
++	/* Y2: the default level instead of the reset value (High), so the
++	 * readback is right before the first stream; the amplifier is down. */
++	ret = y2_hp_level_set(cs43130, y2_hp_level);
++	if (ret < 0)
++		return ret;
+ 
+ 	ret = snd_soc_card_jack_new(card, "Headphone", CS43130_JACK_MASK,
+ 				    &cs43130->jack);
+@@ -2388,6 +3231,10 @@
+ 	regmap_update_bits(cs43130->regmap, CS43130_HP_DETECT,
+ 			   CS43130_HP_DETECT_CTRL_MASK,
+ 			   CS43130_HP_DETECT_CTRL_MASK);
++	/* Y2: the stock detector configuration (cs43131_hw_init), polled. */
++	regmap_write(cs43130->regmap, CS43130_HP_DETECT, Y2_HP_DETECT_STOCK);
++	y2_jack_codec = cs43130;
++	schedule_delayed_work(&y2_jack_work, msecs_to_jiffies(Y2_JACK_POLL_MS));
+ 
+ 	return 0;
+ }
+@@ -2475,13 +3322,16 @@
+ 	cs43130->dc_meas = device_property_read_bool(cs43130->dev, "cirrus,dc-measure");
+ 	cs43130->ac_meas = device_property_read_bool(cs43130->dev, "cirrus,ac-measure");
+ 
+-	if (!device_property_read_u16_array(cs43130->dev, "cirrus,ac-freq", cs43130->ac_freq,
++	/* Fall back to the defaults when the property is absent (the read
++	 * fails). Upstream tested the opposite, so without these properties
++	 * both arrays stayed zero and every load selected the highest level. */
++	if (device_property_read_u16_array(cs43130->dev, "cirrus,ac-freq", cs43130->ac_freq,
+ 					CS43130_AC_FREQ)) {
+ 		for (i = 0; i < CS43130_AC_FREQ; i++)
+ 			cs43130->ac_freq[i] = cs43130_ac_freq[i];
+ 	}
+ 
+-	if (!device_property_read_u16_array(cs43130->dev, "cirrus,dc-threshold",
++	if (device_property_read_u16_array(cs43130->dev, "cirrus,dc-threshold",
+ 				       cs43130->dc_threshold,
+ 				       CS43130_DC_THRESHOLD)) {
+ 		for (i = 0; i < CS43130_DC_THRESHOLD; i++)
+@@ -2529,11 +3379,31 @@
+ 		dev_err(cs43130->dev, "Failed to request supplies: %d\n", ret);
+ 		return ret;
+ 	}
++	/* Y2 (#52): rails found on (VGP2 feeds VA, VP, VCP and the crystal) start
++	 * cold, as from a power-on, so a stuck crystal cannot carry over. On the
++	 * owner's player a restart already resets VGP2 (8.24): a safety net. */
++	y2_cold_start = regulator_is_enabled(cs43130->supplies[0].consumer) > 0;
+ 	ret = regulator_bulk_enable(ARRAY_SIZE(cs43130->supplies),
+ 				    cs43130->supplies);
+ 	if (ret != 0) {
+ 		dev_err(cs43130->dev, "Failed to enable supplies: %d\n", ret);
+ 		return ret;
++	}
++	if (y2_cold_start) {
++		bool off;
++
++		regulator_bulk_disable(ARRAY_SIZE(cs43130->supplies),
++				       cs43130->supplies);
++		off = regulator_is_enabled(cs43130->supplies[0].consumer) <= 0;
++		msleep(Y2_CODEC_OFF_MS);
++		ret = regulator_bulk_enable(ARRAY_SIZE(cs43130->supplies),
++					    cs43130->supplies);
++		dev_info(cs43130->dev, "cold start: rails were on, off for %u ms (VGP2 %s)\n",
++			 Y2_CODEC_OFF_MS, off ? "off" : "held elsewhere");
++		if (ret != 0) {
++			dev_err(cs43130->dev, "Failed to enable supplies: %d\n", ret);
++			return ret;
++		}
+ 	}
+ 
+ 	cs43130->reset_gpio = devm_gpiod_get_optional(cs43130->dev,
+@@ -2603,10 +3473,23 @@
+ 
+ 	cs43130->mclk_int_src = CS43130_MCLK_SRC_RCO;
+ 
+-	pm_runtime_set_autosuspend_delay(cs43130->dev, 100);
++	/* Y2 (#52, #54): as stock, the crystal starts with the codec at boot
++	 * and keeps running while the player is in use; stock stops it only
++	 * when the screen goes off while idle. Two players' crystals did not
++	 * start, or stopped, within the ≈1 s a stream gave them after each
++	 * power-up. Two idle minutes before the rails drop (upstream: 100 ms);
++	 * system sleep powers the codec down regardless. */
++	if (cs43130->xtal_ibias != CS43130_XTAL_UNUSED)
++		y2_xtal_power_on(cs43130, true);
++	pm_runtime_set_autosuspend_delay(cs43130->dev, 120000);
+ 	pm_runtime_use_autosuspend(cs43130->dev);
++	pm_runtime_mark_last_busy(cs43130->dev);
+ 	pm_runtime_set_active(cs43130->dev);
+ 	pm_runtime_enable(cs43130->dev);
++
++	ret = devm_device_add_group(cs43130->dev, &y2_hp_group);
++	if (ret)
++		dev_warn(cs43130->dev, "y2_hp sysfs unavailable: %d\n", ret);
+ 
+ 	switch (cs43130->dev_id) {
+ 	case CS43130_CHIP_ID:
+@@ -2647,6 +3530,8 @@
+ {
+ 	struct cs43130_private *cs43130 = i2c_get_clientdata(client);
+ 
++	y2_jack_codec = NULL;
++	cancel_delayed_work_sync(&y2_jack_work);
+ 	if (cs43130->xtal_ibias != CS43130_XTAL_UNUSED)
+ 		regmap_update_bits(cs43130->regmap, CS43130_INT_MASK_1,
+ 				   CS43130_XTAL_ERR_INT,
+@@ -2672,23 +3557,119 @@
+ 	regulator_bulk_disable(CS43130_NUM_SUPPLIES, cs43130->supplies);
+ }
+ 
++/* Baseline02 full wake reaches this codec callback without returning. Keep
++ * its regulator/reset/cache boundaries in the existing retained PM ring only
++ * during system sleep, rather than tracing ordinary runtime audio traffic. */
++static void cs43130_pm_note(const char *step, int ret)
++{
++	if (pm_suspend_target_state != PM_SUSPEND_ON)
++		y2_pm_note(step, ret);
++}
++
++static int cs43130_restore_cache(struct cs43130_private *cs43130)
++{
++	int ret;
++
++	cs43130_pm_note("cs_access_begin", 0);
++	regcache_cache_only(cs43130->regmap, false);
++	gpiod_set_value_cansleep(cs43130->reset_gpio, 1);
++	cs43130_pm_note("cs_delay_begin", 0);
++	usleep_range(2000, 2050);
++	cs43130_pm_note("cs_delay_done", 0);
++
++	cs43130_pm_note("cs_cache_begin", 0);
++	ret = regcache_sync(cs43130->regmap);
++	cs43130_pm_note("cs_cache_done", ret);
++	if (ret)
++		return ret;
++
++	if (cs43130->xtal_ibias != CS43130_XTAL_UNUSED) {
++		cs43130_pm_note("cs_xtal_begin", 0);
++		ret = regmap_update_bits(cs43130->regmap, CS43130_INT_MASK_1,
++					 CS43130_XTAL_ERR_INT, 0);
++		cs43130_pm_note("cs_xtal_done", ret);
++		if (ret)
++			return ret;
++	}
++	return 0;
++}
++
+ static int cs43130_runtime_suspend(struct device *dev)
+ {
+ 	struct cs43130_private *cs43130 = dev_get_drvdata(dev);
+-
+-	if (cs43130->xtal_ibias != CS43130_XTAL_UNUSED)
+-		regmap_update_bits(cs43130->regmap, CS43130_INT_MASK_1,
++	int ret, restore;
++
++	if (cs43130->xtal_ibias != CS43130_XTAL_UNUSED) {
++		ret = regmap_update_bits(cs43130->regmap, CS43130_INT_MASK_1,
+ 				   CS43130_XTAL_ERR_INT,
+ 				   1 << CS43130_XTAL_ERR_INT_SHIFT);
++		if (ret)
++			return ret;
++	}
+ 
+ 	regcache_cache_only(cs43130->regmap, true);
+ 	regcache_mark_dirty(cs43130->regmap);
+-
++	/* Y2: the crystal stops with the rails; the replay leaves it down,
++	 * the PLL off and the codec on RCO (hw_free keeps the running clock). */
++	y2_xtal_on = false;
++	regmap_update_bits(cs43130->regmap, CS43130_PWDN_CTL,
++			   CS43130_PDN_XTAL_MASK, 1 << CS43130_PDN_XTAL_SHIFT);
++	regmap_update_bits(cs43130->regmap, CS43130_PWDN_CTL,
++			   CS43130_PDN_PLL_MASK, 1 << CS43130_PDN_PLL_SHIFT);
++	regmap_update_bits(cs43130->regmap, CS43130_SYS_CLK_CTL_1,
++			   CS43130_MCLK_SRC_SEL_MASK | CS43130_MCLK_INT_MASK,
++			   CS43130_MCLK_SRC_RCO << CS43130_MCLK_SRC_SEL_SHIFT |
++			   CS43130_MCLK_22P5 << CS43130_MCLK_INT_SHIFT);
++	cs43130->mclk_int_src = CS43130_MCLK_SRC_RCO;
+ 	gpiod_set_value_cansleep(cs43130->reset_gpio, 0);
+ 
+-	regulator_bulk_disable(CS43130_NUM_SUPPLIES, cs43130->supplies);
+-
+-	return 0;
++	ret = regulator_bulk_disable(CS43130_NUM_SUPPLIES, cs43130->supplies);
++	if (ret) {
++		/* Bulk disable restores the prior rail references on failure. A
++		 * reset or partial rail cycle may have erased codec state; the XTAL
++		 * interrupt was masked too. Replay without enabling rails twice. */
++		cs43130_pm_note("cs_disable_fail", ret);
++		restore = cs43130_restore_cache(cs43130);
++		if (restore) {
++			dev_err(dev, "Failed to restore after supply refusal: %d\n", restore);
++			return restore;
++		}
++		dev_err(dev, "Failed to disable supplies: %d\n", ret);
++	}
++	return ret;
++}
++
++/* Rails on and the cache replayed, the crystal still down; on failure the
++ * rails are off again. */
++static int y2_codec_up(struct cs43130_private *cs43130)
++{
++	struct device *dev = cs43130->dev;
++	int ret, cleanup;
++
++	/* jiffies stamps separate slow rail enables from a stalled timer tick. */
++	cs43130_pm_note("cs_jiffies_begin", (int)jiffies);
++	cs43130_pm_note("cs_rails_begin", 0);
++	ret = regulator_bulk_enable(CS43130_NUM_SUPPLIES, cs43130->supplies);
++	cs43130_pm_note("cs_rails_done", ret);
++	cs43130_pm_note("cs_jiffies_done", (int)jiffies);
++	if (ret) {
++		dev_err(dev, "Failed to enable supplies: %d\n", ret);
++		return ret;
++	}
++
++	ret = cs43130_restore_cache(cs43130);
++	if (!ret)
++		return 0;
++
++	dev_err(dev, "Failed to restore codec state: %d\n", ret);
++	regcache_cache_only(cs43130->regmap, true);
++	gpiod_set_value_cansleep(cs43130->reset_gpio, 0);
++	cleanup = regulator_bulk_disable(CS43130_NUM_SUPPLIES, cs43130->supplies);
++	if (cleanup) {
++		cs43130_pm_note("cs_cleanup_fail", cleanup);
++		dev_err(dev, "Failed to disable supplies after restore error: %d\n", cleanup);
++	}
++	return ret;
+ }
+ 
+ static int cs43130_runtime_resume(struct device *dev)
+@@ -2696,38 +3677,43 @@
+ 	struct cs43130_private *cs43130 = dev_get_drvdata(dev);
+ 	int ret;
+ 
+-	ret = regulator_bulk_enable(CS43130_NUM_SUPPLIES, cs43130->supplies);
+-	if (ret != 0) {
+-		dev_err(dev, "Failed to enable supplies: %d\n", ret);
++	ret = y2_codec_up(cs43130);
++	if (ret)
+ 		return ret;
+-	}
+-
+-	regcache_cache_only(cs43130->regmap, false);
+-
+-	gpiod_set_value_cansleep(cs43130->reset_gpio, 1);
+-
+-	usleep_range(2000, 2050);
+-
+-	ret = regcache_sync(cs43130->regmap);
+-	if (ret != 0) {
+-		dev_err(dev, "Failed to restore register cache\n");
+-		goto err;
+-	}
+-
+-	if (cs43130->xtal_ibias != CS43130_XTAL_UNUSED)
+-		regmap_update_bits(cs43130->regmap, CS43130_INT_MASK_1,
+-				   CS43130_XTAL_ERR_INT, 0);
+-
++	/* Y2: as stock, the crystal starts with the codec; a new power-up lets
++	 * a stream add its own cold start again (#52). */
++	if (cs43130->xtal_ibias != CS43130_XTAL_UNUSED) {
++		y2_xtal_stream_cycles = 0;
++		y2_xtal_power_on(cs43130, true);
++	}
++	if (y2_jack_codec)
++		mod_delayed_work(system_wq, &y2_jack_work, msecs_to_jiffies(Y2_JACK_POLL_MS));
+ 	return 0;
+-err:
+-	regcache_cache_only(cs43130->regmap, true);
+-	regulator_bulk_disable(CS43130_NUM_SUPPLIES, cs43130->supplies);
+-
++}
++
++static int cs43130_system_suspend(struct device *dev)
++{
++	int ret;
++
++	cs43130_pm_note("cs_sleep_begin", 0);
++	ret = pm_runtime_force_suspend(dev);
++	cs43130_pm_note("cs_sleep_done", ret);
++	return ret;
++}
++
++static int cs43130_system_resume(struct device *dev)
++{
++	int ret;
++
++	cs43130_pm_note("cs_force_begin", 0);
++	ret = pm_runtime_force_resume(dev);
++	cs43130_pm_note("cs_force_done", ret);
+ 	return ret;
+ }
+ 
+ static const struct dev_pm_ops cs43130_runtime_pm = {
+ 	RUNTIME_PM_OPS(cs43130_runtime_suspend, cs43130_runtime_resume, NULL)
++	SYSTEM_SLEEP_PM_OPS(cs43130_system_suspend, cs43130_system_resume)
+ };
+ 
+ #if IS_ENABLED(CONFIG_OF)

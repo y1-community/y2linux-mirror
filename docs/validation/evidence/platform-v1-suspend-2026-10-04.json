@@ -1,0 +1,334 @@
+{
+  "schema": "org.y2linux.platform-v1-suspend/qualification-v1",
+  "date": "2026-10-04",
+  "installed": {
+    "linux": "8584ccd85f052f351fe51650b2348c83ca894ed4",
+    "reborn": "b71b468860233faa0a42b8448ec5777fa952b8e3",
+    "kernel": "6.18.0-y2linux-baseline-02"
+  },
+  "boot_before": "27e6d684-3794-4490-95db-a489027cd4f4",
+  "pm_tests": {
+    "pm-freezer-charging": {
+      "generic_verdict": {
+        "wake_sources": [],
+        "pass": true,
+        "deep_resume": false,
+        "checks": {
+          "same_boot": true,
+          "untainted": true,
+          "helper_returned": true,
+          "kernel_exit": true,
+          "pm_test_restored": true,
+          "no_deep_entry": true,
+          "filesystem:/sys/fs/ext4/mmcblk0p5/errors_count": true,
+          "filesystem:/sys/fs/ext4/mmcblk0p7/errors_count": true,
+          "filesystem:/sys/fs/ext4/mmcblk1p1/errors_count": true
+        }
+      },
+      "helper_return": 0,
+      "kernel_journal": "valid=1 sequence=14 stage=COMPLETE failed_stage=NONE error=0 wake=0x0 r13=0x0 raw=0x0 pcm_pointer=0x0 pcm_length=0 wake_mask=0x0 boot_vector=0x0 boot_enable=0x0 cirq=0x0 fsm=0x0 power=0x0 power_s=0x0 rtc_enable=0x0 pmic_mask0=0x0 pmic_mask1=0x0 pmic_status0=0x0 pmic_status1=0x0 reset_resume_entry=0x0 sleep_timer=0 watchdog_timer=0 pcm_control1=0x0 clock_control=0x0 ca7_cache_config=0x0 retention=stock_internal_sram_warm_reset",
+      "same_boot": true,
+      "taint": "0",
+      "ext4_errors": {
+        "/sys/fs/ext4/mmcblk0p5/errors_count": "0",
+        "/sys/fs/ext4/mmcblk0p7/errors_count": "0",
+        "/sys/fs/ext4/mmcblk1p1/errors_count": "0"
+      },
+      "expected_outcome": "stage_return"
+    },
+    "pm-devices-charging": {
+      "generic_verdict": {
+        "wake_sources": [],
+        "pass": false,
+        "deep_resume": false,
+        "checks": {
+          "same_boot": true,
+          "untainted": true,
+          "helper_returned": false,
+          "kernel_exit": false,
+          "pm_test_restored": true,
+          "no_deep_entry": true,
+          "filesystem:/sys/fs/ext4/mmcblk0p5/errors_count": true,
+          "filesystem:/sys/fs/ext4/mmcblk0p7/errors_count": true,
+          "filesystem:/sys/fs/ext4/mmcblk1p1/errors_count": true
+        }
+      },
+      "helper_return": 1,
+      "kernel_journal": "valid=1 sequence=32 stage=RADIOS_RESTORING failed_stage=DPM_PREPARED error=-16 wake=0x0 r13=0x0 raw=0x0 pcm_pointer=0x0 pcm_length=0 wake_mask=0x0 boot_vector=0x0 boot_enable=0x0 cirq=0x0 fsm=0x0 power=0x0 power_s=0x0 rtc_enable=0x0 pmic_mask0=0x0 pmic_mask1=0x0 pmic_status0=0x0 pmic_status1=0x0 reset_resume_entry=0x0 sleep_timer=0 watchdog_timer=0 pcm_control1=0x0 clock_control=0x0 ca7_cache_config=0x0 retention=stock_internal_sram_warm_reset",
+      "same_boot": true,
+      "taint": "0",
+      "ext4_errors": {
+        "/sys/fs/ext4/mmcblk0p5/errors_count": "0",
+        "/sys/fs/ext4/mmcblk0p7/errors_count": "0",
+        "/sys/fs/ext4/mmcblk1p1/errors_count": "0"
+      },
+      "expected_outcome": "charger_refusal"
+    },
+    "pm-devices-battery": {
+      "generic_verdict": {
+        "wake_sources": [],
+        "pass": true,
+        "deep_resume": false,
+        "checks": {
+          "same_boot": true,
+          "untainted": true,
+          "helper_returned": true,
+          "kernel_exit": true,
+          "pm_test_restored": true,
+          "no_deep_entry": true,
+          "filesystem:/sys/fs/ext4/mmcblk0p5/errors_count": true,
+          "filesystem:/sys/fs/ext4/mmcblk0p7/errors_count": true,
+          "filesystem:/sys/fs/ext4/mmcblk1p1/errors_count": true
+        }
+      },
+      "helper_return": 0,
+      "kernel_journal": "valid=1 sequence=54 stage=COMPLETE failed_stage=NONE error=0 wake=0x0 r13=0x0 raw=0x0 pcm_pointer=0x0 pcm_length=0 wake_mask=0x0 boot_vector=0x0 boot_enable=0x0 cirq=0x0 fsm=0x0 power=0x0 power_s=0x0 rtc_enable=0x0 pmic_mask0=0x0 pmic_mask1=0x0 pmic_status0=0x0 pmic_status1=0x0 reset_resume_entry=0x0 sleep_timer=0 watchdog_timer=0 pcm_control1=0x0 clock_control=0x0 ca7_cache_config=0x0 retention=stock_internal_sram_warm_reset",
+      "same_boot": true,
+      "taint": "0",
+      "ext4_errors": {
+        "/sys/fs/ext4/mmcblk0p5/errors_count": "0",
+        "/sys/fs/ext4/mmcblk0p7/errors_count": "0",
+        "/sys/fs/ext4/mmcblk1p1/errors_count": "0"
+      },
+      "expected_outcome": "stage_return"
+    },
+    "pm-platform-battery": {
+      "generic_verdict": {
+        "wake_sources": [],
+        "pass": true,
+        "deep_resume": false,
+        "checks": {
+          "same_boot": true,
+          "untainted": true,
+          "helper_returned": true,
+          "kernel_exit": true,
+          "pm_test_restored": true,
+          "no_deep_entry": true,
+          "filesystem:/sys/fs/ext4/mmcblk0p5/errors_count": true,
+          "filesystem:/sys/fs/ext4/mmcblk0p7/errors_count": true,
+          "filesystem:/sys/fs/ext4/mmcblk1p1/errors_count": true
+        }
+      },
+      "helper_return": 0,
+      "kernel_journal": "valid=1 sequence=79 stage=COMPLETE failed_stage=NONE error=0 wake=0x0 r13=0x0 raw=0x0 pcm_pointer=0x0 pcm_length=0 wake_mask=0x0 boot_vector=0x0 boot_enable=0x0 cirq=0x0 fsm=0x0 power=0x0 power_s=0x0 rtc_enable=0x4 pmic_mask0=0x420 pmic_mask1=0x10 pmic_status0=0x0 pmic_status1=0x0 reset_resume_entry=0x0 sleep_timer=0 watchdog_timer=0 pcm_control1=0x0 clock_control=0x0 ca7_cache_config=0x0 retention=stock_internal_sram_warm_reset",
+      "same_boot": true,
+      "taint": "0",
+      "ext4_errors": {
+        "/sys/fs/ext4/mmcblk0p5/errors_count": "0",
+        "/sys/fs/ext4/mmcblk0p7/errors_count": "0",
+        "/sys/fs/ext4/mmcblk1p1/errors_count": "0"
+      },
+      "expected_outcome": "stage_return"
+    },
+    "pm-processors-battery": {
+      "generic_verdict": {
+        "wake_sources": [],
+        "pass": true,
+        "deep_resume": false,
+        "checks": {
+          "same_boot": true,
+          "untainted": true,
+          "helper_returned": true,
+          "kernel_exit": true,
+          "pm_test_restored": true,
+          "no_deep_entry": true,
+          "filesystem:/sys/fs/ext4/mmcblk0p5/errors_count": true,
+          "filesystem:/sys/fs/ext4/mmcblk0p7/errors_count": true,
+          "filesystem:/sys/fs/ext4/mmcblk1p1/errors_count": true
+        }
+      },
+      "helper_return": 0,
+      "kernel_journal": "valid=1 sequence=107 stage=COMPLETE failed_stage=NONE error=0 wake=0x0 r13=0x0 raw=0x0 pcm_pointer=0x0 pcm_length=0 wake_mask=0x0 boot_vector=0x0 boot_enable=0x0 cirq=0x0 fsm=0x0 power=0x0 power_s=0x0 rtc_enable=0x4 pmic_mask0=0x420 pmic_mask1=0x10 pmic_status0=0x0 pmic_status1=0x0 reset_resume_entry=0x0 sleep_timer=0 watchdog_timer=0 pcm_control1=0x0 clock_control=0x0 ca7_cache_config=0x0 retention=stock_internal_sram_warm_reset",
+      "same_boot": true,
+      "taint": "0",
+      "ext4_errors": {
+        "/sys/fs/ext4/mmcblk0p5/errors_count": "0",
+        "/sys/fs/ext4/mmcblk0p7/errors_count": "0",
+        "/sys/fs/ext4/mmcblk1p1/errors_count": "0"
+      },
+      "expected_outcome": "stage_return"
+    },
+    "pm-core-battery": {
+      "generic_verdict": {
+        "wake_sources": [],
+        "pass": true,
+        "deep_resume": false,
+        "checks": {
+          "same_boot": true,
+          "untainted": true,
+          "helper_returned": true,
+          "kernel_exit": true,
+          "pm_test_restored": true,
+          "no_deep_entry": true,
+          "filesystem:/sys/fs/ext4/mmcblk0p5/errors_count": true,
+          "filesystem:/sys/fs/ext4/mmcblk0p7/errors_count": true,
+          "filesystem:/sys/fs/ext4/mmcblk1p1/errors_count": true
+        }
+      },
+      "helper_return": 0,
+      "kernel_journal": "valid=1 sequence=137 stage=COMPLETE failed_stage=NONE error=0 wake=0x0 r13=0x0 raw=0x0 pcm_pointer=0x0 pcm_length=0 wake_mask=0x0 boot_vector=0x0 boot_enable=0x0 cirq=0x0 fsm=0x0 power=0x0 power_s=0x0 rtc_enable=0x4 pmic_mask0=0x420 pmic_mask1=0x10 pmic_status0=0x0 pmic_status1=0x0 reset_resume_entry=0x0 sleep_timer=0 watchdog_timer=0 pcm_control1=0x0 clock_control=0x0 ca7_cache_config=0x0 retention=stock_internal_sram_warm_reset",
+      "same_boot": true,
+      "taint": "0",
+      "ext4_errors": {
+        "/sys/fs/ext4/mmcblk0p5/errors_count": "0",
+        "/sys/fs/ext4/mmcblk0p7/errors_count": "0",
+        "/sys/fs/ext4/mmcblk1p1/errors_count": "0"
+      },
+      "expected_outcome": "stage_return"
+    }
+  },
+  "full_rtc": {
+    "alarm_seconds_requested": 12,
+    "launches": 1,
+    "boot_after": "88b85fa3-2282-4d93-b0b8-818a105ddd0a",
+    "result": "FAIL_RESET_RECOVERY_NEW_BOOT",
+    "same_boot": false,
+    "retained_journal": "valid=1 sequence=175 stage=DEVICES_RESUMING failed_stage=NONE error=0 wake=0x20 r13=0xe8060000 raw=0x20 pcm_pointer=0x84864000 pcm_length=596 wake_mask=0xfedfbfdb boot_vector=0x80483fa0 boot_enable=0x80000000 cirq=0x3 fsm=0x50640 power=0x314c power_s=0x314c rtc_enable=0x5 pmic_mask0=0x420 pmic_mask1=0x10 pmic_status0=0x0 pmic_status1=0x0 reset_resume_entry=0x59325253 sleep_timer=19660800 watchdog_timer=20643840 pcm_control1=0xd68 clock_control=0x80008270 ca7_cache_config=0x60 retention=stock_internal_sram_warm_reset",
+    "retained_ring_header": "ring=valid cycle=138 last=7422 backstop_s=30",
+    "retained_ring_tail": [
+      "7399 phase=7 leave result=0 ms=10259441 device=1400c000.dsi",
+      "7400 phase=7 enter result=0 ms=10259442 device=audio-controller",
+      "7401 phase=7 leave result=0 ms=10259442 device=audio-controller",
+      "7402 phase=7 enter result=0 ms=10259442 device=11007000.i2c",
+      "7403 phase=7 leave result=0 ms=10259442 device=11007000.i2c",
+      "7404 phase=7 enter result=0 ms=10259442 device=11008000.i2c",
+      "7405 phase=7 leave result=0 ms=10259442 device=11008000.i2c",
+      "7406 phase=7 enter result=0 ms=10259443 device=0-0051",
+      "7407 phase=7 enter result=0 ms=10259443 device=1-0030",
+      "7408 phase=7 leave result=0 ms=10259443 device=0-0051",
+      "7409 phase=7 enter result=0 ms=10259443 device=input2",
+      "7410 phase=7 leave result=0 ms=10259444 device=input2",
+      "7411 phase=7 enter result=0 ms=10259444 device=input3",
+      "7412 phase=7 leave result=0 ms=10259444 device=input3",
+      "7413 phase=7 enter result=0 ms=10259444 device=1400c000.dsi.0",
+      "7414 phase=7 leave result=0 ms=10259444 device=1400c000.dsi.0",
+      "7415 phase=7 enter result=0 ms=10259444 device=11230000.mmc",
+      "7416 phase=7 leave result=0 ms=10259444 device=11230000.mmc",
+      "7417 phase=7 enter result=0 ms=10259445 device=11240000.mmc",
+      "7418 phase=7 leave result=0 ms=10259445 device=11240000.mmc",
+      "7419 phase=7 enter result=0 ms=10259445 device=mmc0:0001",
+      "7420 phase=7 enter result=0 ms=10259445 device=mmc1:aaaa",
+      "7421 phase=7 leave result=0 ms=10259445 device=mmc0:0001",
+      "7422 phase=7 leave result=0 ms=10259445 device=mmc1:aaaa"
+    ],
+    "unmatched_callback": {
+      "device": "1-0030",
+      "identity": "CS43131",
+      "phase": 7,
+      "enter_sequence": 7407,
+      "leave_observed": false
+    },
+    "rtc_child_irq_delta": "not recoverable across reset",
+    "sleep_duration_s": null,
+    "power_trial": "NOT_RUN",
+    "five_cycles": "NOT_RUN",
+    "ten_cycles": "NOT_RUN",
+    "long_residence": "NOT_RUN",
+    "watchdog_backstop_s": 30,
+    "decoded_reset_cause": null
+  },
+  "storage": {
+    "create": {
+      "mode": "create",
+      "boot": "27e6d684-3794-4490-95db-a489027cd4f4",
+      "files": [
+        {
+          "path": "/data/.suspend-platform-3bb31fcb02154d1a84e06236a9589b20/fixture.bin",
+          "bytes": 65536,
+          "sha256": "7daca2095d0438260fa849183dfc67faa459fdf4936e1bc91eec6b281b27e4c2",
+          "read_method": "O_DIRECT aligned preadv"
+        },
+        {
+          "path": "/media/sd/.suspend-platform-3bb31fcb02154d1a84e06236a9589b20/fixture.bin",
+          "bytes": 65536,
+          "sha256": "7daca2095d0438260fa849183dfc67faa459fdf4936e1bc91eec6b281b27e4c2",
+          "read_method": "O_DIRECT aligned preadv"
+        }
+      ],
+      "ext4_errors": {
+        "/sys/fs/ext4/mmcblk1p1/errors_count": "0",
+        "/sys/fs/ext4/mmcblk0p7/errors_count": "0",
+        "/sys/fs/ext4/mmcblk0p5/errors_count": "0"
+      }
+    },
+    "read": {
+      "mode": "read",
+      "boot": "88b85fa3-2282-4d93-b0b8-818a105ddd0a",
+      "files": [
+        {
+          "path": "/data/.suspend-platform-3bb31fcb02154d1a84e06236a9589b20/fixture.bin",
+          "bytes": 65536,
+          "sha256": "7daca2095d0438260fa849183dfc67faa459fdf4936e1bc91eec6b281b27e4c2",
+          "read_method": "O_DIRECT aligned preadv"
+        },
+        {
+          "path": "/media/sd/.suspend-platform-3bb31fcb02154d1a84e06236a9589b20/fixture.bin",
+          "bytes": 65536,
+          "sha256": "7daca2095d0438260fa849183dfc67faa459fdf4936e1bc91eec6b281b27e4c2",
+          "read_method": "O_DIRECT aligned preadv"
+        }
+      ],
+      "ext4_errors": {
+        "/sys/fs/ext4/mmcblk1p1/errors_count": "0",
+        "/sys/fs/ext4/mmcblk0p7/errors_count": "0",
+        "/sys/fs/ext4/mmcblk0p5/errors_count": "0"
+      }
+    },
+    "cleanup": {
+      "mode": "cleanup",
+      "boot": "88b85fa3-2282-4d93-b0b8-818a105ddd0a",
+      "files": [
+        {
+          "path": "/data/.suspend-platform-3bb31fcb02154d1a84e06236a9589b20/fixture.bin",
+          "removed": true
+        },
+        {
+          "path": "/media/sd/.suspend-platform-3bb31fcb02154d1a84e06236a9589b20/fixture.bin",
+          "removed": true
+        }
+      ],
+      "ext4_errors": {
+        "/sys/fs/ext4/mmcblk1p1/errors_count": "0",
+        "/sys/fs/ext4/mmcblk0p7/errors_count": "0",
+        "/sys/fs/ext4/mmcblk0p5/errors_count": "0"
+      }
+    }
+  },
+  "source_not_installed": true,
+  "no_flash_no_push": true,
+  "standby_current_ua": null,
+  "verdict": "MORE_WORK_REQUIRED",
+  "raw_receipt_sha256": {
+    "out/platform-v1-suspend/rtc-awake.json": "2611f497db6ae1154b50003fc766e6c520ffa8c46260a3e655c47849690feb87",
+    "out/platform-v1-suspend/pm-freezer-charging/result.json": "6b836410f7c48c5d1a2b4f7dbc2d3cea68943f8c4e91538f17f5e22bc8acdbe3",
+    "out/platform-v1-suspend/pm-devices-charging/result.json": "655c4095b06550abcac01c9d41350dc0e9fbddf8c0f00fec5eae4e91ce2b29e1",
+    "out/platform-v1-suspend/pm-devices-battery/result.json": "676de547aa6f215d5788f3a68818d7b6fe9fcc829edb10354e7fe225e8be274c",
+    "out/platform-v1-suspend/pm-platform-battery/result.json": "802c2500dea2946e027000ef0543d2a02254d0e8521ab5247ef86b3dd9f2eaa3",
+    "out/platform-v1-suspend/pm-processors-battery/result.json": "8e5a9203258ab804c799c3b43ba9f39eed598b634dd0a62baa2068d64cb28f29",
+    "out/platform-v1-suspend/pm-core-battery/result.json": "c08185dcf8e1721fb5e10dea559cb6c785d096b2f835b3d6f213b82a695c0e11",
+    "out/platform-v1-suspend/full-rtc-01/inspect.txt": "31ef8583356132572a40c2b72e71ed0304c7cb06d4bb6605688f0384473cd03b",
+    "out/platform-v1-suspend/full-rtc-01/launch.json": "0b5d0ec3b58c54dc4d4ed5d38853fdbb5330450e45e46ee8ca7df3289d81515c",
+    "out/platform-v1-suspend/full-rtc-01/no-return.txt": "1b9a375c57dd33bd913e3b2459660385c665c11a3de03f996b9271c886291504",
+    "out/platform-v1-suspend/full-rtc-01/recovery-usb.txt": "e0724224435ce31e86f584c9faea2011ccf681f2eabf39889e51ca2f9e366797",
+    "out/platform-v1-suspend/full-rtc-01/recovery-status.txt": "526a0b35b0f6b50da5861108fd097a7ba3833357a84eef6d6b4581943d9c3509",
+    "out/platform-v1-suspend/full-rtc-01/cleanup-status.txt": "1fedd79ea115cfa433bf62973fbcda70fcac666d65c96a6ecec826b6dcae0973",
+    "out/platform-v1-suspend/storage-create.json": "a1a47efdb6a410e8af08a2795237891c5d44ac81f281b8942b3f8183b9f43a8e",
+    "out/platform-v1-suspend/storage-read.json": "190eff2c3f4fdd5542cab8ee726361429de33b65dd8309382d68b2a075196bfa",
+    "out/platform-v1-suspend/storage-cleanup.json": "31bcfad0cb6bc7cb2195d0f80aed3de43e7dbd9bcbd1f3f88d80fc7106f7105a"
+  },
+  "rtc_awake": {
+    "kind": "awake_alarm",
+    "boot_before": "27e6d684-3794-4490-95db-a489027cd4f4",
+    "irq_before": 0,
+    "rtc_before": "1791118554",
+    "armed": "1791118562",
+    "irq_after": 1,
+    "rtc_after": "1791118562",
+    "alarm_after_irq": "",
+    "boot_after": "27e6d684-3794-4490-95db-a489027cd4f4",
+    "alarm_after_clear": "",
+    "pass": true,
+    "program_return": 0,
+    "clear_return": 0
+  }
+}

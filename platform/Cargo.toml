@@ -1,0 +1,36 @@
+# The on-device platform service in Rust (docs/planning/PLATFORM-RUST-PORT-PLAN.md). The `y2-platform`
+# binary is installed as /usr/sbin/y2-platform; subcommands not ported yet run the Python platform.
+[workspace]
+resolver = "2"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.99"
+license = "GPL-2.0-only"
+
+[workspace.dependencies]
+# The same pins as Y2Reborn (its vendor/ holds the same sources).
+serde = { version = "=1.0.228", features = ["derive"] }
+# float_roundtrip: a number read back from /data is the f64 that was written; without it about 1 in 450
+# reads was one ULP off, and a reset plan (signed as read) refused as reset_plan_changed.
+serde_json = { version = "=1.0.145", features = ["preserve_order", "float_roundtrip"] }
+libc = "=0.2.177"
+ryu = "=1.0.23"
+# The error-report scrubber (report.py) is regular expressions; Rust regex has no lookbehind, which the
+# port spells out by hand.
+regex = { version = "=1.13.1", default-features = false, features = ["std", "unicode", "perf"] }
+# Report archives, retained boot evidence (gzip/tar as Reborn's pins) and the hashes the records carry.
+flate2 = { version = "=1.1.5", default-features = false, features = ["rust_backend"] }
+tar = { version = "=0.4.44", default-features = false }
+sha2 = { version = "=0.10.9", default-features = false }
+hmac = "=0.12.1"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = "debuginfo"
+# Nothing catches a panic: a bug ends the command like an uncaught Python exception (exit != 0).
+panic = "abort"

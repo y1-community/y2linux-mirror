@@ -1,0 +1,15 @@
+{
+ "argv": [
+  "collect",
+  "--seconds",
+  "99999999999999999999"
+ ],
+ "calls": [],
+ "exit": 2,
+ "stdout": [],
+ "tree": {
+  "added": {},
+  "changed": {},
+  "removed": []
+ }
+}

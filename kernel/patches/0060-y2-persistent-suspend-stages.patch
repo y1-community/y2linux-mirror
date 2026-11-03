@@ -1,0 +1,155 @@
+--- a/kernel/power/suspend.c
++++ b/kernel/power/suspend.c
+@@ -24,6 +24,7 @@
+ #include <linux/slab.h>
+ #include <linux/export.h>
+ #include <linux/suspend.h>
++#include "/project/kernel/platform/pm-journal.h"
+ #include <linux/syscore_ops.h>
+ #include <linux/swait.h>
+ #include <linux/ftrace.h>
+@@ -348,6 +349,7 @@
+ 		pr_info("suspend debug: Waiting for %d second(s).\n",
+ 				pm_test_delay);
+ 		mdelay(pm_test_delay * 1000);
++		y2_pm_mark(Y2_PM_TEST_RETURN, 0);
+ 		return 1;
+ 	}
+ #endif /* !CONFIG_PM_DEBUG */
+@@ -379,6 +381,7 @@
+ 	trace_suspend_resume(TPS("freeze_processes"), 0, true);
+ 	error = suspend_freeze_processes();
+ 	trace_suspend_resume(TPS("freeze_processes"), 0, false);
++	y2_pm_mark(Y2_PM_TASKS_FROZEN, error);
+ 	if (!error)
+ 		return 0;
+ 
+@@ -418,6 +421,7 @@
+ 		goto Platform_finish;
+ 
+ 	error = dpm_suspend_late(PMSG_SUSPEND);
++	y2_pm_mark(Y2_PM_LATE_SUSPENDED, error);
+ 	if (error) {
+ 		pr_err("late suspend of devices failed\n");
+ 		goto Platform_finish;
+@@ -427,6 +431,7 @@
+ 		goto Devices_early_resume;
+ 
+ 	error = dpm_suspend_noirq(PMSG_SUSPEND);
++	y2_pm_mark(Y2_PM_NOIRQ_SUSPENDED, error);
+ 	if (error) {
+ 		pr_err("noirq suspend of devices failed\n");
+ 		goto Platform_early_resume;
+@@ -443,7 +448,9 @@
+ 		goto Platform_wake;
+ 	}
+ 
++	y2_pm_mark(Y2_PM_SECONDARIES_DISABLING, 0);
+ 	error = pm_sleep_disable_secondary_cpus();
++	y2_pm_mark(Y2_PM_SECONDARIES_OFF, error);
+ 	if (error || suspend_test(TEST_CPUS))
+ 		goto Enable_cpus;
+ 
+@@ -453,9 +460,11 @@
+ 	system_state = SYSTEM_SUSPEND;
+ 
+ 	error = syscore_suspend();
++	y2_pm_mark(Y2_PM_SYSCORE_SUSPENDED, error);
+ 	if (!error) {
+ 		*wakeup = pm_wakeup_pending();
+ 		if (!(suspend_test(TEST_CORE) || *wakeup)) {
++			y2_pm_mark(Y2_PM_PLATFORM_ENTER, 0);
+ 			trace_suspend_resume(TPS("machine_suspend"),
+ 				state, true);
+ 			error = suspend_ops->enter(state);
+@@ -465,6 +474,7 @@
+ 			error = -EBUSY;
+ 		}
+ 		syscore_resume();
++		y2_pm_mark(Y2_PM_TIMER_RESTORED, error);
+ 	}
+ 
+ 	system_state = SYSTEM_RUNNING;
+@@ -474,6 +484,7 @@
+ 
+  Enable_cpus:
+ 	pm_sleep_enable_secondary_cpus();
++	y2_pm_mark(Y2_PM_SECONDARIES_ON, error);
+ 
+  Platform_wake:
+ 	platform_resume_noirq(state);
+@@ -508,6 +519,7 @@
+ 		pm_set_suspend_no_platform();
+ 
+ 	error = platform_suspend_begin(state);
++	y2_pm_mark(Y2_PM_PLATFORM_BEGIN, error);
+ 	if (error)
+ 		goto Close;
+ 
+@@ -518,6 +530,7 @@
+ 		pr_err("Some devices failed to suspend, or early wake event detected\n");
+ 		goto Recover_platform;
+ 	}
++	y2_pm_mark(Y2_PM_DEVICES_SUSPENDED, 0);
+ 	suspend_test_finish("suspend devices");
+ 	if (suspend_test(TEST_DEVICES))
+ 		goto Recover_platform;
+@@ -527,15 +540,19 @@
+ 	} while (!error && !wakeup && platform_suspend_again(state));
+ 
+  Resume_devices:
++	y2_pm_mark(Y2_PM_DEVICES_RESUMING, error);
+ 	suspend_test_start();
+ 	dpm_resume_end(PMSG_RESUME);
++	y2_pm_mark(Y2_PM_DEVICES_RESUMED, error);
+ 	suspend_test_finish("resume devices");
+ 	trace_suspend_resume(TPS("console_resume_all"), state, true);
+ 	console_resume_all();
++	y2_pm_mark(Y2_PM_CONSOLE_RESUMED, error);
+ 	trace_suspend_resume(TPS("console_resume_all"), state, false);
+ 
+  Close:
+ 	platform_resume_end(state);
++	y2_pm_mark(Y2_PM_PLATFORM_ENDED, error);
+ 	pm_suspend_target_state = PM_SUSPEND_ON;
+ 	return error;
+ 
+@@ -553,9 +570,13 @@
+ static void suspend_finish(void)
+ {
+ 	suspend_thaw_processes();
++	y2_pm_mark(Y2_PM_TASKS_THAWED, 0);
+ 	filesystems_thaw();
++	y2_pm_mark(Y2_PM_FILESYSTEMS_THAWED, 0);
+ 	pm_notifier_call_chain(PM_POST_SUSPEND);
++	y2_pm_mark(Y2_PM_POST_SUSPEND_NOTIFIED, 0);
+ 	pm_restore_console();
++	y2_pm_mark(Y2_PM_CONSOLE_RESTORED, 0);
+ }
+ 
+ /**
+@@ -590,6 +611,7 @@
+ 	if (sync_on_suspend_enabled) {
+ 		trace_suspend_resume(TPS("sync_filesystems"), 0, true);
+ 		ksys_sync_helper();
++		y2_pm_mark(Y2_PM_FILESYSTEM_SYNCED, 0);
+ 		trace_suspend_resume(TPS("sync_filesystems"), 0, false);
+ 	}
+ 
+@@ -629,8 +651,16 @@
+ 	if (state <= PM_SUSPEND_ON || state >= PM_SUSPEND_MAX)
+ 		return -EINVAL;
+ 
++	y2_pm_mark(Y2_PM_SUSPEND_REQUEST, 0);
++#ifdef CONFIG_PM_DEBUG
++	y2_pm_backstop_begin(pm_test_level != TEST_NONE);
++#else
++	y2_pm_backstop_begin(false);
++#endif
+ 	pr_info("suspend entry (%s)\n", mem_sleep_labels[state]);
+ 	error = enter_state(state);
++	y2_pm_mark(Y2_PM_EXIT, error);
++	y2_pm_backstop_end();
+ 	dpm_save_errno(error);
+ 	pr_info("suspend exit\n");
+ 	return error;

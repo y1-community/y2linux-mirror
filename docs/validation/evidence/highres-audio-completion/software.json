@@ -1,0 +1,411 @@
+{
+  "schema": "org.y2linux.highres-software/v1",
+  "checks": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.39,
+      "log": "out/highres-audio/software/reborn-0.log",
+      "result": "PASS"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 5.13,
+      "log": "out/highres-audio/software/reborn-1.log",
+      "result": "PASS"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--locked"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 31.33,
+      "log": "out/highres-audio/software/reborn-2.log",
+      "result": "PASS"
+    },
+    {
+      "command": [
+        "sh",
+        "tools/build/cross.sh"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 14.14,
+      "log": "out/highres-audio/software/reborn-3.log",
+      "result": "PASS"
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_highres_observations.py",
+        "-v"
+      ],
+      "exit": 0,
+      "result": "PASS",
+      "elapsed_seconds": 0.22,
+      "output": "test_live_fixture_cli_succeeds_without_playing (test_highres_observations.WiredPrecisionObservations.test_live_fixture_cli_succeeds_without_playing) ... ok\ntest_live_fixtures_distinguish_low_bits_and_pack_signed_channels (test_highres_observations.WiredPrecisionObservations.test_live_fixtures_distinguish_low_bits_and_pack_signed_channels) ... ok\ntest_neutral_software_24_bit_outputs_keep_exact_signed_low_bits (test_highres_observations.WiredPrecisionObservations.test_neutral_software_24_bit_outputs_keep_exact_signed_low_bits) ... ok\ntest_physical_dma_equals_final_membrane_and_dac_is_16_bit (test_highres_observations.WiredPrecisionObservations.test_physical_dma_equals_final_membrane_and_dac_is_16_bit) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.178s\n\nOK\n"
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_audio*.py",
+        "-v"
+      ],
+      "exit": 0,
+      "result": "PASS",
+      "elapsed_seconds": 0.21,
+      "output": "test_real_trigger_irq_and_dma_bounds (test_audio.AFE.test_real_trigger_irq_and_dma_bounds) ... ok\ntest_resolved_audio_dt_rejects_unsafe_rails (test_audio.AFE.test_resolved_audio_dt_rejects_unsafe_rails) ... ok\ntest_startup_accepts_positive_constraint_success (test_audio.AFE.test_startup_accepts_positive_constraint_success) ... ok\ntest_exact_low_bits_at_all_supported_fixture_rates (test_audio_capture.Capture.test_exact_low_bits_at_all_supported_fixture_rates) ... ok\ntest_audio_mux_masks (test_audio_clocks.AudioClocks.test_audio_mux_masks) ... ok\ntest_idle_configured_and_running_driver_contract (test_audio_precision_contract.PrecisionContract.test_idle_configured_and_running_driver_contract) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.162s\n\nOK\n"
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_dev_abi.py",
+        "-v"
+      ],
+      "exit": 0,
+      "result": "PASS",
+      "elapsed_seconds": 0.13,
+      "output": "test_failed_child_keeps_root_handoff_disabled (test_dev_abi.UserspaceABI.test_failed_child_keeps_root_handoff_disabled) ... ok\ntest_required_abi_and_framebuffer_support (test_dev_abi.UserspaceABI.test_required_abi_and_framebuffer_support) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.050s\n\nOK\n"
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_production*.py",
+        "-v"
+      ],
+      "exit": 0,
+      "result": "PASS",
+      "elapsed_seconds": 1.39,
+      "output": "test_explicit_rescue_never_mounts_a_filesystem (test_production_handover.Handover.test_explicit_rescue_never_mounts_a_filesystem) ... ok\ntest_failed_exec_restores_mounts_and_enters_rescue (test_production_handover.Handover.test_failed_exec_restores_mounts_and_enters_rescue) ... ok\ntest_failed_mount_move_rolls_back_before_rescue (test_production_handover.Handover.test_failed_mount_move_rolls_back_before_rescue) ... ok\ntest_missing_identity_schema_and_fsck_stay_in_rescue (test_production_handover.Handover.test_missing_identity_schema_and_fsck_stay_in_rescue) ... ok\ntest_no_sd_root_data_mounts_then_switch_root (test_production_handover.Handover.test_no_sd_root_data_mounts_then_switch_root) ... ok\ntest_torn_root_recovery_precedes_normal_identity_and_failed_restore_stays_in_ram (test_production_handover.Handover.test_torn_root_recovery_precedes_normal_identity_and_failed_restore_stays_in_ram) ... ok\ntest_locked_archive_extraction_and_corruption_rejection (test_production_prepare.Prepare.test_locked_archive_extraction_and_corruption_rejection) ... ok\ntest_data_partition_geometry_identity_and_number_independence (test_production_storage.RootResolver.test_data_partition_geometry_identity_and_number_independence) ... ok\ntest_exact_internal_geometry_without_fixed_number (test_production_storage.RootResolver.test_exact_internal_geometry_without_fixed_number) ... ok\ntest_full_physical_disk_capacity (test_production_storage.RootResolver.test_full_physical_disk_capacity) ... ok\ntest_mismatched_capacity (test_production_storage.RootResolver.test_mismatched_capacity) ... ok\ntest_removable_clone_never_selected (test_production_storage.RootResolver.test_removable_clone_never_selected) ... ok\ntest_shifted_partition (test_production_storage.RootResolver.test_shifted_partition) ... ok\ntest_wrong_identity_and_duplicates (test_production_storage.RootResolver.test_wrong_identity_and_duplicates) ... ok\ntest_wrong_size (test_production_storage.RootResolver.test_wrong_size) ... ok\ntest_ext_csd_cannot_select_boot_rpmb_or_change_boot_config (test_production_storage.StorageGuard.test_ext_csd_cannot_select_boot_rpmb_or_change_boot_config) ... ok\ntest_real_request_guard_completes_hsq_rejections (test_production_storage.StorageGuard.test_real_request_guard_completes_hsq_rejections) ... ok\ntest_write_bounds_and_protected_exclusions (test_production_storage.StorageGuard.test_write_bounds_and_protected_exclusions) ... ok\ntest_boot_only_profile_preserves_all_stock_fields (test_production_storage.Transport.test_boot_only_profile_preserves_all_stock_fields) ... ok\ntest_classified_partitions_and_target_math (test_production_storage.Transport.test_classified_partitions_and_target_math) ... ok\ntest_sparse_defined_bytes_and_truncation (test_production_storage.Transport.test_sparse_defined_bytes_and_truncation) ... ok\ntest_spft_scatter_maps_raw_images_only (test_production_storage.Transport.test_spft_scatter_maps_raw_images_only) ... ok\n\n----------------------------------------------------------------------\nRan 22 tests in 1.328s\n\nOK\n"
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_suspend_audio.py",
+        "-v"
+      ],
+      "exit": 0,
+      "result": "PASS",
+      "elapsed_seconds": 0.11,
+      "output": "test_reset_state_and_rail_references_survive_suspend_refusal (test_suspend_audio.CodecSleepUnwind.test_reset_state_and_rail_references_survive_suspend_refusal) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.071s\n\nOK\n"
+    },
+    {
+      "command": [
+        "python3",
+        "tools/build/check_config.py",
+        "out/highres-observer-build/kernel/.config",
+        "kernel/config/production.config"
+      ],
+      "exit": 0,
+      "result": "PASS",
+      "elapsed_seconds": 0.02,
+      "output": "Reviewed kernel configuration matches D08 and platform fragment.\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "result": "PASS",
+      "elapsed_seconds": 0.03,
+      "output": ""
+    },
+    {
+      "command": [
+        "make",
+        "-C",
+        "/src",
+        "O=/build/kernel",
+        "-j8",
+        "zImage",
+        "modules",
+        "dtbs"
+      ],
+      "result": "PASS",
+      "exit": 0,
+      "log": "out/highres-observer-build/kernel-build.log",
+      "scope": "Exact running configuration in isolated build copy; built-in audio source unchanged"
+    },
+    {
+      "command": [
+        "make",
+        "-C",
+        "/src",
+        "O=/build/kernel",
+        "M=/build/observer",
+        "modules"
+      ],
+      "result": "PASS",
+      "exit": 0,
+      "scope": "Read-only observer and v2, matching6.18.0-y2linux-platform-v1-baseline-01; loaded without forcing"
+    },
+    {
+      "command": [
+        "Y2_DTS=innioasis-y2-production.dts",
+        "sh",
+        "tools/build/dtb.sh"
+      ],
+      "result": "PASS",
+      "exit": 0,
+      "log": "out/highres-observer-build/dt-build.log"
+    },
+    {
+      "command": [
+        "arm-linux-gcc",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "tools/build/precision-probe.c"
+      ],
+      "result": "PASS",
+      "exit": 0,
+      "scope": "Matching production SDK/FFmpeg;18 native software probe cases on Y2"
+    },
+    {
+      "command": [
+        "qemu-arm",
+        "-cpu",
+        "cortex-a7",
+        "-L",
+        "<matching ARM root>",
+        "precision-probe",
+        "lowbits-24-48000.wav",
+        "48000",
+        "3",
+        "qemu-s24.raw"
+      ],
+      "result": "PASS",
+      "exit": 0,
+      "scope": "Exact first512-byte match with live native probe; not physical output"
+    }
+  ],
+  "reborn_tests_passed": 324,
+  "kernel_config_sha256": "368105827a8c70ddfcec9a95ffc425bad27e21b4f4bda6ae8dedb11f3890fe0a",
+  "package_validation": "NOT_APPLICABLE_NO_NEW_PRODUCT_IMAGE",
+  "candidate_created": false,
+  "builtin_audio_modified": false,
+  "product_dsp_modified": false,
+  "documented_probe_build_verified": true,
+  "artifacts": {
+    "observer": {
+      "sha256": "fe090d9c54cf67ef363f1e5eedf8908094d260ee16421aec16599eb74cb267b2",
+      "path": "out/highres-audio/software/observer-initial.ko"
+    },
+    "native_probe": {
+      "sha256": "0b5b1a452bae1896a31d94834db74667ab6d745fe10469a057aa60d0114dbdd9",
+      "path": "out/highres-audio/precision-probe"
+    },
+    "documented_probe": {
+      "sha256": "d4565cd3e3c087b04859b18e5c7aab68723d37e56602dfa3354c2095766bd4e0",
+      "path": "out/highres-audio/precision-probe-documented"
+    },
+    "production_dtb": {
+      "sha256": "ca9891ddf64c7f0004940d3e9525232d56349962780be1b968539849e9129501",
+      "path": "out/highres-observer-build/y2.dtb"
+    }
+  },
+  "native_probe_cases": [
+    {
+      "source_bits": 16,
+      "rate_hz": 44100,
+      "format_id": 1,
+      "bytes": 512,
+      "sha256": "415ff712fa45ce9020748e43b6fa786f54b4a22a8b7c918b4f00949b666269be",
+      "physical_output": false
+    },
+    {
+      "source_bits": 16,
+      "rate_hz": 44100,
+      "format_id": 2,
+      "bytes": 512,
+      "sha256": "1ac5bf1948a31141f3909f61bb0301c69df26da852f663919ceee9c4d86362ee",
+      "physical_output": false
+    },
+    {
+      "source_bits": 16,
+      "rate_hz": 44100,
+      "format_id": 3,
+      "bytes": 512,
+      "sha256": "ce815bd0bf9a9d521758ed856711d5de165c9f50d5543f70208362d7aba30adf",
+      "physical_output": false
+    },
+    {
+      "source_bits": 16,
+      "rate_hz": 48000,
+      "format_id": 1,
+      "bytes": 512,
+      "sha256": "415ff712fa45ce9020748e43b6fa786f54b4a22a8b7c918b4f00949b666269be",
+      "physical_output": false
+    },
+    {
+      "source_bits": 16,
+      "rate_hz": 48000,
+      "format_id": 2,
+      "bytes": 512,
+      "sha256": "1ac5bf1948a31141f3909f61bb0301c69df26da852f663919ceee9c4d86362ee",
+      "physical_output": false
+    },
+    {
+      "source_bits": 16,
+      "rate_hz": 48000,
+      "format_id": 3,
+      "bytes": 512,
+      "sha256": "ce815bd0bf9a9d521758ed856711d5de165c9f50d5543f70208362d7aba30adf",
+      "physical_output": false
+    },
+    {
+      "source_bits": 24,
+      "rate_hz": 44100,
+      "format_id": 1,
+      "bytes": 512,
+      "sha256": "4f36e21c71a58dddb8ff7744f5572dfb24d4b234d8299a2650aa51849c00fcd5",
+      "physical_output": false
+    },
+    {
+      "source_bits": 24,
+      "rate_hz": 44100,
+      "format_id": 2,
+      "bytes": 512,
+      "sha256": "7413ee72f7debeadc0615be75bf3589729724fb1c8199b0d9a30335f0feafab7",
+      "physical_output": false
+    },
+    {
+      "source_bits": 24,
+      "rate_hz": 44100,
+      "format_id": 3,
+      "bytes": 512,
+      "sha256": "3fbf4991311e87325cc9285ae9e6aed8359f8d82314ae6de4e59821395697122",
+      "physical_output": false
+    },
+    {
+      "source_bits": 24,
+      "rate_hz": 48000,
+      "format_id": 1,
+      "bytes": 512,
+      "sha256": "4f36e21c71a58dddb8ff7744f5572dfb24d4b234d8299a2650aa51849c00fcd5",
+      "physical_output": false
+    },
+    {
+      "source_bits": 24,
+      "rate_hz": 48000,
+      "format_id": 2,
+      "bytes": 512,
+      "sha256": "7413ee72f7debeadc0615be75bf3589729724fb1c8199b0d9a30335f0feafab7",
+      "physical_output": false
+    },
+    {
+      "source_bits": 24,
+      "rate_hz": 48000,
+      "format_id": 3,
+      "bytes": 512,
+      "sha256": "3fbf4991311e87325cc9285ae9e6aed8359f8d82314ae6de4e59821395697122",
+      "physical_output": false
+    },
+    {
+      "source_bits": 32,
+      "rate_hz": 44100,
+      "format_id": 1,
+      "bytes": 512,
+      "sha256": "4f36e21c71a58dddb8ff7744f5572dfb24d4b234d8299a2650aa51849c00fcd5",
+      "physical_output": false
+    },
+    {
+      "source_bits": 32,
+      "rate_hz": 44100,
+      "format_id": 2,
+      "bytes": 512,
+      "sha256": "77fab0af2a53d723ecd806cd609da32fc6b669a425c25fb191786141d9b463b4",
+      "physical_output": false
+    },
+    {
+      "source_bits": 32,
+      "rate_hz": 44100,
+      "format_id": 3,
+      "bytes": 512,
+      "sha256": "eecda0e90305fe4ae48be090713ce474ce654eaba0930df68bd7dfb8402c0518",
+      "physical_output": false
+    },
+    {
+      "source_bits": 32,
+      "rate_hz": 48000,
+      "format_id": 1,
+      "bytes": 512,
+      "sha256": "4f36e21c71a58dddb8ff7744f5572dfb24d4b234d8299a2650aa51849c00fcd5",
+      "physical_output": false
+    },
+    {
+      "source_bits": 32,
+      "rate_hz": 48000,
+      "format_id": 2,
+      "bytes": 512,
+      "sha256": "77fab0af2a53d723ecd806cd609da32fc6b669a425c25fb191786141d9b463b4",
+      "physical_output": false
+    },
+    {
+      "source_bits": 32,
+      "rate_hz": 48000,
+      "format_id": 3,
+      "bytes": 512,
+      "sha256": "eecda0e90305fe4ae48be090713ce474ce654eaba0930df68bd7dfb8402c0518",
+      "physical_output": false
+    }
+  ],
+  "observer_interpretation_correction": {
+    "module_build": "PASS",
+    "physical_deployment": false,
+    "sha256": "ee76801a00d483608449ea85b2d1644853c4d2b0421d847a83494f9366b9b9c2",
+    "scope": "Diagnostic text now distinguishes16-bit monitor fields from an unproven silicon precision ceiling; register read behavior unchanged",
+    "retained_observation_tests": "4 PASS"
+  }
+}

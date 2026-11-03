@@ -1,0 +1,98 @@
+"""Adversarial coverage of the active production MMC request policy."""
+import ctypes, subprocess, tempfile, unittest
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+class Request(ctypes.Structure):
+    _fields_=[(n,ctypes.c_uint) for n in ('opcode','arg','direction','blocks','blksz','has_sbc','sbc_opcode','sbc_arg','has_stop','stop_opcode','stop_arg','user_area','part_config','identified','recovery_image')]
+class ProductionMMC(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp=tempfile.TemporaryDirectory();p=Path(cls.tmp.name)
+        (p/'test.c').write_text('#include "storage-policy.h"\nint allow(const struct y2_emmc_request *r){return y2_emmc_request_allowed(r);}\n')
+        subprocess.run(['cc','-Wall','-Wextra','-Werror','-shared','-fPIC','-I'+str(ROOT/'kernel/platform'),str(p/'test.c'),'-o',str(p/'test.so')],check=True)
+        cls.lib=ctypes.CDLL(str(p/'test.so'));cls.lib.allow.argtypes=[ctypes.POINTER(Request)]
+    @classmethod
+    def tearDownClass(cls):cls.tmp.cleanup()
+    def allowed(self,**kwargs):return bool(self.lib.allow(ctypes.byref(Request(**kwargs))))
+    def io(self,write=False,**changes):
+        d=dict(opcode=25 if write else 18,arg=166912,direction=256 if write else 512,blocks=8,blksz=512,user_area=1,identified=1)
+        d.update(changes);return self.allowed(**d)
+    def test_read_write_and_companions(self):
+        for write in (False,True):
+            self.assertTrue(self.io(write))
+            self.assertTrue(self.io(write,opcode=24 if write else 17,blocks=1))
+            self.assertFalse(self.io(write,opcode=24 if write else 17,blocks=2))
+            self.assertTrue(self.io(write,has_sbc=1,sbc_opcode=23,sbc_arg=8,has_stop=1,stop_opcode=12))
+            for arg in (7,9,0x40000008,0xffffffff):self.assertFalse(self.io(write,has_sbc=1,sbc_opcode=23,sbc_arg=arg))
+            for arg in (0x80000008,0x20000008,0xa0000008):self.assertEqual(self.io(write,has_sbc=1,sbc_opcode=23,sbc_arg=arg),write)
+            self.assertFalse(self.io(write,has_stop=1,stop_opcode=38))
+            self.assertFalse(self.io(write,has_stop=1,stop_opcode=12,stop_arg=1))
+            for direction in (0,768):self.assertFalse(self.io(write,direction=direction))
+            self.assertFalse(self.io(write,blksz=1024))
+            self.assertFalse(self.io(write,user_area=0))
+    def test_all_protected_boundaries_and_overflow(self):
+        # ANDROID (Y2ROOT), USRDATA (Y2DATA) and, since POWER-FINAL-08, the stock FAT
+        # partition p8 (Y2Media). p8 directly follows USRDATA, so a one-sector write just
+        # below it belongs to USRDATA and is the only legal start-1 write.
+        for start,end in ((166912,1846272),(2104320,3742720),(3742720,15203328)):
+            for blocks in (1,8,128,65535,end-start):
+                self.assertTrue(self.io(True,arg=start,blocks=blocks))
+                self.assertTrue(self.io(True,arg=end-blocks,blocks=blocks))
+                self.assertEqual(bool(self.io(True,arg=start-1,blocks=blocks)),start==3742720 and blocks==1)
+                # Past the end is refused, except the single sector that is p8's first.
+                self.assertEqual(bool(self.io(True,arg=end-blocks+1,blocks=blocks)),end==3742720 and blocks==1)
+        # Boot/protected areas, the gap before ANDROID and CACHE stay read-only.
+        for sector in (0,1024,18432,38912,125952,145408,1846272,59904,138248,138496):
+            for mode in (0,1):
+                self.assertTrue(self.io(arg=sector,recovery_image=mode));self.assertFalse(self.io(True,arg=sector,recovery_image=mode))
+        self.assertTrue(self.io(arg=3742720));self.assertTrue(self.io(True,arg=3742720))
+        self.assertFalse(self.io(True,arg=3742719,blocks=2))   # a write straddling two spans is refused
+        self.assertTrue(self.io(arg=15203327,blocks=1))
+        for sector,count in ((0xffffffff,2),(166912,0xffffffff),(15269888,1),(15203328,1),(15203327,2),(0,0)):
+            self.assertFalse(self.io(arg=sector,blocks=count));self.assertFalse(self.io(True,arg=sector,blocks=count))
+    def test_boot_images_and_misc_message_by_running_image(self):
+        # OTA-35: BOOTIMG [60416,93184), RECOVERY [93184,125952), MISC message [138240,138248).
+        # A kernel from BOOTIMG writes RECOVERY, one from RECOVERY writes BOOTIMG; both the message.
+        for mode,(own,other) in ((0,(60416,93184)),(1,(93184,60416))):
+            for blocks in (1,8,256,32768):
+                self.assertTrue(self.io(True,arg=other,blocks=blocks,recovery_image=mode))
+                self.assertTrue(self.io(True,arg=other+32768-blocks,blocks=blocks,recovery_image=mode))
+                self.assertFalse(self.io(True,arg=own,blocks=blocks,recovery_image=mode))
+                self.assertFalse(self.io(True,arg=own+32768-blocks,blocks=blocks,recovery_image=mode))
+                self.assertTrue(self.io(arg=own,blocks=blocks,recovery_image=mode))
+            self.assertFalse(self.io(True,arg=other+32768-8,blocks=9,recovery_image=mode))
+            self.assertFalse(self.io(True,arg=other-1,blocks=2,recovery_image=mode))
+            for start,blocks in ((138240,8),(138240,1),(138247,1),(138244,4)):
+                self.assertTrue(self.io(True,arg=start,blocks=blocks,recovery_image=mode))
+            for start,blocks in ((138240,9),(138239,1),(138239,2),(138248,1),(138247,2),(138240+256,8)):
+                self.assertFalse(self.io(True,arg=start,blocks=blocks,recovery_image=mode))
+        # A write spanning both images is refused in either mode.
+        for mode in (0,1):self.assertFalse(self.io(True,arg=93184-4,blocks=8,recovery_image=mode))
+    def test_switch_fields_and_hardware_areas(self):
+        for index in range(256):
+            for value in (0,1,2,3,4,5,6,0x40,0x48,0x82,0x86,0xff):
+                allowed={32:{1},33:{0,1},34:{1,2,3},161:{0,1},175:{1},183:{0,1,2,5,6},185:{0,1,2}}.get(index,set())
+                self.assertEqual(self.allowed(opcode=6,arg=0x03000001|(index<<16)|(value<<8)),value in allowed,(index,value))
+        for before in range(256):
+            self.assertTrue(self.allowed(opcode=6,arg=0x03b30001|((before&~7)<<8),part_config=before,identified=1))
+            for region in range(1,8):
+                self.assertFalse(self.allowed(opcode=6,arg=0x03b30001|(((before&~7)|region)<<8),part_config=before,identified=1))
+        self.assertFalse(self.allowed(opcode=6,arg=0x03b30001,identified=0))
+    def test_standard_initialization_flush_shutdown(self):
+        self.assertTrue(self.allowed(opcode=8,direction=512,blocks=1,blksz=512))
+        self.assertFalse(self.allowed(opcode=8,direction=256,blocks=1,blksz=512))
+        for op in (0,1,2,3,7,9,10,12,13):self.assertTrue(self.allowed(opcode=op))
+        self.assertTrue(self.allowed(opcode=16,arg=512))
+        self.assertTrue(self.allowed(opcode=5,user_area=1))
+        self.assertTrue(self.allowed(opcode=6,arg=0x03200101)) # FLUSH_CACHE used by block fsync
+        self.assertFalse(self.allowed(opcode=0,arg=0xf0f0f0f0))
+        for op in (23,24,25,26,27,28,29,35,36,38,42,56,60):self.assertFalse(self.allowed(opcode=op,user_area=1))
+    def test_hs200_tuning_block_is_the_only_new_read(self):
+        for size in (64,128):
+            self.assertTrue(self.allowed(opcode=21,direction=512,blocks=1,blksz=size))
+        for change in (dict(arg=1),dict(blocks=2),dict(blksz=512),dict(direction=256),dict(has_stop=1,stop_opcode=12)):
+            request=dict(opcode=21,direction=512,blocks=1,blksz=128);request.update(change)
+            self.assertFalse(self.allowed(**request),change)
+        # HS400 timing, non-default driver strength and enhanced strobe stay denied.
+        for value in (3,0x12,0x22,0x86):
+            self.assertFalse(self.allowed(opcode=6,arg=0x03b90001|(value<<8)),value)

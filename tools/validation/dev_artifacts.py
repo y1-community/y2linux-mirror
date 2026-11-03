@@ -1,0 +1,198 @@
+"""Validate DEV-01 emitted ARM code, rescue/DT memory ownership and BOOTIMG."""
+import argparse, hashlib, io, json, stat, struct
+from pathlib import Path
+from elftools.elf.elffile import ELFFile
+from tools.build.check_config import check as check_config, parse
+from tools.validation.artifacts import Elf
+from tools.validation.formats import gunzip
+from tools.validation.dev_dtb import check as check_dtb
+from tools.validation.d08 import Inputs, require
+from tools.validation.dev_memory import check_layout
+from tools.validation.sleep_syscall import check as check_sleep, slot_offset
+from tools.validation.bootimg import check as check_bootimg
+from tools.build.bootimage import pack
+
+
+def rescue_entries(raw):
+    entries={};offset=0
+    while True:
+        require(raw[offset:offset+6]==b'070701','rescue newc signature')
+        fields=[int(raw[i:i+8],16) for i in range(offset+6,offset+110,8)]
+        ino,mode,uid,gid,links,mtime,size,dmaj,dmin,rmaj,rmin,namesize,crc=fields
+        require(uid==gid==mtime==dmaj==dmin==crc==0,'rescue metadata')
+        require(0<namesize<256 and size<=0x800000,'rescue entry bounds')
+        offset+=110;name_raw=raw[offset:offset+namesize]
+        require(name_raw.endswith(b'\0'),'rescue path terminator')
+        name=name_raw[:-1].decode();offset=(offset+namesize+3)&~3
+        require(name not in entries and not name.startswith('/') and '..' not in name.split('/'),'unsafe rescue path')
+        data=raw[offset:offset+size];require(len(data)==size,'rescue truncated file');offset=(offset+size+3)&~3
+        if name=='TRAILER!!!':
+            require(size==0 and not any(raw[offset:]) and len(raw)==(offset+511)&~511,'rescue trailer')
+            return entries
+        require(stat.S_IFMT(mode) in (stat.S_IFDIR,stat.S_IFREG,stat.S_IFLNK,stat.S_IFCHR),'rescue file type')
+        if stat.S_ISCHR(mode): require((name,rmaj,rmin) in [('dev/console',5,1),('dev/null',1,3)],'unexpected rescue device')
+        entries[name]=(mode,data)
+
+
+def userspace_config(config):
+    require(config['CONFIG_PAGE_OFFSET']=='0xC0000000' and config['CONFIG_HIGHMEM']=='y','ARM split/HIGHMEM')
+    for key in ('CONFIG_ARM_THUMB','CONFIG_KUSER_HELPERS','CONFIG_FB_DEVICE','CONFIG_DEBUG_USER','CONFIG_VFP','CONFIG_NEON','CONFIG_EXT4_FS','CONFIG_MMC_BLOCK','CONFIG_INET','CONFIG_UNIX98_PTYS'):
+        require(config.get(key)=='y','missing development prerequisite '+key)
+    if config.get('CONFIG_USB_CONFIGFS_F_FS') == 'y':
+        for key in ('CONFIG_USB_CONFIGFS','CONFIG_USB_CONFIGFS_ACM','CONFIG_USB_CONFIGFS_ECM'):
+            require(config.get(key)=='y','missing product USB prerequisite '+key)
+        require(config.get('CONFIG_USB_CDC_COMPOSITE') not in ('y','m'),'configfs owns product and developer gadget')
+        require(config.get('CONFIG_USB_CONFIGFS_MASS_STORAGE')!='y' and config.get('CONFIG_USB_MASS_STORAGE') not in ('y','m'),'no block storage export')
+    else:
+        require(config.get('CONFIG_USB_CDC_COMPOSITE')=='y','missing development prerequisite CONFIG_USB_CDC_COMPOSITE')
+
+
+
+def check(root,project,production=False):
+    check_config(root/'kernel/.config',project/('kernel/config/production.config' if production else 'kernel/config/first-boot.config'))
+    config=parse(root/'kernel/.config')
+    userspace_config(config)
+    kernel=Elf(root/'kernel/vmlinux');comp=Elf(root/'kernel/arch/arm/boot/compressed/vmlinux')
+    image=(root/'kernel/arch/arm/boot/Image').read_bytes();z=(root/'kernel/arch/arm/boot/zImage').read_bytes()
+    tree=(root/'y2.dtb').read_bytes();rd=(root/'initramfs.cpio.gz').read_bytes()
+    text=kernel.sym('_text');require(text==0xc0008000 and kernel.elf['e_entry']==text,'kernel entry')
+    require(kernel.binary(text,0xc00000)==image,'Image vs ELF')
+    require(comp.sym('_start')==0 and comp.binary(0,0x600000)==z,'zImage vs ELF')
+    sym=comp.sym;bss=kernel.sym('__bss_stop')-kernel.sym('__bss_start')
+    require(sym('_kernel_bss_size')==bss,'compressed BSS contract')
+    require(struct.unpack_from('<III',z,0x24)==(0x016f2818,0,len(z)),'zImage header')
+    require(sym('_edata_real')==sym('_edata')==len(z) and len(z)%8==0,'appended DT alignment')
+    require(struct.unpack_from('<I',z,sym('__piggy_size_addr'))[0]==len(image),'inflated length')
+    require(gunzip(z[sym('input_data'):sym('input_data_end')],0xc00000)==image,'compressed kernel bytes')
+    require(struct.unpack_from('<7I',z,sym('_table_start'))==(6,0x5a534c4b,sym('__piggy_size_addr'),bss,0x8000,0x10000,0),'relocation table')
+    lc=sym('LC1');stack,edata=struct.unpack_from('<ii',z,lc);stack+=lc;edata+=lc
+    require(edata==len(z),'LC1 input end')
+    ss=comp.elf.get_section_by_name('.stack')
+    require(ss is not None and ss['sh_size']==4096 and ss['sh_addr']+4096==stack,'decompressor stack')
+    begin,end,continuation=(sym(n) for n in ('y2_wdt_stop_begin','y2_wdt_stop_end','y2_wdt_continue'))
+    expected=struct.pack('<10I',0xe3070000,0xe3410000,0xe5901000,0xe3c11001,0xe3811422,0xe5801000,0xf57ff04f,0xe5901000,0xe3110001,0x1afffffe)
+    require(0x30<begin<end<=continuation<sym('restart'),'early watchdog execution order')
+    expected+=struct.pack('<I',0xea000000|(((continuation-(end-4)-8)//4)&0xffffff))
+    require(z[begin:end]==expected,'early watchdog emitted instructions')
+    entries=rescue_entries(gunzip(rd,0x810000))
+    regular=sum(len(data) for mode,data in entries.values() if stat.S_ISREG(mode))
+    require(entries['init']==(stat.S_IFREG|0o755,(project/('initramfs/production/init' if production else 'initramfs/rescue/init')).read_bytes()),'rescue PID1 differs from reviewed source')
+    require(entries['sbin/y2-observer'][1]==(root/'y2-observer').read_bytes(),'observer archive bytes')
+    if production:
+        for name in ('y2-platform-start','y2-offline-charge','y2-usb-status'):
+            require(entries['sbin/'+name][1]==(root/name).read_bytes(),'production tool archive bytes '+name)
+        require(entries['sbin/y2-status'][1]==(project/'tools/production/y2-status').read_bytes(),'shared diagnostic tool')
+        update=root/'buildroot/target/usr/sbin/y2-update-core'
+        if not update.exists(): update=root/'buildroot/target/sbin/y2-update-core'
+        require(entries['sbin/y2-update-core'][1]==update.read_bytes(),'exact signed rescue updater')
+        require(b'Y2_TEST_ROOT' not in entries['sbin/y2-update-core'][1] and
+                b'Y2_TEST_FAULT' not in entries['sbin/y2-update-core'][1], 'no test writer in rescue')
+        for name in ('update-trust.json','update-compat.json'):
+            require(entries['etc/y2linux/'+name][1]==(root/'buildroot/target/etc/y2linux'/name).read_bytes(),'rescue trust/compatibility identity')
+        if 'CONFIG_CFG80211=y' in (root/'kernel/.config').read_text().splitlines():
+            from tools.build.regulatory import load
+            for name, raw in load(project).items():
+                require(entries.get(name)==(stat.S_IFREG|0o644,raw),'early signed regulatory data '+name)
+    module=(root/'kernel/drivers/gpu/drm/mediatek/mediatek-drm.ko').read_bytes()
+    require(entries['display.ko'][1]==module==(root/'display.ko').read_bytes(),'exact DRM module packaging')
+    elf=ELFFile(io.BytesIO(module));info=elf.get_section_by_name('.modinfo').data().split(b'\0')
+    release=(root/'kernel/include/config/kernel.release').read_text().strip()
+    require(b'depends=' in info and any(x.startswith(('vermagic='+release+' ').encode()) for x in info),'module ABI/dependencies')
+    from tools.build.dev_initramfs import boot_module_paths, boot_module_dependencies
+    paths=boot_module_paths(root)
+    dependencies=boot_module_dependencies(root, paths)
+    for path in paths:
+        raw=(root/'kernel'/(path+'.ko')).read_bytes()
+        name='display.ko' if path.endswith('/mediatek-drm') else 'boot-modules/'+release+'/kernel/'+Path(path).name+'.ko'
+        require(entries.get(name)==(stat.S_IFREG|0o400,raw),'exact BOOTIMG module '+path)
+        extra=ELFFile(io.BytesIO(raw))
+        details=extra.get_section_by_name('.modinfo').data().split(b'\0')
+        require(any(x.startswith(('vermagic='+release+' ').encode()) for x in details),
+                'module ABI/dependencies '+path)
+    expected='\n'.join('kernel/'+name+':'+''.join(' kernel/'+dep for dep in dependencies[name]) for name in dependencies)+'\n'
+    require(entries['boot-modules/'+release+'/modules.dep'][1]==expected.encode(), 'exact module dependency graph')
+    for name in ('bin/busybox','sbin/blkid','sbin/y2-observer','sbin/y2-fbtest','sbin/y2-abi-check','lib/ld-linux-armhf.so.3','lib/libc.so.6'):
+        elf=ELFFile(io.BytesIO(entries[name][1]));require(elf.elfclass==32 and elf.little_endian and elf['e_machine']=='EM_ARM','rescue ARM ABI '+name)
+    require(b'Y2LINUX-PLATFORM' in entries['sbin/y2-observer'][1],'observer identity')
+    args=Inputs(len(z),len(tree),len(rd),len(image),bss,kernel.sym('_end')-text,
+        sym('restart'),sym('wont_overwrite'),sym('_edata'),sym('reloc_code_end'),stack,sym('__bss_start'),sym('_end'),regular)
+    layout=check_layout(args);layout['dt']=check_dtb(tree,len(rd),production=production);layout['sleep_syscall']=check_sleep(kernel,root/'kernel/.config')
+    for number in (11,14,19,21,54,114,120,192,221,240,241,281,282,284,379):
+        entry=struct.unpack_from('<I',kernel.data,slot_offset(kernel,number))[0]
+        require(entry!=kernel.sym('sys_ni_syscall'),'missing development syscall '+str(number))
+    for name in ('y2_usb_worker','y2_musb_init','y2_musb_interrupt','musb_start','musb_g_disconnect','ecm_bind','acm_bind','msdc_drv_probe','mtk_i2c_probe'):
+        require(kernel.sym(name)>=text,'missing subsystem '+name)
+    if config.get('CONFIG_USB_CONFIGFS_F_FS') == 'y':
+        for name in ('ffs_func_bind', 'configfs_composite_bind'):
+            require(kernel.sym(name) >= text, 'missing consumer USB path '+name)
+        require(config.get('CONFIG_USB_CONFIGFS_MASS_STORAGE') != 'y', 'raw block export excluded')
+    else:
+        require(kernel.sym('cdc_bind') >= text, 'legacy CDC gadget linked')
+    if config.get('CONFIG_Y2_POWER')=='y':
+        for name in ('y2_adc_probe','y2_charger_probe','y2_thermal_probe','y2_cpu_set','y2_enter_idle','mt6323_irq_suspend','y2_boot_init','y2_spm_enter','y2_spm_cpu_kill'):
+            require(kernel.sym(name)>=text,'missing power subsystem '+name)
+    if config.get('CONFIG_Y2_CONNECTIVITY')=='y':
+        for name in ('y2_conn_get','y2_conn_put','y2_conn_request_firmware','y2_md_calibrate',
+                     'y2_btif_start','y2_stp_send','y2_wmt_boot','y2_hci_register','wlanAdapterStart'):
+            require(kernel.sym(name)>=text,'missing connectivity subsystem '+name)
+    if config.get('CONFIG_DRM_LIMA')=='y':
+        for name in ('lima_device_init','lima_mmu_init','lima_sched_timedout_job','y2_mfg_power_on','y2_mfg_power_off','y2_mfg_clock_probe'):
+            require(kernel.sym(name)>=text,'missing GPU subsystem '+name)
+    require('mtk_musb_init' not in kernel.syms, 'unexpected alternate USB glue')
+    require(('musb_host_setup' in kernel.syms) == (config.get('CONFIG_USB_MUSB_DUAL_ROLE') == 'y'),
+            'USB host framework matches guarded dual-role configuration')
+    if production and config.get('CONFIG_USB_INVENTRA_DMA') == 'y':
+        for name in ('musbhs_dma_controller_create_noirq', 'dma_controller_irq',
+                     'y2_musb_dma_init', 'y2_musb_dma_exit'):
+            require(kernel.sym(name) >= text, 'missing reviewed DMA path '+name)
+    else:
+        require('dma_controller_irq' not in kernel.syms, 'unexpected USB DMA')
+    if production and config.get('CONFIG_ARM_ARCH_TIMER') == 'y':
+        for name in ('y2_local_timer_prepare', 'y2_local_timer_ready',
+                     'arch_timer_of_init', 'mtk_gpt_init'):
+            require(kernel.sym(name) >= text, 'missing guarded timer path '+name)
+    payload=z+tree+bytes(-len(tree)%8)
+    layout['kernel_symbols']={n:kernel.sym(n) for n in ('_text','_edata','__bss_start','__bss_stop','_end')}
+    layout['artifacts']={name:{'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()} for name,raw in [('Image',image),('zImage',z),('y2.dtb',tree),('zImage-dtb',payload),('initramfs.cpio.gz',rd),('display.ko',module)]}
+    layout['status']='PASS offline Production Storage v1; internal boot unqualified' if production else 'PASS offline M3 audio candidate; DEV-02 core physically qualified; audio acceptance pending'
+    if config.get('CONFIG_Y2_POWER')=='y':
+        layout['status']='PASS offline integrated M4 power candidate; retained root/data; physical qualification pending'
+    if config.get('CONFIG_Y2_CONNECTIVITY')=='y':
+        layout['status']='PASS offline integrated M5 connectivity candidate; preserving system update; physical radio qualification pending'
+    if config.get('CONFIG_DRM_LIMA')=='y':
+        layout['status']='PASS offline integrated GPU candidate; physical Lima/Mesa qualification pending'
+    return layout,payload,rd
+
+
+def recovery_image(root, payload, rd):
+    """OTA-35 RECOVERY.img: the same kernel and archive, its own DTB that differs
+    only in bootargs (y2.recovery=1), the RECOVERY ramdisk label and our name."""
+    from tools.validation.formats import fdt
+    z=(root/'kernel/arch/arm/boot/zImage').read_bytes()
+    tree=(root/'y2.dtb').read_bytes();rtree=(root/'y2-recovery.dtb').read_bytes()
+    normal,reserved=fdt(tree);other,reserved_other=fdt(rtree)
+    require(other['/chosen'].pop('bootargs').decode().rstrip('\0')==
+            normal['/chosen'].pop('bootargs').decode().rstrip('\0')+' y2.recovery=1','recovery bootargs')
+    require(other==normal and reserved_other==reserved,'recovery tree differs only in bootargs')
+    check_dtb(rtree,len(rd),production=True,recovery=True)
+    require(payload==z+tree+bytes(-len(tree)%8),'BOOTIMG payload identity')
+    rpayload=z+rtree+bytes(-len(rtree)%8)
+    image=pack(rpayload,rd,recovery=True)
+    end=2048+(len(rpayload)+512+2047)//2048*2048+(len(rd)+512+2047)//2048*2048+4096
+    require(len(image)<=0x1000000,'RECOVERY partition span')
+    result=check_bootimg(image,rpayload,rd,{'bootimg_read_end':end},recovery=True)
+    (root/'zImage-recovery-dtb').write_bytes(rpayload);(root/'RECOVERY.img').write_bytes(image)
+    return result
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('root',type=Path);p.add_argument('--package',action='store_true');p.add_argument('--production',action='store_true');a=p.parse_args()
+    project=Path(__file__).resolve().parents[2];layout,payload,rd=check(a.root,project,production=a.production)
+    if a.package:
+        boot=pack(payload,rd);layout['bootimg']=check_bootimg(boot,payload,rd,layout)
+        (a.root/'zImage-dtb').write_bytes(payload);(a.root/'BOOTIMG.img').write_bytes(boot)
+        if a.production:
+            layout['recovery']=recovery_image(a.root,payload,rd)
+    elif (a.root/'BOOTIMG.img').exists():layout['bootimg']=check_bootimg((a.root/'BOOTIMG.img').read_bytes(),payload,rd,layout)
+    (a.root/'layout.json').write_text(json.dumps(layout,indent=2)+'\n');print(json.dumps(layout,indent=2))
+if __name__=='__main__':main()

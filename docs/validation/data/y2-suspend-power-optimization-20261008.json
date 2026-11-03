@@ -1,0 +1,169 @@
+{
+  "schema": "y2-suspend-power-optimization/v1",
+  "phase": "1-research",
+  "branch": "codex/platform-v1-power-final-05",
+  "base": "27148be",
+  "installed": {
+    "image": "DEEPSLEEP-FINAL-04",
+    "linux": "5e267571d584da7fbe356d3161801ba15f87fa57",
+    "spm_mode": "SPM_CPU_SHUTDOWN_INFRA_RETAINED",
+    "pcm_origin": "MT6582_d53dd75c_dpidle",
+    "pcm_words": 480
+  },
+  "baseline_1h": {
+    "elapsed_s": 3824.6,
+    "suspended_s": 3805.25,
+    "residency": 0.9949,
+    "maintenance_cycle_s": 603.0,
+    "timer_s": 600.0,
+    "overhead_s": 3.0,
+    "awake_after_resume_s": 2.5,
+    "entries": 9,
+    "resumes": 9
+  },
+  "current_measurement": {
+    "available": false,
+    "current_ua": null,
+    "charge_counter_uah": null,
+    "isense": "voltage path only; uncalibrated"
+  },
+  "capacity_mah": null,
+  "allowed_avg_current_ma_for_1pct": {
+    "8h": {
+      "400": 0.5,
+      "600": 0.75,
+      "800": 1.0,
+      "1000": 1.25,
+      "1500": 1.875
+    },
+    "12h": {
+      "400": 0.333,
+      "600": 0.5,
+      "800": 0.667,
+      "1000": 0.833,
+      "1500": 1.25
+    },
+    "24h": {
+      "400": 0.167,
+      "600": 0.25,
+      "800": 0.333,
+      "1000": 0.417,
+      "1500": 0.625
+    }
+  },
+  "key_finding": "Y2Linux uses vendor pcm_dpidle with INFRA/DDRPHY retained; vendor real suspend uses separate pcm_suspend (597 words) with cpu_pdn=1, infra_pdn=1, ck26m_off (mt_sleep.c defaults).",
+  "vendor_source": "android.googlesource.com/kernel/mediatek d53dd75c3ff77cac3f5be58fddfe660e94f94d64 arch/arm/mach-mt6582/{mt_spm_sleep.c,mt_sleep.c,include/mach/mt_spm.h}",
+  "maintenance_wake_owner": "SPM PCM timer, Y2_SPM_TIMER=19660800 ticks=600 s; vendor SPM_WAKE_PERIOD=600",
+  "changes_implemented": [
+    "vendor LP_SEL bit0 (5 LDOs)"
+  ],
+  "device_changes": [],
+  "verdict": "SUSPEND_POWER_IMPROVED_OVERNIGHT_TEST_REMAINS (candidate built, NEEDS_OWNER_FLASH; benefit unmeasured)",
+  "pmic_awake_dump": {
+    "archive": "out/deep-sleep-final/evidence/20261008/78-image04-pmic-regdump",
+    "registers": 2079,
+    "golden_entries": 44,
+    "golden_differences_vs_awake": 25,
+    "unclaimed_ldos_on": [
+      "VTCXO",
+      "VA",
+      "VIO28",
+      "VUSB",
+      "VEMC3V3",
+      "VM",
+      "VRTC"
+    ],
+    "connectivity_rails_held_only_while_active": true,
+    "sd_card_power_off_in_suspend": false,
+    "vendor_init_applied_by_y2": "connectivity subset only"
+  },
+  "probe_run_1": {
+    "archives": [
+      "79",
+      "80",
+      "81"
+    ],
+    "unplugged_cest": "20:33",
+    "reconnected_cest": "21:04",
+    "suspended_seconds": 1849.88,
+    "maintenance_wakes": 3,
+    "spm_entries": 7,
+    "captures": 11,
+    "capture_read_seconds": 0.038,
+    "golden_differences": {
+      "awake": 25,
+      "pre_entry": 22,
+      "post_resume": 20
+    },
+    "connectivity_rails_at_pre_entry": "off",
+    "sd_rails": {
+      "pre_entry": "on",
+      "post_resume": "off"
+    },
+    "vusb_unplugged": "on",
+    "emmc_vcc": "on throughout",
+    "lp_sel_set": [
+      "VTCXO"
+    ],
+    "vproc_vsys_sleep_voltage": "not enabled",
+    "pmic_regs_changed_across_sleep": [
+      "0x504",
+      "0x506",
+      "0x13a",
+      "0x73a"
+    ],
+    "limits": "states just before/after sleep; not during sleep; no current measured"
+  },
+  "candidate_05": {
+    "linux": "837b6146ee4d0f551b69cfaddd686a69ce56a060",
+    "bootimg_sha256": "0137a855db96d8f94005333941495c4fdaa2f81c9eb653458b77e9c0fd044117",
+    "y2root_sha256": "9175185fd577b759302337cc8d17f678fde3dc621525b90d45cf6cb370e99a4d",
+    "change": "vendor LP_SEL bit0 on VA,VIO28,VUSB,VM,VIO18 + runtime revert /sys/firmware/y2_pmic/lp_sel",
+    "physical": "NOT_RUN",
+    "tests": {
+      "container": 560,
+      "native_packaging": 10,
+      "native_splash": 27,
+      "reborn": 335
+    },
+    "first_check": {
+      "archives": [
+        "82",
+        "83",
+        "84"
+      ],
+      "boot_id": "3cae62f2-286b-496a-b60a-29be8317a949",
+      "taint": 0,
+      "lp_sel": "applied=1 error=0 VA=1 VIO28=1 VUSB=1 VM=1 VIO18=1",
+      "golden_differences_awake": {
+        "04": 25,
+        "05": 20
+      },
+      "rail_enables_changed": 0,
+      "physical_suspend": "NOT_RUN"
+    },
+    "probe_run": {
+      "archives": [
+        "85",
+        "86",
+        "87"
+      ],
+      "unplugged_cest": "22:07",
+      "suspended_seconds": 1573.4,
+      "maintenance_wakes": 2,
+      "spm_entries": 3,
+      "aborts": 0,
+      "captures": 8,
+      "golden_differences_pre_entry": 17,
+      "lp_sel_set": [
+        "VTCXO",
+        "VA",
+        "VIO28",
+        "VUSB",
+        "VM",
+        "VIO18"
+      ],
+      "physical_current": "not measured"
+    }
+  }
+}

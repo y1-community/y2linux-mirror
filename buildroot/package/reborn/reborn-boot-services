@@ -1,0 +1,20 @@
+#!/bin/sh
+# All normal boot messages remain in dmesg, bounded persistent syslog and SSH.
+# The early initramfs splash normally already owns the display; --start is
+# idempotent and also permits a deliberate service recovery without a reboot.
+if mountpoint -q /data && [ ! -L /data/logs ]; then
+    mkdir -p /data/logs
+fi
+# The directory can exist while pstore is unmounted. Mount before capturing;
+# otherwise a surviving ramoops panic incorrectly appears to be absent.
+if [ -d /sys/fs/pstore ]; then
+    mountpoint -q /sys/fs/pstore || mount -t pstore -o nosuid,nodev,noexec pstore /sys/fs/pstore || :
+fi
+/usr/sbin/y2-platform boot-evidence >/dev/null 2>&1 || echo "Y2: previous boot evidence unavailable" >/dev/kmsg
+/usr/libexec/reborn-splash --start >/dev/kmsg 2>&1 || :
+/etc/init.d/rcS >/dev/kmsg 2>&1
+result=$?
+# The stage record (boot history, several KiB) is in /data/system/platform/boot.json;
+# /dev/kmsg refuses a write over 1 KiB (EINVAL at every boot). Errors still go there.
+/usr/sbin/y2-platform boot-stage services_started >/dev/null 2>/dev/kmsg || :
+exit "$result"

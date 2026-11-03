@@ -1,0 +1,26 @@
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -1066,6 +1066,7 @@
+ int ext4_bread_batch(struct inode *inode, ext4_lblk_t block, int bh_count,
+ 		     bool wait, struct buffer_head **bhs)
+ {
++	struct blk_plug plug;
+ 	int i, err;
+ 
+ 	for (i = 0; i < bh_count; i++) {
+@@ -1077,10 +1078,15 @@
+ 		}
+ 	}
+ 
++	/* Y2: plug so the batch reaches the device as merged requests
++	 * (POWER-FINAL-30 SD-card directory reads; ext4_readdir is already
++	 * batched by block-device readahead). */
++	blk_start_plug(&plug);
+ 	for (i = 0; i < bh_count; i++)
+ 		/* Note that NULL bhs[i] is valid because of holes. */
+ 		if (bhs[i] && !ext4_buffer_uptodate(bhs[i]))
+ 			ext4_read_bh_lock(bhs[i], REQ_META | REQ_PRIO, false);
++	blk_finish_plug(&plug);
+ 
+ 	if (!wait)
+ 		return 0;

@@ -1,0 +1,266 @@
+#!/bin/busybox sh
+# SPDX-License-Identifier: GPL-2.0-only
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+mount -t devtmpfs devtmpfs /dev
+mkdir -p /dev/pts /run /tmp /newroot /newdata /sys/kernel/debug
+mount -t devpts devpts /dev/pts
+mount -t tmpfs -o mode=0755,nosuid,nodev tmpfs /run
+mount -t tmpfs -o mode=1777,nosuid,nodev tmpfs /tmp
+mkdir -p /run/y2
+y2_stage() {
+    # Names are fixed internal constants. Monotonic clock remains valid without RTC.
+    read up rest < /proc/uptime
+    printf '{"stage":"%s","monotonic_s":%s}\n' "$1" "$up" >> /run/y2/boot-stages.jsonl
+    # The early splash maps the same milestone names to its progress bar and
+    # status line. It owns this directory; before it exists nothing is written.
+    [ ! -d /run/reborn-splash ] || printf '%s\n' "$1" > /run/reborn-splash/phase
+    # In the kernel log too: a boot that dies before the system logger keeps
+    # only its RAM console (ramoops), and that shows how far it got (F23).
+    echo "<6>Y2STAGE $1" >> /dev/kmsg
+    # And in pstore's message buffer, which survives a reset: the next boot
+    # sees how far a boot that died before the system logger got (F23).
+    [ ! -c /dev/pmsg0 ] || echo "$up init $1" > /dev/pmsg0
+}
+# F23: the first boots of a new system, counted by the update journal, can die
+# before the system logger; each later boot (and recovery) overwrites what the
+# previous one left in RAM. Keep its stage messages and console with the update
+# record, newest 4.
+y2_keep_previous_boot() {
+    mount -t pstore pstore /sys/fs/pstore 2>/dev/null || return 0
+    if mkdir -p "$1"; then
+        # This initramfs links only the applets init always needs.
+        n=0
+        for old in $(/bin/busybox ls -1 "$1" 2>/dev/null | /bin/busybox sort -r); do
+            n=$((n+1)); [ "$n" -le 3 ] || /bin/busybox rm -f "$1/$old"
+        done
+        {
+            # This boot's context: a low battery on a weak charger, LK's boot
+            # reason, and a data check that had to replay a journal (the
+            # previous boot died with /data mounted) each tell a story.
+            echo "== this boot $(cat /proc/sys/kernel/random/boot_id) uptime $(cat /proc/uptime)"
+            echo "battery_uv $(cat /sys/class/power_supply/BAT0/voltage_now 2>/dev/null)"
+            echo "lk $(cat /sys/firmware/y2_boot/metadata 2>/dev/null)"
+            echo "data_fsck $3"; cat /run/y2/health-data-fsck.txt 2>/dev/null
+            echo "== boot-check"; cat /run/y2/update-boot-check.json 2>/dev/null
+            for part in pmsg-ramoops-0 console-ramoops-0 dmesg-ramoops-0; do
+                [ ! -s "/sys/fs/pstore/$part" ] || { echo "== $part"; /bin/busybox head -c 262144 "/sys/fs/pstore/$part"; }
+            done
+        } > "$1/$(/bin/busybox date +%s)-$2-previous-boot.txt"
+    fi
+    umount /sys/fs/pstore
+}
+y2_stage initramfs
+mount -t debugfs debugfs /sys/kernel/debug
+[ -e /dev/y2diag ] || mknod -m 600 /dev/y2diag c 120 0
+# BOOTIMG owns every loadable module. Carry them into the real system in RAM.
+release=$(uname -r)
+mkdir -p "/run/y2/modules/$release/kernel"
+cp /display.ko "/run/y2/modules/$release/kernel/mediatek-drm.ko"
+printf '%s\n' 'kernel/mediatek-drm.ko:' > "/run/y2/modules/$release/modules.dep"
+if [ -d /boot-modules ]; then
+    cp -a /boot-modules/. /run/y2/modules/ || exit 1
+fi
+# Suppress only panel text before fbcon attaches. This does not lower printk
+# verbosity and never starts a splash owner during the charging-only path.
+if [ -x /sbin/reborn-splash ]; then /sbin/reborn-splash --quiet-if-normal || :; fi
+/sbin/y2-platform-start
+observer=
+start_observer() {
+    if [ -x /sbin/y2-observer ]; then /sbin/y2-observer & observer=$!; fi
+}
+. /sbin/y2-storage
+rescue() {
+    y2_stage rescue
+    echo "<3>Y2RESCUE: $*; staying in rescue" > /dev/kmsg
+    [ ! -c /dev/pmsg0 ] || echo "rescue $*" > /dev/pmsg0
+    {
+        printf '\033[2J\033[H'
+        echo 'Y2Linux STORAGE06 RESCUE'
+        echo "$*"
+        echo 'No reboot / no SD fallback / no formatting'
+        /sbin/y2-usb-status
+        /sbin/y2-status storage
+    } > /dev/tty0
+    # A failed exec in a subshell cannot terminate rescue PID1.
+    while :; do
+        /bin/busybox sh </dev/console >/dev/console 2>&1
+        sleep 1
+    done
+}
+# OTA-35: this kernel was loaded from RECOVERY. Install or restore, then power
+# off; the recovery image never starts the normal system.
+case " $(cat /proc/cmdline) " in
+    *' y2.recovery=1 '*)
+        . /sbin/y2-recovery
+        ;;
+esac
+case " $(cat /proc/cmdline) " in
+    *' y2.rescue=1 '*)
+        echo 1 > /sys/firmware/y2_boot/normal_boot || rescue 'normal peripheral handover failed'
+        start_observer
+        rescue 'rescue requested by boot command line'
+        ;;
+esac
+# This process stays in the RAM rescue environment for a charger-triggered
+# boot. It cannot reach root/data discovery until intentional normal power-on.
+/sbin/y2-offline-charge || rescue 'offline charging decision failed'
+if [ -x /sbin/reborn-splash ]; then /sbin/reborn-splash --start || :; fi
+echo 1 > /sys/firmware/y2_boot/normal_boot || rescue 'normal peripheral handover failed'
+# Rescue charging uses the lowest OPP; the normal platform adapts to load.
+if [ -w /sys/devices/system/cpu/cpufreq/policy0/scaling_governor ]; then
+    echo schedutil > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor || rescue 'CPU frequency policy failed'
+fi
+start_observer
+echo 'Y2ROOT: Production Storage v1; internal-only discovery' > /dev/kmsg
+y2_stage storage_discovery
+# Allow asynchronous controller discovery; no media card is needed or inspected.
+# The internal eMMC partitions usually appear within ~0.2 s of this point, so poll
+# in 50 ms steps (up to ~40 s) instead of a whole second per attempt.
+# F23 (report 5497435a): the partitions can appear between the two probes, so
+# root read empty while data was found and the boot rescued over an intact root.
+# Wait for both; with data alone (a torn root after an interrupted update) go on
+# after another second, so the update journal still routes to the recovery.
+n=0 alone=0
+while [ "$n" -lt 800 ]; do
+    rootdev=$(y2_find_partition Y2ROOT 79324c69-6e75-4801-8000-000000000101 166912 1679360)
+    datadev=$(y2_find_partition Y2DATA 79324c69-6e75-4801-8000-000000000102 2104320 1638400)
+    [ -n "$datadev" ] && [ -n "$rootdev" ] && break
+    if [ -n "$datadev" ]; then
+        alone=$((alone+1))
+        [ "$alone" -lt 20 ] || break
+    fi
+    n=$((n+1))
+    if [ "$n" = 200 ]; then
+        printf '\nY2Linux Storage06: locating internal root/data\nNo SD card required.\n' > /dev/tty0
+    fi
+    sleep 0.05
+done
+[ -n "$datadev" ] || rescue 'missing/invalid internal Y2DATA'
+# Inspect the trusted data identity before requiring an intact root. An
+# interrupted update may have left a torn root; only the Y2 recovery image
+# installs or restores it (OTA-35), this rescue only routes there.
+mount -t ext4 -o ro,noload "$datadev" /newdata || rescue 'update data preflight mount'
+[ "$(cat /newdata/.y2data-schema 2>/dev/null)" = 1 ] || rescue 'update data schema'
+update_record=0
+if [ -e /newdata/updates/state.json ] || [ -L /newdata/updates/state.json ]; then
+    /sbin/y2-update-core boot-needed
+    case "$?" in
+        0) update_record=1 ;;
+        10) : ;; # completed history does not add another fsck or mount
+        *) rescue 'update journal unreadable' ;;
+    esac
+fi
+umount /newdata || rescue 'update preflight unmount'
+if [ "$update_record" != 0 ]; then
+    e2fsck -p "$datadev" > /run/y2/health-data-fsck.txt 2>&1
+    data_fsck=$?
+    cat /run/y2/health-data-fsck.txt > /dev/kmsg
+    [ "$data_fsck" -le 1 ] || rescue 'update data filesystem check'
+    mount -t ext4 -o rw,nosuid,nodev "$datadev" /newdata || rescue 'update data mount'
+    y2_stage rescue_update
+    /sbin/y2-update-core boot-check > /run/y2/update-boot-check.json
+    update_decision=$?
+    cp /run/y2/update-boot-check.json /newdata/updates/boot-check-last.json 2>/dev/null
+    health_boot=$(sed -n 's/.*"health_boots": *\([0-9]*\).*/\1/p' /run/y2/update-boot-check.json)
+    y2_keep_previous_boot /newdata/updates/health "boot${health_boot:-x}" "$data_fsck"
+    sync
+    umount /newdata || rescue 'update data unmount'
+    case "$update_decision" in
+        10)
+            # First boots of a new system are counted, then start normally.
+            # F23: until health is confirmed (y2-platform restores these),
+            # every kernel message reaches the RAM console and a CPU stall
+            # panics into a ramoops record and a restart, instead of a silent
+            # hang the next boot cannot see.
+            # printk separates its four levels with tabs, which JSON refuses raw.
+            read -r p1 p2 p3 p4 < /proc/sys/kernel/printk
+            printf '{"printk":"%s %s %s %s","panic":"%s","panic_on_rcu_stall":"%s"}\n' \
+                "$p1" "$p2" "$p3" "$p4" "$(cat /proc/sys/kernel/panic)" \
+                "$(cat /proc/sys/kernel/panic_on_rcu_stall 2>/dev/null)" > /run/y2/health-debug.json
+            echo 7 > /proc/sys/kernel/printk
+            echo 10 > /proc/sys/kernel/panic
+            echo 1 > /proc/sys/kernel/panic_on_rcu_stall 2>/dev/null
+            ;;
+        20)
+            # The recovery image restores the previous system on the next power-on.
+            echo '<3>Y2RESCUE: update unfinished; recovery requested; power off' > /dev/kmsg
+            sync
+            poweroff -f
+            rescue 'power off failed' ;;
+        *) rescue 'update needs attention; inspect update-boot-check.json' ;;
+    esac
+fi
+[ -n "$rootdev" ] ||
+    rootdev=$(y2_find_partition Y2ROOT 79324c69-6e75-4801-8000-000000000101 166912 1679360)
+[ -n "$rootdev" ] || rescue 'missing/invalid internal Y2ROOT'
+
+/sbin/y2-abi-check > /dev/kmsg 2>&1 || rescue 'ABI preflight failed'
+y2_stage storage_preflight
+# Journal is not replayed until identity + layout markers + executable preflight pass.
+mount -t ext4 -o ro,noload "$rootdev" /newroot || rescue 'root read-only mount failed'
+mount -t ext4 -o ro,noload "$datadev" /newdata || rescue 'data read-only mount failed'
+[ "$(cat /newroot/etc/y2linux/layout-version 2>/dev/null)" = 1 ] || rescue 'root layout mismatch'
+[ "$(cat /newdata/.y2data-schema 2>/dev/null)" = 1 ] || rescue 'data schema mismatch'
+[ "$(cat /newroot/etc/y2linux/platform-contract 2>/dev/null)" = y2-platform-v1 ] || rescue 'root platform contract mismatch'
+[ -x /newroot/sbin/init ] &&
+    chroot /newroot /bin/true || rescue 'root executable preflight failed'
+umount /newdata && umount /newroot || rescue 'preflight unmount failed'
+# e2fsck -p allows only safe automatic repairs on the two validated filesystems.
+# Uncorrectable/interactive repairs never trigger boot loops or autoformatting.
+y2_stage fsck_start
+for dev in "$rootdev" "$datadev"; do
+    e2fsck -p "$dev" > /dev/kmsg 2>&1
+    rc=$?
+    [ "$rc" -le 1 ] || rescue "filesystem check failed ($rc) on $dev"
+done
+y2_stage fsck_complete
+mount -t ext4 -o rw "$rootdev" /newroot || rescue 'root writable mount failed'
+mount -t ext4 -o rw,nosuid,nodev "$datadev" /newroot/data || rescue 'data writable mount failed'
+# Credit this device's stored random seed now. Without it the kernel needs ~6 s
+# to gather entropy on this CPU and the first process that waits for randomness
+# (the platform helper's temporary file names) blocks until then. Same per-device
+# seed directory and tool as S03seedrng; absent on a first boot, which then waits.
+if [ -d /newroot/data/system/entropy ]; then
+    /bin/busybox timeout 10 /bin/busybox seedrng --seed-dir=/newroot/data/system/entropy > /dev/kmsg 2>&1 || :
+fi
+y2_stage root_data_mounted
+mkdir -p /newroot/lib/modules
+mount --bind /run/y2/modules /newroot/lib/modules || rescue 'module handover failed'
+printf '%s\n' "$rootdev" > /run/y2-root-device
+printf '%s\n' "$datadev" > /run/y2-data-device
+echo "Y2ROOT: verified $rootdev with Y2DATA=$datadev; switching to Buildroot" > /dev/kmsg
+y2_stage switch_root
+[ -z "$observer" ] || { kill "$observer"; wait "$observer" 2>/dev/null; }
+# Owner decision (2026-10-28): the running system restarts 10 s after a
+# kernel panic (pstore keeps the record) instead of staying dark until the
+# battery is empty. The command line keeps panic=0 for this rescue, so a
+# failed handover below puts it back. Health boots set 10 above already.
+panic_before=$(cat /proc/sys/kernel/panic 2>/dev/null)
+echo 10 > /proc/sys/kernel/panic 2>/dev/null
+handover_rescue() {
+    [ -z "$panic_before" ] || echo "$panic_before" > /proc/sys/kernel/panic 2>/dev/null
+    start_observer
+    rescue "$1"
+}
+moved=
+for fs in proc sys run tmp dev; do
+    mkdir -p "/newroot/$fs"
+    if mount --move "/$fs" "/newroot/$fs"; then
+        moved="$fs $moved"
+    else
+        for undo in $moved; do mount --move "/newroot/$undo" "/$undo"; done
+        handover_rescue 'mount handover failed'
+    fi
+done
+# BusyBox ash accepts -i only at shell startup, never through "set -i".
+# An EXIT trap handles a failed shell exec; a successful exec keeps PID1 and
+# replaces the shell with the normal BusyBox switch_root applet.
+handover_exec_failed() {
+    trap - EXIT
+    for undo in $moved; do mount --move "/newroot/$undo" "/$undo"; done
+    handover_rescue 'switch_root exec failed'
+}
+trap handover_exec_failed EXIT
+exec switch_root -c /dev/console /newroot /sbin/init

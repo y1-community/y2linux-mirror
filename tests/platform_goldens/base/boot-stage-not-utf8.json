@@ -1,0 +1,14 @@
+{
+ "argv": [
+  "boot-stage",
+  "platform_\udcff"
+ ],
+ "calls": [],
+ "exit": 2,
+ "stdout": [],
+ "tree": {
+  "added": {},
+  "changed": {},
+  "removed": []
+ }
+}

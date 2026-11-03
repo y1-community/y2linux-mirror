@@ -1,0 +1,96 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/* MT6582 automatic idle hierarchy, Linux tick broadcast/context ownership. */
+#include <linux/cpuidle.h>
+#include <linux/module.h>
+#include <linux/of.h>
+#include <linux/atomic.h>
+#include <linux/ktime.h>
+#include <asm/cpuidle.h>
+#include <asm/proc-fns.h>
+#include "clocks.h"
+#include "spm.h"
+#include "cpu-options.h"
+static unsigned long slow_entries, slow_aborts, slow_failures, slow_attempts;
+static bool slow_broken;
+static atomic_t dormant_aborts = ATOMIC_INIT(0);
+static atomic64_t dormant_deadline_ns = ATOMIC64_INIT(0);
+static int dormant_deadline_get(char *buf, const struct kernel_param *kp)
+{
+	return sysfs_emit(buf, "%lld\n", atomic64_read(&dormant_deadline_ns));
+}
+static const struct kernel_param_ops dormant_deadline_ops = { .get = dormant_deadline_get };
+module_param_cb(dormant_deadline_ns, &dormant_deadline_ops, NULL, 0400);
+static int dormant_aborts_get(char *buf, const struct kernel_param *kp)
+{
+	return sysfs_emit(buf, "%d\n", atomic_read(&dormant_aborts));
+}
+static const struct kernel_param_ops dormant_aborts_ops = { .get = dormant_aborts_get };
+module_param_cb(dormant_aborts, &dormant_aborts_ops, NULL, 0400);
+static int last_error;
+module_param(slow_attempts, ulong, 0400);
+module_param(slow_entries, ulong, 0400);
+module_param(slow_aborts, ulong, 0400);
+module_param(slow_failures, ulong, 0400);
+module_param(slow_broken, bool, 0400);
+module_param(last_error, int, 0400);
+static int y2_enter_slow_idle(struct cpuidle_device *dev, struct cpuidle_driver *drv, int index)
+{
+	bool already_broken = READ_ONCE(slow_broken);
+	int ret;
+	if (!smp_processor_id()) slow_attempts++;
+	ret = READ_ONCE(slow_broken) || y2_idle_disabled() ? -EIO : y2_ccf_slow_idle();
+	/* Stock SLIDLE is CPU0 only, so these counters have a single writer. */
+	if (!ret) { slow_entries++; return index; }
+	if (!smp_processor_id()) {
+		slow_aborts++;
+		if (ret == -EIO && !already_broken) { slow_failures++; WRITE_ONCE(slow_broken, true); }
+	}
+	WRITE_ONCE(last_error, ret);
+	cpu_do_idle();
+	return 0;
+}
+static int y2_enter_dormant(struct cpuidle_device *dev, struct cpuidle_driver *drv, int index)
+{
+	int ret;
+	s64 remaining = ktime_to_ns(ktime_sub(READ_ONCE(dev->next_hrtimer), ktime_get()));
+	atomic64_set(&dormant_deadline_ns, remaining);
+	/* Stock minimum 26000 ticks at 13 MHz; Linux provides a monotonic
+	 * deadline. Do not round a near/past deadline into a long GPT sleep. */
+	if (remaining < 2000000)
+		ret = -ETIME;
+	else ret = y2_spm_dormant_idle();
+	if (!ret) return index;
+	atomic_inc(&dormant_aborts);
+	WRITE_ONCE(last_error, ret);
+	return y2_enter_slow_idle(dev, drv, 1);
+}
+static int y2_enter_idle(struct cpuidle_device *dev, struct cpuidle_driver *drv, int index)
+{
+	cpu_do_idle();
+	return index;
+}
+static struct cpuidle_driver y2_idle_driver = {
+	.name = "mt6582-idle", .owner = THIS_MODULE,
+	.states = { ARM_CPUIDLE_WFI_STATE, {
+		.name = "SLIDLE", .desc = "Bus DCM WFI",
+		.exit_latency = 50, .target_residency = 1000,
+		.enter = y2_enter_slow_idle,
+	}, {
+		.name = "DORMANT", .desc = "CPU0 off, L2/infra retained",
+		.flags = CPUIDLE_FLAG_TIMER_STOP | CPUIDLE_FLAG_OFF,
+		.exit_latency = 500, .target_residency = 5000,
+		.enter = y2_enter_dormant,
+	} },
+	.state_count = 3,
+};
+static int __init y2_idle_init(void)
+{
+	if (!of_machine_is_compatible("innioasis,y2")) return -ENODEV;
+	if (y2_idle_disabled()) y2_idle_driver.state_count = 1;
+	else if (y2_deep_idle_disabled()) y2_idle_driver.state_count = 2;
+	y2_idle_driver.states[0].enter = y2_enter_idle;
+	y2_idle_driver.states[0].enter_s2idle = y2_enter_idle;
+	return cpuidle_register(&y2_idle_driver, NULL);
+}
+device_initcall(y2_idle_init);
+MODULE_LICENSE("GPL");

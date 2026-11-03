@@ -1,0 +1,183 @@
+{
+  "schema": 1,
+  "date": "2026-10-04",
+  "source_base": {
+    "linux": "b5aea93",
+    "reborn": "b71b468"
+  },
+  "installed": {
+    "build": "Y2LINUX-BASELINE-02",
+    "linux": "8584ccd85f052f351fe51650b2348c83ca894ed4",
+    "reborn": "b71b468860233faa0a42b8448ec5777fa952b8e3",
+    "boot_id": "27e6d684-3794-4490-95db-a489027cd4f4",
+    "taint": 0
+  },
+  "peer_available": false,
+  "electrical_battery_measurement": false,
+  "candidate_physical_after": "NOT_RUN_DEVICE_LOCK_BUSY",
+  "baselines": {
+    "off": {
+      "seconds": 20.169189913999958,
+      "online": "0",
+      "irq_per_second": 179.67999783097326,
+      "context_switches_per_second": 351.77416793895014,
+      "processes": {
+        "dbus-daemon": {
+          "cpu_percent_one_core": 0.19832229341167026,
+          "rss_kib": 1700,
+          "bluetooth_thread": null
+        },
+        "bluetoothd": {
+          "cpu_percent_one_core": 0.1487417200587527,
+          "rss_kib": 3848,
+          "bluetooth_thread": null
+        },
+        "bluealsad": {
+          "cpu_percent_one_core": 0.09916114670583513,
+          "rss_kib": 5656,
+          "bluetooth_thread": null
+        },
+        "y2-bt-reconnect": {
+          "cpu_percent_one_core": 0.2479028667645878,
+          "rss_kib": 4348,
+          "bluetooth_thread": null
+        },
+        "reborn": {
+          "cpu_percent_one_core": 3.3714789879983944,
+          "rss_kib": 23696,
+          "bluetooth_thread": {
+            "name": "bluetooth",
+            "voluntary_ctxt_switches_per_second": 50.373862526564245,
+            "nonvoluntary_ctxt_switches_per_second": 1.7353200673521147,
+            "cpu_percent_one_core": 0.6941280269408459
+          }
+        }
+      },
+      "CPU0_idle": {
+        "SLIDLE": {
+          "name": "SLIDLE",
+          "entries": 0,
+          "residency_us": 0,
+          "residency_percent": 0.0
+        },
+        "DORMANT": {
+          "name": "DORMANT",
+          "entries": 0,
+          "residency_us": 0,
+          "residency_percent": 0.0
+        },
+        "WFI": {
+          "name": "WFI",
+          "entries": 2982,
+          "residency_us": 18021761,
+          "residency_percent": 89.3529243209249
+        }
+      },
+      "CONSYS_IRQ_202_206_delta": 0
+    },
+    "on": {
+      "seconds": 20.229513055000098,
+      "online": "0",
+      "irq_per_second": 172.1741887968535,
+      "context_switches_per_second": 352.85080667009487,
+      "processes": {
+        "dbus-daemon": {
+          "cpu_percent_one_core": 0.19773090875320531,
+          "rss_kib": 1712,
+          "bluetooth_thread": null
+        },
+        "bluetoothd": {
+          "cpu_percent_one_core": 0.14829818156490399,
+          "rss_kib": 3852,
+          "bluetooth_thread": null
+        },
+        "bluealsad": {
+          "cpu_percent_one_core": 0.09886545437660266,
+          "rss_kib": 5664,
+          "bluetooth_thread": null
+        },
+        "y2-bt-reconnect": {
+          "cpu_percent_one_core": 0.39546181750641063,
+          "rss_kib": 4412,
+          "bluetooth_thread": null
+        },
+        "reborn": {
+          "cpu_percent_one_core": 3.460290903181093,
+          "rss_kib": 23720,
+          "bluetooth_thread": {
+            "name": "bluetooth",
+            "voluntary_ctxt_switches_per_second": 50.371949004879056,
+            "nonvoluntary_ctxt_switches_per_second": 1.5818472700256425,
+            "cpu_percent_one_core": 0.6920581806362186
+          }
+        }
+      },
+      "CPU0_idle": {
+        "SLIDLE": {
+          "name": "SLIDLE",
+          "entries": 0,
+          "residency_us": 0,
+          "residency_percent": 0.0
+        },
+        "DORMANT": {
+          "name": "DORMANT",
+          "entries": 0,
+          "residency_us": 0,
+          "residency_percent": 0.0
+        },
+        "WFI": {
+          "name": "WFI",
+          "entries": 2937,
+          "residency_us": 18010589,
+          "residency_percent": 89.03125325376209
+        }
+      },
+      "CONSYS_IRQ_202_206_delta": 0
+    }
+  },
+  "software": {
+    "Reborn_workspace_tests": 238,
+    "Reborn_fmt": "PASS",
+    "Reborn_clippy": "PASS",
+    "Linux_Bluetooth_tests": 12,
+    "Linux_connectivity_tests": {
+      "cases": 15,
+      "skipped": 1,
+      "reason": "unchanged emitted DT needs artifact opt-in"
+    },
+    "Linux_radio_codec_policy_tests": 7,
+    "Linux_platform_contract_tests": 11,
+    "ARM_build": "PASS",
+    "Cortex_A7_reconnect_and_serializer": "PASS",
+    "Linux_telemetry_regressions": 5,
+    "intent_dispatch_ms_Cortex_A7_QEMU": 111.928
+  },
+  "private_receipt_sha256": {
+    "baseline-off.jsonl": "55e353dddba2e3c92c31f114d347aa73a1363fcd880269d6e7d9f767acf71e9c",
+    "baseline-on-discovery.json": "6fcc854b725fc3f9f415c34e9f9a7a96505f3d6e7b9273aa15087025935bb843",
+    "baseline-state.txt": "eb2fd0f0377e25c5a848b6aa02e9cabe3bf6af4a2089ed146670d36f6999f07d",
+    "open-issues.json": "333c3c4cf6dae242169516e3f159bb361085ff2013a3388e9a0d4c4c5aced4a9"
+  },
+  "radio_baseline": {
+    "enable_command_seconds": 0.9520414420001089,
+    "discovery_command_accept_seconds": 0.06850008700007493,
+    "discovering_observed_after_seconds": 1,
+    "discovery_end_raw_json": "INVALID_NUMERIC_MANUFACTURER_KEY",
+    "disable_command_seconds": 0.58942055600005,
+    "CONSYS_transport_errors": 0,
+    "CONSYS_recoveries": 0,
+    "WiFi": "associated idle; no Bluetooth peer traffic"
+  },
+  "candidate_Reborn_commit": "de092094c27ad4ebba3cc0ba7003f29944de53ac",
+  "compiled_source_sha256": {
+    "tools/connectivity/reconnect.c": "4fa2f0c95eb9da51414628432df5e58eac0b3eb11eb92080da27cafd6f546ff8",
+    "tools/connectivity/bt-observe.c": "aa8932f7b3a1c7258d09230cee54a9606c9031ccbd2b7d376fb1228b7aece766",
+    "Y2Reborn/crates/reborn-platform/src/bluetooth.rs": "600350e7aee1f086f02d954b23e3862f8270a1f5a98e14735d8bd732bedd8c40",
+    "Y2Reborn/crates/reborn-platform/src/native.rs": "97987e07c09d705c82c6f37ee996f5f862e1b0fbc023b8167138753da9bc3f5c"
+  },
+  "candidate_binary_sha256": {
+    "y2-bt-reconnect-arm": "2e0fc91a1b84bd6ea2b6bae5d0820b9187d5a4ccb9be78a3b962af10970c3663",
+    "y2-bt-observe-arm": "c2f718c0a85c21aea8bf31f95db1ad815a8b76a8a49b8e4aec480cb9f467cb2f",
+    "reborn-arm": "0007dad06d78343f6b60bd9fe2bc50814ece2f9164d95f374cd835e450576ff7"
+  }
+}

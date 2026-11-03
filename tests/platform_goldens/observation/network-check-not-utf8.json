@@ -1,0 +1,15 @@
+{
+ "argv": [
+  "network-check",
+  "--peer",
+  "192.168.1.\udcff"
+ ],
+ "calls": [],
+ "exit": 2,
+ "stdout": [],
+ "tree": {
+  "added": {},
+  "changed": {},
+  "removed": []
+ }
+}

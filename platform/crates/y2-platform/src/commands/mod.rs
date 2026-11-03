@@ -1,0 +1,79 @@
+//! The subcommands implemented in Rust, each for exactly the argument forms listed in `route`. `route`
+//! sees the canonical form of a parsed command line (argparse.rs `Parsed::canonical`: the subcommand, the
+//! positionals given, then the optionals given in definition order with their full names); help, argument
+//! errors and abbreviations never reach it. A form no route takes goes to Python with the arguments as given.
+// SPDX-License-Identifier: GPL-2.0-only
+pub mod boot;
+pub mod capabilities;
+pub mod codec;
+pub mod cpu_idle;
+pub mod network;
+pub mod power_features;
+pub mod sleep;
+pub mod time;
+pub mod workload;
+// The remaining port groups, one module each, each with its own `route`.
+pub mod connectivity;
+pub mod devices;
+pub mod observation;
+pub mod power;
+pub mod reports;
+pub mod service;
+pub mod storage;
+pub mod suspend;
+
+use crate::reply::Outcome;
+use y2p_core::Root;
+
+pub type Command = Box<dyn FnOnce(&Root) -> Outcome>;
+
+/// The Rust implementation of these exact arguments, if there is one.
+/// The installed build's versions.json (none when it is missing or does not read).
+pub fn versions(root: &y2p_core::Root) -> Option<y2p_contract::Versions> {
+    serde_json::from_value(root.json("/etc/y2linux/versions.json")?).ok()
+}
+
+pub fn route(args: &[&str]) -> Option<Command> {
+    let one = |choices: &[&str], value: &str| choices.contains(&value);
+    Some(match args {
+        ["capabilities"] | ["capabilities", "--json"] => Box::new(capabilities::run),
+        ["sleep", "status"] => Box::new(sleep::status),
+        ["time"] => Box::new(time::status),
+        ["time-remember"] => Box::new(time::remember),
+        // Any stage argparse took (`boot-stage -- -x` too): boot.mark refuses the unknown ones.
+        ["boot-stage", stage] => {
+            let stage = stage.to_string();
+            Box::new(move |root| boot::mark(root, &stage))
+        }
+        ["codec-runtime"] => Box::new(|root| codec::runtime(root, false)),
+        ["codec-runtime", "--record"] => Box::new(|root| codec::runtime(root, true)),
+        ["wifi-event", event] if one(&["CONNECTED", "DISCONNECTED", "SERVICE_RESTART"], event) => {
+            let event = event.to_string();
+            Box::new(move |root| network::wifi_event(root, &event))
+        }
+        ["dhcp-event", event]
+            if one(&["deconfig", "leasefail", "nak", "bound", "renew"], event) =>
+        {
+            let event = event.to_string();
+            Box::new(move |root| network::dhcp_event(root, &event))
+        }
+        ["ntp-event", event] if one(&["step", "stratum", "periodic", "unsync"], event) => {
+            let event = event.to_string();
+            Box::new(move |root| time::ntp_event(root, &event))
+        }
+        ["cpu-idle-policy", action] if one(&["start", "stop"], action) => {
+            let action = action.to_string();
+            Box::new(move |root| cpu_idle::apply(root, &action))
+        }
+        _ => {
+            return observation::route(args)
+                .or_else(|| connectivity::route(args))
+                .or_else(|| devices::route(args))
+                .or_else(|| storage::route(args))
+                .or_else(|| service::route(args))
+                .or_else(|| reports::route(args))
+                .or_else(|| power::route(args))
+                .or_else(|| suspend::route(args))
+        }
+    })
+}

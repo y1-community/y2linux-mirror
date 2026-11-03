@@ -1,0 +1,74 @@
+[
+  {
+    "file": "AudDrv_Afe.h",
+    "url": "https://android.googlesource.com/kernel/mediatek/+/53aba21e332b3864f26832fd9b35a0b372089c10/drivers/misc/mediatek/sound/mt6582/AudDrv_Afe.h?format=TEXT",
+    "sha256": "1a472e5e1c213a0e7e7663f63e4ea65365b00a221ad5b3bec4794b0122633a61"
+  },
+  {
+    "file": "AudDrv_Afe.c",
+    "url": "https://android.googlesource.com/kernel/mediatek/+/53aba21e332b3864f26832fd9b35a0b372089c10/drivers/misc/mediatek/sound/mt6582/AudDrv_Afe.c?format=TEXT",
+    "sha256": "fc70a6bab18ac6b9f3bb618c7676cd06c4a7c21dcd1ac9d844e85015150d081a"
+  },
+  {
+    "file": "AudDrv_Def.h",
+    "url": "https://android.googlesource.com/kernel/mediatek/+/53aba21e332b3864f26832fd9b35a0b372089c10/drivers/misc/mediatek/sound/mt6582/AudDrv_Def.h?format=TEXT",
+    "sha256": "e6ad296ed344e4558c4ed9c4e0ebe48f9f9c061c6a8087e1e88a35b3300b5161"
+  },
+  {
+    "file": "AudDrv_Common.h",
+    "url": "https://android.googlesource.com/kernel/mediatek/+/53aba21e332b3864f26832fd9b35a0b372089c10/drivers/misc/mediatek/sound/mt6582/AudDrv_Common.h?format=TEXT",
+    "sha256": "5e26e90620be659aed223ef3057a901b436c1a0b63b2e9e50175b03f948c69b0"
+  },
+  {
+    "file": "AudDrv_Kernel.c",
+    "url": "https://android.googlesource.com/kernel/mediatek/+/53aba21e332b3864f26832fd9b35a0b372089c10/drivers/misc/mediatek/sound/mt6582/AudDrv_Kernel.c?format=TEXT",
+    "sha256": "97859a9bc453cf4c82bd088c908d047ffcf2c5dd072d79fae6ba02f6e8f46697"
+  },
+  {
+    "file": "AudDrv_Kernel.h",
+    "url": "https://android.googlesource.com/kernel/mediatek/+/53aba21e332b3864f26832fd9b35a0b372089c10/drivers/misc/mediatek/sound/mt6582/AudDrv_Kernel.h?format=TEXT",
+    "sha256": "4f66b7e9c990d156d789f01afbc4866c16c2168e69024841620224a8cdb28108"
+  },
+  {
+    "file": "AudDrv_ioctl.h",
+    "url": "https://android.googlesource.com/kernel/mediatek/+/53aba21e332b3864f26832fd9b35a0b372089c10/drivers/misc/mediatek/sound/mt6582/AudDrv_ioctl.h?format=TEXT",
+    "sha256": "56c884c5eff2cc234d1b1645ff359f34a527e6f94d491dc8ad559d4cd418e73b"
+  },
+  {
+    "file": "giraffe-config",
+    "url": "https://github.com/DeVviL/android_kernel_mediatek_giraffe/blob/6e398bfbba8a178b780e07e32e62388c4657d535/arch/arm/configs/zera_defconfig",
+    "sha256": "12f4316a3c5515ee010596698d44d3b4a6ae8c86fd21d2f5cd9553df577e3ce0",
+    "compatibility": "UNPROVEN; MT6582 defconfig selects MTK_SOUND_DRV, not SND_SOC"
+  },
+  {
+    "file": "giraffe__sound__soc__mediatek__mt_soc_audio_v1__mt_soc_afe_control.c",
+    "url": "https://github.com/DeVviL/android_kernel_mediatek_giraffe/blob/6e398bfbba8a178b780e07e32e62388c4657d535/sound/soc/mediatek/mt_soc_audio_v1/mt_soc_afe_control.c",
+    "sha256": "85c42fdddf7ca633318a55fc37756d27a72b609de14af45aae6aef4620ed7db0",
+    "compatibility": "UNPROVEN; MT6582 defconfig selects MTK_SOUND_DRV, not SND_SOC"
+  },
+  {
+    "file": "giraffe__sound__soc__mediatek__mt_soc_audio_v1__AudDrv_Afe.h",
+    "url": "https://github.com/DeVviL/android_kernel_mediatek_giraffe/blob/6e398bfbba8a178b780e07e32e62388c4657d535/sound/soc/mediatek/mt_soc_audio_v1/AudDrv_Afe.h",
+    "sha256": "e5a79eb0fe511567a87ff47ac58eb42aac055957790f8a88324001e079cbdcf9",
+    "compatibility": "UNPROVEN; MT6582 defconfig selects MTK_SOUND_DRV, not SND_SOC"
+  },
+  {
+    "file": "CS43131_DS1155F2.pdf",
+    "url": "https://statics.cirrus.com/pubs/proDatasheet/CS43131_DS1155F2.pdf",
+    "revision": "DS1155F2",
+    "scope": "receiver word/slot formats: sections4.9,7.1.8,7.3.22-24; official Cirrus source"
+  },
+  {
+    "file": "cs43130.c",
+    "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/sound/soc/codecs/cs43130.c?h=v6.18",
+    "revision": "v6.18",
+    "scope": "locally retained exact Linux6.18 codec source; params_width word length separate from sclk-derived slot width"
+  },
+  {
+    "file": "MT6582WG_Technical_Brief_v1.1.pdf",
+    "url": "https://device.report/m/09c50b26c755173dbd88dbf3a4f8720f16810b54ffb56fb78197abf968657287.pdf",
+    "revision": "1.1, 2013-07-11",
+    "scope": "MediaTek-authored document on mirror; page8 overview lists8/16 audio, no DL1/interconnect register proof",
+    "access": "web PDF reader verified page8; direct local download HTTP403; no local artifact hash claimed"
+  }
+]

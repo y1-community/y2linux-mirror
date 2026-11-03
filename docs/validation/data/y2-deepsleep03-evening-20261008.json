@@ -1,0 +1,143 @@
+{
+  "battery": {
+    "calibrated_capacity_available": false,
+    "first_ssh_connected": {
+      "calibration_source": "estimated Li-ion curve within Y2 stock 3.4V precharge and 4.175V CV bounds; not a measured discharge curve",
+      "charge_counter_uah": null,
+      "charging": true,
+      "confidence": "provisional",
+      "current_ua": null,
+      "filtered_voltage_uv": 3786233,
+      "percent": 31,
+      "provisional": true,
+      "resting": false,
+      "source": "voltage_estimate",
+      "status": "Charging",
+      "temperature_millicelsius": null,
+      "voltage_uv": 3820385
+    },
+    "health_connected": {
+      "calibration_source": "estimated Li-ion curve within Y2 stock 3.4V precharge and 4.175V CV bounds; not a measured discharge curve",
+      "charge_counter_uah": null,
+      "charging": true,
+      "confidence": "provisional",
+      "current_ua": null,
+      "filtered_voltage_uv": 3816701,
+      "percent": 31,
+      "provisional": true,
+      "resting": false,
+      "source": "voltage_estimate",
+      "status": "Charging",
+      "temperature_millicelsius": null,
+      "voltage_uv": 3829614
+    },
+    "last_precable": {
+      "backlight": {
+        "y2-backlight": "4"
+      },
+      "boot_id": "ad0d5416-1a4a-453c-a008-704b3ae88ceb",
+      "boottime_s": 25346.183575509,
+      "event": "suspend_refused_sleep_recovery_required",
+      "file": "power-journal.jsonl",
+      "line": 353,
+      "percent": 32,
+      "status": "Discharging",
+      "voltage_uv": 3736450
+    },
+    "measured_pack_current_available": false,
+    "new_boot_first": {
+      "backlight": {
+        "y2-backlight": "0"
+      },
+      "boot_id": "ad0d5416-1a4a-453c-a008-704b3ae88ceb",
+      "boottime_s": 4.996807614,
+      "event": "snapshot",
+      "file": "power-journal.previous.jsonl",
+      "line": 288,
+      "percent": 57,
+      "status": "Discharging",
+      "voltage_uv": 3861914
+    },
+    "soc_provisional": true
+  },
+  "capture_host_utc": "2026-10-08T15:00:45.158724+00:00",
+  "chronology": {
+    "device_wall_clock_authoritative": false,
+    "new_boot_estimated_host_utc": "2026-10-08T07:55:54.875006+00:00",
+    "old_boot_host_anchor_utc": "2026-10-08T01:16:30.062972+00:00",
+    "orderly_shutdown": {
+      "backlight": {
+        "y2-backlight": "4"
+      },
+      "boot_id": "81dce40c-9bb5-4f14-8465-c7e80ba3c602",
+      "boottime_s": 23949.235335041,
+      "event": "shutdown_execute",
+      "file": "power-journal.previous.jsonl",
+      "line": 287,
+      "percent": 63,
+      "status": "Discharging",
+      "voltage_uv": 3889819
+    },
+    "orderly_shutdown_estimated_host_utc": "2026-10-08T07:55:39.298307+00:00",
+    "shutdown_reason": "user"
+  },
+  "health": {
+    "application_ok": true,
+    "charger_state": "phase=CONSTANT_CURRENT source=1 source_valid=1 charge_limit_ua=450000\nactive=1 online=1 present=1 fault=0x0 sample_error=0 stop_error=0 paused=0 last_error=0\nbattery_uv=3829833 baton_raw=10389 isense_raw=17874 pmic_die_mc=33432 input_budget_ua=500000\nchr_con0=0x007b cv_status=0x008e battery_ovp=0x0003 baton=0x0005 watchdog=0x0001 thermal=0x0000\nwatchdog_pets=89 last_pet_ms=25489598 total_seconds=91 cv_seconds=0 precharge_seconds=0 hold=0 full=0 timeout=0\nfirst_fault=0x0 at_ms=0 battery_uv=0 sample_error=0 chr=0x0 cv=0x0 ovp=0x0 watchdog=0x0 thermal=0x0\ndormant_blocked=1 check_reg=0x0 check_mask=0x0 check_expected=0x0 check_actual=0x0 check_error=0\n",
+    "ext4_counters": {
+      "/sys/fs/ext4/mmcblk0p5/errors_count": 0,
+      "/sys/fs/ext4/mmcblk0p5/warning_count": 0,
+      "/sys/fs/ext4/mmcblk0p7/errors_count": 0,
+      "/sys/fs/ext4/mmcblk0p7/warning_count": 0,
+      "/sys/fs/ext4/mmcblk1p1/errors_count": 0,
+      "/sys/fs/ext4/mmcblk1p1/warning_count": 0
+    },
+    "installed_sha256": {
+      "/usr/bin/reborn": "890216e09b6de5a19796912e11db4ec831183d713c2c4c0a6669fd4ffe785423",
+      "/usr/lib/y2-platform/y2_platform/power_journal.py": "57add62a7b97c9ef3055abfc94e2a24d8e8bdd2075f03b6bff9800a8c6d3e1b9",
+      "/usr/lib/y2-platform/y2_platform/product_sleep.py": "d83f140fb9b3670ae778864c39f61cfb64f5a1aa2279022eefec8e1f8c149dba",
+      "/usr/lib/y2-platform/y2_platform/suspend_record.py": "97c8a6804c4dcacfddd0dbba4cca75780a0b8061c86123fa32fba7f56a47aa73"
+    },
+    "playback": "paused",
+    "pm_processes": [],
+    "pstore_files": [
+      "/sys/fs/pstore/console-ramoops-0"
+    ]
+  },
+  "identity": {
+    "current_boot_id": "ad0d5416-1a4a-453c-a008-704b3ae88ceb",
+    "kernel": "6.18.0-y2linux-platform-v1-deepsleep-final-03",
+    "previous_boot_id": "81dce40c-9bb5-4f14-8465-c7e80ba3c602",
+    "taint": "0"
+  },
+  "schema": "org.y2linux.deepsleep-evening-observation/v1",
+  "scope": {
+    "device_mutations": [],
+    "qualification": "MORE_WORK_REQUIRED"
+  },
+  "sleep": {
+    "boottime_minus_monotonic_range_s": [
+      0.0038608459999522893,
+      0.021855384999071248
+    ],
+    "current_boot_events": {
+      "snapshot": 86,
+      "suspend_refused_charger_active": 1,
+      "suspend_refused_sleep_recovery_required": 421
+    },
+    "guard": {
+      "boot_id": "0132fb21-8462-4f77-9faf-3a7e7f1b8429",
+      "identity": {
+        "build_git_commit": "cfb7e098eae60918f47d7b330445bf66e9d61817",
+        "build_id": "Y2LINUX-PLATFORM-V1-DEEPSLEEP-FINAL-03",
+        "kernel": "6.18.0-y2linux-platform-v1-deepsleep-final-03",
+        "reborn_source_commit": "97ff8c357bab12319087740d7c97b5051e6588f5"
+      },
+      "pending": true,
+      "updated": 1791421592.369859
+    },
+    "no_full_system_sleep": true,
+    "spm_entries": 0,
+    "spm_resumes": 0
+  }
+}

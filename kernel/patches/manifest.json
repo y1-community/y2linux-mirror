@@ -1,0 +1,322 @@
+{
+  "overlays": [
+    {
+      "path": "arch/arm/mm/Kconfig",
+      "base_sha256": "320a616f70976e6bf1544f4cebccd4f796524d7e856da6d2f053aed581d4a049",
+      "result_sha256": "57ec8dcb3b02cd5c5efc6925b921e69671add7f2db51a9c21ca72df5ec307116",
+      "patch": "0001-arm-allow-explicit-virt-ext-disable.patch"
+    },
+    {
+      "path": "arch/arm/mach-mediatek/mediatek.c",
+      "base_sha256": "5fef5712eb9b6729519b4e45898ea25b1b7a0bbd914dabecfc46f3f3de624ea5",
+      "result_sha256": "ad45f51de9561ae085f313d613743243cd2f54330b27fd4cfd111e263701e182",
+      "patch": "0003-y2-mediatek-c.patch"
+    },
+    {
+      "path": "arch/arm/boot/compressed/head.S",
+      "base_sha256": "f58ea39b9d2d64f6b985a3be842ddb340365521a782dcb0c15e6183804bf3d82",
+      "result_sha256": "c1c4f9d89788431ba7d18aae0e8eb9e34012071b7458755cd9d0aeb6248fd076",
+      "patch": "0004-y2-head-S.patch"
+    },
+    {
+      "path": "drivers/soc/mediatek/mtk-mmsys.c",
+      "patch": "0010-mt6582-mmsys.patch",
+      "base_sha256": "6f959cf51269bd1e1cf2895c38962bec5341a53e4f189681ff0db75e960e3dac",
+      "result_sha256": "10439e5003848dfe51f22e2beffa1a4776392b3a5c4406b77aa782cb878a62b7"
+    },
+    {
+      "path": "drivers/soc/mediatek/mtk-mutex.c",
+      "patch": "0011-mt6582-mutex.patch",
+      "base_sha256": "3d62c9f315dc53c189f97febb3aaaea9a76528c84bf42515cf572c5f5f11f2e3",
+      "result_sha256": "6a5a3d2c351f0c943bd4e122252d9cb8c33bbccbcad6978d3b31af587399078d"
+    },
+    {
+      "path": "drivers/gpu/drm/mediatek/mtk_drm_drv.c",
+      "patch": "0012-mt6582-drm.patch",
+      "base_sha256": "9429cb523b3c02a952af171b415aafb35ce4bb7997e5d274c9a80ee58666981e",
+      "result_sha256": "85d73b49bd06d146d80fcc0972c0671b1126dbd9b16e25c77538d57bc0fb41a3"
+    },
+    {
+      "path": "drivers/gpu/drm/mediatek/mtk_disp_color.c",
+      "patch": "0013-mt6582-color.patch",
+      "base_sha256": "c0c6bf9320e17010264634ea6318fdb7596f42efbb2ca9fb6b628374ae6516c1",
+      "result_sha256": "bf29c8ee49a30023f554b52a614142ceb5bba3493201061ad0e9d5c2f50c7b31"
+    },
+    {
+      "path": "drivers/gpu/drm/mediatek/mtk_disp_ovl.c",
+      "patch": "0014-mt6582-ovl.patch",
+      "base_sha256": "405ee251d3f328a00074158d2cf9664c934de40a5b47c7a5b018a8deeb6b233d",
+      "result_sha256": "306614ecd657947017a5ff15e4142b4ac73d5bcfb9c83cde2cf85d762d28a163"
+    },
+    {
+      "path": "drivers/gpu/drm/mediatek/mtk_disp_rdma.c",
+      "patch": "0015-mt6582-rdma.patch",
+      "base_sha256": "accb19352368a971d67937c4e0b97a17988f5136c22870aa72e69c5787dadd26",
+      "result_sha256": "205a9d64e736d8ba5ae73bc70b2d861c0e93c1c2024047fb09faa01e716fe92f"
+    },
+    {
+      "path": "drivers/Makefile",
+      "patch": "0005-y2-drivers.patch",
+      "base_sha256": "32d5e6823a71712aaab73276e574a8c24c386602c2c05a4085d1e2abfa381d01",
+      "result_sha256": "94bda5dc324bf8866ae3f9a310fbc6dcb09f223aa41ed507f40459e7d80c8a7e"
+    },
+    {
+      "path": "arch/arm/mach-mediatek/platsmp.c",
+      "patch": "0006-mt6582-smp.patch",
+      "base_sha256": "437c79de149466434a7bd3ab0a5210196a43f75f151d896d0e3871c1d37c7145",
+      "result_sha256": "be3c871e7670d135c4a32525599f2f77ddedc1682649d9220df4ab4b51353b90"
+    },
+    {
+      "path": "drivers/pinctrl/mediatek/Kconfig",
+      "patch": "0019-y2-eint-library.patch",
+      "base_sha256": "358c03715ce2d3351183bff171f663ba7f3ee071425b44c9ef159fd0b8146d1c",
+      "result_sha256": "288066840f6a86f78ec096ac76fad90877021cb941efeb1eced4d5ae657c179d"
+    },
+    {
+      "path": "drivers/input/keyboard/mtk-pmic-keys.c",
+      "patch": "0007-y2-pmic-keys.patch",
+      "base_sha256": "4a085e49f16e12cc6c00f7b74b7c1e7e18735b45eccd26f0b24e076d9f940d1e",
+      "result_sha256": "6c8eee147a2040ae9e704053d45ad8410530f3f03a1be35412ec463133110c2d"
+    },
+    {
+      "path": "drivers/i2c/busses/i2c-mt65xx.c",
+      "patch": "0008-mt6582-i2c.patch",
+      "base_sha256": "fc2cb20be4237685878d9abfa9028a94949d67af62a974dc61d9fff1c5de3072",
+      "result_sha256": "54ed7bddf496540a3253f1a9cf0fdeee070942b29e4ed044ade4c1059aac0196"
+    },
+    {
+      "path": "drivers/mmc/host/mtk-sd.c",
+      "patch": "0009-y2-msdc-readonly.patch",
+      "base_sha256": "8fd10e3a6f6d60e37216de79b2d7a8b8f766c7d7e5cdd5851cccfe375e2536d1",
+      "result_sha256": "3845ab861d7e6b93492f4f0a7479227989e496971e6db1affe54e0d314cdc0f2"
+    },
+    {
+      "path": "drivers/gpu/drm/mediatek/mtk_crtc.c",
+      "patch": "0018-mt6582-crtc.patch",
+      "base_sha256": "ef3a60c738b668f546b7f241d9890d63944052d36a15df87661a13f2995db0fd",
+      "result_sha256": "b539d9e862fcf4a5bb59130fa6e7363f1179b091b35fcf9594f1f400d56ac1dc"
+    },
+    {
+      "path": "drivers/phy/mediatek/phy-mtk-mipi-dsi.h",
+      "patch": "0020-mt6582-phy-ops.patch",
+      "base_sha256": "e2bc2b68cfad1e061eb61f27847fbac8c840db0597b4eccd4284d15c90e5e2b7",
+      "result_sha256": "8d732c198b30a65fdcdeb09bebea17ea5e82b065c7879d2655c42b2d3b209a78"
+    },
+    {
+      "path": "drivers/phy/mediatek/phy-mtk-mipi-dsi.c",
+      "patch": "0016-mt6582-phy.patch",
+      "base_sha256": "22cd8bea37a7663052a5576c37d1fd68712d98fc8c45f4c0754547539cb3aded",
+      "result_sha256": "b9efc3dec5a4924e857e6433b7f8270b990a3233a1712cdadbdc4e99d5a5ed5f"
+    },
+    {
+      "path": "arch/arm/mach-mediatek/Kconfig",
+      "patch": "0002-y2-Kconfig.patch",
+      "base_sha256": "61790e35f9fbdb5dd524c658f041739b4cf52d8393962622d6cdb4a0f497506b",
+      "result_sha256": "157c7e071a48c9e4e732651dd8d6880c2b5de6bf7a6efd9fd69c6633411599f5"
+    },
+    {
+      "path": "drivers/gpu/drm/mediatek/mtk_dsi.c",
+      "patch": "0017-mt6582-dsi.patch",
+      "base_sha256": "a8405967bc29d4786727389cff06f9f7129b319ecb27840ae9b4ed0fcd857476",
+      "result_sha256": "faf61957c64320b3b9a721013dc8021752526608a9841869e5ce94571dffe6af"
+    },
+    {
+      "path": "sound/soc/mediatek/Makefile",
+      "patch": "0021-mt6582-audio-Makefile.patch",
+      "base_sha256": "5a4c58e2b6ff638bfe69aba785dee981a003ee1e5a894a5636e055d647b8c9ec",
+      "result_sha256": "39199c53e3f00b2d5132543d472266434ef8a68de541e411d870e2f27cceb311"
+    },
+    {
+      "path": "sound/soc/mediatek/Kconfig",
+      "patch": "0022-mt6582-audio-Kconfig.patch",
+      "base_sha256": "0bb03979e1b171cccf16fb727332cc24413794442e571c31a73745acd542ad70",
+      "result_sha256": "db3710fb9d8e380514d524e71f91557ed2e465f7ca08f008794d8f07a22feb95"
+    },
+    {
+      "path": "drivers/mmc/core/block.c",
+      "patch": "0023-y2-stock-emmc-capacity.patch",
+      "base_sha256": "a671a8347246591a2589e10f6f25ca5d638b30d27430bb3528d484831b44bd42",
+      "result_sha256": "10eb4e3582c58d01eec9f005cf0d0a98ff8242bd892c7865d479143a0533b39b"
+    },
+    {
+      "path": "drivers/mfd/mt6397-core.c",
+      "patch": "0024-mt6323-power-children.patch",
+      "base_sha256": "4c9b1a942df7ade97f0bb4cd7af65a8f7a9487df96b278eedc125f1eda6e3209",
+      "result_sha256": "4f43636b5b3efea3b2294710017087d831ba444af7defeb7631a8be2ce097dd6"
+    },
+    {
+      "path": "drivers/mfd/mt6397-irq.c",
+      "patch": "0025-mt6323-wake-order.patch",
+      "base_sha256": "be6f4059b169ddfcc48a65539f94969d83f220602c09d4df66b7a4e81bb9a61e",
+      "result_sha256": "b47a3a0d0ea3eda5c5eb13188d5124f9cc51550c658dfd8feebe5ccda249104f"
+    },
+    {
+      "path": "include/linux/mfd/mt6397/core.h",
+      "patch": "0026-mt6323-pm-state.patch",
+      "base_sha256": "e9391c0799c3c046cefee99187070531cf97baa6fc1113c1d3adfc1c20f24840",
+      "result_sha256": "3981235cf41cc92fe43c524b28d2fb4cff3a5a1fc9f04ee24de128802bbac908"
+    },
+    {
+      "path": "drivers/power/reset/mt6323-poweroff.c",
+      "patch": "0027-mt6323-poweroff-atomic.patch",
+      "base_sha256": "7ce333b601878e3a2a9aa60c2b3d0f9509b7aff49738ce9bffab168af1d402da",
+      "result_sha256": "889d78ead6dfa6bd538174d8beabe5b831324ef2586500713cd1a2798bf63884"
+    },
+    {
+      "path": "drivers/rtc/rtc-mt6397.c",
+      "patch": "0028-mt6323-rtc-errors.patch",
+      "base_sha256": "fa9fb999e4f22cde90b2a931e8ac547c87d3e267c94be6e6ab48f286fae2881c",
+      "result_sha256": "79f483e3bd1443db1d9a8de316e9f2ada16070082b9dda877395423e92858edb"
+    },
+    {
+      "path": "drivers/mmc/core/mmc.c",
+      "patch": "0029-y2-retain-emmc-s2idle.patch",
+      "base_sha256": "3fd819d40cb6aa118a3689a1ee82041383a64506546f4e5faee308fc63d1949d",
+      "result_sha256": "121dd9cc3cf5b33251e133e870377241565e7ba7b6fbc41a5fd9344ff88365fb"
+    },
+    {
+      "path": "sound/soc/codecs/cs43130.c",
+      "patch": "0030-cs43130-system-pm.patch",
+      "base_sha256": "e3f2d840943600a6cb9d474ba367b1bb6a225cd98fc502f3c09570a7d6033099",
+      "result_sha256": "d93866db4f1334ccb2b429af5c9a27f7255a1142f057b54fe1cb8b3b14de9620"
+    },
+    {
+      "path": "drivers/usb/gadget/legacy/cdc2.c",
+      "patch": "0031-y2-usb-power-budget.patch",
+      "base_sha256": "a5508550e99d3db8de44a9d42f2a3e5ee1b97a25faa0e5024852a44c80c3c763",
+      "result_sha256": "60c5646ff09083bb07b573166eb25f43b72593440119aedbc59395f88062b9ac"
+    },
+    {
+      "path": "include/linux/mfd/mt6397/rtc.h",
+      "patch": "0035-mt6323-rtc-epoch-data.patch",
+      "base_sha256": "6cc6002d16d882c4d5239c5f7dd2b1c7e8e5ade4b6343d9b7011264f2a8486ab",
+      "result_sha256": "4d647579a30f8e52a01d1d181b42475e2af6548a0d1d8966c2b0bd59f7520faf"
+    },
+    {
+      "path": "drivers/nvmem/mtk-efuse.c",
+      "patch": "0036-mt6582-efuse-word-access.patch",
+      "base_sha256": "94160d968714ac1c288a812c1783c0aa2fb8a16b9350ddab21c4b0a0774b0628",
+      "result_sha256": "40b2d05e23ed19439fcd6a4921f48d1b370a0f332196167d15c7a235c376f5a8"
+    },
+    {
+      "path": "drivers/watchdog/mtk_wdt.c",
+      "patch": "0037-mt6582-consys-reset.patch",
+      "base_sha256": "6e8230dff7db590f16bdc83918220da48be57c8a594cd3f0917f4c0e0018da9b",
+      "result_sha256": "689116af76c892088b3cc8a18a9af2787563f6f65a202a4f6e9b144255e4fdac"
+    },
+    {
+      "path": "drivers/gpu/drm/lima/lima_drv.c",
+      "patch": "0038-lima-initial-runtime-idle.patch",
+      "base_sha256": "f690bd317e00ca5c4b87935598ffa473136cf544e50984f47c98fcfe36f8fe46",
+      "result_sha256": "642a879b7e109229856c2c8d2f8888c59680e7aedd7047e9491aeeb507f385e1"
+    },
+    {
+      "path": "Documentation/devicetree/bindings/gpu/arm,mali-utgard.yaml",
+      "patch": "0039-mt6582-mali-binding.patch",
+      "base_sha256": "21bd67c366ebb7cd038f133c63048a630086a2fe74699857d0177d41d4b1a01a",
+      "result_sha256": "a9c5285183549d69a231e1942cbe94393e9ae9a6b899c452895a49daabe1466f"
+    },
+    {
+      "path": "drivers/clocksource/timer-mediatek.c",
+      "patch": "0052-y2-gpt6-counter.patch",
+      "base_sha256": "15f499b5abefc9bab004ef1a9ca55180582e48bba8dd5429b1e7a0cbdf1988e7",
+      "result_sha256": "5c5b513d69f7bb10a641afeac052f3d3a385ae76fa961fd5a21ca009698beb50"
+    },
+    {
+      "path": "drivers/clocksource/arm_arch_timer.c",
+      "patch": "0053-y2-local-timer-guard.patch",
+      "base_sha256": "0613e2f5d21a736e98fb993db17e8db5c8e050b813c59035fb5bd4a696dd7ead",
+      "result_sha256": "fcf462109e07438e8067ab113b152428e5a54b5e0bfc3e08da1371c523afebfd"
+    },
+    {
+      "path": "drivers/usb/musb/Kconfig",
+      "patch": "0054-y2-inventra-dma.patch",
+      "base_sha256": "799615aba275600620ab07aa8a1a29cb179effc5ce3d7916602764550a73c49e",
+      "result_sha256": "8c6c9492652243eb7c7ffd733cdc8523c543e8eca78681f8e9bb680889d63fc4"
+    },
+    {
+      "path": "drivers/usb/musb/musbhsdma.c",
+      "patch": "0055-musb-abort-bus-error.patch",
+      "base_sha256": "45ee5dacef39ff755e5bd9b8c4f895b534f5a28014b0ecd7b4f06d527097fc40",
+      "result_sha256": "c231cac0895332628be35c1f8c71328a5a510ac8f24d879cbdd89ff67ae1a609"
+    },
+    {
+      "path": "drivers/cpufreq/cpufreq-dt.c",
+      "patch": "0056-y2-cpufreq-voltage-owner.patch",
+      "base_sha256": "a0ee2ef7866e2882116a3f66c605ae5df6161448d7bf33c87020099bde0b2d25",
+      "result_sha256": "ad90a8609ab537624a0ff872ab77312fbb2fcc6754f1ded5890066583c94da78"
+    },
+    {
+      "path": "drivers/usb/gadget/function/u_ether.c",
+      "patch": "0057-u-ether-align-dma-tx.patch",
+      "base_sha256": "5f6cbeaa36549b244705290203dcc124a673ee6c38f1325b415e6fc08cdef2c0",
+      "result_sha256": "3c549eaf42bc94e7cab6293f968d4d05c97ecbb860c3d86b78f69145152f9aca"
+    },
+    {
+      "path": "drivers/usb/musb/musb_core.c",
+      "patch": "0058-y2-musb-sleep-lifecycle.patch",
+      "base_sha256": "0b8be0783e244d987284f10d6e87e6173bc29c91458cc7c5f2fe58057b0d63fc",
+      "result_sha256": "20ac95e24243fc20fcbff3241febcc6ad43058d6dbd64b138d768a1f439944dc"
+    },
+    {
+      "path": "drivers/base/power/main.c",
+      "patch": "0059-pm-balance-prepare-refusal.patch",
+      "base_sha256": "0842ea9473ca90bdb3d745912ea47e2826107a5369316d64665e7b597fc01132",
+      "result_sha256": "301dba11f7b851bdf44953b732d8ecb88b3c272f4f21dd142d277d79bb804114"
+    },
+    {
+      "path": "kernel/power/suspend.c",
+      "patch": "0060-y2-persistent-suspend-stages.patch",
+      "base_sha256": "0f5cd354b1523364549e8cfc6dc4bbd781edc207b58a664617c4b971c119ae24",
+      "result_sha256": "1d2d9a01f60849c0c118880f803cc979175935e2c5a2d319fe2b0b63b144194c"
+    },
+    {
+      "path": "drivers/tty/serial/8250/8250_mtk.c",
+      "patch": "0061-mt6582-uart-pio-sleep.patch",
+      "base_sha256": "9ed47647ccf4c2cada2b09d61d088b04cbc80b92f9455673b41fd645e5dfe821",
+      "result_sha256": "b7469917e426c80d1b74cdf61e55788bfd9b15f976368a31bd873f84b893d80a"
+    },
+    {
+      "path": "drivers/usb/musb/musb_gadget.c",
+      "patch": "0065-y2-musb-pio-progress.patch",
+      "base_sha256": "c0948905903b9e2998408d01adefbb69195bd493f165c209b350e019760a97a4",
+      "result_sha256": "006bd127133f2fc077b0e50460ccc71fc06b9dd86f8c103664c94dee68b70e5f"
+    },
+    {
+      "path": "drivers/base/regmap/regcache.c",
+      "base_sha256": "1f5c9b1e6ece8b2719ef44c9fdfd23a3923f8066a04f9cc27fa20a612ae67774",
+      "result_sha256": "3c66058dabbff1a684766cf56bdc58209fd9318e0c0c8ac0dca0319930587411",
+      "patch": "0062-y2-codec-cache-pm-trace.patch"
+    },
+    {
+      "path": "kernel/power/main.c",
+      "patch": "0067-y2-pm-sync-device-suspend.patch",
+      "base_sha256": "f8eb032af1f0f295f5deb133ae7a8da43636e44e8bd32312b4293072656bcef8",
+      "result_sha256": "77c5e5de25b52be965ed03e1e7bbf8103516e49d3dccdbaec757805f5c49214e"
+    },
+    {
+      "path": "fs/exfat/dir.c",
+      "patch": "0068-exfat-dir-readahead-plug.patch",
+      "base_sha256": "a6fd5c83ebf83b42a89b5ee92daf8b7d25842dfc66ac9694bd78ecfe93961979",
+      "result_sha256": "41be4f88b930b7b366b03ebfcce20a0432535d0ba7e5c00b1373f7a19a909149"
+    },
+    {
+      "path": "fs/fat/dir.c",
+      "patch": "0069-fat-dir-readahead-plug.patch",
+      "base_sha256": "0650b329ad265be51f22de2839115a5b93b0af956743cd109abd427c1c525e84",
+      "result_sha256": "dc4803793f0974602c1dc44b9ca71e5cecb164d96b20c7af2a8c0e221defc838"
+    },
+    {
+      "path": "fs/ext4/inode.c",
+      "patch": "0070-ext4-bread-batch-plug.patch",
+      "base_sha256": "497bb7ca8da1da0a39bcb14110d6fe5ae8016e74ad0b1a640f1bb9ecc2e02257",
+      "result_sha256": "3b188e6f471c3e4fcd47e5afaff961b6e5f46b45bcc1a89d53fab8c7414efa39"
+    },
+    {
+      "path": "drivers/mmc/core/sd.c",
+      "patch": "0071-y2-sd-poweroff-notify-fallback.patch",
+      "base_sha256": "70f3c63f37772a20d42e25d8e0b045f85248ce4f8f5ee273c2feedea3169f191",
+      "result_sha256": "5a73182f3562a6b707f0bd162fa8d3ea2e8d106d204250a0fb087b351d4177ea"
+    }
+  ]
+}

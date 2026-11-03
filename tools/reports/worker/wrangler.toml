@@ -1,0 +1,32 @@
+# Y2Linux error report receiver (docs/planning/ERROR-REPORTS-PLAN.md, R3).
+# Deploy: see tools/reports/README.md.
+name = "y2linux-reports"
+main = "src/index.js"
+compatibility_date = "2026-06-01"
+# Only reports.schulzcode.dev: no workers.dev address, no preview URLs.
+workers_dev = false
+preview_urls = false
+routes = [
+  { pattern = "reports.schulzcode.dev", custom_domain = true },
+]
+
+[[r2_buckets]]
+binding = "REPORTS"
+bucket_name = "y2linux-reports"
+
+# The daily budget (class Quota in src/index.js): exact counts, Free plan.
+[[durable_objects.bindings]]
+name = "QUOTA"
+class_name = "Quota"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Quota"]
+
+# Secrets (never in this file): UPLOAD_KEY (the key built into the player's
+# platform) and RATE_SALT (any long random text), set with `wrangler secret put`.
+
+# No request logs: they would hold the players' IP addresses, which the
+# receiver never stores (docs/ERROR-REPORTS.md). Errors answer 500 only.
+[observability]
+enabled = false

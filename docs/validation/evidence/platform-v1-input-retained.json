@@ -1,0 +1,68 @@
+[
+  {
+    "source": "docs/hardware-evidence/2026-09-10-dev02-live/input-event2.bin",
+    "source_sha256": "ecbfda13d7daec521e7317c1ccb6240e98156743d23e191ba8d8f261ecaf9c92",
+    "origin": "retained physical evdev capture; not current acceptance",
+    "wheel_presses": 52,
+    "wheel_releases": 52,
+    "cw": 30,
+    "ccw": 22,
+    "same_direction_gap_us": {
+      "n": 49,
+      "median_us": 82356,
+      "p95_us": 133782,
+      "worst_us": 4745645,
+      "min_us": 61712
+    },
+    "active_same_direction_gap_us": {
+      "n": 48,
+      "median_us": 82350,
+      "p95_us": 123511,
+      "worst_us": 154569,
+      "min_us": 61712
+    },
+    "same_direction_gaps_lt8ms": 0,
+    "synthetic_press_release_us": {
+      "n": 52,
+      "median_us": 14,
+      "p95_us": 27,
+      "worst_us": 34,
+      "min_us": 13
+    },
+    "owner_detent_count": null,
+    "input_to_frame_latency": null
+  },
+  {
+    "source": "docs/hardware-evidence/2026-09-18-gpu01/input-events.txt",
+    "source_sha256": "b4d78c69e7fa152c0e90d8f3d439ce7d1040f77512c8c5e86b819f33cb1714ba",
+    "origin": "retained physical evdev capture; not current acceptance",
+    "wheel_presses": 166,
+    "wheel_releases": 166,
+    "cw": 83,
+    "ccw": 83,
+    "same_direction_gap_us": {
+      "n": 154,
+      "median_us": 41357,
+      "p95_us": 165575,
+      "worst_us": 200842756,
+      "min_us": 30957
+    },
+    "active_same_direction_gap_us": {
+      "n": 147,
+      "median_us": 41349,
+      "p95_us": 82729,
+      "worst_us": 165575,
+      "min_us": 30957
+    },
+    "same_direction_gaps_lt8ms": 0,
+    "synthetic_press_release_us": {
+      "n": 166,
+      "median_us": 9,
+      "p95_us": 18,
+      "worst_us": 32,
+      "min_us": 8
+    },
+    "owner_detent_count": null,
+    "input_to_frame_latency": null
+  }
+]

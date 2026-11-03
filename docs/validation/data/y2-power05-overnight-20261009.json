@@ -1,0 +1,80 @@
+{
+ "schema": 1,
+ "date": "2026-10-09",
+ "image": "POWER-FINAL-05 (Linux 837b6146ee4d, Reborn 97ff8c3, root v1.35)",
+ "archive": "out/deep-sleep-final/evidence/20261009/88-power05-overnight-return/",
+ "archive_sha256": {
+  "first-return.json": "6b5fa9abfdaaf8c85ce8277c40ff2ef26d3611593bd73ff4c5e4c2c5a3e2c2b4",
+  "retained-sysfs.tar": "b723c60a897cedb0597df499ef6b7b2875a5fe5cc84a42e49b83293e68501133",
+  "persistent.tar": "9fa39357a2d1e5197620d01604bd7f3af77c5f2abbcb8e0e6c39aeda8932c94d",
+  "diagnostic-exports.tar": "214f485291aa0eeb33e8092694c1197bdc99b59d5cecf03a51489357d3808372"
+ },
+ "stray_capture": "out/deep-sleep-final/evidence/20261009/88a-accidental-unlocked-readonly-capture/ (capture-return.py has no argparse; '--help' was taken as the output dir and ran a read-only capture without the host lease; no device change)",
+ "time_bases": "power-journal wall_time and 'CEST' below are local (CEST, UTC+2). /data/logs/system.log timestamps are UTC (+2 h to CEST). Device wall time is not trustworthy across boots; boottime_s is authoritative.",
+ "overnight_boot": {
+  "boot_id": "3cae62f2-286b-496a-b60a-29be8317a949",
+  "first_check_boottime_s": 8.3,
+  "orderly_shutdown_at_boottime_s": 42564.7,
+  "taint": 0
+ },
+ "overnight_suspend_session": {
+  "entry_cest": "2026-10-08 23:03:21",
+  "entry_boottime_s": 3804.9,
+  "owner_resume_cest": "2026-10-09 09:40:36",
+  "resume_boottime_s": 42039.5,
+  "elapsed_s": 38234.6,
+  "suspended_s": 38052.54,
+  "fraction": 0.9952,
+  "cycles": 64,
+  "maintenance_wakes": 63,
+  "maintenance_period_s": 600,
+  "final_wake": "Y2SPM wake=0x20 after 8266732 ticks32k (252 s into the 64th cycle) = owner Power button; label stays 'unknown' in the product receipt",
+  "resume_to_complete_s": 2.2,
+  "resume_result": 0,
+  "battery_at_entry": {
+   "percent": 88,
+   "voltage_uv": 4083618
+  },
+  "battery_at_end_of_suspend": {
+   "percent": 66,
+   "voltage_uv": 3931787
+  },
+  "battery_last_unplugged_row": {
+   "percent": 66,
+   "voltage_uv": 3910034,
+   "boottime_s": 42051.7
+  },
+  "soc_points_per_hour": 2.07,
+  "caveat": "voltage-derived SOC, no current sensor, non-linear curve (88% held ~2.5 h then fell 85,83,82,78,74,72,70,68,66), unplug/entry time from journal. Indicative, not a drain measurement. 03 overnight was ~5.5 points/h on a different load/image."
+ },
+ "earlier_same_boot_sessions": [
+  {
+   "cest": "22:07:38",
+   "suspended_s": 1573.4,
+   "note": "suspend probe"
+  },
+  {
+   "cest": "22:41:07",
+   "suspended_s": 1200.0,
+   "ended": "suspend_product_refused at 23:01:11 (cycle 2), then re-requested 23:03:18"
+  }
+ ],
+ "defect_1_usb_irq_overflow": {
+  "when": "2026-10-09 01:34:01 CEST (log shows 23:34:01 UTC; journal cycle 15 resume at boottime 12844.5), cable out, during a maintenance wake, SPM resumes=20",
+  "log": "musb-hdrc musb-hdrc.4.auto: Y2USB IRQ overflow: l1=800/f00 usb=0/0 tx=0/0 rx=0/0 power=a0 devctl=80; then 'Y2USB stopped stage=8 result=-75 IRQ=1515947'",
+  "state_after": "fault_reason=irq_overflow fault_rc=-75 detached=1 gadget_state=0 configured=0 reconnect_retries=0; irq_max_burst=513 > limit 512, irq_unexplained=512",
+  "effect": "guard is terminal: no recovery path. Suspend/resume continued normally for the following ~8 h. At the owner's USB reconnect (09:41) there was no enumeration on the host, no 10.42.0.1, charger status 'Not charging' (input 0 uA). A reboot cleared it.",
+  "known_context": "same guard fired earlier under loaded USB (roadmap-gap-audit.md ~line 3438, FIX02 qualification doc line 192, kernel/usb/fault.h, kernel/platform/usb.c ~688). This is the first occurrence with no traffic: L1 bit 0x800 with no MUSB sub-status, on resume.",
+  "source": "first-return.json files './data/system/platform/suspend-last.json' usb_restore; extracted/data/logs/system.log.0"
+ },
+ "defect_2_wlan0_registration_oops": {
+  "when": "2026-10-09 09:40:38 CEST (07:40:38 UTC in log), 2 s after the owner Power-button wake, right after 'Wi-Fi interface wlan0 registered'",
+  "log": "Unable to handle kernel NULL pointer dereference at virtual address 00000000 (Oops 5), Comm: ip pid 4183, PC strlen, LR nla_put_string; trace strlen <- nla_put_string <- rtnl_fill_ifinfo <- rtnl_getlink <- rtnetlink_rcv_msg",
+  "analysis": "r5=0x38=56 matches IFLA_PARENT_DEV_NAME, i.e. dev_name(wlan0->dev.parent) is NULL: the wlan0 parent device is unnamed/unregistered when `ip link show` runs. INFERRED from the register value, not confirmed in source.",
+  "suspected_follow_on": "from 09:40:48 every sleep attempt was refused as kernel_sleep_unavailable (4 refusals, 09:40:48 to 09:46:54). Link to the Oops (e.g. rtnl lock/hung connectivity) is UNVERIFIED. The USB fault cannot be the cause because 49 suspends succeeded after it.",
+  "first_seen": "first full radio restore after a ~10 h sleep; maintenance wakes keep radios suspended"
+ },
+ "after": "owner shutdown at 09:49:21 (orderly shutdown_execute), new boot 65d3b0c9, uptime 42-65 s at capture, taint 0, versions match 05, USB and SSH healthy, product guard pending:false",
+ "not_done": "no device change, no deploy, no guard clear, no lp_sel change (still set), no flash, no source change. Power-button wake time (2.2 s) and early-boot / RTC wake on 05 are still untested in a controlled way.",
+ "readiness": "MORE_WORK_REQUIRED unchanged"
+}

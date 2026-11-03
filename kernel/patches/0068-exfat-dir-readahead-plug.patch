@@ -1,0 +1,28 @@
+--- a/fs/exfat/dir.c
++++ b/fs/exfat/dir.c
+@@ -6,6 +6,7 @@
+ #include <linux/slab.h>
+ #include <linux/compat.h>
+ #include <linux/bio.h>
++#include <linux/blkdev.h>
+ #include <linux/buffer_head.h>
+ 
+ #include "exfat_raw.h"
+@@ -681,10 +682,17 @@
+ 
+ 	bh = sb_find_get_block(sb, sec);
+ 	if (!bh || !buffer_uptodate(bh)) {
++		struct blk_plug plug;
+ 		unsigned int i;
+ 
++		/* Y2: plug like exfat_load_bitmap() so the per-sector readahead
++		 * of a 128 KiB cluster merges into one request; unplugged, an SD
++		 * card served ~200 separate 512-byte reads (~50 ms) per cold
++		 * directory. */
++		blk_start_plug(&plug);
+ 		for (i = 0; i < ra_count; i++)
+ 			sb_breadahead(sb, (sector_t)(sec + i));
++		blk_finish_plug(&plug);
+ 	}
+ 	brelse(bh);
+ 	return 0;

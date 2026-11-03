@@ -1,0 +1,23 @@
+[package]
+name = "y2p-core"
+description = "Root-prefixed paths, Python-compatible JSON and durable records for the Y2 platform"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+libc.workspace = true
+ryu.workspace = true
+regex.workspace = true
+flate2.workspace = true
+tar.workspace = true
+sha2.workspace = true
+hmac.workspace = true
+y2p-contract = { path = "../y2p-contract" }
+
+[features]
+# Thread-local subprocess answers for unit tests (command::testing); only dev-dependencies enable it.
+testing = []

@@ -1,0 +1,119 @@
+"""Fault-inject actual regmap callbacks, including PMIC writes, without hardware."""
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+from test_audio import function
+
+ROOT=Path(__file__).resolve().parents[1]
+class Transport(unittest.TestCase):
+    def test_regmap_callbacks(self):
+        src=(ROOT/'kernel/platform/pwrap.c').read_text()
+        functions=''.join(function(src,n) for n in ('wrap_reg_read','wrap_reg_write'))
+        fixture=r'''
+#include <assert.h>
+#include <stdint.h>
+#include "policy.h"
+#include "pwrap.h"
+#define EINVAL 22
+#define EPERM 1
+#define BIT(n) (1U<<(n))
+struct y2_wrap {void *base;};
+static unsigned mem[1024],phase,word=0xab00,polls,delays,commands,writes,acks,fault;
+static unsigned readl(void *p) {
+ unsigned off=(char*)p-(char*)mem;
+ assert(off==0xa0);
+ if(fault==1)return 0x00360000; /* unowned stale read: never ack */
+ if(fault==2)return 0x00100000; /* lost INIT */
+ if(phase==1) {if(fault==3||polls++<2)return 0x00340000;return 0x00360000|word;}
+ if(phase==2) {if(fault==4||polls++<2)return 0x00340000;phase=0;}
+ return 0x00300000;
+}
+static void writel(unsigned value,void *p) {
+ unsigned off=(char*)p-(char*)mem;
+ if(off==0xa4){assert(value==1&&phase==1);++acks;phase=0;return;}
+ assert(off==0x9c&&!phase);++commands;polls=0;
+ if(value&BIT(31)){++writes;word=value&65535;phase=2;}
+ else phase=1;
+}
+static unsigned rd(void *p,unsigned off){return readl((char*)p+off);}
+static void wr(void *p,unsigned off,unsigned v){writel(v,(char*)p+off);}
+static void wait(void *p){(void)p;++delays;assert(delays<=2000);}
+static struct y2_pwrap_io wrap_io(struct y2_wrap *w)
+{return (struct y2_pwrap_io){w->base,rd,wr,wait};}
+'''
+        fixture+=functions+r'''
+int main(void) {
+ struct y2_wrap w={mem};unsigned value;
+ for(fault=0;fault<5;++fault) {
+  phase=polls=delays=commands=writes=acks=0;word=0xab00;
+  int ret=wrap_reg_write(&w,0x330,0xaa00);
+  if(!fault)assert(!ret&&word==0xaa00&&writes==1&&acks==1);
+  if(fault==1||fault==2)assert(ret<0&&!commands&&!acks&&!writes);
+  if(fault==3)assert(ret==-110&&commands==1&&!acks&&!writes);
+  if(fault==4)assert(ret==-110&&writes==1&&acks==1);
+ }
+ fault=phase=polls=delays=commands=writes=acks=0;word=0xab00;
+ assert(wrap_reg_write(&w,0x330,0xaa01)==-EPERM&&writes==0); /* mode bits */
+ commands=acks=0;
+ for(unsigned reg=0;reg<4096;++reg)if(!y2_pmic_write_mask(reg))
+  assert(wrap_reg_write(&w,reg,65535)==-EPERM&&!commands);
+ assert(wrap_reg_read(&w,1,&value)==-EINVAL&&!commands);
+ assert(!wrap_reg_write(&w,0x160,1)&&writes==1); /* mask, no read needed */
+ assert(!wrap_reg_read(&w,0x160,&value)&&value==1);
+ phase=polls=delays=commands=writes=acks=0;word=0x0055;
+ assert(!wrap_reg_write(&w,0x50c,0x8055)&&word==0x8055&&writes==1);
+ assert(wrap_reg_write(&w,0x50c,0x8054)==-EPERM); /* enable, not unrelated mode */
+ phase=polls=delays=commands=writes=acks=0;word=0xff1f;
+ assert(!wrap_reg_write(&w,0x532,0xff5f)&&word==0xff5f&&writes==1);
+ assert(wrap_reg_write(&w,0x532,0xfe5f)==-EPERM); /* selector, not adjacent rail */
+ /* SD rails, as mt6323-regulator drives them for MSDC1 power and UHS-I. */
+ phase=polls=delays=commands=writes=acks=0;word=0x1002;
+ assert(!wrap_reg_write(&w,0x504,0x0002)&&word==0x0002&&writes==1); /* VMC off */
+ assert(!wrap_reg_write(&w,0x504,0x1002)&&word==0x1002&&writes==2); /* VMC on */
+ assert(wrap_reg_write(&w,0x504,0x1000)==-EPERM); /* not the mode bit */
+ phase=polls=delays=commands=writes=acks=0;word=0x4002;
+ assert(!wrap_reg_write(&w,0x506,0x0002)&&!wrap_reg_write(&w,0x506,0x4002)&&writes==2); /* VMCH cycle */
+ phase=polls=delays=commands=writes=acks=0;word=0x0010;
+ assert(!wrap_reg_write(&w,0x52a,0x0000)&&word==0&&writes==1); /* VMC 3.3 -> 1.8 V */
+ assert(!wrap_reg_write(&w,0x52a,0x0010)&&word==0x10&&writes==2); /* and back */
+ assert(wrap_reg_write(&w,0x52a,0x0018)==-EPERM); /* adjacent field */
+ phase=polls=delays=commands=writes=acks=0;word=0x0080;
+ assert(!wrap_reg_write(&w,0x52c,0x0080)&&writes==1);  /* VMCH 3.3 V */
+ assert(wrap_reg_write(&w,0x52c,0x0000)==-EPERM&&writes==1); /* never 3.0 V */
+ word=0x4000;assert(wrap_reg_write(&w,0x508,0x0000)==-EPERM&&wrap_reg_write(&w,0x52e,0)==-EPERM); /* VEMC_3V3 */
+ /* #28 VIBR as mt6323-regulator drives it for regulator-haptic. */
+ phase=polls=delays=commands=writes=acks=0;word=0x0000;
+ assert(wrap_reg_write(&w,0x542,0x8000)==-EPERM&&!writes); /* not before the thermal shutdown */
+ assert(!wrap_reg_write(&w,0x542,0x0004)&&word==0x0004&&writes==1); /* pmic-lowpower sets it */
+ assert(!wrap_reg_write(&w,0x542,0x8004)&&!wrap_reg_write(&w,0x542,0x0004)&&writes==3); /* on, off */
+ assert(wrap_reg_write(&w,0x542,0x8000)==-EPERM&&writes==3); /* never cleared */
+ assert(wrap_reg_write(&w,0x542,0x8006)==-EPERM&&writes==3); /* adjacent bit */
+ phase=polls=delays=commands=writes=acks=0;word=0x0060;
+ assert(!wrap_reg_write(&w,0x544,0x00a0)&&word==0x00a0&&writes==1); /* 2.8 V */
+ assert(!wrap_reg_write(&w,0x544,0x0080)&&!wrap_reg_write(&w,0x544,0x0060)&&writes==3); /* 2.0, 1.8 V */
+ assert(wrap_reg_write(&w,0x544,0x00c0)==-EPERM&&wrap_reg_write(&w,0x544,0x00e0)==-EPERM); /* 3.0, 3.3 V */
+ assert(wrap_reg_write(&w,0x544,0x0040)==-EPERM&&wrap_reg_write(&w,0x544,0x0061)==-EPERM&&writes==3);
+
+ phase=polls=delays=commands=writes=acks=0;word=0x0088;
+ assert(!wrap_reg_write(&w,0x76e,0x00e8)&&word==0x00e8&&writes==1);
+ for(unsigned bit=0;bit<16;bit++) {
+  if((1U<<bit)&0x00e8)continue;
+  unsigned before=writes;
+  assert(wrap_reg_write(&w,0x76e,word^(1U<<bit))==-EPERM&&writes==before);
+ }
+ /* Charging must not defeat input OVP, even in the transport guard. */
+ unsigned before=writes;
+ word=0x0062;
+ assert(wrap_reg_write(&w,0x0000,0x007a)==-EPERM&&writes==before);
+ word=0x0063;
+ assert(!wrap_reg_write(&w,0x0000,0x007b)&&writes==before+1);
+
+}
+'''
+        with tempfile.TemporaryDirectory() as tmp:
+            p=Path(tmp);(p/'test.c').write_text(fixture)
+            subprocess.run(['clang','-O2','-Wall','-Wextra','-Werror','-Wno-unknown-warning-option','-Wno-unused-but-set-global',
+                '-I'+str(ROOT/'kernel/platform'),'-I'+str(ROOT/'kernel/diagnostic'),
+                str(p/'test.c'),'-o',str(p/'test')],check=True)
+            subprocess.run([str(p/'test')],check=True)

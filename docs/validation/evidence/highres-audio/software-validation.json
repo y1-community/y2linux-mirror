@@ -1,0 +1,84 @@
+{
+  "schema": "org.y2linux.highres-audio-source-validation/v1",
+  "date": "2026-10-04",
+  "verdict": "MORE_HARDWARE_EVIDENCE_REQUIRED",
+  "source_bases": {
+    "Y2Linux": "b5aea93",
+    "Y2Reborn": "b71b468"
+  },
+  "compiled_with_local_changes": true,
+  "native_wider_modes_enabled": false,
+  "checks": {
+    "audio_clock_kernel_capture_DT_contract": 6,
+    "localized_source_ABI_layout_package_ALSA_diagnostics": 19,
+    "reborn_workspace_tests": 241,
+    "reborn_fmt_check": "PASS",
+    "reborn_clippy_all_targets_D_warnings": "PASS",
+    "ARM_kernel_config_Image_modules": "PASS",
+    "ARM_Reborn_release": "PASS",
+    "ARM_Cortex_A7_QEMU_media_tests": 24,
+    "ARM_Cortex_A7_QEMU_ALSA_tests": 8,
+    "ARM_Cortex_A7_ALSA_query_candidates": 16,
+    "module_ABIs": 7
+  },
+  "physical": {
+    "installed_build_id": "Y2LINUX-BASELINE-02",
+    "boot_id": "27e6d684-3794-4490-95db-a489027cd4f4",
+    "taint": 0,
+    "scope": "locked read-only exact constraints, idle register snapshot and runtime PM",
+    "fresh_playback": "NOT_RUN_DEVICE_LOCK_BUSY",
+    "CPU_measurements": "NOT_RUN_DEVICE_LOCK_BUSY",
+    "electrical_I2S_low_bits": "REQUIRES_EXTERNAL_CAPTURE",
+    "changed_artifact_installed": false
+  },
+  "artifacts": {
+    "ARM_kernel_Image": {
+      "bytes": 12406144,
+      "sha256": "665afab813d816acac574d9a079076e712bce7586e5ed063cdce23c7bc7c4233"
+    },
+    "ARM_kernel_vmlinux": {
+      "bytes": 15373004,
+      "sha256": "2f04dd4f726915512a816bb1b9a89b023ec178c9f9900e7a7c5ebceefff6d2ef"
+    },
+    "production_DTB": {
+      "bytes": 14682,
+      "sha256": "c954033571f0d0d3aacc8ac379e92974882503a8844258dff7ee60d0de0a8182"
+    },
+    "ARM_Reborn": {
+      "bytes": 12536304,
+      "sha256": "15ccb508b517fb1a4854a4a81ffc477badd345f8ef9aed75eedcc305b41f77fd"
+    },
+    "ARM_audio_constraint_query": {
+      "bytes": 12828,
+      "sha256": "40cac992d7f02a30437e67a785b6cb7479696faf8012d39aa7fd35fc25afaf84"
+    },
+    "ARM_precision_CPU_benchmark": {
+      "bytes": 50028,
+      "sha256": "6a3df6a07a616f1a8fe5810d3bf593dd29dc2f3a20d9b8107671ade181347467"
+    }
+  },
+  "receipts": "out/highres-audio/validation/",
+  "commands": [
+    "Y2_ARTIFACT_TEST_ROOT=out/highres-audio/kernel-check Y2_PRODUCTION_TEST=1 python3 -m unittest discover -s tests -p test_audio*.py -v",
+    "python3 -m unittest tests.test_emmc_layout tests.test_dev_abi tests.test_overlays tests.test_bootimg tests.test_release_composition tests.test_platform_evidence tests.test_diagnostic_export -v (with artifact root and ELF dependencies)",
+    "cargo fmt --all -- --check",
+    "cargo clippy --workspace --all-targets --locked -- -D warnings",
+    "cargo test --workspace --locked",
+    "Y2_BUILDROOT_OUTPUT=EXISTING_SDK sh tools/build/cross.sh",
+    "cargo test --release -p reborn-media -p reborn-audio --target armv7-unknown-linux-gnueabihf --no-run --locked (with production SDK environment)",
+    "qemu-arm -cpu cortex-a7 -L SDK_SYSROOT ARM_TEST_BINARY --test-threads=1"
+  ],
+  "software_precision_scope": {
+    "fixture_user_gain": "neutral/unity",
+    "native_DMA_I2S_wider_proof": false,
+    "live_VolumeRamp": "post-membrane integer to f64 gain to integer; existing unity/sign/partial-frame tests retained",
+    "benchmark_includes": "FFmpeg demux/decode/filters/final membrane packing only",
+    "benchmark_excludes": [
+      "live VolumeRamp",
+      "Playback queue/control",
+      "ALSA pacing",
+      "physical output"
+    ],
+    "documentation_correction": "source-only 2026-10-04; no implementation/build/device evidence changed"
+  }
+}

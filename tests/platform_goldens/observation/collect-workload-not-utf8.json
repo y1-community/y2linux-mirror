@@ -1,0 +1,19 @@
+{
+ "argv": [
+  "collect",
+  "--seconds",
+  "1",
+  "--interval",
+  "1",
+  "--workload",
+  "w\udcff"
+ ],
+ "calls": [],
+ "exit": 2,
+ "stdout": [],
+ "tree": {
+  "added": {},
+  "changed": {},
+  "removed": []
+ }
+}

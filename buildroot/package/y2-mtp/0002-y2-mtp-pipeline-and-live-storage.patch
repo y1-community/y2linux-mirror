@@ -1,0 +1,394 @@
+diff --color -ruN -x obj -x umtprd -x 'mtp-safe.*' -x '*.o' mtp-src.orig/inc/usb_gadget_fct.h mtp-src/inc/usb_gadget_fct.h
+--- a/inc/usb_gadget_fct.h
++++ b/inc/usb_gadget_fct.h
+@@ -31,6 +31,10 @@
+ usb_gadget * init_usb_mtp_gadget(mtp_ctx * ctx);
+ 
+ int read_usb(usb_gadget * ctx, unsigned char * buffer, int maxsize);
++/* Borrow the next USB read in place (NULL: unavailable, fall back to read_usb). */
++const unsigned char * read_usb_peek(usb_gadget * ctx, int * length);
++void read_usb_done(void);
++void read_usb_flush(void);
+ int write_usb(usb_gadget * ctx, int channel, unsigned char * buffer, int size);
+ 
+ int handle_ep0(usb_gadget * ctx);
+diff --color -ruN -x obj -x umtprd -x 'mtp-safe.*' -x '*.o' mtp-src.orig/inc/y2_rx.h mtp-src/inc/y2_rx.h
+--- a/inc/y2_rx.h
++++ b/inc/y2_rx.h
+@@ -0,0 +1,17 @@
++/* SPDX-License-Identifier: GPL-3.0-or-later */
++#ifndef Y2_RX_H
++#define Y2_RX_H
++#include <stddef.h>
++/* Dedicated bulk-OUT reader: a read request is always queued on the endpoint,
++ * so a host packet never arrives while the gadget has nothing to receive it
++ * with, and USB reception overlaps storage writes. */
++int y2_rx_start(int fd, size_t slot_size);
++void y2_rx_stop(void);
++int y2_rx_active(void);
++/* Pop the next USB read (>=0 bytes, 0 is a ZLP). -1: stopped, failed or cancelled. */
++int y2_rx_read(unsigned char *destination, int maximum, volatile int *cancel, volatile int *stop);
++/* Borrow the next read in place; release with y2_rx_done(). NULL: -1 case above. */
++const unsigned char *y2_rx_peek(int *length, volatile int *cancel, volatile int *stop);
++void y2_rx_done(void);
++void y2_rx_flush(void);
++#endif
+diff --color -ruN -x obj -x umtprd -x 'mtp-safe.*' -x '*.o' mtp-src.orig/src/msgqueue.c mtp-src/src/msgqueue.c
+--- a/src/msgqueue.c
++++ b/src/msgqueue.c
+@@ -121,15 +121,27 @@
+ 				mtp_remove_storage_from_line(ctx, message + 10, 0);
+ 			}
+ 
+-			if(!strncmp(message,"mount:",6))
++			if(!strncmp(message,"mount:",6) || !strncmp(message,"mountro:",8))
+ 			{
+-				store_index = mtp_get_storage_index_by_name(ctx, message + 6);
++				int read_only = (message[5] == 'r');
++				store_index = mtp_get_storage_index_by_name(ctx, message + (read_only ? 8 : 6));
+ 
+ 				if(store_index >= 0)
+ 				{
+ 					if( !pthread_mutex_lock( &ctx->inotify_mutex ) )
+ 					{
+-						mount_store( ctx, store_index, 1 );
++						/* Access mode follows the validated mount; the pin is fresh. */
++						if( read_only )
++							ctx->storages[store_index].flags |= UMTP_STORAGE_READONLY;
++						else
++							ctx->storages[store_index].flags &= ~UMTP_STORAGE_READONLY;
++
++						if( mount_store( ctx, store_index, 1 ) )
++						{
++							PRINT_ERROR("%s : Mount failed : %s", __func__, message);
++							pthread_mutex_unlock( &ctx->inotify_mutex );
++							continue;
++						}
+ 
+ 						handle[0] = ctx->storages[store_index].storage_id;
+ 
+diff --color -ruN -x obj -x umtprd -x 'mtp-safe.*' -x '*.o' mtp-src.orig/src/mtp_operations/mtp_op_opensession.c mtp-src/src/mtp_operations/mtp_op_opensession.c
+--- a/src/mtp_operations/mtp_op_opensession.c
++++ b/src/mtp_operations/mtp_op_opensession.c
+@@ -69,7 +69,9 @@
+ 		if( pthread_mutex_lock( &ctx->inotify_mutex ) )
+ 			return MTP_RESPONSE_GENERAL_ERROR;
+ 
+-		alloc_root_entry(ctx->fs_db, ctx->storages[i].storage_id);
++		/* A storage that is not currently part of the view has no root yet. */
++		if( !(ctx->storages[i].flags & UMTP_STORAGE_NOTMOUNTED) )
++			alloc_root_entry(ctx->fs_db, ctx->storages[i].storage_id);
+ 
+ 		pthread_mutex_unlock( &ctx->inotify_mutex );
+ 
+diff --color -ruN -x obj -x umtprd -x 'mtp-safe.*' -x '*.o' mtp-src.orig/src/mtp_operations/mtp_op_sendobject.c mtp-src/src/mtp_operations/mtp_op_sendobject.c
+--- a/src/mtp_operations/mtp_op_sendobject.c
++++ b/src/mtp_operations/mtp_op_sendobject.c
+@@ -61,11 +61,13 @@
+     uint64_t received = 0;
+     int unknown = ctx->SendObjInfoSize == UINT32_MAX;
+     const void *data = (const char *)hdr + sizeof(MTP_PACKET_HEADER);
+-    int first = 1;
++    int first = 1, borrowed = 0;
+     for (;;) {
+-        if (length < 0 || ctx->cancel_req ||
++        int bad = length < 0 || ctx->cancel_req ||
+             (!unknown && (uint64_t)length > ctx->SendObjInfoSize-received) ||
+-            y2_upload_write(entry->y2_upload, data, length)) goto abort;
++            y2_upload_write(entry->y2_upload, data, length);
++        if (borrowed) { read_usb_done(); borrowed = 0; }
++        if (bad) goto abort;
+         received += length;
+         /* A short packet ends unknown-size transfers; known-size transfers
+          * must exactly match the SendObjectInfo size (including empty files).
+@@ -77,8 +79,14 @@
+             goto abort;
+         }
+         first = 0;
+-        length = read_usb(ctx->usb_ctx, ctx->rdbuffer2, ctx->usb_rd_buffer_max_size);
+-        data = ctx->rdbuffer2;
++        /* USB reception already runs ahead on its own thread: write the received
++         * request in place, without a copy, while the next one is being filled. */
++        data = read_usb_peek(ctx->usb_ctx, &length);
++        if (data) borrowed = 1;
++        else {
++            length = read_usb(ctx->usb_ctx, ctx->rdbuffer2, ctx->usb_rd_buffer_max_size);
++            data = ctx->rdbuffer2;
++        }
+     }
+     /* Consume the protocol's ZLP when the final data container is exactly a
+      * request-size multiple. Otherwise it would be read as the next command. */
+@@ -95,6 +103,7 @@
+ abort:
+     ; /* preserve the cause across staging cleanup */
+     int failure = ctx->cancel_req ? ECANCELED : (errno ? errno : EIO);
++    read_usb_flush();
+     y2_upload_abort(entry->y2_upload);
+     entry->y2_upload = NULL;
+     entry->flags |= ENTRY_IS_DELETED;
+diff --color -ruN -x obj -x umtprd -x 'mtp-safe.*' -x '*.o' mtp-src.orig/src/mtp_operations/mtp_ops_helpers.c mtp-src/src/mtp_operations/mtp_ops_helpers.c
+--- a/src/mtp_operations/mtp_ops_helpers.c
++++ b/src/mtp_operations/mtp_ops_helpers.c
+@@ -149,6 +149,8 @@
+ 				entry = get_entry_by_storageid( ctx->fs_db, ctx->storages[store_index].storage_id, entry );
+ 				if(entry)
+ 				{
++					/* Drop open descriptors and unfinished uploads of the leaving view. */
++					entry_close( ctx->fs_db, entry );
+ 					entry->flags |= ENTRY_IS_DELETED;
+ 					if( entry->watch_descriptor != -1 )
+ 					{
+@@ -161,6 +163,8 @@
+ 
+ 			if( update_flag )
+ 				ctx->storages[store_index].flags |= UMTP_STORAGE_NOTMOUNTED;
++			/* The pinned root is the last reference to the old filesystem. */
++			y2_fs_unpin( ctx->storages[store_index].root_path );
+ 		}
+ 	}
+ 
+@@ -175,7 +179,10 @@
+ 		{
+ 			if( ctx->storages[store_index].flags & UMTP_STORAGE_NOTMOUNTED )
+ 			{
+-				alloc_root_entry(ctx->fs_db, ctx->storages[store_index].storage_id);
++				if( y2_fs_pin( ctx->storages[store_index].root_path ) )
++					return -1;
++				if( !get_entry_by_storageid( ctx->fs_db, ctx->storages[store_index].storage_id, NULL ) )
++					alloc_root_entry(ctx->fs_db, ctx->storages[store_index].storage_id);
+ 			}
+ 
+ 			if( update_flag )
+diff --color -ruN -x obj -x umtprd -x 'mtp-safe.*' -x '*.o' mtp-src.orig/src/umtprd.c mtp-src/src/umtprd.c
+--- a/src/umtprd.c
++++ b/src/umtprd.c
+@@ -98,8 +98,13 @@
+-    int has_sd=0, has_internal=0;
++    int has_sd=0, has_internal=0, has_firmware=0, has_old=0;
+     for (unsigned i=0; i<MAX_STORAGE_NB; i++) {
+         const char *root=mtp_context->storages[i].root_path;
+-        if (root && !strcmp(root, "/media/sd")) has_sd=1;
+-        if (root && !strcmp(root, "/media/internal/music")) has_internal=1;
++        int mounted = !(mtp_context->storages[i].flags & UMTP_STORAGE_NOTMOUNTED);
++        if (root && mounted && !strcmp(root, "/media/sd")) has_sd=1;
++        if (root && mounted && !strcmp(root, "/media/internal/music")) has_internal=1;
++        if (root && mounted && !strcmp(root, "/data/firmware/inbox")) has_firmware=1;
++        if (root && mounted && !strcmp(root, "/run/y2/old-storage")) has_old=1;
+     }
+     if (y2_fs_init(has_internal ? "/media/internal/music" : NULL, has_sd ? "/media/sd" : NULL, "/run/y2/mtp-events.json")) return -3;
++    if (has_firmware && y2_fs_pin("/data/firmware/inbox")) return -3;
++    if (has_old && y2_fs_pin("/run/y2/old-storage")) return -3;
+ 
+diff --color -ruN -x obj -x umtprd -x 'mtp-safe.*' -x '*.o' mtp-src.orig/src/usb_gadget.c mtp-src/src/usb_gadget.c
+--- a/src/usb_gadget.c
++++ b/src/usb_gadget.c
+@@ -59,6 +59,7 @@
+ #include "usb_gadget_fct.h"
+ 
+ #include "logs_out.h"
++#include "y2_rx.h"
+ 
+ #define CONFIG_VALUE 1
+ 
+@@ -80,6 +81,10 @@
+ 	int ret;
+ 
+ 	ret = -1;
++	if(y2_rx_active() && maxsize && buffer)
++	{
++		return y2_rx_read(buffer, maxsize, mtp_context->transferring_file_data ? &mtp_context->cancel_req : NULL, &ctx->stop);
++	}
+ 	if(ctx->ep_handles[EP_DESCRIPTOR_OUT] >= 0 && maxsize && buffer)
+ 	{
+ 		ret = read (ctx->ep_handles[EP_DESCRIPTOR_OUT], buffer, maxsize);
+@@ -88,6 +93,24 @@
+ 	return ret;
+ }
+ 
++const unsigned char * read_usb_peek(usb_gadget * ctx, int * length)
++{
++	if(!y2_rx_active())
++		return NULL;
++	return y2_rx_peek(length, mtp_context->transferring_file_data ? &mtp_context->cancel_req : NULL, &ctx->stop);
++}
++
++void read_usb_done(void)
++{
++	y2_rx_done();
++}
++
++void read_usb_flush(void)
++{
++	if(y2_rx_active())
++		y2_rx_flush();
++}
++
+ int write_usb(usb_gadget * ctx, int channel, unsigned char * buffer, int size)
+ {
+ 	int ret;
+@@ -816,7 +839,12 @@
+ 				{
+ 					ctx->stop = 0;
+ 					if( ctx->thread_not_started )
++					{
++						/* Keep an OUT request queued at all times. */
++						if (y2_rx_start(ctx->ep_handles[EP_DESCRIPTOR_OUT], mtp_context->usb_rd_buffer_max_size))
++							PRINT_ERROR("EP0 FFS ENABLE : receive thread failed");
+ 						ctx->thread_not_started = pthread_create(&ctx->thread, NULL, io_thread, ctx);
++					}
+ 				}
+ 
+ 				break;
+@@ -828,6 +856,7 @@
+ 
+ 				// Stop the main rx thread.
+ 				ctx->stop = 1;
++				y2_rx_stop();
+ 				if( !ctx->thread_not_started )
+ 				{
+ 					if(mtp_context->transferring_file_data)
+@@ -1180,6 +1209,7 @@
+ 	if( usbctx )
+ 	{
+ 		usbctx->stop = 1;
++		y2_rx_stop();
+ 
+ 		i = 0;
+ 		while( i < EP_NB_OF_DESCRIPTORS )
+diff --color -ruN -x obj -x umtprd -x 'mtp-safe.*' -x '*.o' mtp-src.orig/src/y2_rx.c mtp-src/src/y2_rx.c
+--- a/src/y2_rx.c
++++ b/src/y2_rx.c
+@@ -0,0 +1,133 @@
++/* SPDX-License-Identifier: GPL-3.0-or-later */
++#define _GNU_SOURCE
++#include <errno.h>
++#include <pthread.h>
++#include <signal.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/prctl.h>
++#include <time.h>
++#include <unistd.h>
++#include "y2_rx.h"
++
++/* Bulk-OUT receive on its own thread. USB reception overlaps the slower storage
++ * writes of the consumer: while one request is being written, later requests
++ * are already queued on the endpoint and land in the ring. When the ring is
++ * full the endpoint simply NAKs the host (the controller keeps one received
++ * packet in its FIFO and the kernel hands it to the next queued request). */
++#define SLOTS 32
++static struct slot { unsigned char *buffer; int length; } slots[SLOTS];
++static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
++static pthread_cond_t data = PTHREAD_COND_INITIALIZER, space = PTHREAD_COND_INITIALIZER;
++static pthread_t thread;
++static int running, failed, head, tail, count, descriptor = -1, borrowed;
++static size_t slot_size;
++
++static void *reader(void *unused)
++{
++    (void)unused;
++    prctl(PR_SET_NAME, (unsigned long)"y2_rx");
++    for (;;) {
++        pthread_mutex_lock(&lock);
++        while (running && count == SLOTS) pthread_cond_wait(&space, &lock);
++        if (!running) { pthread_mutex_unlock(&lock); break; }
++        struct slot *slot = &slots[head];
++        pthread_mutex_unlock(&lock);
++        ssize_t n = read(descriptor, slot->buffer, slot_size);
++        pthread_mutex_lock(&lock);
++        if (n < 0) {
++            if (errno == EINTR && running) { pthread_mutex_unlock(&lock); continue; }
++            failed = 1;
++            pthread_cond_broadcast(&data);
++            pthread_mutex_unlock(&lock);
++            break;
++        }
++        slot->length = (int)n;
++        head = (head + 1) % SLOTS;
++        count++;
++        pthread_cond_broadcast(&data);
++        pthread_mutex_unlock(&lock);
++    }
++    return NULL;
++}
++
++int y2_rx_start(int fd, size_t size)
++{
++    if (running) return 0;
++    pthread_mutex_lock(&lock);
++    for (int i = 0; i < SLOTS; i++) {
++        if (slots[i].buffer && size != slot_size) { free(slots[i].buffer); slots[i].buffer = NULL; }
++        if (!slots[i].buffer && !(slots[i].buffer = malloc(size))) { pthread_mutex_unlock(&lock); return -1; }
++        slots[i].length = 0;
++    }
++    slot_size = size; descriptor = fd; head = tail = count = failed = borrowed = 0; running = 1;
++    pthread_mutex_unlock(&lock);
++    if (pthread_create(&thread, NULL, reader, NULL)) { running = 0; return -1; }
++    return 0;
++}
++
++void y2_rx_stop(void)
++{
++    pthread_mutex_lock(&lock);
++    if (!running) { pthread_mutex_unlock(&lock); return; }
++    running = 0;
++    pthread_cond_broadcast(&space);
++    pthread_cond_broadcast(&data);
++    pthread_mutex_unlock(&lock);
++    /* SIGUSR1 has a no-op handler without SA_RESTART: it interrupts a blocked read. */
++    pthread_kill(thread, SIGUSR1);
++    pthread_join(thread, NULL);
++}
++
++int y2_rx_active(void) { return running; }
++
++void y2_rx_flush(void)
++{
++    pthread_mutex_lock(&lock);
++    if (!borrowed) { tail = head; count = 0; pthread_cond_broadcast(&space); }
++    pthread_mutex_unlock(&lock);
++}
++
++static int wait_data(volatile int *cancel, volatile int *stop)
++{
++    for (;;) {
++        if (count > 0) return 0;
++        if (failed || !running || (stop && *stop)) return -1;
++        if (cancel && *cancel) return -1;
++        struct timespec until;
++        clock_gettime(CLOCK_REALTIME, &until);
++        until.tv_nsec += 20 * 1000000L;
++        if (until.tv_nsec >= 1000000000L) { until.tv_sec++; until.tv_nsec -= 1000000000L; }
++        pthread_cond_timedwait(&data, &lock, &until);
++    }
++}
++
++const unsigned char *y2_rx_peek(int *length, volatile int *cancel, volatile int *stop)
++{
++    pthread_mutex_lock(&lock);
++    if (wait_data(cancel, stop)) { pthread_mutex_unlock(&lock); return NULL; }
++    borrowed = 1;
++    *length = slots[tail].length;
++    const unsigned char *buffer = slots[tail].buffer;
++    pthread_mutex_unlock(&lock);
++    return buffer;
++}
++
++void y2_rx_done(void)
++{
++    pthread_mutex_lock(&lock);
++    if (borrowed && count > 0) { tail = (tail + 1) % SLOTS; count--; pthread_cond_signal(&space); }
++    borrowed = 0;
++    pthread_mutex_unlock(&lock);
++}
++
++int y2_rx_read(unsigned char *destination, int maximum, volatile int *cancel, volatile int *stop)
++{
++    int length;
++    const unsigned char *buffer = y2_rx_peek(&length, cancel, stop);
++    if (!buffer) return -1;
++    if (length > maximum) length = maximum;
++    memcpy(destination, buffer, length);
++    y2_rx_done();
++    return length;
++}

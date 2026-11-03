@@ -1,0 +1,232 @@
+{
+  "schema": "org.y2linux.power-final-02-physical/v1",
+  "installed": {
+    "release": "1.0.0-platform-v1-power-final-candidate.2",
+    "build": "Y2LINUX-PLATFORM-V1-POWER-FINAL-02",
+    "kernel": "6.18.0-y2linux-platform-v1-power-final-02",
+    "root": "2025.02.18-platform-v1.28",
+    "linux": "eb824a67d5fe7cdc114a1970c03f0ce506caeb92",
+    "reborn": "05af011d7d91e6984e522b8c2ce4787d3c3b4587",
+    "first_boot_id": "309681c4-551a-4ab5-ab45-c0a77b14ab2a",
+    "taint": 0,
+    "bootimg_sha256": "79f0925f0b0fb85229f6667f6c82a52fa943947b4bb161c578ed6a3f3039b307",
+    "y2root_sha256": "93c1bf99aa9e41f05b49bbbc07415540652a1e460b033727b036e1df8994f147"
+  },
+  "dac_idle_bias": {
+    "result": "PASS",
+    "idle_before_playback": {
+      "gpio_15_18_20": "low",
+      "regulator_enable_counts": [
+        0,
+        0,
+        0
+      ],
+      "dapm_bias": "Off",
+      "pcm": "closed",
+      "audio_clocks": "off",
+      "afe_runtime": "suspended"
+    },
+    "during_playback_track_425": {
+      "gpio_15_18_20": "high",
+      "regulator_enable_counts": [
+        1,
+        2,
+        1
+      ],
+      "dapm_bias": "On",
+      "pcm": "RUNNING",
+      "audio_clocks": "on",
+      "afe_runtime": "active",
+      "afe_irqs": 517
+    },
+    "after_stop_3s_and_18s": "identical to idle: rails low, bias Off, clocks off, PCM closed; playback restart worked",
+    "power01_comparison": "POWER01 held five rail references with GPIOs high while paused"
+  },
+  "connectivity_supervisor": {
+    "daemon_pid_model": "single thread, exec'd by libexec/y2/connectivity",
+    "context_switches_total_since_boot": "107 at ~6 min uptime",
+    "rate_window_120s": "below 0.05 ctx/s (not in top list)",
+    "wifi_irq_per_s_associated_idle": "1.2-2.6",
+    "bluetooth_connected_idle": {
+      "system_ctx_per_s": 168.8,
+      "wifi_irq_per_s": 1.15,
+      "reconnect_attempts": 0,
+      "peer_present": true
+    }
+  },
+  "missing_ap": {
+    "without_fix": {
+      "active_scans_per_60s": 11,
+      "wifi_irq_per_s": 7.2
+    },
+    "with_runtime_autoscan_exponential_2_120": {
+      "scan_events_per_150s": 5,
+      "wifi_irq_per_s": 1.3
+    },
+    "fix": "supervisor applies autoscan exponential:2:120 after interface_add (source, candidate-03)",
+    "note": "runtime-only test with a dummy network; original network restored COMPLETED, nothing saved"
+  },
+  "power_button": {
+    "root_cause": "Reborn executed /usr/bin/y2-platform, absent from every production image (installed at /usr/sbin); all platform calls failed",
+    "fix": "PROGRAM=/usr/sbin/y2-platform (source, candidate-03)",
+    "live_test": "temporary symlink on device; fallback blanked the screen when refused physical_qualification_required",
+    "extension": "also blank when refused charger_active",
+    "stale_state": "restore_failed record from the previous boot persists until the next request"
+  },
+  "cpu_idle_normal_policy": {
+    "c3": "Enabled, qualified_CPU0_DORMANT, budget -1, disabled 0, no reasons",
+    "c1": "WFI",
+    "c2": "SLIDLE",
+    "c3_state": "DORMANT"
+  },
+  "idle_windows": {
+    "B60_radios_off_unplugged": {
+      "seconds": 60.3,
+      "irq_per_s": 98.9,
+      "ctx_per_s": 145.7,
+      "cpu0_c1_pct": 97.9,
+      "cpu0_c3_pct": 0.0,
+      "note": "post-observer multicore hold; not a steady result"
+    },
+    "B300_radios_off_unplugged": {
+      "seconds": 300.3,
+      "irq_per_s": 87.6,
+      "ctx_per_s": 143.0,
+      "cpu0_c1_pct": 55.2,
+      "cpu0_c2_pct": 2.7,
+      "cpu0_c3_pct": 38.4,
+      "c3_entries": 5792,
+      "voltage_uv": [
+        4095483,
+        4092187
+      ]
+    },
+    "W_CAM_300_wifi_associated": {
+      "seconds": 300,
+      "irq_per_s": 82.6,
+      "ctx_per_s": 154.2,
+      "cpu0_c1_pct": 94.5,
+      "cpu0_c3_pct": 0.0,
+      "dormant_aborts": 14499,
+      "c2_attempts": 17796,
+      "c2_aborts": 17796
+    },
+    "W_FASTPSP_300_wifi_associated": {
+      "seconds": 300,
+      "irq_per_s": 94.4,
+      "ctx_per_s": 162.7,
+      "cpu0_c1_pct": 95.5,
+      "cpu0_c3_pct": 0.0,
+      "gateway_ping_ms_avg": 1.545,
+      "loss_pct": 0
+    },
+    "B1800_radios_off_unplugged": {
+      "seconds": 1800,
+      "irq_per_s": 71.9,
+      "ctx_per_s": 136.2,
+      "cpu0_c1_pct": 17.5,
+      "cpu0_c2_pct": 3.8,
+      "cpu0_c3_pct": 74.4,
+      "c3_entries": 65808,
+      "voltage_uv": [
+        4065600,
+        4059887
+      ]
+    },
+    "limits": [
+      "voltage slopes are post-charge relaxation plus load; not measured current",
+      "CAM then FAST_PSP order confounds slope",
+      "no real battery current sensor"
+    ],
+    "finding": "Associated Wi-Fi blocks C2/C3 entirely (APDMA bit 11 and BTIF bit 20 owned by connectivity) while radios-off reaches 74% C3"
+  },
+  "top_wake_sources_radios_off_B300": [
+    [
+      "kworker/0:2-events_freezable (50 Hz polled navigation GPIO)",
+      27.2
+    ],
+    [
+      "rcu_sched",
+      8.1
+    ],
+    [
+      "kworker/2:2-mm_percpu_wq",
+      6.6
+    ],
+    [
+      "kworker/u21:0-y2-charger",
+      4.8
+    ],
+    [
+      "python3 daemons",
+      2.2
+    ]
+  ],
+  "full_suspend": {
+    "staged_pm": "freezer,devices,platform,processors,core all PASS same boot taint 0",
+    "real_attempts": [
+      {
+        "id": "RTC12_backstop30",
+        "result": "FAIL",
+        "kernel": "deep entry, SPM wake 0x20, PCM 596, reset-return stamp 0x59325253, resumed through DEVICES_RESUMED, CONSOLE_RESUMED, PLATFORM_ENDED, TASKS_THAWED, failed_stage NONE error 0",
+        "stall": "FILESYSTEMS_THAWED never marked; backstop reset; boot id changed"
+      },
+      {
+        "id": "RTC12_backstop30_sd_host_unbound",
+        "result": "FAIL",
+        "same": "identical retained stages; mmc_hosts only mmc0 so SD is not the cause"
+      }
+    ],
+    "previous_codec_stall": "not reproduced: DAC rails already down at suspend so codec resume/cache replay is skipped",
+    "localised_to": "suspend_finish(): after suspend_thaw_processes() and before filesystems_thaw() completes (or an immediate crash there)",
+    "next": "candidate-03 samples suspender wchan, uninterruptible tasks and MMC IRQ counts at 3 s and 15 s, notes oops/panic, reserves ramoops",
+    "backstop_limit_s": "kernel accepts 10..30",
+    "rtc_wake": "SPM wake source fired at the programmed time (wake=0x20); same-boot completion unproven",
+    "power_wake": "not tested; same-boot completion required first"
+  },
+  "charging": {
+    "pc_usb": {
+      "source": "SDP",
+      "configured_ceiling_ua": 450000,
+      "state": "HOLD near 4.175 V with USB data+SSH+MTP configured",
+      "fault": 0
+    },
+    "wall": "NOT_RUN",
+    "note": "programmed ceiling, not measured current"
+  },
+  "candidate_03": {
+    "status": "built, sealed, not flashed",
+    "directory": "out/y2linux-platform-v1-power-final-candidate-03",
+    "linux_compiled": "ffddeb8769ecae8aa6ae7d58e4f5eadf178713d3",
+    "reborn_compiled": "b2c460e83aae643ab61392a66a060cfc455ed469",
+    "bootimg_sha256": "8872666c3f1e3fdcbded7b0bea5986c5653344623ce787ad741da6a415f691f6",
+    "y2root_sha256": "0ae0bd785ea0ca5009f5ec5487d055c6dc60223c049c4487ee3df2e1e18bed28",
+    "fallback": "POWER-FINAL-02 pair",
+    "validation": "production profile 511 cases, 10 skips, 0 failures; Reborn fmt/clippy/tests pass; ARM 35 modules; ELF/inventory/legal-info/package pass",
+    "contents": [
+      "Reborn platform path fix",
+      "screen-off fallback for sleep refusal (qualification and charger)",
+      "runtime Wi-Fi power-down after 5 dark idle minutes on battery",
+      "supervisor autoscan",
+      "post-thaw stall sampler",
+      "oops/panic notes",
+      "ramoops reservation",
+      "Wi-Fi idle power-down after 5 dark minutes on battery"
+    ]
+  },
+  "verdict": "MORE_WORK_REQUIRED",
+  "candidate_04": {
+    "status": "built, sealed, not flashed; the working baseline",
+    "directory": "out/y2linux-platform-v1-power-final-candidate-04",
+    "relation": "POWER-FINAL-03 plus the 11 parallel branches and highres-audio-completion merged into main with 03 winning every collision; image behaviourally identical to 03 (tools, tests, docs added)",
+    "linux_compiled": "5aeba051c428451483402e5874dcf8222afca259",
+    "reborn_compiled": "8cd365da5f3454c8e3189df1434b966edbd06575",
+    "release": "1.0.0-platform-v1-power-final-candidate.4",
+    "kernel": "6.18.0-y2linux-platform-v1-power-final-04",
+    "root": "2025.02.18-platform-v1.30",
+    "bootimg_sha256": "be0f4379531be4b8f94fd927adda18106fbad1a567665cb63d5807908095aea4",
+    "y2root_sha256": "4fc765b931f85e0fee96c0b80c92592eca3a4f3f2a4e379d18abd71bc3978e64",
+    "fallback": "POWER-FINAL-02 pair (installed on the device today); 03 was never flashed",
+    "validation": "production profile 515 cases, 10 skips, 0 failures; Reborn fmt/clippy/tests pass; ARM 35 modules; ELF 384 files/1411 edges; package, inventory, legal-info pass"
+  }
+}

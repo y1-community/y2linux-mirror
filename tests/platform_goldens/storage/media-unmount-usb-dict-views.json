@@ -1,0 +1,25 @@
+{
+ "argv": [
+  "media",
+  "unmount"
+ ],
+ "calls": [],
+ "exit": 1,
+ "stdout": {
+  "reason": "usb_transfer_views_invalid",
+  "schema": "org.y2linux.error/v1",
+  "state": "Failed",
+  "type": "ValueError"
+ },
+ "tree": {
+  "added": {
+   "/run/y2/media.lock": {
+    "content": [],
+    "mode": "0o600",
+    "type": "file"
+   }
+  },
+  "changed": {},
+  "removed": []
+ }
+}

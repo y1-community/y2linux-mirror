@@ -1,0 +1,10 @@
+config BR2_PACKAGE_Y2_UPDATE
+	bool "Y2 signed full-system updater and recovery screen"
+	select BR2_PACKAGE_LIBSODIUM
+	select BR2_PACKAGE_JSON_C
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_LIBDRM
+	help
+	  Detached Ed25519 verification, RECOVERY/MISC requests from the normal
+	  system and offline BOOTIMG + Y2ROOT backup/install/restore in the Y2
+	  recovery image. No partition table, loader or protected writes.

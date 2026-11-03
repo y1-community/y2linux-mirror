@@ -1,0 +1,285 @@
+MTP: sleep until receive, cancellation or disconnect
+
+Preserve the USB-final-02 ring, queued OUT requests, FIFO and storage pipeline.
+Publish cancel/stop under the receive mutex so predicate waits cannot miss
+a notification. Remove the 20-ms idle timeout.
+
+--- a/src/y2_rx.c
++++ b/src/y2_rx.c
+@@ -6,7 +6,6 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sys/prctl.h>
+-#include <time.h>
+ #include <unistd.h>
+ #include "y2_rx.h"
+ 
+@@ -88,17 +87,23 @@
+     pthread_mutex_unlock(&lock);
+ }
+ 
++/* Flag publication and the predicate wait share this mutex, so cancellation
++ * cannot land between the check and sleep. Keep the receive/storage pipeline. */
++void y2_rx_set_flag(volatile int *flag, int value)
++{
++    pthread_mutex_lock(&lock);
++    *flag = value;
++    pthread_cond_broadcast(&data);
++    pthread_mutex_unlock(&lock);
++}
++
+ static int wait_data(volatile int *cancel, volatile int *stop)
+ {
+     for (;;) {
+         if (count > 0) return 0;
+         if (failed || !running || (stop && *stop)) return -1;
+         if (cancel && *cancel) return -1;
+-        struct timespec until;
+-        clock_gettime(CLOCK_REALTIME, &until);
+-        until.tv_nsec += 20 * 1000000L;
+-        if (until.tv_nsec >= 1000000000L) { until.tv_sec++; until.tv_nsec -= 1000000000L; }
+-        pthread_cond_timedwait(&data, &lock, &until);
++        pthread_cond_wait(&data, &lock);
+     }
+ }
+ 
+--- a/inc/y2_rx.h
++++ b/inc/y2_rx.h
+@@ -14,4 +14,6 @@
+ const unsigned char *y2_rx_peek(int *length, volatile int *cancel, volatile int *stop);
+ void y2_rx_done(void);
+ void y2_rx_flush(void);
++/* Publish cancel/stop and wake a blocked consumer without periodic polling. */
++void y2_rx_set_flag(volatile int *flag, int value);
+ #endif
+--- a/src/usb_gadget.c
++++ b/src/usb_gadget.c
+@@ -484,14 +484,14 @@
+ 
+ 					if (!status)
+ 					{
+-						ctx->stop = 0;
++						y2_rx_set_flag(&ctx->stop, 0);
+ 						if( ctx->thread_not_started )
+ 							ctx->thread_not_started = pthread_create(&ctx->thread, NULL, io_thread, ctx);
+ 					}
+ 					break;
+ 				case 0:
+ 					PRINT_DEBUG("Disable threads");
+-					ctx->stop = 1;
++					y2_rx_set_flag(&ctx->stop, 1);
+ 					break;
+ 
+ 				default:
+@@ -534,11 +534,11 @@
+ 			{
+ 				if(mtp_context->transferring_file_data)
+ 				{
+-					mtp_context->cancel_req = 2;
++					y2_rx_set_flag(&mtp_context->cancel_req, 2);
+ 					pthread_kill(ctx->thread, SIGUSR1);
+ 				}
+ 				else
+-					mtp_context->cancel_req = 0;
++					y2_rx_set_flag(&mtp_context->cancel_req, 0);
+ 
+ 				pthread_mutex_unlock( &mtp_context->cancel_mutex );
+ 			}
+@@ -568,7 +568,7 @@
+ 
+ 				dstatus.wCode = MTP_RESPONSE_OK;
+ 				if(!mtp_context->transferring_file_data)
+-					mtp_context->cancel_req = 0;
++					y2_rx_set_flag(&mtp_context->cancel_req, 0);
+ 
+ 			}
+ 			else
+@@ -578,7 +578,7 @@
+ 				if( !pthread_mutex_lock( &mtp_context->cancel_mutex ) )
+ 				{
+ 					if ( mtp_context->cancel_req == 2 )
+-						mtp_context->cancel_req = 1;
++						y2_rx_set_flag(&mtp_context->cancel_req, 1);
+ 
+ 					pthread_mutex_unlock( &mtp_context->cancel_mutex );
+ 				}
+@@ -653,7 +653,7 @@
+ 		{
+ 			if( shutdown_requested )
+ 			{
+-				ctx->stop = 1;
++				y2_rx_set_flag(&ctx->stop, 1);
+ 				goto end;
+ 			}
+ 			continue;
+@@ -691,7 +691,7 @@
+ 					timeout.tv_sec = 1;
+ 					timeout.tv_usec = 0;
+ 
+-					ctx->stop = 1;
++					y2_rx_set_flag(&ctx->stop, 1);
+ 					if( !ctx->thread_not_started )
+ 					{
+ 						pthread_cancel(ctx->thread);
+@@ -719,11 +719,11 @@
+ 						{
+ 							if(mtp_context->transferring_file_data)
+ 							{
+-								mtp_context->cancel_req = 2;
++								y2_rx_set_flag(&mtp_context->cancel_req, 2);
+ 								pthread_kill(ctx->thread, SIGUSR1);
+ 							}
+ 							else
+-								mtp_context->cancel_req = 0;
++								y2_rx_set_flag(&mtp_context->cancel_req, 0);
+ 
+ 							pthread_mutex_unlock( &mtp_context->cancel_mutex );
+ 						}
+@@ -755,7 +755,7 @@
+ 		}
+ 	}
+ 
+-	ctx->stop = 1;
++	y2_rx_set_flag(&ctx->stop, 1);
+ 
+ end:
+ 	PRINT_DEBUG("handle_ep0 : Leaving (ctx->stop=%d)...",ctx->stop);
+@@ -798,7 +798,7 @@
+ 		{
+ 			if( shutdown_requested )
+ 			{
+-				ctx->stop = 1;
++				y2_rx_set_flag(&ctx->stop, 1);
+ 				goto end;
+ 			}
+ 			continue;
+@@ -837,7 +837,7 @@
+ 
+ 				if (!status)
+ 				{
+-					ctx->stop = 0;
++					y2_rx_set_flag(&ctx->stop, 0);
+ 					if( ctx->thread_not_started )
+ 					{
+ 						/* Keep an OUT request queued at all times. */
+@@ -855,7 +855,7 @@
+ 				timeout.tv_usec = 0;
+ 
+ 				// Stop the main rx thread.
+-				ctx->stop = 1;
++				y2_rx_set_flag(&ctx->stop, 1);
+ 				y2_rx_stop();
+ 				if( !ctx->thread_not_started )
+ 				{
+@@ -863,7 +863,7 @@
+ 					{
+ 						if(!pthread_mutex_lock(&mtp_context->cancel_mutex))
+ 						{
+-							mtp_context->cancel_req = 2;
++							y2_rx_set_flag(&mtp_context->cancel_req, 2);
+ 							pthread_kill(ctx->thread, SIGUSR1);
+ 							pthread_mutex_unlock(&mtp_context->cancel_mutex);
+ 						}
+@@ -874,7 +874,7 @@
+ 					ctx->thread_not_started = 1;
+ 				}
+ 				// But don't close the endpoints !
+-				ctx->stop = 0;
++				y2_rx_set_flag(&ctx->stop, 0);
+ 
+ 				// Drop the file system db
+ 				if ( !pthread_mutex_lock( &mtp_context->inotify_mutex ) )
+@@ -914,7 +914,7 @@
+ 		}
+ 	}
+ 
+-	ctx->stop = 1;
++	y2_rx_set_flag(&ctx->stop, 1);
+ 
+ end:
+ 	PRINT_DEBUG("handle_ffs_ep0 : Leaving... (ctx->stop=%d)",ctx->stop);
+@@ -1208,7 +1208,7 @@
+ 
+ 	if( usbctx )
+ 	{
+-		usbctx->stop = 1;
++		y2_rx_set_flag(&usbctx->stop, 1);
+ 		y2_rx_stop();
+ 
+ 		i = 0;
+--- a/src/umtprd.c
++++ b/src/umtprd.c
+@@ -23,6 +23,7 @@
+  * @author Jean-François DEL NERO <Jean-Francois.DELNERO@viveris.fr>
+  */
+ 
++#include "y2_rx.h"
+ #include "buildconf.h"
+ 
+ #include <inttypes.h>
+@@ -75,7 +76,7 @@
+ 		ret = mtp_incoming_packet(mtp_context);
+ 		if(ret < 0)
+ 		{
+-			ctx->stop = 1;
++			y2_rx_set_flag(&ctx->stop, 1);
+ 		}
+ 	}
+ 
+--- a/src/mtp.c
++++ b/src/mtp.c
+@@ -23,6 +23,7 @@
+  * @author Jean-François DEL NERO <Jean-Francois.DELNERO@viveris.fr>
+  */
+ 
++#include "y2_rx.h"
+ #include "buildconf.h"
+ 
+ #include <inttypes.h>
+@@ -89,7 +90,7 @@
+ 		ctx->default_uid = -1;
+ 		ctx->default_gid = -1;
+ 
+-		ctx->cancel_req = 0;
++		y2_rx_set_flag(&ctx->cancel_req, 0);
+ 
+ 		ctx->SetObjectPropValue_Handle = 0xFFFFFFFF;
+ 
+--- a/src/mtp_operations/mtp_ops_helpers.c
++++ b/src/mtp_operations/mtp_ops_helpers.c
+@@ -23,6 +23,7 @@
+  * @author Jean-Fran�ois DEL NERO <Jean-Francois.DELNERO@viveris.fr>
+  */
+ 
++#include "y2_rx.h"
+ #include "buildconf.h"
+ 
+ #include <unistd.h>
+@@ -78,7 +79,7 @@
+ done:
+     ctx->transferring_file_data=0;
+     if(ctx->cancel_req) result=-2;
+-    ctx->cancel_req=0;
++    y2_rx_set_flag(&ctx->cancel_req, 0);
+     entry_close(ctx->fs_db,entry);
+     y2_transfer_activity(0,result<0 ? EIO : 0);
+     return result;
+--- a/src/mtp_operations/mtp_op_sendobject.c
++++ b/src/mtp_operations/mtp_op_sendobject.c
+@@ -23,6 +23,7 @@
+  * @author Jean-François DEL NERO <Jean-Francois.DELNERO@viveris.fr>
+  */
+ 
++#include "y2_rx.h"
+ #include "buildconf.h"
+ 
+ #include <inttypes.h>
+@@ -113,7 +114,7 @@
+                failure == EROFS ? MTP_RESPONSE_STORE_READ_ONLY : MTP_RESPONSE_INCOMPLETE_TRANSFER;
+ done:
+     ctx->transferring_file_data = 0;
+-    ctx->cancel_req = 0;
++    y2_rx_set_flag(&ctx->cancel_req, 0);
+     pthread_mutex_unlock(&ctx->inotify_mutex);
+     return response;
+ }

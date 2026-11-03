@@ -1,0 +1,54 @@
+{
+ "argv": [
+  "boot-evidence"
+ ],
+ "calls": [],
+ "exit": 0,
+ "stdout": {
+  "captured_on_boot_id": "boot-a",
+  "kernel_panic_retention_guaranteed": false,
+  "loader": {
+   "boot_reason": null,
+   "reset": null
+  },
+  "logs": [],
+  "logs_are_private": false,
+  "pmic": {
+   "long_press_reset": null,
+   "long_press_reset_reason": "",
+   "state": ""
+  },
+  "previous_boot_id": null,
+  "previous_last_stage": null,
+  "previous_orderly_shutdown": null,
+  "record": {
+   "boot_id": null,
+   "build_id": null,
+   "evidence_level": "",
+   "failure": null,
+   "kernel": null,
+   "monotonic_ns": "<volatile>",
+   "parameters": {},
+   "reborn_commit": null,
+   "result": null,
+   "rootfs_release": null,
+   "units": {},
+   "wall_timestamp": "<volatile>",
+   "workload": "",
+   "y2linux_commit": null
+  },
+  "reset_cause": null,
+  "reset_cause_reason": null,
+  "reset_status_raw": null,
+  "retained": {
+   "error": "not_captured",
+   "source_entries_deleted": false
+  },
+  "schema": 0
+ },
+ "tree": {
+  "added": {},
+  "changed": {},
+  "removed": []
+ }
+}

@@ -1,0 +1,13 @@
+#!/bin/sh
+# Mount Y2Media (internal user media, eMMC p8) after Y2DATA. It is never boot-critical:
+# any failure leaves the system up without internal media, and the library falls back to /data.
+# First, the stock FAT storage becomes Y2Media by itself where that is safe (STORAGE-SETUP):
+# nothing to keep or a few files (kept), resuming an interrupted run; a large old library waits
+# for the listener. It runs before USB and Reborn, never on an update's health boot.
+[ "$1" = start ] || exit 0
+/usr/sbin/y2-platform internal-media setup --automatic > /dev/null 2>&1 || :
+/usr/sbin/y2-platform internal-media mount > /dev/null 2>&1 || :
+if mountpoint -q /media/internal; then
+    mkdir -p /media/internal/music
+fi
+exit 0

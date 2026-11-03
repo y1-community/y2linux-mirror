@@ -1,0 +1,19 @@
+{
+ "argv": [
+  "media",
+  "verify"
+ ],
+ "calls": [],
+ "exit": 1,
+ "stdout": {
+  "reason": "card_identity_invalid",
+  "schema": "org.y2linux.error/v1",
+  "state": "Failed",
+  "type": "ValueError"
+ },
+ "tree": {
+  "added": {},
+  "changed": {},
+  "removed": []
+ }
+}

@@ -1,0 +1,54 @@
+#!/bin/sh
+# Services use native APIs; failure leaves normal boot and wired SSH available.
+set -eu
+umask 077
+exec >>/run/y2/connectivity.log 2>&1
+start_bluealsa() {
+    # Generated from the exact configured encoder set. AAC otherwise starts
+    # enabled by upstream default. Fail closed if the build contract is absent.
+    [ -r /etc/y2linux/bluetooth-daemon.args ] || return 1
+    codec_args=$(/usr/sbin/y2-platform codec-runtime --record) || return 1
+    # Only immutable build-generated disable switches are accepted, never eval.
+    set -f
+    set -- $codec_args
+    for arg do
+        case "$arg" in --codec=-AAC|--codec=-aptX|--codec=-aptX-HD|--codec=-LDAC|--codec=AAC|--codec=aptX|--codec=aptX-HD|--codec=LDAC|--sbc-quality=high|--sbc-quality=xq|--sbc-quality=xq+|--sbc-abr|--ldac-quality=mobile|--ldac-quality=standard|--ldac-quality=high|--ldac-abr|--aac-afterburner|--aac-bitrate=320000|--aac-abr) ;;
+            *) return 1;; esac
+    done
+    start-stop-daemon -S -b -m -p /run/y2/bluealsa.pid -x /usr/bin/bluealsad -- \
+        -p a2dp-source --loglevel=warning "$@"
+}
+cleanup() {
+    for name in wifi-action wifi-dhcp wpa reconnect bluealsa calibration; do
+        start-stop-daemon -K -p "/run/y2/$name.pid" 2>/dev/null || :
+    done
+}
+trap cleanup EXIT
+trap 'exit' INT TERM
+if [ ! -f /run/y2/factory/ready ]; then
+    /usr/sbin/y2-factory || exit 1
+fi
+# Kernel open is exclusive. Readiness is published only after obtaining it.
+rm -f /run/y2/calibration-ready
+start-stop-daemon -S -b -m -p /run/y2/calibration.pid -x /usr/sbin/y2-calibration
+for n in $(seq 1 50); do
+    [ ! -f /run/y2/calibration-ready ] || break
+    sleep .1
+done
+[ -f /run/y2/calibration-ready ] || { cleanup; exit 1; }
+case "$(cat /sys/devices/platform/18070000.connectivity/status)" in
+ activated=1*) ;;
+ *) /usr/sbin/y2-radio-activate || { cleanup; exit 1; };;
+esac
+wpa_supplicant -B -u -g /run/wpa_supplicant/global -P /run/y2/wpa.pid
+start_bluealsa
+start-stop-daemon -S -b -m -p /run/y2/reconnect.pid -x /usr/sbin/y2-bt-reconnect
+[ "$(cat /data/network/enabled)" != 1 ] || y2-radio wifi on-runtime
+if [ "$(cat /data/bluetooth/enabled)" = 1 ]; then
+    # Cold calibration has a kernel deadline; do not serialize Wi-Fi monitoring on HCI open.
+    # Subshell: the final daemon replaces this shell and never waits on children.
+    ( y2-radio bluetooth on-runtime & )
+fi
+# Keep the boot/calibration/codec setup, then monitor link changes and helper
+# death with blocking fds. No periodic shell sleep/cat/readlink process tree.
+exec /usr/sbin/y2-platform connectivity-daemon

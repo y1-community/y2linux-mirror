@@ -1,0 +1,8 @@
+#!/bin/sh
+# Select qualified CPU0 C3 policy once; kernel guards own actual admission.
+# /dev/kmsg takes one bounded record per write(); forward line by line.
+kmsg() { while IFS= read -r line; do printf '%.900s\n' "$line" >/dev/kmsg; done; }
+case "$1" in
+ start|stop) { /usr/sbin/y2-platform cpu-idle-policy "$1" 2>&1 || :; } | kmsg ;;
+ *) exit 2 ;;
+esac

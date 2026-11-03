@@ -1,0 +1,17 @@
+{
+ "argv": [
+  "sleep",
+  "status"
+ ],
+ "calls": [],
+ "exit": 1,
+ "stdout": {
+  "failure": "suspend_receipt_unreadable",
+  "state": "Failed"
+ },
+ "tree": {
+  "added": {},
+  "changed": {},
+  "removed": []
+ }
+}

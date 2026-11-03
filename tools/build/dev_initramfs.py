@@ -1,0 +1,146 @@
+"""Create the DEV rescue archive from built Buildroot binaries and exact module."""
+import gzip, hashlib, io, json, posixpath, stat
+from pathlib import Path
+from elftools.elf.elffile import ELFFile
+from tools.validation.d08 import require
+
+
+def boot_module_paths(root):
+    """Fixed reviewed module allowlist; BOOTIMG remains their sole owner."""
+    config = (root/'kernel/.config').read_text().splitlines()
+    paths = ['drivers/gpu/drm/mediatek/mediatek-drm']
+    if 'CONFIG_USB_G_NCM=m' in config:
+        paths += ['drivers/usb/gadget/function/usb_f_ncm', 'drivers/usb/gadget/legacy/g_ncm']
+    if 'CONFIG_SND_USB_AUDIO=m' in config:
+        paths += ['sound/core/snd-hwdep', 'sound/core/snd-rawmidi',
+                  'sound/usb/snd-usb-audio', 'sound/usb/snd-usbmidi-lib']
+    actual=(root/'kernel/modules.order').read_text().splitlines()
+    require(len(actual)==len(paths) and set(actual)=={path+'.o' for path in paths},
+            'unexpected loadable kernel module')
+    return paths
+
+
+def boot_module_dependencies(root, paths):
+    """Read actual modpost dependencies, reject modules outside the allowlist."""
+    release=(root/'kernel/include/config/kernel.release').read_text().strip()
+    names={Path(path).name.replace('-', '_'): Path(path).name+'.ko' for path in paths}
+    records={}
+    for path in paths:
+        raw=(root/'kernel'/(path+'.ko')).read_bytes()
+        elf=ELFFile(io.BytesIO(raw))
+        require(elf.elfclass==32 and elf.little_endian and elf['e_machine']=='EM_ARM', 'module ARM ABI '+path)
+        info=elf.get_section_by_name('.modinfo').data().split(b'\0')
+        versions=[v for v in info if v.startswith(b'vermagic=')]
+        require(len(versions)==1 and versions[0].startswith(('vermagic='+release+' ').encode()), 'module release '+path)
+        dependency=[v.removeprefix(b'depends=').decode() for v in info if v.startswith(b'depends=')]
+        require(len(dependency)==1, 'module dependency metadata '+path)
+        deps=dependency[0].split(',') if dependency[0] else []
+        require(all(name.replace('-', '_') in names for name in deps), 'unpackaged module dependency '+path)
+        records[Path(path).name+'.ko']=[names[name.replace('-', '_')] for name in deps]
+    return records
+
+
+def encode(entries):
+    result=bytearray()
+    ordered=sorted(entries.items(),key=lambda item:(item[0].count('/'),item[0]))
+    ordered.append(('TRAILER!!!',(0,b'',0,0)))
+    for ino,(name,(mode,data,major,minor)) in enumerate(ordered,1):
+        raw=name.encode()+b'\0'
+        fields=[ino,mode,0,0,2 if stat.S_ISDIR(mode) else 1,0,len(data),0,0,major,minor,len(raw),0]
+        result+=b'070701'+''.join(f'{v:08x}' for v in fields).encode()+raw
+        result+=bytes(-len(result)%4);result+=data;result+=bytes(-len(result)%4)
+    result+=bytes(-len(result)%512)
+    return bytes(result)
+
+
+def build(root, project, production=True):
+    target=root/'buildroot/target'; entries={}
+    def put(name,mode,data=b'',major=0,minor=0):
+        parent=posixpath.dirname(name)
+        if parent and parent not in entries: put(parent,stat.S_IFDIR|0o755)
+        entries[name]=(mode,data,major,minor)
+    def binary(name, path):
+        if name in entries:return
+        raw=path.read_bytes();put(name,stat.S_IFREG|0o755,raw)
+        elf=ELFFile(io.BytesIO(raw))
+        require(elf.elfclass==32 and elf.little_endian and elf['e_machine']=='EM_ARM','rescue ELF architecture')
+        for segment in elf.iter_segments():
+            if segment['p_type']=='PT_INTERP':
+                lib=segment.get_interp_name().lstrip('/');binary(lib,target/lib)
+            if segment['p_type']=='PT_DYNAMIC':
+                for tag in segment.iter_tags():
+                    if tag.entry.d_tag!='DT_NEEDED':continue
+                    candidates=[target/'lib'/tag.needed,target/'usr/lib'/tag.needed]
+                    path=next((p for p in candidates if p.is_file()),None)
+                    require(path is not None,'missing rescue library '+tag.needed)
+                    # Flatten this known library symlink into its SONAME. No absolute host links.
+                    binary(str(path.relative_to(target)),path)
+    for name in ('.','dev','proc','sys','run','tmp','newroot','bin','sbin'):put(name,stat.S_IFDIR|0o755)
+    put('dev/console',stat.S_IFCHR|0o600,major=5,minor=1)
+    put('dev/null',stat.S_IFCHR|0o666,major=1,minor=3)
+    put('init',stat.S_IFREG|0o755,(project/('initramfs/production/init' if production else 'initramfs/rescue/init')).read_bytes())
+    binary('bin/busybox',target/'bin/busybox')
+    binary('sbin/blkid',target/'sbin/blkid')
+    if production:
+        if (target/'usr/libexec/reborn-splash').is_file():
+            binary('sbin/reborn-splash',target/'usr/libexec/reborn-splash')
+        binary('sbin/y2-platform-start',root/'y2-platform-start')
+        binary('sbin/y2-offline-charge',root/'y2-offline-charge')
+        put('sbin/y2-status',stat.S_IFREG|0o755,(project/'tools/production/y2-status').read_bytes())
+        binary('sbin/y2-usb-status',root/'y2-usb-status')
+        binary('sbin/e2fsck',target/'sbin/e2fsck')
+        update=target/'usr/sbin/y2-update-core'
+        if not update.exists(): update=target/'sbin/y2-update-core'
+        require(update.is_file(), 'base lacks signed rescue updater; build a full paired release')
+        binary('sbin/y2-update-core',update)
+        for name in ('update-trust.json','update-compat.json'):
+            put('etc/y2linux/'+name,stat.S_IFREG|0o644,(target/'etc/y2linux'/name).read_bytes())
+        # Both boot images carry this archive; the kernel's own y2.recovery=1
+        # (RECOVERY's DTB) decides whether it may install (OTA-35).
+        put('etc/y2linux/recovery-update',stat.S_IFREG|0o644,b'1\n')
+        put('sbin/y2-recovery',stat.S_IFREG|0o644,(project/'initramfs/production/recovery.sh').read_bytes())
+        binary('sbin/y2-recovery-ui',target/'usr/libexec/y2-recovery-ui')
+        put('sbin/y2-storage',stat.S_IFREG|0o644,(project/'initramfs/production/storage.sh').read_bytes())
+        if 'CONFIG_CFG80211=y' in (root/'kernel/.config').read_text().splitlines():
+            from tools.build.regulatory import load
+            for name, raw in load(project).items():
+                put(name,stat.S_IFREG|0o644,raw)
+    binary('sbin/y2-observer',root/'y2-observer')
+    binary('sbin/y2-fbtest',root/'y2-fbtest')
+    binary('sbin/y2-abi-check',root/'y2-abi-check')
+    module=(root/'kernel/drivers/gpu/drm/mediatek/mediatek-drm.ko').read_bytes()
+    put('display.ko',stat.S_IFREG|0o400,module);(root/'display.ko').write_bytes(module)
+    release=(root/'kernel/include/config/kernel.release').read_text().strip()
+    paths=boot_module_paths(root)
+    records=boot_module_dependencies(root, paths)
+    dependencies=[]; aliases=[]
+    for path in paths:
+        filename=Path(path).name+'.ko'
+        raw=(root/'kernel'/(path+'.ko')).read_bytes()
+        if filename != 'mediatek-drm.ko':
+            put('boot-modules/'+release+'/kernel/'+filename,stat.S_IFREG|0o400,raw)
+        dependencies.append('kernel/'+filename+':'+''.join(' kernel/'+name for name in records[filename]))
+        info=ELFFile(io.BytesIO(raw)).get_section_by_name('.modinfo').data().split(b'\0')
+        aliases += ['alias '+value.removeprefix(b'alias=').decode()+' '+Path(path).name.replace('-', '_')
+                    for value in info if value.startswith(b'alias=')]
+    put('boot-modules/'+release+'/modules.dep',stat.S_IFREG|0o644,
+        ('\n'.join(dependencies)+'\n').encode())
+    put('boot-modules/'+release+'/modules.alias',stat.S_IFREG|0o644,
+        ('\n'.join(aliases)+'\n').encode())
+    for applet in ('sh','mount','mkdir','mknod','sleep','readlink','chroot','umount','switch_root','kill','cat','dmesg','grep','tail','cp','uname',
+                   'mv','sed','sync','poweroff','reboot'):
+        put('bin/'+applet,stat.S_IFLNK|0o777,b'busybox')
+    regular=sum(len(v[1]) for v in entries.values() if stat.S_ISREG(v[0]))
+    require(regular<=0x800000,'DEV rescue regular-file budget')
+    raw=encode(entries);packed=gzip.compress(raw,compresslevel=9,mtime=0)
+    require(0<len(packed)<=0x400000,'DEV rescue compressed budget')
+    (root/'initramfs.cpio').write_bytes(raw);(root/'initramfs.cpio.gz').write_bytes(packed)
+    (root/'initrd-size.h').write_text(f'#define Y2_INITRD_END 0x{0x84000000+len(packed):08x}\n')
+    manifest={k:{'mode':v[0],'bytes':len(v[1]),'sha256':hashlib.sha256(v[1]).hexdigest(),'rdev':[v[2],v[3]]} for k,v in entries.items()}
+    (root/'rescue-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+    print(f'DEV rescue: {regular} regular bytes; gzip {len(packed)} bytes; {len(entries)} entries')
+    return entries
+
+if __name__=='__main__':
+    import sys
+    build(Path('/build'),Path('/project'),production=True)

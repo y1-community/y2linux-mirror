@@ -1,0 +1,149 @@
+{
+  "schema": "org.y2linux.highres-sources/v1",
+  "recorded_utc": "2026-10-04T20:02:24Z",
+  "sources": [
+    {
+      "source": "MT6582 Functional Specification v0.91",
+      "author": "MediaTek",
+      "url": "https://disk.yandex.com/d/b2Sy4Y4xFJXYjQ",
+      "discovery_url": "https://4pda.to/forum/index.php?showtopic=583114&st=21320#entry110500396",
+      "pages": 2798,
+      "archive_sha256": "7b749bf45520e1c8cc3a00cea689bce2136b59d745699ad76b20f9a796b94886",
+      "pdf_sha256": "7cf9294f2e9d7ae264e8bf98ddc8083ef0368ecdc57e2601eaefeef6c8a68fe6",
+      "evidence": "PROVEN_SOURCE",
+      "scope": "Complete audio chapter53 register map: authoritative monitor/control definitions; no explicit all-mode internal DL1-width exclusion established",
+      "references": {
+        "DL1_control": "AFE_DAC_CON1 0x11220014 pp2716-18: bit21 mono/stereo, low4 rate",
+        "DMA": "AFE_DL1_BASE/CUR/END 0x11220040/44/48 pp2734-35",
+        "AFE_route": "Figure53-1 p2706 and Table53-1 p2707; AFE_CONN0 pp2719-22",
+        "I2S": "AFE_I2S_CON3 0x1122004c pp2735-36; WLEN16/32",
+        "prefetch": "AFE_MEMIF_PBUF_SIZE 0x112203d8 p2768: bits19:16 DL_ULTRA_TH, low2 DL1_PBUF_SIZE bytes16/32/64/128",
+        "rates": "Features53.2 p2705; rate enums pp2718,2736",
+        "DL1_monitor": "AFE_MEMIF_MON0 0x112200d0 p2741 bits31:16 right /15:0 left; DL2 equivalent p2742"
+      },
+      "interpretation_correction": "Two16-bit monitor fields do not themselves specify the complete internal bus width in every mode. Absence of documented wide selection is not conclusive silicon impossibility."
+    },
+    {
+      "source": "Exact MT6582 training archive",
+      "url": "https://disk.yandex.com/d/070jMEQlXey1Ag",
+      "archive_sha256": "0ccedded3b0a5992e130a8a4e71772dbefb768319d5a72c3dff51a65e47c6ef9",
+      "scope": "Only audio playback/customization sections examined; no additional wide memory-fetch contract found; corroboration not limit proof"
+    },
+    {
+      "source": "MT6582 BSP",
+      "revision": "53aba21e332b3864f26832fd9b35a0b372089c10",
+      "evidence": "PROVEN_SOURCE",
+      "url": "https://android.googlesource.com/kernel/mediatek/+/53aba21e332b3864f26832fd9b35a0b372089c10/drivers/misc/mediatek/sound/mt6582/",
+      "file_hash_manifest": "../highres-audio/sources.json",
+      "scope": "AudDrv_Afe.h, AudDrv_Kernel.c: exact controls/byte-address ring; independent retained d53dd75c3ff77cac3f5be58fddfe660e94f94d64 agrees"
+    },
+    {
+      "source": "Retained stock Y2 audio HAL",
+      "sha256": "5c5162f6a68f7db57febd050ee88cc886779dcce5948937149d6cd211eb0e6de",
+      "evidence": "PROVEN_SOURCE",
+      "functions": [
+        {
+          "names": [
+            "SetMemIfFetchFormatPerSample",
+            "SetoutputConnectionFormat"
+          ],
+          "elf_va": "0x31138",
+          "bytes": 8,
+          "behavior": "mvn r0,#37; bx lr => -38/ENOSYS",
+          "confidence": "HIGH for stub return; not standalone silicon proof"
+        },
+        {
+          "name": "Set2ndI2SOut",
+          "elf_va": "0x61c14"
+        },
+        {
+          "name": "Set2ndI2SOutEnable",
+          "elf_va": "0x62838"
+        }
+      ],
+      "provenance_record": "docs/validation/Y2-PLATFORM-V1-HIGHRES-AUDIO.md",
+      "stock_route_record": "Y2Player/docs/Y2_AUDIO_PATH_PHASE4_SECOND_I2S.md",
+      "scope": "Targeted audio-only disassembly; no new unchanged ROM provenance audit"
+    },
+    {
+      "source": "CS43131 official datasheet",
+      "revision": "DS1155F2",
+      "url": "https://statics.cirrus.com/pubs/proDatasheet/CS43131_DS1155F2.pdf",
+      "sha256": "aca15853c2a4027a6cecd7fb5052a848ee15c6ccf7628c3f76760b6fb0c9a0d3",
+      "evidence": "PROVEN_SOURCE",
+      "scope": "Sections4.9,7.1.8,7.3.22-24; serial formats/word lengths separate from slots"
+    },
+    {
+      "source": "Linux codec",
+      "revision": "v6.18",
+      "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/sound/soc/codecs/cs43130.c?h=v6.18",
+      "evidence": "PROVEN_SOURCE",
+      "scope": "cs43130.c/h ASP params_width vs sclk-derived slot size"
+    },
+    {
+      "source": "xcore995/android_kernel_lg_magna",
+      "revision": "43a1be80064079af0a2d5e8287a690052fe40e6a",
+      "url": "https://github.com/xcore995/android_kernel_lg_magna/blob/43a1be80064079af0a2d5e8287a690052fe40e6a/arch/arm/configs/muse6582_y70_m_defconfig",
+      "config_sha256": "48a2819268fdbc11d00803142d976abde027365bc8a53837077f2d6df155514c",
+      "scope": "Exact MT6582 build selection, MTK_SOUND_DRV=y / SND_SOC disabled. Mixed-SoC HD source is not selected; its HD[17:16] contradicts documented MT6582 DL_ULTRA_TH."
+    },
+    {
+      "source": "xcore995/android_kernel_magna_3.10.54",
+      "revision": "e1ad6254eab487eab966be6e9837c834d6815173",
+      "url": "https://github.com/xcore995/android_kernel_magna_3.10.54/blob/e1ad6254eab487eab966be6e9837c834d6815173/arch/arm/configs/muse6582_y70_l_defconfig",
+      "config_sha256": "abf9a403f6d3c9b72398026db3ab9df7ed911564d07e488f54cf5f4cc972f0dd",
+      "scope": "Exact MT6582 build selection, MTK_SOUND_DRV=y / SND_SOC disabled. Mixed-SoC HD source is not selected; its HD[17:16] contradicts documented MT6582 DL_ULTRA_TH."
+    },
+    {
+      "source": "Pablito2020/android_kernel_bq_krillin",
+      "revision": "0678f5f97f91e296477bbd39d8b8b08ccc095a5b",
+      "url": "https://github.com/Pablito2020/android_kernel_bq_krillin/blob/0678f5f97f91e296477bbd39d8b8b08ccc095a5b/arch/arm/configs/lineage_krillin_defconfig",
+      "config_sha256": "ead28363f7f6458dcbafd198d014116dc81ce1099d32b14c672afd4611154310",
+      "scope": "Exact MT6582 build selection, MTK_SOUND_DRV=y / SND_SOC disabled. Mixed-SoC HD source is not selected; its HD[17:16] contradicts documented MT6582 DL_ULTRA_TH."
+    },
+    {
+      "source": "lewonchik/MT6582-LP-KERNEL",
+      "revision": "ebf5882c7ad368f682544d9d00c80e1cd781b760",
+      "url": "https://github.com/lewonchik/MT6582-LP-KERNEL/blob/ebf5882c7ad368f682544d9d00c80e1cd781b760/kernel/arch/arm/configs/sprout_defconfig",
+      "config_sha256": "66ce84ba661974aa465ae36da89d7cba56734d1964755a3cc94b6f681e081b0b",
+      "scope": "Exact MT6582 build selection, MTK_SOUND_DRV=y / SND_SOC disabled. Mixed-SoC HD source is not selected; its HD[17:16] contradicts documented MT6582 DL_ULTRA_TH."
+    },
+    {
+      "source": "l33tnoob/MT65x2_kernel_lk",
+      "revision": "f48b462fe90862b30ea067698167c0a55458eec3",
+      "url": "https://github.com/l33tnoob/MT65x2_kernel_lk/blob/f48b462fe90862b30ea067698167c0a55458eec3/mediatek/platform/mt6582/hardware/audio/aud_drv/AudioDigitalControl.cpp",
+      "sha256": "f773fc5152ea5dd15580c25bdc8abce1ee0ca619d0189f2ee226a02558063df7",
+      "scope": "Exact MT6582 HAL; width setters return INVALID_OPERATION (TeamWin APIs absent); not standalone physical-limit proof"
+    },
+    {
+      "source": "manjotsidhu/GODz_Kernel_a106_wiko",
+      "revision": "44ffc566dc59acf465c4a358da57924b3b069330",
+      "url": "https://github.com/manjotsidhu/GODz_Kernel_a106_wiko/blob/44ffc566dc59acf465c4a358da57924b3b069330/kernel/mediatek/platform/mt6582/hardware/audio/aud_drv/AudioDigitalControl.cpp",
+      "sha256": "f773fc5152ea5dd15580c25bdc8abce1ee0ca619d0189f2ee226a02558063df7",
+      "scope": "Exact MT6582 HAL; width setters return INVALID_OPERATION (TeamWin APIs absent); not standalone physical-limit proof"
+    },
+    {
+      "source": "TeamWin/android_kernel_kazam_thunder_q45",
+      "revision": "95b1263fbe48c589ba935d7ad2efb523c2b54fc1",
+      "url": "https://github.com/TeamWin/android_kernel_kazam_thunder_q45/blob/95b1263fbe48c589ba935d7ad2efb523c2b54fc1/mediatek/platform/mt6582/hardware/audio/aud_drv/AudioDigitalControl.cpp",
+      "sha256": "ed4be430da7bef306192e21c56f65a9a9925ffd05e2b4d6483a65df594f96958",
+      "scope": "Exact MT6582 HAL; width setters return INVALID_OPERATION (TeamWin APIs absent); not standalone physical-limit proof"
+    },
+    {
+      "source": "FFmpeg ARM conversion",
+      "revision": "n9.0.2",
+      "url": "https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libswresample/arm/audio_convert_neon.S",
+      "sha256": "06a4000286d6e260d369a4a680daca7ceff4bba6c212d277ec47505e96721401",
+      "evidence": "PROVEN_SOURCE",
+      "scope": "Installed stereo FLTP->S16 NEON Q31/high-half packing differs from rounded packed-float converter"
+    },
+    {
+      "source": "FFmpeg ARM conversion",
+      "revision": "n9.0.2",
+      "url": "https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libswresample/arm/audio_convert_init.c",
+      "sha256": "ef3fa844ee274f4631bac07deb15bdf2d1141a87e1f36f6d60b0aaa1cfba3837",
+      "evidence": "PROVEN_SOURCE",
+      "scope": "Installed stereo FLTP->S16 NEON Q31/high-half packing differs from rounded packed-float converter"
+    }
+  ]
+}

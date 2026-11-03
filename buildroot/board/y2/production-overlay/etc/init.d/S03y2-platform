@@ -1,0 +1,8 @@
+#!/bin/sh
+# Only durable boot bookkeeping here. Radio and Reborn keep their existing owners.
+# /dev/kmsg takes one bounded record per write(); Python's block-buffered
+# stdout failed with EINVAL on 15 (Python 3.15), so forward line by line.
+kmsg() { while IFS= read -r line; do printf '%.900s\n' "$line" >/dev/kmsg; done; }
+case "$1" in
+ start) { /usr/sbin/y2-platform boot-stage platform_start 2>&1 || :; } | kmsg ;;
+esac

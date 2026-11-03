@@ -1,0 +1,3 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+/* Compatibility filename: one canonical Y2 hardware description. */
+#include "innioasis-y2.dts"

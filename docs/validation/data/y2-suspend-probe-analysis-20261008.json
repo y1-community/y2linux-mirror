@@ -1,0 +1,2660 @@
+[
+ {
+  "label": "pre-entry",
+  "index": 1,
+  "boottime": 3363.466370358,
+  "suspend_during_capture": false,
+  "registers": 2079,
+  "rails": {
+   "VPROC": true,
+   "VSYS": true,
+   "VPA": false,
+   "VTCXO": true,
+   "VCN28": false,
+   "VCN33_BT": false,
+   "VCN33_WIFI": false,
+   "VA": true,
+   "VCAMA": false,
+   "VIO28": true,
+   "VUSB": true,
+   "VMC": true,
+   "VMCH": true,
+   "VEMC3V3": true,
+   "VGP1": false,
+   "VGP2": true,
+   "VGP3": false,
+   "VCN18": false,
+   "VSIM1": false,
+   "VSIM2": false,
+   "VRTC": true,
+   "VCAMAF": false,
+   "VIBR": false,
+   "VRF18": false,
+   "VM": true,
+   "VIO18": true,
+   "VCAMD": false,
+   "VCAMIO": false
+  },
+  "lp_select": {
+   "VTCXO": true,
+   "VA": false,
+   "VIO28": false,
+   "VUSB": false,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": false,
+   "VM": false,
+   "VIO18": false
+  },
+  "golden_differences": [
+   {
+    "reg": "0x4e",
+    "name": "",
+    "mask": "0xa0",
+    "golden": "0xa0",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x102",
+    "name": "",
+    "mask": "0xc7ff",
+    "golden": "0x8042",
+    "actual": "0x8043"
+   },
+   {
+    "reg": "0x108",
+    "name": "",
+    "mask": "0xffff",
+    "golden": "0x15ff",
+    "actual": "0x3bf"
+   },
+   {
+    "reg": "0x10e",
+    "name": "",
+    "mask": "0xf0",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x120",
+    "name": "",
+    "mask": "0x83fd",
+    "golden": "0xb9",
+    "actual": "0x31"
+   },
+   {
+    "reg": "0x212",
+    "name": "",
+    "mask": "0x30",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x216",
+    "name": "",
+    "mask": "0x2",
+    "golden": "0x2",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x21c",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x230",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x256",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x310",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x404",
+    "name": "VA",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x500",
+    "name": "VIO28",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x502",
+    "name": "VUSB",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x504",
+    "name": "VMC(SD IO)",
+    "mask": "0x1000",
+    "golden": "0x0",
+    "actual": "0x1000"
+   },
+   {
+    "reg": "0x506",
+    "name": "VMCH(SD VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x508",
+    "name": "VEMC3V3(eMMC VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x552",
+    "name": "VM",
+    "mask": "0x4001",
+    "golden": "0x4001",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x556",
+    "name": "VIO18",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x70c",
+    "name": "",
+    "mask": "0xc250",
+    "golden": "0x200",
+    "actual": "0x10"
+   },
+   {
+    "reg": "0x776",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x778",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   }
+  ],
+  "clocks_enabled": [
+   "clock-uart",
+   "clock-system",
+   "clk26m",
+   "y2-efuse",
+   "y2-msdc0-source",
+   "y2-msdc0",
+   "y2-kp",
+   "y2-pwrap",
+   "y2-axi",
+   "y2-auxadc",
+   "y2-therm"
+  ],
+  "runtime_pm": {
+   "18070000.connectivity/power": "suspended",
+   "11200000.usb/musb-hdrc.4.auto/power": "suspended",
+   "11240000.mmc/power": "suspended",
+   "11240000.mmc/mmc_host/mmc0/power": "unsupported",
+   "11230000.mmc/power": "active",
+   "11230000.mmc/mmc_host/mmc1/power": "unsupported",
+   "13010000.gpu/power": "suspended",
+   "11002000.serial/power": "active"
+  },
+  "backlight": {
+   "y2-backlight": "4"
+  },
+  "rails_changed_vs_baseline": {
+   "VCN33_BT": [
+    true,
+    false
+   ],
+   "VCN33_WIFI": [
+    true,
+    false
+   ],
+   "VCN18": [
+    true,
+    false
+   ]
+  }
+ },
+ {
+  "label": "post-resume",
+  "index": 2,
+  "boottime": 3963.98232425,
+  "suspend_during_capture": false,
+  "registers": 2079,
+  "rails": {
+   "VPROC": true,
+   "VSYS": true,
+   "VPA": false,
+   "VTCXO": true,
+   "VCN28": false,
+   "VCN33_BT": false,
+   "VCN33_WIFI": false,
+   "VA": true,
+   "VCAMA": false,
+   "VIO28": true,
+   "VUSB": true,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": true,
+   "VGP1": false,
+   "VGP2": true,
+   "VGP3": false,
+   "VCN18": false,
+   "VSIM1": false,
+   "VSIM2": false,
+   "VRTC": true,
+   "VCAMAF": false,
+   "VIBR": false,
+   "VRF18": false,
+   "VM": true,
+   "VIO18": true,
+   "VCAMD": false,
+   "VCAMIO": false
+  },
+  "lp_select": {
+   "VTCXO": true,
+   "VA": false,
+   "VIO28": false,
+   "VUSB": false,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": false,
+   "VM": false,
+   "VIO18": false
+  },
+  "golden_differences": [
+   {
+    "reg": "0x4e",
+    "name": "",
+    "mask": "0xa0",
+    "golden": "0xa0",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x102",
+    "name": "",
+    "mask": "0xc7ff",
+    "golden": "0x8042",
+    "actual": "0x8043"
+   },
+   {
+    "reg": "0x108",
+    "name": "",
+    "mask": "0xffff",
+    "golden": "0x15ff",
+    "actual": "0x3bf"
+   },
+   {
+    "reg": "0x10e",
+    "name": "",
+    "mask": "0xf0",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x120",
+    "name": "",
+    "mask": "0x83fd",
+    "golden": "0xb9",
+    "actual": "0x31"
+   },
+   {
+    "reg": "0x212",
+    "name": "",
+    "mask": "0x30",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x216",
+    "name": "",
+    "mask": "0x2",
+    "golden": "0x2",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x21c",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x230",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x256",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x310",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x404",
+    "name": "VA",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x500",
+    "name": "VIO28",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x502",
+    "name": "VUSB",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x508",
+    "name": "VEMC3V3(eMMC VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x552",
+    "name": "VM",
+    "mask": "0x4001",
+    "golden": "0x4001",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x556",
+    "name": "VIO18",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x70c",
+    "name": "",
+    "mask": "0xc250",
+    "golden": "0x200",
+    "actual": "0x10"
+   },
+   {
+    "reg": "0x776",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x778",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   }
+  ],
+  "clocks_enabled": [
+   "clock-uart",
+   "clock-system",
+   "clk26m",
+   "y2-efuse",
+   "y2-msdc0-source",
+   "y2-msdc0",
+   "y2-kp",
+   "y2-pwrap",
+   "y2-axi",
+   "y2-auxadc",
+   "y2-therm",
+   "y2-usb0"
+  ],
+  "runtime_pm": {
+   "18070000.connectivity/power": "suspended",
+   "11200000.usb/musb-hdrc.4.auto/power": "active",
+   "11240000.mmc/power": "suspended",
+   "11240000.mmc/mmc_host/mmc0/power": "unsupported",
+   "11230000.mmc/power": "active",
+   "11230000.mmc/mmc_host/mmc1/power": "unsupported",
+   "13010000.gpu/power": "suspended",
+   "11002000.serial/power": "active"
+  },
+  "backlight": {
+   "y2-backlight": "4"
+  },
+  "rails_changed_vs_baseline": {
+   "VCN33_BT": [
+    true,
+    false
+   ],
+   "VCN33_WIFI": [
+    true,
+    false
+   ],
+   "VMC": [
+    true,
+    false
+   ],
+   "VMCH": [
+    true,
+    false
+   ],
+   "VCN18": [
+    true,
+    false
+   ]
+  }
+ },
+ {
+  "label": "maintenance",
+  "index": 3,
+  "boottime": 3965.148353176,
+  "suspend_during_capture": false,
+  "registers": 2079,
+  "rails": {
+   "VPROC": true,
+   "VSYS": true,
+   "VPA": false,
+   "VTCXO": true,
+   "VCN28": false,
+   "VCN33_BT": false,
+   "VCN33_WIFI": false,
+   "VA": true,
+   "VCAMA": false,
+   "VIO28": true,
+   "VUSB": true,
+   "VMC": true,
+   "VMCH": true,
+   "VEMC3V3": true,
+   "VGP1": false,
+   "VGP2": true,
+   "VGP3": false,
+   "VCN18": false,
+   "VSIM1": false,
+   "VSIM2": false,
+   "VRTC": true,
+   "VCAMAF": false,
+   "VIBR": false,
+   "VRF18": false,
+   "VM": true,
+   "VIO18": true,
+   "VCAMD": false,
+   "VCAMIO": false
+  },
+  "lp_select": {
+   "VTCXO": true,
+   "VA": false,
+   "VIO28": false,
+   "VUSB": false,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": false,
+   "VM": false,
+   "VIO18": false
+  },
+  "golden_differences": [
+   {
+    "reg": "0x4e",
+    "name": "",
+    "mask": "0xa0",
+    "golden": "0xa0",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x102",
+    "name": "",
+    "mask": "0xc7ff",
+    "golden": "0x8042",
+    "actual": "0x8043"
+   },
+   {
+    "reg": "0x108",
+    "name": "",
+    "mask": "0xffff",
+    "golden": "0x15ff",
+    "actual": "0x3bf"
+   },
+   {
+    "reg": "0x10e",
+    "name": "",
+    "mask": "0xf0",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x120",
+    "name": "",
+    "mask": "0x83fd",
+    "golden": "0xb9",
+    "actual": "0x31"
+   },
+   {
+    "reg": "0x212",
+    "name": "",
+    "mask": "0x30",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x216",
+    "name": "",
+    "mask": "0x2",
+    "golden": "0x2",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x21c",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x230",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x256",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x310",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x404",
+    "name": "VA",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x500",
+    "name": "VIO28",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x502",
+    "name": "VUSB",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x504",
+    "name": "VMC(SD IO)",
+    "mask": "0x1000",
+    "golden": "0x0",
+    "actual": "0x1000"
+   },
+   {
+    "reg": "0x506",
+    "name": "VMCH(SD VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x508",
+    "name": "VEMC3V3(eMMC VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x552",
+    "name": "VM",
+    "mask": "0x4001",
+    "golden": "0x4001",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x556",
+    "name": "VIO18",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x70c",
+    "name": "",
+    "mask": "0xc250",
+    "golden": "0x200",
+    "actual": "0x10"
+   },
+   {
+    "reg": "0x776",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x778",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   }
+  ],
+  "clocks_enabled": [
+   "clock-uart",
+   "clock-system",
+   "clk26m",
+   "y2-efuse",
+   "y2-kp",
+   "y2-pwrap",
+   "y2-axi",
+   "y2-auxadc",
+   "y2-therm",
+   "y2-usb0"
+  ],
+  "runtime_pm": {
+   "18070000.connectivity/power": "suspended",
+   "11200000.usb/musb-hdrc.4.auto/power": "active",
+   "11240000.mmc/power": "suspended",
+   "11240000.mmc/mmc_host/mmc0/power": "unsupported",
+   "11230000.mmc/power": "suspended",
+   "11230000.mmc/mmc_host/mmc1/power": "unsupported",
+   "13010000.gpu/power": "suspended",
+   "11002000.serial/power": "active"
+  },
+  "backlight": {
+   "y2-backlight": "4"
+  },
+  "rails_changed_vs_baseline": {
+   "VCN33_BT": [
+    true,
+    false
+   ],
+   "VCN33_WIFI": [
+    true,
+    false
+   ],
+   "VCN18": [
+    true,
+    false
+   ]
+  }
+ },
+ {
+  "label": "pre-entry",
+  "index": 4,
+  "boottime": 3966.513339795,
+  "suspend_during_capture": false,
+  "registers": 2079,
+  "rails": {
+   "VPROC": true,
+   "VSYS": true,
+   "VPA": false,
+   "VTCXO": true,
+   "VCN28": false,
+   "VCN33_BT": false,
+   "VCN33_WIFI": false,
+   "VA": true,
+   "VCAMA": false,
+   "VIO28": true,
+   "VUSB": true,
+   "VMC": true,
+   "VMCH": true,
+   "VEMC3V3": true,
+   "VGP1": false,
+   "VGP2": true,
+   "VGP3": false,
+   "VCN18": false,
+   "VSIM1": false,
+   "VSIM2": false,
+   "VRTC": true,
+   "VCAMAF": false,
+   "VIBR": false,
+   "VRF18": false,
+   "VM": true,
+   "VIO18": true,
+   "VCAMD": false,
+   "VCAMIO": false
+  },
+  "lp_select": {
+   "VTCXO": true,
+   "VA": false,
+   "VIO28": false,
+   "VUSB": false,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": false,
+   "VM": false,
+   "VIO18": false
+  },
+  "golden_differences": [
+   {
+    "reg": "0x4e",
+    "name": "",
+    "mask": "0xa0",
+    "golden": "0xa0",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x102",
+    "name": "",
+    "mask": "0xc7ff",
+    "golden": "0x8042",
+    "actual": "0x8043"
+   },
+   {
+    "reg": "0x108",
+    "name": "",
+    "mask": "0xffff",
+    "golden": "0x15ff",
+    "actual": "0x3bf"
+   },
+   {
+    "reg": "0x10e",
+    "name": "",
+    "mask": "0xf0",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x120",
+    "name": "",
+    "mask": "0x83fd",
+    "golden": "0xb9",
+    "actual": "0x31"
+   },
+   {
+    "reg": "0x212",
+    "name": "",
+    "mask": "0x30",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x216",
+    "name": "",
+    "mask": "0x2",
+    "golden": "0x2",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x21c",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x230",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x256",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x310",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x404",
+    "name": "VA",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x500",
+    "name": "VIO28",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x502",
+    "name": "VUSB",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x504",
+    "name": "VMC(SD IO)",
+    "mask": "0x1000",
+    "golden": "0x0",
+    "actual": "0x1000"
+   },
+   {
+    "reg": "0x506",
+    "name": "VMCH(SD VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x508",
+    "name": "VEMC3V3(eMMC VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x552",
+    "name": "VM",
+    "mask": "0x4001",
+    "golden": "0x4001",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x556",
+    "name": "VIO18",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x70c",
+    "name": "",
+    "mask": "0xc250",
+    "golden": "0x200",
+    "actual": "0x10"
+   },
+   {
+    "reg": "0x776",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x778",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   }
+  ],
+  "clocks_enabled": [
+   "clock-uart",
+   "clock-system",
+   "clk26m",
+   "y2-efuse",
+   "y2-msdc0-source",
+   "y2-msdc0",
+   "y2-kp",
+   "y2-pwrap",
+   "y2-axi",
+   "y2-auxadc",
+   "y2-therm",
+   "y2-usb0"
+  ],
+  "runtime_pm": {
+   "18070000.connectivity/power": "suspended",
+   "11200000.usb/musb-hdrc.4.auto/power": "active",
+   "11240000.mmc/power": "suspended",
+   "11240000.mmc/mmc_host/mmc0/power": "unsupported",
+   "11230000.mmc/power": "suspended",
+   "11230000.mmc/mmc_host/mmc1/power": "unsupported",
+   "13010000.gpu/power": "suspended",
+   "11002000.serial/power": "active"
+  },
+  "backlight": {
+   "y2-backlight": "4"
+  },
+  "rails_changed_vs_baseline": {
+   "VCN33_BT": [
+    true,
+    false
+   ],
+   "VCN33_WIFI": [
+    true,
+    false
+   ],
+   "VCN18": [
+    true,
+    false
+   ]
+  }
+ },
+ {
+  "label": "post-resume",
+  "index": 5,
+  "boottime": 4566.982259984,
+  "suspend_during_capture": false,
+  "registers": 2079,
+  "rails": {
+   "VPROC": true,
+   "VSYS": true,
+   "VPA": false,
+   "VTCXO": true,
+   "VCN28": false,
+   "VCN33_BT": false,
+   "VCN33_WIFI": false,
+   "VA": true,
+   "VCAMA": false,
+   "VIO28": true,
+   "VUSB": true,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": true,
+   "VGP1": false,
+   "VGP2": true,
+   "VGP3": false,
+   "VCN18": false,
+   "VSIM1": false,
+   "VSIM2": false,
+   "VRTC": true,
+   "VCAMAF": false,
+   "VIBR": false,
+   "VRF18": false,
+   "VM": true,
+   "VIO18": true,
+   "VCAMD": false,
+   "VCAMIO": false
+  },
+  "lp_select": {
+   "VTCXO": true,
+   "VA": false,
+   "VIO28": false,
+   "VUSB": false,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": false,
+   "VM": false,
+   "VIO18": false
+  },
+  "golden_differences": [
+   {
+    "reg": "0x4e",
+    "name": "",
+    "mask": "0xa0",
+    "golden": "0xa0",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x102",
+    "name": "",
+    "mask": "0xc7ff",
+    "golden": "0x8042",
+    "actual": "0x8043"
+   },
+   {
+    "reg": "0x108",
+    "name": "",
+    "mask": "0xffff",
+    "golden": "0x15ff",
+    "actual": "0x3bf"
+   },
+   {
+    "reg": "0x10e",
+    "name": "",
+    "mask": "0xf0",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x120",
+    "name": "",
+    "mask": "0x83fd",
+    "golden": "0xb9",
+    "actual": "0x31"
+   },
+   {
+    "reg": "0x212",
+    "name": "",
+    "mask": "0x30",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x216",
+    "name": "",
+    "mask": "0x2",
+    "golden": "0x2",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x21c",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x230",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x256",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x310",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x404",
+    "name": "VA",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x500",
+    "name": "VIO28",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x502",
+    "name": "VUSB",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x508",
+    "name": "VEMC3V3(eMMC VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x552",
+    "name": "VM",
+    "mask": "0x4001",
+    "golden": "0x4001",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x556",
+    "name": "VIO18",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x70c",
+    "name": "",
+    "mask": "0xc250",
+    "golden": "0x200",
+    "actual": "0x10"
+   },
+   {
+    "reg": "0x776",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x778",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   }
+  ],
+  "clocks_enabled": [
+   "clock-uart",
+   "clock-system",
+   "clk26m",
+   "y2-efuse",
+   "y2-kp",
+   "y2-pwrap",
+   "y2-axi",
+   "y2-auxadc",
+   "y2-therm",
+   "y2-usb0"
+  ],
+  "runtime_pm": {
+   "18070000.connectivity/power": "suspended",
+   "11200000.usb/musb-hdrc.4.auto/power": "active",
+   "11240000.mmc/power": "suspended",
+   "11240000.mmc/mmc_host/mmc0/power": "unsupported",
+   "11230000.mmc/power": "suspended",
+   "11230000.mmc/mmc_host/mmc1/power": "unsupported",
+   "13010000.gpu/power": "suspended",
+   "11002000.serial/power": "active"
+  },
+  "backlight": {
+   "y2-backlight": "4"
+  },
+  "rails_changed_vs_baseline": {
+   "VCN33_BT": [
+    true,
+    false
+   ],
+   "VCN33_WIFI": [
+    true,
+    false
+   ],
+   "VMC": [
+    true,
+    false
+   ],
+   "VMCH": [
+    true,
+    false
+   ],
+   "VCN18": [
+    true,
+    false
+   ]
+  }
+ },
+ {
+  "label": "maintenance",
+  "index": 6,
+  "boottime": 4568.145888027,
+  "suspend_during_capture": false,
+  "registers": 2079,
+  "rails": {
+   "VPROC": true,
+   "VSYS": true,
+   "VPA": false,
+   "VTCXO": true,
+   "VCN28": false,
+   "VCN33_BT": false,
+   "VCN33_WIFI": false,
+   "VA": true,
+   "VCAMA": false,
+   "VIO28": true,
+   "VUSB": true,
+   "VMC": true,
+   "VMCH": true,
+   "VEMC3V3": true,
+   "VGP1": false,
+   "VGP2": true,
+   "VGP3": false,
+   "VCN18": false,
+   "VSIM1": false,
+   "VSIM2": false,
+   "VRTC": true,
+   "VCAMAF": false,
+   "VIBR": false,
+   "VRF18": false,
+   "VM": true,
+   "VIO18": true,
+   "VCAMD": false,
+   "VCAMIO": false
+  },
+  "lp_select": {
+   "VTCXO": true,
+   "VA": false,
+   "VIO28": false,
+   "VUSB": false,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": false,
+   "VM": false,
+   "VIO18": false
+  },
+  "golden_differences": [
+   {
+    "reg": "0x4e",
+    "name": "",
+    "mask": "0xa0",
+    "golden": "0xa0",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x102",
+    "name": "",
+    "mask": "0xc7ff",
+    "golden": "0x8042",
+    "actual": "0x8043"
+   },
+   {
+    "reg": "0x108",
+    "name": "",
+    "mask": "0xffff",
+    "golden": "0x15ff",
+    "actual": "0x3bf"
+   },
+   {
+    "reg": "0x10e",
+    "name": "",
+    "mask": "0xf0",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x120",
+    "name": "",
+    "mask": "0x83fd",
+    "golden": "0xb9",
+    "actual": "0x31"
+   },
+   {
+    "reg": "0x212",
+    "name": "",
+    "mask": "0x30",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x216",
+    "name": "",
+    "mask": "0x2",
+    "golden": "0x2",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x21c",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x230",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x256",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x310",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x404",
+    "name": "VA",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x500",
+    "name": "VIO28",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x502",
+    "name": "VUSB",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x504",
+    "name": "VMC(SD IO)",
+    "mask": "0x1000",
+    "golden": "0x0",
+    "actual": "0x1000"
+   },
+   {
+    "reg": "0x506",
+    "name": "VMCH(SD VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x508",
+    "name": "VEMC3V3(eMMC VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x552",
+    "name": "VM",
+    "mask": "0x4001",
+    "golden": "0x4001",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x556",
+    "name": "VIO18",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x70c",
+    "name": "",
+    "mask": "0xc250",
+    "golden": "0x200",
+    "actual": "0x10"
+   },
+   {
+    "reg": "0x776",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x778",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   }
+  ],
+  "clocks_enabled": [
+   "clock-uart",
+   "clock-system",
+   "clk26m",
+   "y2-efuse",
+   "y2-kp",
+   "y2-pwrap",
+   "y2-axi",
+   "y2-auxadc",
+   "y2-therm",
+   "y2-usb0"
+  ],
+  "runtime_pm": {
+   "18070000.connectivity/power": "suspended",
+   "11200000.usb/musb-hdrc.4.auto/power": "active",
+   "11240000.mmc/power": "suspended",
+   "11240000.mmc/mmc_host/mmc0/power": "unsupported",
+   "11230000.mmc/power": "suspended",
+   "11230000.mmc/mmc_host/mmc1/power": "unsupported",
+   "13010000.gpu/power": "suspended",
+   "11002000.serial/power": "active"
+  },
+  "backlight": {
+   "y2-backlight": "4"
+  },
+  "rails_changed_vs_baseline": {
+   "VCN33_BT": [
+    true,
+    false
+   ],
+   "VCN33_WIFI": [
+    true,
+    false
+   ],
+   "VCN18": [
+    true,
+    false
+   ]
+  }
+ },
+ {
+  "label": "pre-entry",
+  "index": 7,
+  "boottime": 4569.506642101,
+  "suspend_during_capture": false,
+  "registers": 2079,
+  "rails": {
+   "VPROC": true,
+   "VSYS": true,
+   "VPA": false,
+   "VTCXO": true,
+   "VCN28": false,
+   "VCN33_BT": false,
+   "VCN33_WIFI": false,
+   "VA": true,
+   "VCAMA": false,
+   "VIO28": true,
+   "VUSB": true,
+   "VMC": true,
+   "VMCH": true,
+   "VEMC3V3": true,
+   "VGP1": false,
+   "VGP2": true,
+   "VGP3": false,
+   "VCN18": false,
+   "VSIM1": false,
+   "VSIM2": false,
+   "VRTC": true,
+   "VCAMAF": false,
+   "VIBR": false,
+   "VRF18": false,
+   "VM": true,
+   "VIO18": true,
+   "VCAMD": false,
+   "VCAMIO": false
+  },
+  "lp_select": {
+   "VTCXO": true,
+   "VA": false,
+   "VIO28": false,
+   "VUSB": false,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": false,
+   "VM": false,
+   "VIO18": false
+  },
+  "golden_differences": [
+   {
+    "reg": "0x4e",
+    "name": "",
+    "mask": "0xa0",
+    "golden": "0xa0",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x102",
+    "name": "",
+    "mask": "0xc7ff",
+    "golden": "0x8042",
+    "actual": "0x8043"
+   },
+   {
+    "reg": "0x108",
+    "name": "",
+    "mask": "0xffff",
+    "golden": "0x15ff",
+    "actual": "0x3bf"
+   },
+   {
+    "reg": "0x10e",
+    "name": "",
+    "mask": "0xf0",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x120",
+    "name": "",
+    "mask": "0x83fd",
+    "golden": "0xb9",
+    "actual": "0x31"
+   },
+   {
+    "reg": "0x212",
+    "name": "",
+    "mask": "0x30",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x216",
+    "name": "",
+    "mask": "0x2",
+    "golden": "0x2",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x21c",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x230",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x256",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x310",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x404",
+    "name": "VA",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x500",
+    "name": "VIO28",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x502",
+    "name": "VUSB",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x504",
+    "name": "VMC(SD IO)",
+    "mask": "0x1000",
+    "golden": "0x0",
+    "actual": "0x1000"
+   },
+   {
+    "reg": "0x506",
+    "name": "VMCH(SD VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x508",
+    "name": "VEMC3V3(eMMC VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x552",
+    "name": "VM",
+    "mask": "0x4001",
+    "golden": "0x4001",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x556",
+    "name": "VIO18",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x70c",
+    "name": "",
+    "mask": "0xc250",
+    "golden": "0x200",
+    "actual": "0x10"
+   },
+   {
+    "reg": "0x776",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x778",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   }
+  ],
+  "clocks_enabled": [
+   "clock-uart",
+   "clock-system",
+   "clk26m",
+   "y2-efuse",
+   "y2-msdc0-source",
+   "y2-msdc0",
+   "y2-kp",
+   "y2-pwrap",
+   "y2-axi",
+   "y2-auxadc",
+   "y2-therm",
+   "y2-usb0"
+  ],
+  "runtime_pm": {
+   "18070000.connectivity/power": "suspended",
+   "11200000.usb/musb-hdrc.4.auto/power": "active",
+   "11240000.mmc/power": "suspended",
+   "11240000.mmc/mmc_host/mmc0/power": "unsupported",
+   "11230000.mmc/power": "active",
+   "11230000.mmc/mmc_host/mmc1/power": "unsupported",
+   "13010000.gpu/power": "suspended",
+   "11002000.serial/power": "active"
+  },
+  "backlight": {
+   "y2-backlight": "4"
+  },
+  "rails_changed_vs_baseline": {
+   "VCN33_BT": [
+    true,
+    false
+   ],
+   "VCN33_WIFI": [
+    true,
+    false
+   ],
+   "VCN18": [
+    true,
+    false
+   ]
+  }
+ },
+ {
+  "label": "post-resume",
+  "index": 8,
+  "boottime": 5169.982214292,
+  "suspend_during_capture": false,
+  "registers": 2079,
+  "rails": {
+   "VPROC": true,
+   "VSYS": true,
+   "VPA": false,
+   "VTCXO": true,
+   "VCN28": false,
+   "VCN33_BT": false,
+   "VCN33_WIFI": false,
+   "VA": true,
+   "VCAMA": false,
+   "VIO28": true,
+   "VUSB": true,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": true,
+   "VGP1": false,
+   "VGP2": true,
+   "VGP3": false,
+   "VCN18": false,
+   "VSIM1": false,
+   "VSIM2": false,
+   "VRTC": true,
+   "VCAMAF": false,
+   "VIBR": false,
+   "VRF18": false,
+   "VM": true,
+   "VIO18": true,
+   "VCAMD": false,
+   "VCAMIO": false
+  },
+  "lp_select": {
+   "VTCXO": true,
+   "VA": false,
+   "VIO28": false,
+   "VUSB": false,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": false,
+   "VM": false,
+   "VIO18": false
+  },
+  "golden_differences": [
+   {
+    "reg": "0x4e",
+    "name": "",
+    "mask": "0xa0",
+    "golden": "0xa0",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x102",
+    "name": "",
+    "mask": "0xc7ff",
+    "golden": "0x8042",
+    "actual": "0x8043"
+   },
+   {
+    "reg": "0x108",
+    "name": "",
+    "mask": "0xffff",
+    "golden": "0x15ff",
+    "actual": "0x3bf"
+   },
+   {
+    "reg": "0x10e",
+    "name": "",
+    "mask": "0xf0",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x120",
+    "name": "",
+    "mask": "0x83fd",
+    "golden": "0xb9",
+    "actual": "0x31"
+   },
+   {
+    "reg": "0x212",
+    "name": "",
+    "mask": "0x30",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x216",
+    "name": "",
+    "mask": "0x2",
+    "golden": "0x2",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x21c",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x230",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x256",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x310",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x404",
+    "name": "VA",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x500",
+    "name": "VIO28",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x502",
+    "name": "VUSB",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x508",
+    "name": "VEMC3V3(eMMC VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x552",
+    "name": "VM",
+    "mask": "0x4001",
+    "golden": "0x4001",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x556",
+    "name": "VIO18",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x70c",
+    "name": "",
+    "mask": "0xc250",
+    "golden": "0x200",
+    "actual": "0x10"
+   },
+   {
+    "reg": "0x776",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x778",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   }
+  ],
+  "clocks_enabled": [
+   "clock-uart",
+   "clock-system",
+   "clk26m",
+   "y2-efuse",
+   "y2-kp",
+   "y2-pwrap",
+   "y2-axi",
+   "y2-auxadc",
+   "y2-therm",
+   "y2-usb0"
+  ],
+  "runtime_pm": {
+   "18070000.connectivity/power": "suspended",
+   "11200000.usb/musb-hdrc.4.auto/power": "active",
+   "11240000.mmc/power": "suspended",
+   "11240000.mmc/mmc_host/mmc0/power": "unsupported",
+   "11230000.mmc/power": "active",
+   "11230000.mmc/mmc_host/mmc1/power": "unsupported",
+   "13010000.gpu/power": "suspended",
+   "11002000.serial/power": "active"
+  },
+  "backlight": {
+   "y2-backlight": "4"
+  },
+  "rails_changed_vs_baseline": {
+   "VCN33_BT": [
+    true,
+    false
+   ],
+   "VCN33_WIFI": [
+    true,
+    false
+   ],
+   "VMC": [
+    true,
+    false
+   ],
+   "VMCH": [
+    true,
+    false
+   ],
+   "VCN18": [
+    true,
+    false
+   ]
+  }
+ },
+ {
+  "label": "maintenance",
+  "index": 9,
+  "boottime": 5171.145026657,
+  "suspend_during_capture": false,
+  "registers": 2079,
+  "rails": {
+   "VPROC": true,
+   "VSYS": true,
+   "VPA": false,
+   "VTCXO": true,
+   "VCN28": false,
+   "VCN33_BT": false,
+   "VCN33_WIFI": false,
+   "VA": true,
+   "VCAMA": false,
+   "VIO28": true,
+   "VUSB": true,
+   "VMC": true,
+   "VMCH": true,
+   "VEMC3V3": true,
+   "VGP1": false,
+   "VGP2": true,
+   "VGP3": false,
+   "VCN18": false,
+   "VSIM1": false,
+   "VSIM2": false,
+   "VRTC": true,
+   "VCAMAF": false,
+   "VIBR": false,
+   "VRF18": false,
+   "VM": true,
+   "VIO18": true,
+   "VCAMD": false,
+   "VCAMIO": false
+  },
+  "lp_select": {
+   "VTCXO": true,
+   "VA": false,
+   "VIO28": false,
+   "VUSB": false,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": false,
+   "VM": false,
+   "VIO18": false
+  },
+  "golden_differences": [
+   {
+    "reg": "0x4e",
+    "name": "",
+    "mask": "0xa0",
+    "golden": "0xa0",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x102",
+    "name": "",
+    "mask": "0xc7ff",
+    "golden": "0x8042",
+    "actual": "0x8043"
+   },
+   {
+    "reg": "0x108",
+    "name": "",
+    "mask": "0xffff",
+    "golden": "0x15ff",
+    "actual": "0x3bf"
+   },
+   {
+    "reg": "0x10e",
+    "name": "",
+    "mask": "0xf0",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x120",
+    "name": "",
+    "mask": "0x83fd",
+    "golden": "0xb9",
+    "actual": "0x31"
+   },
+   {
+    "reg": "0x212",
+    "name": "",
+    "mask": "0x30",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x216",
+    "name": "",
+    "mask": "0x2",
+    "golden": "0x2",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x21c",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x230",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x256",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x310",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x404",
+    "name": "VA",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x500",
+    "name": "VIO28",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x502",
+    "name": "VUSB",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x504",
+    "name": "VMC(SD IO)",
+    "mask": "0x1000",
+    "golden": "0x0",
+    "actual": "0x1000"
+   },
+   {
+    "reg": "0x506",
+    "name": "VMCH(SD VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x508",
+    "name": "VEMC3V3(eMMC VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x552",
+    "name": "VM",
+    "mask": "0x4001",
+    "golden": "0x4001",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x556",
+    "name": "VIO18",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x70c",
+    "name": "",
+    "mask": "0xc250",
+    "golden": "0x200",
+    "actual": "0x10"
+   },
+   {
+    "reg": "0x776",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x778",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   }
+  ],
+  "clocks_enabled": [
+   "clock-uart",
+   "clock-system",
+   "clk26m",
+   "y2-efuse",
+   "y2-kp",
+   "y2-pwrap",
+   "y2-axi",
+   "y2-auxadc",
+   "y2-therm",
+   "y2-usb0"
+  ],
+  "runtime_pm": {
+   "18070000.connectivity/power": "suspended",
+   "11200000.usb/musb-hdrc.4.auto/power": "active",
+   "11240000.mmc/power": "suspended",
+   "11240000.mmc/mmc_host/mmc0/power": "unsupported",
+   "11230000.mmc/power": "suspended",
+   "11230000.mmc/mmc_host/mmc1/power": "unsupported",
+   "13010000.gpu/power": "suspended",
+   "11002000.serial/power": "active"
+  },
+  "backlight": {
+   "y2-backlight": "4"
+  },
+  "rails_changed_vs_baseline": {
+   "VCN33_BT": [
+    true,
+    false
+   ],
+   "VCN33_WIFI": [
+    true,
+    false
+   ],
+   "VCN18": [
+    true,
+    false
+   ]
+  }
+ },
+ {
+  "label": "pre-entry",
+  "index": 10,
+  "boottime": 5172.504541751,
+  "suspend_during_capture": false,
+  "registers": 2079,
+  "rails": {
+   "VPROC": true,
+   "VSYS": true,
+   "VPA": false,
+   "VTCXO": true,
+   "VCN28": false,
+   "VCN33_BT": false,
+   "VCN33_WIFI": false,
+   "VA": true,
+   "VCAMA": false,
+   "VIO28": true,
+   "VUSB": true,
+   "VMC": true,
+   "VMCH": true,
+   "VEMC3V3": true,
+   "VGP1": false,
+   "VGP2": true,
+   "VGP3": false,
+   "VCN18": false,
+   "VSIM1": false,
+   "VSIM2": false,
+   "VRTC": true,
+   "VCAMAF": false,
+   "VIBR": false,
+   "VRF18": false,
+   "VM": true,
+   "VIO18": true,
+   "VCAMD": false,
+   "VCAMIO": false
+  },
+  "lp_select": {
+   "VTCXO": true,
+   "VA": false,
+   "VIO28": false,
+   "VUSB": false,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": false,
+   "VM": false,
+   "VIO18": false
+  },
+  "golden_differences": [
+   {
+    "reg": "0x4e",
+    "name": "",
+    "mask": "0xa0",
+    "golden": "0xa0",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x102",
+    "name": "",
+    "mask": "0xc7ff",
+    "golden": "0x8042",
+    "actual": "0x8043"
+   },
+   {
+    "reg": "0x108",
+    "name": "",
+    "mask": "0xffff",
+    "golden": "0x15ff",
+    "actual": "0x3bf"
+   },
+   {
+    "reg": "0x10e",
+    "name": "",
+    "mask": "0xf0",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x120",
+    "name": "",
+    "mask": "0x83fd",
+    "golden": "0xb9",
+    "actual": "0x31"
+   },
+   {
+    "reg": "0x212",
+    "name": "",
+    "mask": "0x30",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x216",
+    "name": "",
+    "mask": "0x2",
+    "golden": "0x2",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x21c",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x230",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x256",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x310",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x404",
+    "name": "VA",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x500",
+    "name": "VIO28",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x502",
+    "name": "VUSB",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x504",
+    "name": "VMC(SD IO)",
+    "mask": "0x1000",
+    "golden": "0x0",
+    "actual": "0x1000"
+   },
+   {
+    "reg": "0x506",
+    "name": "VMCH(SD VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x508",
+    "name": "VEMC3V3(eMMC VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x552",
+    "name": "VM",
+    "mask": "0x4001",
+    "golden": "0x4001",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x556",
+    "name": "VIO18",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x70c",
+    "name": "",
+    "mask": "0xc250",
+    "golden": "0x200",
+    "actual": "0x10"
+   },
+   {
+    "reg": "0x776",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x778",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   }
+  ],
+  "clocks_enabled": [
+   "clock-uart",
+   "clock-system",
+   "clk26m",
+   "y2-efuse",
+   "y2-msdc0-source",
+   "y2-msdc0",
+   "y2-kp",
+   "y2-pwrap",
+   "y2-axi",
+   "y2-auxadc",
+   "y2-therm",
+   "y2-usb0"
+  ],
+  "runtime_pm": {
+   "18070000.connectivity/power": "suspended",
+   "11200000.usb/musb-hdrc.4.auto/power": "active",
+   "11240000.mmc/power": "suspended",
+   "11240000.mmc/mmc_host/mmc0/power": "unsupported",
+   "11230000.mmc/power": "active",
+   "11230000.mmc/mmc_host/mmc1/power": "unsupported",
+   "13010000.gpu/power": "suspended",
+   "11002000.serial/power": "active"
+  },
+  "backlight": {
+   "y2-backlight": "4"
+  },
+  "rails_changed_vs_baseline": {
+   "VCN33_BT": [
+    true,
+    false
+   ],
+   "VCN33_WIFI": [
+    true,
+    false
+   ],
+   "VCN18": [
+    true,
+    false
+   ]
+  }
+ },
+ {
+  "label": "post-resume",
+  "index": 11,
+  "boottime": 5222.981739762,
+  "suspend_during_capture": false,
+  "registers": 2079,
+  "rails": {
+   "VPROC": true,
+   "VSYS": true,
+   "VPA": false,
+   "VTCXO": true,
+   "VCN28": false,
+   "VCN33_BT": false,
+   "VCN33_WIFI": false,
+   "VA": true,
+   "VCAMA": false,
+   "VIO28": true,
+   "VUSB": true,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": true,
+   "VGP1": false,
+   "VGP2": true,
+   "VGP3": false,
+   "VCN18": false,
+   "VSIM1": false,
+   "VSIM2": false,
+   "VRTC": true,
+   "VCAMAF": false,
+   "VIBR": false,
+   "VRF18": false,
+   "VM": true,
+   "VIO18": true,
+   "VCAMD": false,
+   "VCAMIO": false
+  },
+  "lp_select": {
+   "VTCXO": true,
+   "VA": false,
+   "VIO28": false,
+   "VUSB": false,
+   "VMC": false,
+   "VMCH": false,
+   "VEMC3V3": false,
+   "VM": false,
+   "VIO18": false
+  },
+  "golden_differences": [
+   {
+    "reg": "0x4e",
+    "name": "",
+    "mask": "0xa0",
+    "golden": "0xa0",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x102",
+    "name": "",
+    "mask": "0xc7ff",
+    "golden": "0x8042",
+    "actual": "0x8043"
+   },
+   {
+    "reg": "0x108",
+    "name": "",
+    "mask": "0xffff",
+    "golden": "0x15ff",
+    "actual": "0x3bf"
+   },
+   {
+    "reg": "0x10e",
+    "name": "",
+    "mask": "0xf0",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x120",
+    "name": "",
+    "mask": "0x83fd",
+    "golden": "0xb9",
+    "actual": "0x31"
+   },
+   {
+    "reg": "0x212",
+    "name": "",
+    "mask": "0x30",
+    "golden": "0x20",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x216",
+    "name": "",
+    "mask": "0x2",
+    "golden": "0x2",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x21c",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x230",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x256",
+    "name": "",
+    "mask": "0x100",
+    "golden": "0x100",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x310",
+    "name": "",
+    "mask": "0x8080",
+    "golden": "0x8080",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x404",
+    "name": "VA",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x500",
+    "name": "VIO28",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x502",
+    "name": "VUSB",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x508",
+    "name": "VEMC3V3(eMMC VCC)",
+    "mask": "0x4000",
+    "golden": "0x0",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x552",
+    "name": "VM",
+    "mask": "0x4001",
+    "golden": "0x4001",
+    "actual": "0x4000"
+   },
+   {
+    "reg": "0x556",
+    "name": "VIO18",
+    "mask": "0x1",
+    "golden": "0x1",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x70c",
+    "name": "",
+    "mask": "0xc250",
+    "golden": "0x200",
+    "actual": "0x10"
+   },
+   {
+    "reg": "0x776",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   },
+   {
+    "reg": "0x778",
+    "name": "",
+    "mask": "0x8000",
+    "golden": "0x8000",
+    "actual": "0x0"
+   }
+  ],
+  "clocks_enabled": [
+   "clock-uart",
+   "clock-system",
+   "clk26m",
+   "y2-efuse",
+   "y2-kp",
+   "y2-pwrap",
+   "y2-axi",
+   "y2-auxadc",
+   "y2-therm",
+   "y2-usb0"
+  ],
+  "runtime_pm": {
+   "18070000.connectivity/power": "suspended",
+   "11200000.usb/musb-hdrc.4.auto/power": "active",
+   "11240000.mmc/power": "suspended",
+   "11240000.mmc/mmc_host/mmc0/power": "unsupported",
+   "11230000.mmc/power": "suspended",
+   "11230000.mmc/mmc_host/mmc1/power": "unsupported",
+   "13010000.gpu/power": "suspended",
+   "11002000.serial/power": "active"
+  },
+  "backlight": {
+   "y2-backlight": "4"
+  },
+  "rails_changed_vs_baseline": {
+   "VCN33_BT": [
+    true,
+    false
+   ],
+   "VCN33_WIFI": [
+    true,
+    false
+   ],
+   "VMC": [
+    true,
+    false
+   ],
+   "VMCH": [
+    true,
+    false
+   ],
+   "VCN18": [
+    true,
+    false
+   ]
+  }
+ }
+]

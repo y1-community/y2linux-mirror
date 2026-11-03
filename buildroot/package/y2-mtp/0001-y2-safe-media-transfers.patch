@@ -1,0 +1,893 @@
+From: Y2Linux maintainers
+Subject: [PATCH] Constrain MTP to safe media and commit complete uploads atomically
+
+diff --git a/inc/fs_handles_db.h b/inc/fs_handles_db.h
+index d2cf59e..4b07cea 100644
+--- a/inc/fs_handles_db.h
++++ b/inc/fs_handles_db.h
+@@ -28,6 +28,7 @@
+ 
+ #include <sys/types.h>
+ 
++#include "mtp-safe.h"
+ typedef struct fs_entry fs_entry;
+ 
+ typedef int64_t mtp_size;
+@@ -45,6 +46,7 @@ struct fs_entry
+ 	mtp_size size;
+ 	uint32_t date;
+ 
++	struct y2_upload *y2_upload;
+ 	int file_descriptor;
+ 	int watch_descriptor;
+ 
+diff --git a/inc/usb_gadget.h b/inc/usb_gadget.h
+index a8082be..502be42 100644
+--- a/inc/usb_gadget.h
++++ b/inc/usb_gadget.h
+@@ -118,6 +118,10 @@ typedef struct _usb_ffs_cfg
+ 	uint32_t ss_count;
+ #endif
+ 
++#ifndef OLD_FUNCTIONFS_DESCRIPTORS
++    uint32_t os_count;
++#endif
++
+ #ifdef CONFIG_USB_FS_SUPPORT
+ 	EndPointsDesc ep_desc_fs;
+ #endif
+@@ -130,6 +134,11 @@ typedef struct _usb_ffs_cfg
+ 	SSEndPointsDesc ep_desc_ss;
+ #endif
+ 
++#ifndef OLD_FUNCTIONFS_DESCRIPTORS
++    struct usb_os_desc_header os_header;
++    struct usb_ext_compat_desc os_compat;
++#endif
++
+ } __attribute__ ((packed)) usb_ffs_cfg;
+ 
+ typedef struct _ffs_strings
+diff --git a/src/fs_handles_db.c b/src/fs_handles_db.c
+index 02b1608..1c3bbbb 100644
+--- a/src/fs_handles_db.c
++++ b/src/fs_handles_db.c
+@@ -55,7 +55,7 @@ int fs_remove_tree( char *folder )
+ 
+ 	del_fail = 0;
+ 
+-	dir = opendir (folder);
++	dir = y2_opendir (folder);
+ 	if( dir )
+ 	{
+ 		do
+@@ -71,7 +71,7 @@ int fs_remove_tree( char *folder )
+ 					strcat(tmpstr,d->d_name);
+ 
+ 					memset(&fileStat,0,sizeof(struct stat64));
+-					if( !lstat64 (tmpstr, &fileStat) )
++					if( !y2_stat (tmpstr, &fileStat) )
+ 					{
+ 						if ( S_ISDIR ( fileStat.st_mode ) )
+ 						{
+@@ -83,7 +83,7 @@ int fs_remove_tree( char *folder )
+ 						}
+ 						else
+ 						{
+-							if( remove(tmpstr) )
++							if( y2_remove(tmpstr) )
+ 								del_fail = 1;
+ 						}
+ 					}
+@@ -99,7 +99,7 @@ int fs_remove_tree( char *folder )
+ 
+ 		closedir(dir);
+ 
+-		if( remove(folder) )
++		if( y2_remove(folder) )
+ 			del_fail = 1;
+ 	}
+ 	else
+@@ -115,8 +115,10 @@ int fs_entry_stat(char *path, filefoundinfo* fileinfo)
+ 	struct stat64 fileStat;
+ 	int i;
+ 
++	const char *name=strrchr(path, '/');
++	if (name && !strncmp(name+1, ".y2-mtp-", 8)) return 0;
+ 	memset(&fileStat,0,sizeof(struct stat64));
+-	if( !stat64 (path, &fileStat) )
++	if( !y2_stat (path, &fileStat) )
+ 	{
+ 		if ( S_ISDIR ( fileStat.st_mode ) )
+ 			fileinfo->isdirectory = 1;
+@@ -155,7 +157,7 @@ DIR * fs_find_first_file(char *folder, filefoundinfo* fileinfo)
+ 	DIR * dir;
+ 	char * tmpstr;
+ 
+-	dir = opendir (folder);
++	dir = y2_opendir (folder);
+ 	if( dir )
+ 	{
+ 		while ((d = readdir (dir)) != NULL)
+@@ -265,7 +267,7 @@ void deinit_fs_db(fs_handles_db * fsh)
+ 			}
+ 		}
+ 
+-		entry_close(fsh, fsh->entry_list);
++		for (fs_entry *e=fsh->entry_list; e; e=e->next) entry_close(fsh, e);
+ 
+ 		// Free pool memory
+ 		fs_entry_pool_block *current = fsh->pool_head;
+@@ -309,6 +311,7 @@ fs_entry * alloc_entry(fs_handles_db * db, filefoundinfo *fileinfo, uint32_t par
+ 
+ 	entry = &db->pool_head->entries[--db->pool_free_count];
+ 	memset(entry, 0, sizeof(fs_entry));
++    entry->file_descriptor = -1;
+ 
+ 	entry->handle = db->next_handle;
+ 	db->next_handle++;
+@@ -319,6 +322,7 @@ fs_entry * alloc_entry(fs_handles_db * db, filefoundinfo *fileinfo, uint32_t par
+ 	if( !entry->name )
+ 	{
+ 		memset(entry, 0, sizeof(fs_entry));
++    entry->file_descriptor = -1;
+ 		db->pool_free_count++;
+ 		db->next_handle--;
+ 
+@@ -361,6 +365,7 @@ fs_entry * alloc_root_entry(fs_handles_db * db, uint32_t storage_id)
+ 
+ 	entry = &db->pool_head->entries[--db->pool_free_count];
+ 	memset(entry, 0, sizeof(fs_entry));
++    entry->file_descriptor = -1;
+ 
+ 	entry->handle = 0x00000000;
+ 	entry->parent = 0x00000000;
+@@ -450,7 +455,7 @@ int scan_and_add_folder(fs_handles_db * db, char * base, uint32_t parent, uint32
+ 
+ 			if(path)
+ 			{
+-				ret = stat64(path, &entrystat);
++				ret = y2_stat(path, &entrystat);
+ 				if(ret)
+ 				{
+ 					PRINT_DEBUG("scan_and_add_folder : discard entry %s - stat error", path);
+@@ -693,7 +698,8 @@ char * build_full_path(fs_handles_db * db,char * root_path,fs_entry * entry)
+ 
+ 		free(full_path);
+ 
+-		if( strncmp(root_path, retpath, root_path_len ) )
++		if( !retpath || strncmp(root_path, retpath, root_path_len ) ||
++		    (retpath[root_path_len] && retpath[root_path_len] != '/') )
+ 		{
+ 			// Different Storage root path ! System path traversal attempt ?
+ 			PRINT_ERROR("build_full_path : Storage root folder mismatch !");
+@@ -718,7 +724,7 @@ int entry_open(fs_handles_db * db, fs_entry * entry, int flags, mode_t mode)
+ {
+ 	char * full_path;
+ 
+-	if (entry->file_descriptor > 0)
++	if (entry->file_descriptor >= 0)
+ 		return entry->file_descriptor;
+ 
+ 	full_path = build_full_path(db,mtp_get_storage_root(db->mtp_ctx, entry->storage_id), entry);
+@@ -726,7 +732,7 @@ int entry_open(fs_handles_db * db, fs_entry * entry, int flags, mode_t mode)
+ 	{
+ 		if(!set_storage_giduid(db->mtp_ctx, entry->storage_id))
+ 		{
+-			entry->file_descriptor = open(full_path, flags, mode);
++			entry->file_descriptor = y2_open(full_path, flags, mode);
+ 		}
+ 
+ 		restore_giduid(db->mtp_ctx);
+@@ -763,6 +769,7 @@ void entry_close(fs_handles_db * db, fs_entry * entry)
+ 	if(!entry || !db)
+ 		return;
+ 
++	if (entry->y2_upload) { y2_upload_abort(entry->y2_upload); entry->y2_upload=NULL; }
+ 	if( entry->file_descriptor != -1 )
+ 	{
+ 		if (((mtp_ctx *)db->mtp_ctx)->sync_when_close)
+diff --git a/src/mtp.c b/src/mtp.c
+index 97b8b6c..523e697 100644
+--- a/src/mtp.c
++++ b/src/mtp.c
+@@ -31,6 +31,7 @@
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <limits.h>
++#include <errno.h>
+ #include <stdlib.h>
+ #include <string.h>
+ 
+@@ -205,7 +206,6 @@ int parse_incoming_dataset(mtp_ctx * ctx,void * datain,int size,uint32_t * newha
+ 	uint32_t storage_flags;
+ 	int i,ret_code,ret;
+ 	fs_entry * entry;
+-	int file;
+ 	filefoundinfo tmp_file_entry;
+ 
+ 	ret_code = MTP_RESPONSE_GENERAL_ERROR;
+@@ -294,7 +294,7 @@ int parse_incoming_dataset(mtp_ctx * ctx,void * datain,int size,uint32_t * newha
+ 
+ 							if(!set_storage_giduid(ctx, entry->storage_id))
+ 							{
+-								ret = mkdir(tmp_path, 0777);
++								ret = y2_mkdir(tmp_path, 0700);
+ 							}
+ 
+ 							restore_giduid(ctx);
+@@ -390,33 +390,16 @@ int parse_incoming_dataset(mtp_ctx * ctx,void * datain,int size,uint32_t * newha
+ 							strcpy(tmp_file_entry.filename,tmp_str);
+ 							tmp_file_entry.size = objectsize;
+ 
+-							file = -1;
+-
+-							if(!set_storage_giduid(ctx, storage_id))
+-							{
+-								file = open(tmp_path,
+-										O_WRONLY | O_CREAT | O_TRUNC | O_LARGEFILE,
+-										S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+-							}
+-
+-							restore_giduid(ctx);
+-
+-							if( file == -1)
+-							{
+-								PRINT_WARN("MTP_OPERATION_SEND_OBJECT_INFO : Can't create %s ...",tmp_path);
+-
+-								if(parent_folder)
+-									free(parent_folder);
+-
+-								free(tmp_path);
+-
+-								ret_code = MTP_RESPONSE_ACCESS_DENIED;
+-
+-								return ret_code;
+-							}
+-							close( file );
+-
+-							entry = add_entry(ctx->fs_db, &tmp_file_entry, parent_handle, storage_id);
++                            entry = add_entry(ctx->fs_db, &tmp_file_entry, parent_handle, storage_id);
++                            if (entry) {
++                                entry->y2_upload = y2_upload_begin(tmp_path, objectsize);
++                                if (!entry->y2_upload) {
++                                    entry->flags |= ENTRY_IS_DELETED;
++                                    int failure=errno;
++                                    free(tmp_path); free(parent_folder);
++                                    return posix_to_mtp_errcode(failure);
++                                }
++                            }
+ 
+ 							free(tmp_path);
+ 						}
+@@ -591,10 +574,13 @@ int process_in_packet(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr, int raws
+ 			response_code = mtp_op_SendObjectInfo(ctx,mtp_packet_hdr,&size,(uint32_t*)&params,&params_size);
+ 		break;
+ 
+-		case MTP_OPERATION_SEND_PARTIAL_OBJECT:
+ 		case MTP_OPERATION_SEND_OBJECT:
+-			response_code = mtp_op_SendObject(ctx,mtp_packet_hdr,&size,(uint32_t*)&params,&params_size);
+-		break;
++            response_code = mtp_op_SendObject(ctx,mtp_packet_hdr,&size,(uint32_t*)&params,&params_size);
++            break;
++
++        case MTP_OPERATION_SEND_PARTIAL_OBJECT:
++            response_code = MTP_RESPONSE_OPERATION_NOT_SUPPORTED;
++            break;
+ 
+ 		case MTP_OPERATION_DELETE_OBJECT:
+ 			response_code = mtp_op_DeleteObject(ctx,mtp_packet_hdr,&size,(uint32_t*)&params,&params_size);
+@@ -625,15 +611,15 @@ int process_in_packet(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr, int raws
+ 		break;
+ 
+ 		case MTP_OPERATION_BEGIN_EDIT_OBJECT:
+-			response_code = mtp_op_BeginEditObject(ctx,mtp_packet_hdr,&size,(uint32_t*)&params,&params_size);
+-		break;
++            response_code = MTP_RESPONSE_OPERATION_NOT_SUPPORTED;
++            break;
+ 
+ 		case MTP_OPERATION_END_EDIT_OBJECT:
+-			response_code = mtp_op_EndEditObject(ctx,mtp_packet_hdr,&size,(uint32_t*)&params,&params_size);
+-		break;
++            response_code = MTP_RESPONSE_OPERATION_NOT_SUPPORTED;
++            break;
+ 
+ 		case MTP_OPERATION_TRUNCATE_OBJECT :
+-			response_code = mtp_op_TruncateObject(ctx,mtp_packet_hdr,&size,(uint32_t*)&params,&params_size);
++            response_code = MTP_RESPONSE_OPERATION_NOT_SUPPORTED;
+ 		break;
+ 
+ 		default:
+diff --git a/src/mtp_operations/mtp_op_sendobject.c b/src/mtp_operations/mtp_op_sendobject.c
+index 08f6848..9c7343e 100644
+--- a/src/mtp_operations/mtp_op_sendobject.c
++++ b/src/mtp_operations/mtp_op_sendobject.c
+@@ -32,6 +32,7 @@
+ #include <pthread.h>
+ #include <stdio.h>
+ #include <sys/stat.h>
++#include <errno.h>
+ 
+ #include "logs_out.h"
+ 
+@@ -42,159 +43,68 @@
+ 
+ #include "usb_gadget_fct.h"
+ 
+-uint32_t mtp_op_SendObject(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr, int * size,uint32_t * ret_params, int * ret_params_size)
++/* A failed, short or cancelled USB copy never becomes a library object. */
++uint32_t mtp_op_SendObject(mtp_ctx *ctx, MTP_PACKET_HEADER *hdr, int *size,
++                         uint32_t *params, int *params_size)
+ {
+-	uint32_t response_code;
+-	fs_entry * entry;
+-	unsigned char * tmp_ptr;
+-	int file;
+-	int flags;
+-	mode_t mode;
+-	int sz;
+-
+-	if(!ctx->fs_db)
+-		return MTP_RESPONSE_SESSION_NOT_OPEN;
+-
+-	if( pthread_mutex_lock( &ctx->inotify_mutex ) )
+-		return MTP_RESPONSE_GENERAL_ERROR;
+-
+-	response_code = MTP_RESPONSE_GENERAL_ERROR;
+-
+-	if( mtp_packet_hdr->code == MTP_OPERATION_SEND_PARTIAL_OBJECT && mtp_packet_hdr->operation == MTP_CONTAINER_TYPE_COMMAND )
+-	{
+-		ctx->SendObjInfoHandle = peek(mtp_packet_hdr, sizeof(MTP_PACKET_HEADER), 4);         // Get param 1 - Object handle
+-		ctx->SendObjInfoOffset = peek64(mtp_packet_hdr, sizeof(MTP_PACKET_HEADER) + 4, 8);   // Get param 2 - Offset in bytes
+-		ctx->SendObjInfoSize = peek(mtp_packet_hdr, sizeof(MTP_PACKET_HEADER) + 12, 4);      // Get param 3 - Max size in bytes
+-	}
+-
+-	if( ctx->SendObjInfoHandle != 0xFFFFFFFF )
+-	{
+-		switch(mtp_packet_hdr->operation)
+-		{
+-			case MTP_CONTAINER_TYPE_DATA:
+-				entry = get_entry_by_handle(ctx->fs_db, ctx->SendObjInfoHandle);
+-				if(entry)
+-				{
+-					response_code = MTP_RESPONSE_GENERAL_ERROR;
+-
+-					if( check_handle_access( ctx, entry, 0x00000000, 1, &response_code) )
+-					{
+-						pthread_mutex_unlock( &ctx->inotify_mutex );
+-
+-						return response_code;
+-					}
+-
+-					if( mtp_packet_hdr->code == MTP_OPERATION_SEND_PARTIAL_OBJECT )
+-					{
+-						flags = O_RDWR | O_LARGEFILE;
+-						mode = 0;
+-					}
+-					else
+-					{
+-						flags = O_CREAT | O_WRONLY | O_TRUNC | O_LARGEFILE;
+-						mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+-					}
+-
+-					file = entry_open(ctx->fs_db, entry, flags, mode);
+-
+-					if( file != -1 )
+-					{
+-						ctx->transferring_file_data = 1;
+-
+-						lseek64(file, ctx->SendObjInfoOffset, SEEK_SET);
+-
+-						sz = *size - sizeof(MTP_PACKET_HEADER);
+-						tmp_ptr = ((unsigned char*)mtp_packet_hdr) ;
+-						tmp_ptr += sizeof(MTP_PACKET_HEADER);
+-
+-						if(sz > 0)
+-						{
+-							if( write(file, tmp_ptr, sz) != sz)
+-							{
+-								// TODO : Handle this error case properly
+-							}
+-
+-							ctx->SendObjInfoSize -= sz;
+-						}
+-
+-						tmp_ptr = ctx->rdbuffer2;
+-						if( sz == ( ctx->usb_rd_buffer_max_size - sizeof(MTP_PACKET_HEADER) ) )
+-						{
+-							sz = ctx->usb_rd_buffer_max_size;
+-						}
+-
+-						if( mtp_packet_hdr->code == MTP_OPERATION_SEND_PARTIAL_OBJECT && ctx->SendObjInfoSize )
+-						{
+-							sz = ctx->usb_rd_buffer_max_size;
+-						}
+-
+-						while( ( sz == ctx->usb_rd_buffer_max_size ) && ( !ctx->cancel_req ) && ( sz >= 0 ) )
+-						{
+-							sz = read_usb(ctx->usb_ctx, ctx->rdbuffer2, ctx->usb_rd_buffer_max_size);
+-
+-							if( sz >= 0 )
+-							{
+-								if( write(file, tmp_ptr, sz) != sz)
+-								{
+-									// TODO : Handle this error case properly
+-								}
+-
+-								ctx->SendObjInfoSize -= sz;
+-							}
+-						};
+-
+-						entry->size = lseek64(file, 0, SEEK_END);
+-
+-						ctx->transferring_file_data = 0;
+-
+-						if( mtp_packet_hdr->code != MTP_OPERATION_SEND_PARTIAL_OBJECT )
+-							entry_close(ctx->fs_db, entry);
+-
+-						if(ctx->cancel_req)
+-						{
+-							ctx->cancel_req = 0;
+-
+-							pthread_mutex_unlock( &ctx->inotify_mutex );
+-
+-							return MTP_RESPONSE_NO_RESPONSE;
+-						}
+-
+-						response_code = MTP_RESPONSE_OK;
+-					}
+-				}
+-				else
+-				{
+-					response_code = MTP_RESPONSE_INVALID_OBJECT_HANDLE;
+-				}
+-			break;
+-			case MTP_CONTAINER_TYPE_COMMAND:
+-				PRINT_DEBUG("SEND_OBJECT : Handle 0x%.8x, Offset 0x%"SIZEHEX", Size 0x%"SIZEHEX,ctx->SendObjInfoHandle,ctx->SendObjInfoOffset,ctx->SendObjInfoSize);
+-
+-				if( check_handle_access( ctx, NULL, ctx->SendObjInfoHandle, 1, &response_code) )
+-				{
+-					pthread_mutex_unlock( &ctx->inotify_mutex );
+-
+-					return response_code;
+-				}
+-
+-				// no response to send, wait for the data...
+-				response_code = MTP_RESPONSE_NO_RESPONSE;
+-			break;
+-			default:
+-			break;
+-		}
+-	}
+-	else
+-	{
+-		PRINT_WARN("MTP_OPERATION_SEND_OBJECT ! : Invalid Handle (0x%.8X)", ctx->SendObjInfoHandle);
+-
+-		response_code = MTP_RESPONSE_INVALID_OBJECT_HANDLE;
+-	}
+-
+-	if( pthread_mutex_unlock( &ctx->inotify_mutex ) )
+-	{
+-		response_code = MTP_RESPONSE_GENERAL_ERROR;
+-	}
+-
+-	return response_code;
++    (void)params; (void)params_size;
++    if (!ctx->fs_db) return MTP_RESPONSE_SESSION_NOT_OPEN;
++    if (pthread_mutex_lock(&ctx->inotify_mutex)) return MTP_RESPONSE_GENERAL_ERROR;
++    uint32_t response = MTP_RESPONSE_GENERAL_ERROR;
++    fs_entry *entry = get_entry_by_handle(ctx->fs_db, ctx->SendObjInfoHandle);
++    if (!entry || !entry->y2_upload) { response = MTP_RESPONSE_INVALID_OBJECT_HANDLE; goto done; }
++    if (hdr->operation == MTP_CONTAINER_TYPE_COMMAND) { response = MTP_RESPONSE_NO_RESPONSE; goto done; }
++    if (hdr->operation != MTP_CONTAINER_TYPE_DATA || hdr->code != MTP_OPERATION_SEND_OBJECT) goto abort;
++    if (check_handle_access(ctx, entry, 0, 1, &response)) goto abort;
++    ctx->transferring_file_data = 1;
++    int length = *size - sizeof(MTP_PACKET_HEADER);
++    uint64_t received = 0;
++    int unknown = ctx->SendObjInfoSize == UINT32_MAX;
++    const void *data = (const char *)hdr + sizeof(MTP_PACKET_HEADER);
++    int first = 1;
++    for (;;) {
++        if (length < 0 || ctx->cancel_req ||
++            (!unknown && (uint64_t)length > ctx->SendObjInfoSize-received) ||
++            y2_upload_write(entry->y2_upload, data, length)) goto abort;
++        received += length;
++        /* A short packet ends unknown-size transfers; known-size transfers
++         * must exactly match the SendObjectInfo size (including empty files).
++         * FunctionFS request boundaries are not EOF for known-size transfers. */
++        if (!unknown && received == ctx->SendObjInfoSize) break;
++        int capacity = ctx->usb_rd_buffer_max_size - (first ? sizeof(MTP_PACKET_HEADER) : 0);
++        if (length < capacity) {
++            if (unknown) break;
++            goto abort;
++        }
++        first = 0;
++        length = read_usb(ctx->usb_ctx, ctx->rdbuffer2, ctx->usb_rd_buffer_max_size);
++        data = ctx->rdbuffer2;
++    }
++    /* Consume the protocol's ZLP when the final data container is exactly a
++     * request-size multiple. Otherwise it would be read as the next command. */
++    if (!unknown && (received + sizeof(MTP_PACKET_HEADER)) % ctx->usb_rd_buffer_max_size == 0) {
++        if (read_usb(ctx->usb_ctx, ctx->rdbuffer2, ctx->usb_rd_buffer_max_size) != 0) goto abort;
++    }
++    if (ctx->cancel_req) goto abort;
++    struct y2_upload *upload = entry->y2_upload;
++    entry->y2_upload = NULL;
++    if (y2_upload_finish(upload)) goto abort;
++    entry->size = received;
++    response = MTP_RESPONSE_OK;
++    goto done;
++abort:
++    ; /* preserve the cause across staging cleanup */
++    int failure = ctx->cancel_req ? ECANCELED : (errno ? errno : EIO);
++    y2_upload_abort(entry->y2_upload);
++    entry->y2_upload = NULL;
++    entry->flags |= ENTRY_IS_DELETED;
++    y2_transfer_activity(0, failure);
++    response = ctx->cancel_req ? MTP_RESPONSE_NO_RESPONSE :
++               failure == ENOSPC ? MTP_RESPONSE_STORAGE_FULL :
++               failure == EROFS ? MTP_RESPONSE_STORE_READ_ONLY : MTP_RESPONSE_INCOMPLETE_TRANSFER;
++done:
++    ctx->transferring_file_data = 0;
++    ctx->cancel_req = 0;
++    pthread_mutex_unlock(&ctx->inotify_mutex);
++    return response;
+ }
+diff --git a/src/mtp_operations/mtp_op_sendobjectinfo.c b/src/mtp_operations/mtp_op_sendobjectinfo.c
+index fbe6ca2..0cf1b07 100644
+--- a/src/mtp_operations/mtp_op_sendobjectinfo.c
++++ b/src/mtp_operations/mtp_op_sendobjectinfo.c
+@@ -59,7 +59,16 @@ uint32_t mtp_op_SendObjectInfo(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr,
+ 	sz = read_usb(ctx->usb_ctx, ctx->rdbuffer2, ctx->usb_rd_buffer_max_size);
+ 	PRINT_DEBUG_BUF(ctx->rdbuffer2, sz);
+ 
+-	new_handle = 0xFFFFFFFF;
++	/* A new upload cancels any abandoned SendObjectInfo reservation. */
++    for (fs_entry *e=ctx->fs_db->entry_list; e; e=e->next) {
++        if (e->y2_upload) { y2_upload_abort(e->y2_upload); e->y2_upload=NULL; e->flags |= ENTRY_IS_DELETED; }
++    }
++    if (sz < (int)(sizeof(MTP_PACKET_HEADER)+0x35) ||
++        sz < (int)(sizeof(MTP_PACKET_HEADER)+0x35+2*ctx->rdbuffer2[sizeof(MTP_PACKET_HEADER)+0x34])) {
++        pthread_mutex_unlock(&ctx->inotify_mutex);
++        return MTP_RESPONSE_INVALID_DATASET;
++    }
++    new_handle = 0xFFFFFFFF;
+ 
+ 	response_code = parse_incoming_dataset(ctx,ctx->rdbuffer2,sz,&new_handle,parent_handle,storageid);
+ 	if( response_code == MTP_RESPONSE_OK )
+diff --git a/src/mtp_operations/mtp_ops_helpers.c b/src/mtp_operations/mtp_ops_helpers.c
+index 5ba6e2e..4e7d686 100644
+--- a/src/mtp_operations/mtp_ops_helpers.c
++++ b/src/mtp_operations/mtp_ops_helpers.c
+@@ -25,7 +25,10 @@
+ 
+ #include "buildconf.h"
+ 
++#include <unistd.h>
+ #include <fcntl.h>
++#include <errno.h>
++#include <sys/stat.h>
+ #include <inttypes.h>
+ #include <pthread.h>
+ #include <stdlib.h>
+@@ -41,165 +44,44 @@
+ 
+ #include "logs_out.h"
+ 
+-mtp_size send_file_data( mtp_ctx * ctx, fs_entry * entry,mtp_offset offset, mtp_size maxsize )
++/* Pin one complete inode. Check every read/write; never transmit stale cache
++ * bytes after a local truncation, or acknowledge a short USB IN transfer. */
++mtp_size send_file_data(mtp_ctx *ctx, fs_entry *entry, mtp_offset offset, mtp_size maxsize)
+ {
+-	mtp_size actualsize;
+-	mtp_size j;
+-	int ofs;
+-	mtp_size blocksize;
+-	mtp_size ContainerLength;
+-	int file,bytes_read;
+-	mtp_offset buf_index;
+-	int io_buffer_index;
+-	int first_part_size;
+-	unsigned char * usb_buffer_ptr;
+-
+-	if( !ctx->read_file_buffer )
+-	{
+-		ctx->read_file_buffer = malloc( ctx->read_file_buffer_size );
+-		if(!ctx->read_file_buffer)
+-			return 0;
+-
+-		memset(ctx->read_file_buffer, 0, ctx->read_file_buffer_size);
+-	}
+-
+-	usb_buffer_ptr = NULL;
+-
+-	buf_index = -1;
+-
+-	if( offset >= entry->size )
+-	{
+-		actualsize = 0;
+-	}
+-	else
+-	{
+-		if( offset + maxsize > entry->size )
+-			actualsize = entry->size - offset;
+-		else
+-			actualsize = maxsize;
+-	}
+-
+-	if( (sizeof(MTP_PACKET_HEADER) + actualsize) >= (mtp_size)(0x100000000) )
+-		ContainerLength = 0xFFFFFFFF;
+-	else
+-		ContainerLength = sizeof(MTP_PACKET_HEADER) + actualsize;
+-
+-	poke32(ctx->wrbuffer, 0, ctx->usb_wr_buffer_max_size, ContainerLength);
+-
+-	ofs = sizeof(MTP_PACKET_HEADER);
+-
+-	PRINT_DEBUG("send_file_data : Offset 0x%"SIZEHEX" - Maxsize 0x%"SIZEHEX" - Size 0x%"SIZEHEX" - ActualSize 0x%"SIZEHEX, offset,maxsize,entry->size,actualsize);
+-
+-	file = entry_open(ctx->fs_db, entry, O_RDONLY | O_LARGEFILE, 0);
+-	if( file != -1 )
+-	{
+-		ctx->transferring_file_data = 1;
+-
+-		j = 0;
+-		do
+-		{
+-			if((j + ((mtp_size)(ctx->usb_wr_buffer_max_size) - ofs)) < actualsize)
+-				blocksize = ((mtp_size)(ctx->usb_wr_buffer_max_size) - ofs);
+-			else
+-				blocksize = actualsize - j;
+-
+-			// Is the target page loaded ?
+-			if( buf_index != ((offset + j) & ~((mtp_offset)(ctx->read_file_buffer_size-1))) )
+-			{
+-				bytes_read = entry_read(ctx->fs_db, entry, ctx->read_file_buffer, ((offset + j) & ~((mtp_offset)(ctx->read_file_buffer_size-1))) , (mtp_size)ctx->read_file_buffer_size);
+-				if( bytes_read < 0 )
+-				{
+-					entry_close( ctx->fs_db, entry );
+-					return -1;
+-				}
+-
+-				buf_index = ((offset + j) & ~((mtp_offset)(ctx->read_file_buffer_size-1)));
+-			}
+-
+-			io_buffer_index = (offset + j) & (mtp_offset)(ctx->read_file_buffer_size-1);
+-
+-			// Is a new page needed ?
+-			if( io_buffer_index + blocksize < ctx->read_file_buffer_size )
+-			{
+-				// No, just use the io buffer
+-
+-				if( !ofs )
+-				{
+-					// Use the I/O buffer directly
+-					usb_buffer_ptr = (unsigned char *)&ctx->read_file_buffer[io_buffer_index];
+-				}
+-				else
+-				{
+-					memcpy(&ctx->wrbuffer[ofs], &ctx->read_file_buffer[io_buffer_index], blocksize );
+-					usb_buffer_ptr = (unsigned char *)&ctx->wrbuffer[0];
+-				}
+-			}
+-			else
+-			{
+-				// Yes, new page needed. Get the first part in the io buffer and the load a new page to get the remaining data.
+-				first_part_size = blocksize - ( ( io_buffer_index + blocksize ) - (mtp_size)ctx->read_file_buffer_size);
+-
+-				memcpy(&ctx->wrbuffer[ofs], &ctx->read_file_buffer[io_buffer_index], first_part_size  );
+-
+-				buf_index += (mtp_offset)ctx->read_file_buffer_size;
+-				bytes_read = entry_read(ctx->fs_db, entry, ctx->read_file_buffer, buf_index , ctx->read_file_buffer_size);
+-				if( bytes_read < 0 )
+-				{
+-					entry_close( ctx->fs_db, entry );
+-					return -1;
+-				}
+-
+-				memcpy(&ctx->wrbuffer[ofs + first_part_size], &ctx->read_file_buffer[0], blocksize - first_part_size );
+-
+-				usb_buffer_ptr = (unsigned char *)&ctx->wrbuffer[0];
+-			}
+-
+-			j   += blocksize;
+-			ofs += blocksize;
+-
+-			PRINT_DEBUG("---> 0x%"SIZEHEX" (0x%X)",j,ofs);
+-
+-			if( !ctx->cancel_req )
+-			{
+-
+-				write_usb(ctx->usb_ctx, EP_DESCRIPTOR_IN, usb_buffer_ptr, ofs);
+-
+-			}
+-
+-			ofs = 0;
+-
+-		}while( j < actualsize && !ctx->cancel_req );
+-
+-		ctx->transferring_file_data = 0;
+-
+-		entry_close( ctx->fs_db, entry );
+-
+-		if( !pthread_mutex_lock( &ctx->cancel_mutex ) )
+-		{	
+-			if( ctx->cancel_req )
+-			{
+-				PRINT_DEBUG("send_file_data : Cancelled ! Aborted...");
+-
+-				// Force a ZLP
+-				//check_and_send_USB_ZLP(ctx , ctx->max_packet_size );
+-
+-				actualsize = -2;
+-				ctx->cancel_req = 0;
+-			}
+-			else
+-			{
+-				PRINT_DEBUG("send_file_data : Full transfer done !");
+-
+-				check_and_send_USB_ZLP(ctx , sizeof(MTP_PACKET_HEADER) + actualsize );
+-			}
+-
+-			pthread_mutex_unlock( &ctx->cancel_mutex );
+-		}
+-	}
+-	else
+-		actualsize = -1;
+-
+-	return actualsize;
++    int fd=entry_open(ctx->fs_db, entry, O_RDONLY|O_LARGEFILE, 0);
++    if (fd<0 || offset<0 || maxsize<0) return -1;
++    struct stat64 info;
++    mtp_size result=-1, sent=0;
++    if (fstat64(fd,&info) || offset>info.st_size || maxsize>info.st_size-offset) goto done;
++    uint64_t length=(uint64_t)sizeof(MTP_PACKET_HEADER)+maxsize;
++    poke32(ctx->wrbuffer,0,ctx->usb_wr_buffer_max_size,length>=UINT32_MAX ? UINT32_MAX : length);
++    ctx->transferring_file_data=1;
++    y2_transfer_activity(1,0);
++    int header=sizeof(MTP_PACKET_HEADER);
++    do {
++        size_t count=ctx->usb_wr_buffer_max_size-header;
++        if ((mtp_size)count>maxsize-sent) count=maxsize-sent;
++        size_t have=0;
++        while(have<count) {
++            ssize_t bytes=pread64(fd,ctx->wrbuffer+header+have,count-have,offset+sent+have);
++            if(bytes<0 && errno==EINTR && !ctx->cancel_req) continue;
++            if(bytes<=0) goto done;
++            have+=bytes;
++        }
++        if(ctx->cancel_req) { result=-2; goto done; }
++        if(write_usb(ctx->usb_ctx,EP_DESCRIPTOR_IN,ctx->wrbuffer,header+count)!=(int)(header+count)) goto done;
++        sent+=count; header=0;
++    } while(sent<maxsize);
++    if (ctx->max_packet_size && length%ctx->max_packet_size==0 &&
++        write_usb(ctx->usb_ctx,EP_DESCRIPTOR_IN,ctx->wrbuffer,0)!=0) goto done;
++    result=maxsize;
++done:
++    ctx->transferring_file_data=0;
++    if(ctx->cancel_req) result=-2;
++    ctx->cancel_req=0;
++    entry_close(ctx->fs_db,entry);
++    y2_transfer_activity(0,result<0 ? EIO : 0);
++    return result;
+ }
+ 
+ int delete_tree(mtp_ctx * ctx,uint32_t handle)
+@@ -234,7 +116,7 @@ int delete_tree(mtp_ctx * ctx,uint32_t handle)
+ 			}
+ 			else
+ 			{
+-				ret = remove(path);
++				ret = y2_remove(path);
+ 				if(!ret)
+ 				{
+ 					entry->flags |= ENTRY_IS_DELETED;
+diff --git a/src/mtp_properties.c b/src/mtp_properties.c
+index e180a35..a45c3e8 100644
+--- a/src/mtp_properties.c
++++ b/src/mtp_properties.c
+@@ -598,7 +598,7 @@ int setObjectPropValue(mtp_ctx * ctx,MTP_PACKET_HEADER * mtp_packet_hdr, uint32_
+ 
+ 				if(!set_storage_giduid(ctx, entry->storage_id))
+ 				{
+-					ret = rename(path, path2);
++					ret = y2_rename(path, path2);
+ 				}
+ 				restore_giduid(ctx);
+ 
+@@ -849,7 +849,7 @@ int build_objectproplist_dataset(mtp_ctx * ctx, void * buffer, int maxsize,fs_en
+ 
+ 	if(path)
+ 	{
+-		ret = stat64(path, &entrystat);
++		ret = y2_stat(path, &entrystat);
+ 	}
+ 
+ 	if(ret)
+diff --git a/src/mtp_support_def.c b/src/mtp_support_def.c
+index 32db8e3..35a5333 100644
+--- a/src/mtp_support_def.c
++++ b/src/mtp_support_def.c
+@@ -54,11 +54,7 @@ const unsigned short supported_op[]=
+ 	MTP_OPERATION_GET_OBJECT_PROP_LIST                   ,//0x9805
+ 	//MTP_OPERATION_GET_OBJECT_REFERENCES                  ,//0x9810
+ 	//MTP_OPERATION_SET_OBJECT_REFERENCES                  ,//0x9811
+-	MTP_OPERATION_GET_PARTIAL_OBJECT_64                  ,//0x95C1
+-	MTP_OPERATION_SEND_PARTIAL_OBJECT                    ,//0x95C2
+-	MTP_OPERATION_TRUNCATE_OBJECT                        ,//0x95C3
+-	MTP_OPERATION_BEGIN_EDIT_OBJECT                      ,//0x95C4
+-	MTP_OPERATION_END_EDIT_OBJECT                         //0x95C5
++	MTP_OPERATION_GET_PARTIAL_OBJECT_64//0x95C1
+ };
+ 
+ const int supported_op_size=sizeof(supported_op);
+diff --git a/src/umtprd.c b/src/umtprd.c
+index 93fb167..fdc4a61 100644
+--- a/src/umtprd.c
++++ b/src/umtprd.c
+@@ -33,6 +33,7 @@
+ #include <sys/prctl.h>
+ #include <sys/file.h>
+ #include <signal.h>
++#include <unistd.h>
+ 
+ #ifdef SYSTEMD_NOTIFY
+ #include <systemd/sd-login.h>
+@@ -94,6 +95,13 @@ static int main_thread(const char *conffile)
+ 	}
+ 
+ 	mtp_load_config_file(mtp_context, conffile);
++    int has_sd=0, has_internal=0;
++    for (unsigned i=0; i<MAX_STORAGE_NB; i++) {
++        const char *root=mtp_context->storages[i].root_path;
++        if (root && !strcmp(root, "/media/sd")) has_sd=1;
++        if (root && !strcmp(root, "/media/internal/music")) has_internal=1;
++    }
++    if (y2_fs_init(has_internal ? "/media/internal/music" : NULL, has_sd ? "/media/sd" : NULL, "/run/y2/mtp-events.json")) return -3;
+ 
+ 	loop_continue = mtp_context->usb_cfg.loop_on_disconnect;
+ 
+@@ -168,6 +176,12 @@ int check_running()
+ 
+ int main(int argc, char *argv[])
+ {
++    /* Never leave an endpoint/root owner behind a killed readiness supervisor.
++     * SIGKILL guarantees fd release even if a worker cannot gracefully exit;
++     * private incomplete .part files remain hidden for owner inspection. */
++    pid_t parent_pid=getppid();
++    if (parent_pid<=1 || prctl(PR_SET_PDEATHSIG,SIGKILL) || getppid()!=parent_pid) return 4;
++
+ 	const char *conffile = UMTPR_CONF_FILE;
+ 	int retcode = 0;
+ 	int already_running = check_running();
+diff --git a/src/usb_gadget.c b/src/usb_gadget.c
+index 74d9d2a..729f365 100644
+--- a/src/usb_gadget.c
++++ b/src/usb_gadget.c
+@@ -237,7 +237,7 @@ void fill_ep_descriptor(mtp_ctx * ctx, usb_gadget * usbctx,struct usb_endpoint_d
+ 	else
+ 	{
+ 		desc->bmAttributes =  USB_ENDPOINT_XFER_INT;
+-		desc->wMaxPacketSize = 28; // HS size
++		desc->wMaxPacketSize = 16; // Y2 notification FIFO (events span packets)
+ 		desc->bInterval = 6;
+ 	}
+ 
+@@ -1029,7 +1029,16 @@ usb_gadget * init_usb_mtp_gadget(mtp_ctx * ctx)
+ 			usbctx->usb_ffs_config->magic = htole32(FUNCTIONFS_DESCRIPTORS_MAGIC);
+ #else
+ 			usbctx->usb_ffs_config->magic = htole32(FUNCTIONFS_DESCRIPTORS_MAGIC_V2);
+-			usbctx->usb_ffs_config->flags = htole32(0);
++			usbctx->usb_ffs_config->flags = htole32(FUNCTIONFS_HAS_MS_OS_DESC);
++            usbctx->usb_ffs_config->os_count=htole32(1);
++            usbctx->usb_ffs_config->os_header.interface=0;
++            usbctx->usb_ffs_config->os_header.dwLength=htole32(sizeof(struct usb_os_desc_header)+sizeof(struct usb_ext_compat_desc));
++            usbctx->usb_ffs_config->os_header.bcdVersion=htole16(0x0100);
++            usbctx->usb_ffs_config->os_header.wIndex=htole16(4);
++            usbctx->usb_ffs_config->os_header.bCount=1;
++            usbctx->usb_ffs_config->os_compat.bFirstInterfaceNumber=0;
++            usbctx->usb_ffs_config->os_compat.Reserved1=1;
++            memcpy(usbctx->usb_ffs_config->os_compat.CompatibleID,"MTP",3);
+ 
+ #ifdef CONFIG_USB_FS_SUPPORT
+ 			usbctx->usb_ffs_config->flags |= htole32(FUNCTIONFS_HAS_FS_DESC);

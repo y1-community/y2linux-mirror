@@ -1,0 +1,19 @@
+06c CAND_AFE_CONN_24BIT orig=00000000 mask=0007ffff toggled=00000000 fixed=0007ffff now=00000000
+0cc CAND_AFE_MEMIF_MSB orig=00000000 mask=00ffffff toggled=00000000 fixed=00ffffff now=00000000
+05c CAND_AFE_CONN5 orig=00000000 mask=0000ffff toggled=00000000 fixed=0000ffff now=00000000
+0bc CAND_AFE_CONN6 orig=00000000 mask=0000ffff toggled=00000000 fixed=0000ffff now=00000000
+3d0 AFE_MEMIF_MINLEN orig=11111111 mask=77777777 toggled=00000000 fixed=77777777 now=11111111
+3d4 AFE_MEMIF_MAXLEN orig=11111111 mask=77777777 toggled=77777777 fixed=00000000 now=11111111
+3d8 AFE_MEMIF_PBUF_SIZE orig=ff0000ff mask=00ff00ff toggled=00ff00ff fixed=00000000 now=ff0000ff
+340 CAND_AFE_DL1_D2_BASE orig=00000000 mask=0000fff8 toggled=00000000 fixed=0000fff8 now=00000000
+348 CAND_AFE_DL1_D2_END orig=00000000 mask=0000fff8 toggled=00000000 fixed=0000fff8 now=00000000
+350 CAND_AFE_VUL_D2_BASE orig=00000000 mask=0000fff8 toggled=00000000 fixed=0000fff8 now=00000000
+358 CAND_AFE_VUL_D2_END orig=00000000 mask=0000fff8 toggled=00000000 fixed=0000fff8 now=00000000
+374 CAND_AFE_HDMI_BASE orig=00000000 mask=0000fff8 toggled=00000000 fixed=0000fff8 now=00000000
+37c CAND_AFE_HDMI_END orig=00000000 mask=0000fff8 toggled=00000000 fixed=0000fff8 now=00000000
+390 CAND_AFE_HDMI_CONN0 orig=00000000 mask=0000ffff toggled=00000000 fixed=0000ffff now=00000000
+370 CAND_AFE_HDMI_OUT_CON0 orig=00000000 mask=fffffffe toggled=00000000 fixed=fffffffe now=00000000
+dac_con0=00001001 i2s_con3=00000000 irq=00000000 top_con3=60000000 usage=1 touched=15
+[   94.036649] panel-gc9503v 1400c000.dsi.0: Skipping unprepare of already unprepared panel
+[  121.042203] y2-mt6323-charger y2-mt6323-charger: status=3 fault=0x0 battery=3844995uV input=0uA watchdog_pets=0 source=1 limit=70000uA pmic=42789mC baton_raw
+[  142.379047] y2_afe_lab: loading out-of-tree module taints kernel.

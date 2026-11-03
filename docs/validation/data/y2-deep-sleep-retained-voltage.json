@@ -1,0 +1,21 @@
+{
+  "boot_id": "74a4645d-de94-46c5-8457-8a46b01c6cc1",
+  "samples": 690,
+  "first": {
+    "seconds_into_boot": 8281.842661,
+    "voltage_uv": 3900146,
+    "source_file": "system.log.0",
+    "source_line": 1
+  },
+  "last": {
+    "seconds_into_boot": 49621.842728,
+    "voltage_uv": 3403564,
+    "source_file": "system.log.0",
+    "source_line": 714
+  },
+  "sources": {
+    "system.log.0": "2db94bfd8d5a6ad40c9fa02ad71354c93fb59e32dbef655aca2db0917cccd0a1",
+    "system.log": "0df3ef97c0955e873c17ef26be5407841dc22f6cc3b3c34cd771bd4521509a10"
+  },
+  "limitations": "Boot association reconciled with persistent battery/Reborn history; initial 88% voltage missing; no mA/capacity inference."
+}

@@ -1,0 +1,33 @@
+--- a/drivers/base/regmap/regcache.c
++++ b/drivers/base/regmap/regcache.c
+@@ -14,6 +14,7 @@
+ 
+ #include "trace.h"
+ #include "internal.h"
++#include "/project/kernel/platform/pm-replay-trace.h"
+ 
+ static const struct regcache_ops *cache_types[] = {
+ 	&regcache_rbtree_ops,
+@@ -389,7 +390,9 @@
+ 
+ 	BUG_ON(!map->cache_ops);
+ 
++	y2_pm_replay_note(map->dev, "cs_map_lock_begin", 0);
+ 	map->lock(map->lock_arg);
++	y2_pm_replay_note(map->dev, "cs_map_lock_done", 0);
+ 	/* Remember the initial bypass state */
+ 	bypass = map->cache_bypass;
+ 	dev_dbg(map->dev, "Syncing %s cache\n",
+@@ -412,10 +415,12 @@
+ 	}
+ 	map->cache_bypass = false;
+ 
++	y2_pm_replay_note(map->dev, "cs_map_sync_begin", 0);
+ 	if (map->cache_ops->sync)
+ 		ret = map->cache_ops->sync(map, 0, map->max_register);
+ 	else
+ 		ret = regcache_default_sync(map, 0, map->max_register);
++	y2_pm_replay_note(map->dev, "cs_map_sync_done", ret);
+ 
+ 	if (ret == 0)
+ 		map->cache_dirty = false;

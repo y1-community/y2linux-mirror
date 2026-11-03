@@ -1,0 +1,479 @@
+//! `export-diagnostics`: the tester export with an allowlisted projection, separate from the
+//! private backup (`export-state`).
+//!
+//! No raw log, database, credential file, calibration or user filename is exported. Log excerpts are
+//! represented by fixed event classes and numeric errno only: free text cannot be reliably scrubbed by
+//! a password regular expression.
+//!
+//! The bundle carries the observation group's snapshot and health checks (`platform_state`), taken
+//! only after the space admission, the lock and the export limit: an export that cannot be written
+//! runs none of their commands.
+// SPDX-License-Identifier: GPL-2.0-only
+use super::{
+    fields::{fields, kernel_fields, kernel_status_keys, public_words},
+    json_dict, os,
+    pyre::{self, lazy, S},
+    sha256_hex,
+    state::uuid4,
+    tarball,
+    volume::{admitted, data_volume},
+};
+use crate::commands::reports::Value;
+use crate::reply::{private_directory, Failure, Outcome, Reply};
+use regex::Regex;
+use serde::Serialize;
+use std::{io::Write, os::unix::fs::OpenOptionsExt, sync::OnceLock};
+use y2p_core::json::ObjectExt;
+use y2p_core::{command, Root};
+
+const MAX_BYTES: usize = 2 * 1024 * 1024;
+const IDENTITY_KEYS: [&str; 5] = [
+    "build_git_commit",
+    "reborn_source_commit",
+    "y2linux_commit",
+    "reborn_commit",
+    "sha256",
+];
+const VERSION_KEYS: [&str; 7] = [
+    "kernel_version",
+    "kernel",
+    "rootfs_version",
+    "rootfs_release",
+    "release_version",
+    "reborn_version",
+    "build_id",
+];
+const EVENTS: [&str; 14] = [
+    "timeout",
+    "crc",
+    "underrun",
+    "xrun",
+    "overflow",
+    "abort",
+    "resume",
+    "suspend",
+    "reconnect",
+    "disconnect",
+    "failed",
+    "error",
+    "panic",
+    "warning",
+];
+const COMPONENTS: [&str; 21] = [
+    "msdc",
+    "mmc",
+    "musb",
+    "usb",
+    "spm",
+    "cirq",
+    "gpt",
+    "afe",
+    "alsa",
+    "cs431",
+    "bluetooth",
+    "bluealsa",
+    "wifi",
+    "wlan",
+    "reborn",
+    "battery",
+    "charger",
+    "ext4",
+    "drm",
+    "lima",
+    "watchdog",
+];
+
+fn sorted_contains(list: &[&str], value: &str) -> bool {
+    list.binary_search(&value).is_ok()
+}
+
+fn private_key(key: &str) -> bool {
+    static CELL: OnceLock<Regex> = OnceLock::new();
+    lazy(
+        &CELL,
+        r"(?i)(password|passphrase|secret|credential|ssid|bssid|address|mac(?:\n?\z)|cid(?:\n?\z)|serial|calibration|nvram|bond|link.?key|identity|filename|track|title|artist|album|path|cmdline)",
+    )
+    .is_match(key)
+}
+
+fn full(pattern: &'static OnceLock<Regex>, re: &str, value: &str) -> bool {
+    lazy(pattern, re).is_match(value)
+}
+
+/// `project(value, key, depth)`: keep counters and known public enums; discard unknown strings and
+/// keys.
+pub fn project(value: &Value, key: &str, depth: usize) -> Value {
+    if depth > 16 {
+        return Value::from("[depth-limit]");
+    }
+    // A public bonding fact is a boolean, never a bond record/key/string.
+    if key == "bonded" && matches!(value, Value::Bool(_)) {
+        return value.clone();
+    }
+    if private_key(key) {
+        return Value::from("[redacted]");
+    }
+    match value {
+        Value::Null | Value::Bool(_) | Value::Number(_) => value.clone(),
+        Value::Object(items) => {
+            let mut out: Vec<(String, Value)> = Vec::new();
+            for (k, v) in items.iter().take(512) {
+                if sorted_contains(fields(), k) {
+                    out.push((k.clone(), project(v, k, depth + 1)));
+                }
+            }
+            Value::Object(out.into_iter().collect())
+        }
+        Value::Array(items) => Value::Array(
+            items
+                .iter()
+                .take(256)
+                .map(|v| project(v, key, depth + 1))
+                .collect(),
+        ),
+        Value::String(text) => {
+            if sorted_contains(kernel_status_keys(), key)
+                || matches!(key, "11200000.usb" | "11230000.mmc" | "11240000.mmc")
+            {
+                static PAIRS: OnceLock<Regex> = OnceLock::new();
+                let pairs = lazy(&PAIRS, &format!(r"([\p{{L}}\p{{N}}_]+)=([^{S}]+)"));
+                let mut out: Vec<(String, Value)> = Vec::new();
+                for caps in pairs.captures_iter(text) {
+                    let field = &caps[1];
+                    if sorted_contains(kernel_fields(), field) {
+                        let projected = project(&Value::from(&caps[2]), field, depth + 1);
+                        match out.iter_mut().find(|(k, _)| k == field) {
+                            Some(entry) => entry.1 = projected,
+                            None => out.push((field.to_owned(), projected)),
+                        }
+                    }
+                }
+                return Value::Object(out.into_iter().collect());
+            }
+            static HASH: OnceLock<Regex> = OnceLock::new();
+            static BOOT: OnceLock<Regex> = OnceLock::new();
+            static VERSION: OnceLock<Regex> = OnceLock::new();
+            static NUMBER: OnceLock<Regex> = OnceLock::new();
+            if IDENTITY_KEYS.contains(&key)
+                && full(&HASH, r"\A(?:[0-9a-f]{40}|[0-9a-f]{64})\z", text)
+            {
+                return value.clone();
+            }
+            if matches!(key, "boot_id" | "previous_boot_id")
+                && full(
+                    &BOOT,
+                    r"\A[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\z",
+                    text,
+                )
+            {
+                return value.clone();
+            }
+            if VERSION_KEYS.contains(&key)
+                && full(&VERSION, r"\A[a-zA-Z0-9][a-zA-Z0-9.+_-]{0,99}\z", text)
+            {
+                return value.clone();
+            }
+            if text.chars().count() < 32
+                && full(
+                    &NUMBER,
+                    r"\A-?(?:[0-9]+(?:\.[0-9]+)?|0x[0-9a-fA-F]+)\z",
+                    text,
+                )
+            {
+                return value.clone();
+            }
+            if sorted_contains(public_words(), text) {
+                return value.clone();
+            }
+            Value::from("[redacted]")
+        }
+    }
+}
+
+/// `events(raw)`: fixed-vocabulary excerpts; no source text is ever copied into the bundle.
+pub fn events(raw: Option<&str>) -> Vec<LogEvent> {
+    static ERRNO: OnceLock<Regex> = OnceLock::new();
+    let errno = lazy(
+        &ERRNO,
+        &format!(r"(?:errno|error|ret)[{S}]*[=:][{S}]*(-?\d{{1,4}})(?:[^\p{{L}}\p{{N}}_]|\z)"),
+    );
+    let lines = pyre::splitlines(raw.unwrap_or(""));
+    let start = lines.len().saturating_sub(256);
+    let mut result = Vec::new();
+    for (number, line) in lines[start..].iter().enumerate() {
+        let lower = line.to_lowercase();
+        let tags: Vec<&'static str> = EVENTS
+            .iter()
+            .filter(|tag| {
+                lower
+                    .match_indices(*tag)
+                    .any(|(at, _)| pyre::word_start(&lower, at))
+            })
+            .copied()
+            .collect();
+        let components: Vec<&'static str> = COMPONENTS
+            .iter()
+            .filter(|c| lower.contains(*c))
+            .copied()
+            .collect();
+        if !tags.is_empty() && !components.is_empty() {
+            let numbers: Vec<i64> = pyre::finditer(errno, &lower, 1, pyre::word_start)
+                .iter()
+                .take(4)
+                .filter_map(|c| c[1].parse::<i64>().ok())
+                .collect();
+            result.push(LogEvent {
+                tail_line: number,
+                components,
+                events: tags,
+                errno: numbers,
+            });
+        }
+    }
+    result
+}
+
+/// One log line's event classes: which line of the tail, which components and events it names, and
+/// up to four error numbers (never the text).
+#[derive(Serialize, Debug, PartialEq)]
+pub struct LogEvent {
+    pub tail_line: usize,
+    pub components: Vec<&'static str>,
+    pub events: Vec<&'static str>,
+    pub errno: Vec<i64>,
+}
+
+/// A log's events in the bundle, or why there are none.
+#[derive(Serialize, Debug)]
+#[serde(untagged)]
+pub enum LogExcerpt {
+    Events(Vec<LogEvent>),
+    Missing { state: &'static str },
+}
+
+/// diagnostics.json: counters and known enums only (every value through `project`).
+#[derive(Serialize)]
+struct Bundle {
+    schema: &'static str,
+    redacted: bool,
+    privacy: &'static str,
+    versions: Value,
+    boot_id: Value,
+    platform: Value,
+    health: Value,
+    previous_boot: Value,
+    suspend: Value,
+    logs: std::collections::BTreeMap<&'static str, LogExcerpt>,
+}
+
+/// `export-diagnostics`' answer.
+#[derive(Serialize)]
+struct Exported {
+    state: &'static str,
+    path: String,
+    sha256: String,
+    bytes: usize,
+    redacted: bool,
+}
+
+/// The platform snapshot and the health checks made from it (one snapshot, its commands run once).
+fn platform_state(root: &Root) -> Result<(Value, Value), Failure> {
+    use crate::commands::observation::{health, snapshot};
+    let status = snapshot::snapshot(root, &[], false, 0.0)?;
+    let checks = health::check_from(root, &status, false)?;
+    Ok((Value::Object(status.into_map()?), serde_json::json!(checks)))
+}
+
+/// The events of a log's tail: walk reviewed data paths with no symlinks; never read arbitrary
+/// files.
+fn log_tail(root: &Root, relative: &str) -> Result<Vec<LogEvent>, Failure> {
+    use super::media::{fstat, open_at};
+    use std::io::{Read, Seek, SeekFrom};
+    let directory = libc::O_RDONLY | libc::O_DIRECTORY | libc::O_NOFOLLOW | libc::O_CLOEXEC;
+    let data = root.path("/data");
+    let mut fd = open_at(None, &data.to_string_lossy(), directory, 0).map_err(|e| os(e, &data))?;
+    let parts: Vec<&str> = relative.split('/').collect();
+    let missing = |e: std::io::Error, name: &str| -> Result<Option<()>, Failure> {
+        if e.raw_os_error() == Some(libc::ENOENT) {
+            Ok(None)
+        } else {
+            Err(super::os_name(e, name))
+        }
+    };
+    for part in &parts[..parts.len() - 1] {
+        fd = match open_at(Some(&fd), part, directory, 0) {
+            Ok(child) => child,
+            Err(e) => return missing(e, part).map(|_| Vec::new()),
+        };
+    }
+    let name = parts[parts.len() - 1];
+    let file = match open_at(
+        Some(&fd),
+        name,
+        libc::O_RDONLY | libc::O_NOFOLLOW | libc::O_NONBLOCK | libc::O_CLOEXEC,
+        0,
+    ) {
+        Ok(file) => file,
+        Err(e) => return missing(e, name).map(|_| Vec::new()),
+    };
+    let meta = fstat(&file)?;
+    if meta.mode & libc::S_IFMT != libc::S_IFREG || meta.nlink != 1 {
+        return Err(Failure::value("diagnostic_log_type"));
+    }
+    let mut stream = std::fs::File::from(file);
+    stream.seek(SeekFrom::Start((meta.size as u64).saturating_sub(65536)))?;
+    let mut tail = Vec::new();
+    stream.take(65536).read_to_end(&mut tail)?;
+    Ok(events(Some(&String::from_utf8_lossy(&tail))))
+}
+
+fn collect(root: &Root) -> Result<Bundle, Failure> {
+    let (snapshot, health) = platform_state(root)?;
+    let mut logs = std::collections::BTreeMap::new();
+    for (name, path) in [
+        ("system", "logs/system.log"),
+        ("reborn", "reborn/logs/reborn.log"),
+    ] {
+        let excerpt = match log_tail(root, path) {
+            Ok(events) => LogExcerpt::Events(events),
+            Err(_) => LogExcerpt::Missing { state: "Failed" },
+        };
+        logs.insert(name, excerpt);
+    }
+    let kernel = command::run_with(root, &["dmesg"], 2.0, 1 << 20, false);
+    logs.insert(
+        "kernel",
+        if kernel.ok {
+            LogExcerpt::Events(events(kernel.output.as_deref()))
+        } else {
+            LogExcerpt::Missing {
+                state: "Unavailable",
+            }
+        },
+    );
+    let projected = |name: &str| project(&json_dict(root, name), "", 0);
+    Ok(Bundle {
+        schema: "org.y2linux.tester-diagnostics/v1",
+        redacted: true,
+        privacy: "Counters and known enums only; logs are event classes, never raw text.",
+        versions: projected("/etc/y2linux/versions.json"),
+        boot_id: project(&root.boot_id().into(), "boot_id", 0),
+        platform: project(&snapshot, "", 0),
+        health: project(&health, "", 0),
+        previous_boot: projected("/data/system/platform/previous-boot-evidence.json"),
+        suspend: projected("/data/system/platform/suspend-last.json"),
+        logs,
+    })
+}
+
+fn export_inner(root: &Root) -> Result<Exported, Failure> {
+    let volume = data_volume(root)?;
+    if !admitted(&volume, MAX_BYTES as u64) {
+        return Err(Failure::value("diagnostic_space_reserved"));
+    }
+    let directory = root.path("/data/exports");
+    private_directory(&directory)?;
+    let lock_path = directory.join(".diagnostics.lock");
+    let _lock = y2p_core::lock::try_exclusive(&lock_path)
+        .map_err(|e| os(e, &lock_path))?
+        .ok_or_else(|| Failure::value("busy"))?;
+    let existing = std::fs::read_dir(&directory)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .filter(|e| {
+            let n = e.file_name().to_string_lossy().into_owned();
+            n.starts_with("y2-diagnostics-") && n.ends_with(".tar.gz")
+        })
+        .count();
+    if existing >= 8 {
+        return Err(Failure::value("diagnostic_export_limit_retrieve_existing"));
+    }
+    let raw = serde_json::to_string(&collect(root)?).map_err(Failure::value)? + "\n";
+    if raw.len() > MAX_BYTES {
+        return Err(Failure::value("diagnostic_size_limit"));
+    }
+    let now = root.clock().wall_ns() / 1_000_000_000;
+    let name = format!("y2-diagnostics-{now}-{}.tar.gz", uuid4()?.replace('-', ""));
+    let partial = directory.join(format!(".{name}.partial"));
+    let result = (|| {
+        let mut stream = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .mode(0o600)
+            .custom_flags(libc::O_NOFOLLOW | libc::O_CLOEXEC)
+            .open(&partial)
+            .map_err(|e| os(e, &partial))?;
+        let mut tar = tarball::Writer::new();
+        tar.add(
+            &tarball::Info::file("diagnostics.json", raw.len(), 0, 0o600),
+            raw.as_bytes(),
+        );
+        stream
+            .write_all(&tarball::gzip(&tar.finish(), 9, now as u32))
+            .and_then(|()| stream.sync_all())?;
+        if data_volume(root)?.generation != volume.generation {
+            return Err(Failure::value("diagnostic_data_generation_changed"));
+        }
+        let complete = directory.join(&name);
+        std::fs::rename(&partial, &complete).map_err(|e| os(e, &partial))?;
+        std::fs::File::open(&directory).and_then(|d| d.sync_all())?;
+        let bytes = std::fs::read(&complete).map_err(|e| os(e, &complete))?;
+        let digest = sha256_hex(&bytes);
+        Ok(Exported {
+            state: "Complete",
+            path: format!("/data/exports/{name}"),
+            sha256: digest,
+            bytes: bytes.len(),
+            redacted: true,
+        })
+    })();
+    let _ = std::fs::remove_file(&partial);
+    result
+}
+
+/// `export-diagnostics`: any failure is `diagnostic_export_failed` (exit 1).
+pub fn export(root: &Root) -> Outcome {
+    match export_inner(root) {
+        Ok(value) => Ok(Reply::text(
+            serde_json::to_string(&value).unwrap_or_default(),
+        )),
+        Err(_) => Reply::unsorted(
+            &y2p_core::json::Object::new()
+                .with("state", "Failed")
+                .with("failure", "diagnostic_export_failed"),
+            1,
+        ),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::commands::reports::loads_text;
+
+    /// The same values through host Python's diagnostics.project and events.
+    #[test]
+    fn projection_and_events_match_python() {
+        let value = loads_text(
+            r#"{"state": "Ready", "ssid": "Home", "boot_id": "0123abcd-0123-4567-89ab-0123456789ab",
+                "release_version": "1.0.0-beta.8.44", "battery": {"percent": 80, "temperature_c": 31.5,
+                "status": "Charging", "mac": "aa", "other": "x"}, "spm": "valid=1 sequence=7 bogus=3 power=on",
+                "counters": [1, "2", "0x1f", "free text", null], "unknown_key": 1, "cpu": {"nested": 1}}"#,
+        )
+        .unwrap();
+        let ours = serde_json::to_string(&project(&value, "", 0)).unwrap_or_default();
+        let log = "msdc0: cmd timeout error=-110\nwifi: reconnect failed ret: 5\nnothing here\nBattery charger warning\n";
+        let ours_events = serde_json::to_string(&events(Some(log))).unwrap_or_default();
+        // What the Python platform's diagnostics.project and events gave (recorded).
+        y2p_core::recorded::check(
+            env!("CARGO_MANIFEST_DIR"),
+            "diagnostics-projection.txt",
+            format!("{ours}\n{ours_events}\n").as_bytes(),
+        );
+    }
+}
+
+#[cfg(test)]
+#[path = "diagnostics_tests.rs"]
+mod diagnostics_tests;

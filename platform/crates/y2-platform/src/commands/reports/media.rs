@@ -1,0 +1,228 @@
+//! `report save`: the SD card's state as the storage group records it (our mount, its claim,
+//! `can_write`), the report's own write window on a protected card, and writing the file below a
+//! destination without following a link out of it.
+// SPDX-License-Identifier: GPL-2.0-only
+use super::{
+    build, clock,
+    state::{self, Reports, DESTINATIONS},
+    Value,
+};
+use crate::commands::reports::{object, ValueExt};
+use crate::reply::Failure;
+use std::os::fd::AsFd;
+use std::{ffi::CString, io, os::fd::OwnedFd, path::Path};
+use y2p_contract::reports::ReportPhase;
+pub use y2p_core::mounts::mountinfo;
+use y2p_core::Root;
+
+/// `media.can_write`: True when the SD takes writes now or on a window (not for a damaged card).
+pub use crate::commands::storage::media::can_write;
+
+/// Open the report's write window for `seconds` (or close it, `release`) on a protected card
+/// (the storage group's window, holder `report`); the holders of the window then (none when there
+/// is no window: no card of ours, a card that is not protected, or a check or repair holding it).
+fn write_window(root: &Root, seconds: i64, release: bool) -> Result<Vec<String>, Failure> {
+    let answer = crate::commands::storage::media::write_window(root, "report", seconds, release)?;
+    Ok(answer.holders.unwrap_or_default())
+}
+
+/// `_write_into(mount, top, data, stamp)`: write data as top/FOLDER/y2linux-report-<stamp>.tar.gz
+/// below mount, durably. Every folder must be a real directory on the mounted filesystem itself (no
+/// symlink out of it); the file is complete before it gets its name.
+fn write_into(mount: &Path, top: &str, data: &[u8], stamp: &str) -> io::Result<String> {
+    let flags = libc::O_RDONLY | libc::O_DIRECTORY | libc::O_NOFOLLOW | libc::O_CLOEXEC;
+    let mut dir = open_at(None, &mount.to_string_lossy(), flags, 0)?;
+    let device = fstat(&dir)?.dev;
+    for part in top.split('/').filter(|p| !p.is_empty()) {
+        dir = open_at(Some(&dir), part, flags, 0)?;
+    }
+    let folder_name = CString::new(build::FOLDER).expect("no NUL");
+    if let Err(error) = y2p_core::sys::mkdirat(dir.as_fd(), &folder_name, 0o755) {
+        if error.raw_os_error() != Some(libc::EEXIST) {
+            return Err(error);
+        }
+    }
+    let folder = open_at(Some(&dir), build::FOLDER, flags, 0)?;
+    drop(dir);
+    if fstat(&folder)?.dev != device {
+        return Err(io::Error::from_raw_os_error(libc::EXDEV)); // report_folder_elsewhere
+    }
+    let space = y2p_core::sys::fstatvfs(folder.as_fd())?;
+    if (space.bavail as u128) * (space.frsize as u128) < data.len() as u128 + (1 << 20) {
+        return Err(io::Error::from_raw_os_error(libc::ENOSPC)); // report_no_space
+    }
+    let mut chosen = None;
+    for n in 1..100 {
+        let name = format!(
+            "y2linux-report-{stamp}{}.tar.gz",
+            if n == 1 {
+                String::new()
+            } else {
+                format!("-{n}")
+            }
+        );
+        match lstat_at(&folder, &name) {
+            Err(e) if e.raw_os_error() == Some(libc::ENOENT) => {
+                chosen = Some(name);
+                break;
+            }
+            Err(e) => return Err(e),
+            Ok(()) => {}
+        }
+    }
+    let name = chosen.ok_or_else(|| io::Error::from_raw_os_error(libc::EEXIST))?; // names taken
+    let temporary = format!(".{name}.part");
+    let written = (|| {
+        let fd = open_at(
+            Some(&folder),
+            &temporary,
+            libc::O_WRONLY | libc::O_CREAT | libc::O_TRUNC | libc::O_NOFOLLOW | libc::O_CLOEXEC,
+            0o644,
+        )?;
+        let mut file = std::fs::File::from(fd);
+        io::Write::write_all(&mut file, data)?;
+        file.sync_all()?;
+        drop(file);
+        rename_at(&folder, &temporary, &name)
+    })();
+    if let Err(error) = written {
+        let c = CString::new(temporary).expect("no NUL");
+        let _ = y2p_core::sys::unlinkat(folder.as_fd(), &c, 0);
+        return Err(error);
+    }
+    // An SD card may be pulled right afterwards.
+    let _ = y2p_core::sys::fsync(folder.as_fd());
+    Ok(name)
+}
+
+pub fn open_at(dir: Option<&OwnedFd>, name: &str, flags: i32, mode: u32) -> io::Result<OwnedFd> {
+    let c = CString::new(name).map_err(|_| io::Error::from_raw_os_error(libc::EINVAL))?;
+    y2p_core::sys::openat(dir.map(|d| d.as_fd()), &c, flags, mode as libc::mode_t)
+}
+
+pub fn fstat(fd: &OwnedFd) -> io::Result<y2p_core::sys::Stat> {
+    y2p_core::sys::fstat(fd.as_fd())
+}
+
+pub fn stat_at(dir: &OwnedFd, name: &str) -> io::Result<y2p_core::sys::Stat> {
+    let c = CString::new(name).map_err(|_| io::Error::from_raw_os_error(libc::EINVAL))?;
+    y2p_core::sys::fstatat(dir.as_fd(), &c, libc::AT_SYMLINK_NOFOLLOW)
+}
+
+fn lstat_at(dir: &OwnedFd, name: &str) -> io::Result<()> {
+    stat_at(dir, name).map(|_| ())
+}
+
+pub fn rename_at(dir: &OwnedFd, from: &str, to: &str) -> io::Result<()> {
+    rename_between(dir, from, dir, to)
+}
+
+pub fn rename_between(
+    from_dir: &OwnedFd,
+    from: &str,
+    to_dir: &OwnedFd,
+    to: &str,
+) -> io::Result<()> {
+    let (a, b) = (
+        CString::new(from).map_err(|_| io::Error::from_raw_os_error(libc::EINVAL))?,
+        CString::new(to).map_err(|_| io::Error::from_raw_os_error(libc::EINVAL))?,
+    );
+    y2p_core::sys::renameat(from_dir.as_fd(), &a, to_dir.as_fd(), &b)
+}
+
+/// Build a report and save it onto Internal Storage or
+/// the SD card. Asked for by the owner on the player, so no opt-in is needed: nothing leaves the
+/// player unless the owner sends the file. It carries the install ID only when error reports are on.
+pub fn save_to(
+    root: &Root,
+    destination: &str,
+    topic: Option<&str>,
+    progress: &build::Progress,
+) -> Result<Value, Failure> {
+    let Some(&(_, mount, top)) = DESTINATIONS.iter().find(|(n, _, _)| *n == destination) else {
+        return Err(Failure::value("unknown_destination"));
+    };
+    if !state::destinations(root).contains(&destination) {
+        return Ok(object()
+            .with("saved", Value::Bool(false))
+            .with("reason", Value::from("not_mounted")));
+    }
+    let value = Reports::load(root);
+    let now = clock::Instant::now(root);
+    let install = value.install_id.clone().filter(|_| value.enabled());
+    let (data, index) = build::build(
+        root,
+        &["manual".to_owned()],
+        "",
+        topic,
+        install,
+        now,
+        progress,
+    )?;
+    progress.update(
+        ReportPhase::Save,
+        0.0,
+        true,
+        build::Bytes::total(data.len()),
+    );
+    let window = if destination == "sd" {
+        write_window(root, 120, false)
+    } else {
+        Ok(Vec::new())
+    };
+    let written = match window {
+        Err(error) => Err(error),
+        Ok(holders) => {
+            let result = write_into(&root.path(mount), top, &data, &clock::local_stamp(now))
+                .map_err(Failure::from);
+            // The window ends whatever happened; its own OSError replaces the write's.
+            match (holders.is_empty(), result) {
+                (true, result) => result,
+                (false, result) => write_window(root, 0, true).and(result),
+            }
+        }
+    };
+    let name = match written {
+        Ok(name) => {
+            progress.update(
+                ReportPhase::Save,
+                1.0,
+                true,
+                build::Bytes::total(data.len()),
+            );
+            name
+        }
+        Err(Failure::Os { text, .. }) => {
+            let no_space = text.starts_with(&format!("[Errno {}]", libc::ENOSPC));
+            return Ok(object().with("saved", Value::Bool(false)).with(
+                "reason",
+                Value::from(if no_space { "no_space" } else { "write_failed" }),
+            ));
+        }
+        Err(other) => return Err(other),
+    };
+    let file = format!("{}/{name}", build::FOLDER);
+    let report_id = index.report_id.clone();
+    let mut value = Reports::load(root);
+    value.last = Some(state::Last {
+        report_id: report_id.clone(),
+        trigger: "manual".into(),
+        state: "saved".into(),
+        destination: Some(destination.into()),
+        file: Some(file.clone()),
+        created_utc: index.created_utc.clone(),
+        bytes: data.len() as u64,
+        ..state::Last::default()
+    });
+    value.save(root)?;
+    Ok(object()
+        .with("saved", Value::Bool(true))
+        .with("destination", Value::from(destination))
+        .with("file", Value::from(file))
+        .with("report_id", Value::from(report_id))
+        .with("bytes", Value::from(data.len())))
+}
+
+#[cfg(test)]
+#[path = "media_tests.rs"]
+mod media_tests;

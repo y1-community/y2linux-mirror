@@ -1,0 +1,25 @@
+{
+ "argv": [
+  "reset",
+  "resume",
+  "--confirm",
+  "5d6708ab5e9b5ff0bbcaff839905a8f7456fa2662e312ed9f24ee6edc95ffeaa"
+ ],
+ "calls": [],
+ "exit": 1,
+ "stdout": {
+  "failure": "reset_plan_unreadable",
+  "state": "Failed"
+ },
+ "tree": {
+  "added": {
+   "/data/system/platform/.maintenance.lock": {
+    "content": [],
+    "mode": "0o600",
+    "type": "file"
+   }
+  },
+  "changed": {},
+  "removed": []
+ }
+}
