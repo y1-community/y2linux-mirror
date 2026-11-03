@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "generated_at": "2026-11-03T15:21:21Z",
+  "source_repo": "schulzcode/y2linux",
+  "mirror_repo": "y1-community/y2linux-mirror",
+  "title_prefix": "Portable Flashing Package: ",
+  "updater_repo": "y1-community/updater-ce-neo",
+  "platforms": [
+    {
+      "key": "windows",
+      "os": "windows",
+      "arch": "x86-64",
+      "suffix": "-windows.zip",
+      "layout": "sp_flash_tool"
+    },
+    {
+      "key": "windows-arm64",
+      "os": "windows",
+      "arch": "arm64",
+      "suffix": "-windows-arm64.zip",
+      "layout": "sp_flash_tool"
+    },
+    {
+      "key": "linux",
+      "os": "linux",
+      "arch": "x86-64",
+      "suffix": "-linux.zip",
+      "layout": "sp_flash_tool"
+    },
+    {
+      "key": "linux-arm64",
+      "os": "linux",
+      "arch": "arm64",
+      "suffix": "-linux-arm64.zip",
+      "layout": "sp_flash_tool"
+    },
+    {
+      "key": "macos",
+      "os": "macos",
+      "arch": "universal",
+      "suffix": "-macos.zip",
+      "layout": "beside_app"
+    }
+  ],
+  "releases": [],
+  "source_readme": {
+    "path": "README.md",
+    "source_path": "readme.md",
+    "source_name": "readme.md",
+    "source_url": "https://github.com/SchulzCode/Y2Linux/blob/main/readme.md",
+    "url": "https://raw.githubusercontent.com/y1-community/y2linux-mirror/main/README.md"
+  }
+}
