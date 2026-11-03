@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at": "2026-11-03T15:21:21Z",
+  "generated_at": "2026-11-03T15:36:33Z",
   "source_repo": "schulzcode/y2linux",
   "mirror_repo": "y1-community/y2linux-mirror",
   "title_prefix": "Portable Flashing Package: ",
@@ -42,7 +42,55 @@
       "layout": "beside_app"
     }
   ],
-  "releases": [],
+  "releases": [
+    {
+      "tag": "baseline-207",
+      "title": "Portable Flashing Package: Y2Linux 1.0 Beta 9.2.16",
+      "source_title": "Y2Linux 1.0 Beta 9.2.16",
+      "source_url": "https://github.com/schulzcode/y2linux/releases/tag/baseline-207",
+      "published_at": "2026-11-02T00:02:35Z",
+      "prerelease": false,
+      "source_notes": "**Y2Linux 1.0 Beta 9.2.16: steadier Bluetooth sound.** Linux 6.18 and the native Reborn music player for the Innioasis Y2.\n\n## Already running Y2Linux\nSettings \u2192 System \u2192 Software Update \u2192 **Update Now** (on Beta 9.2.8 and older: Settings \u2192 About & Updates \u2192 Check for Updates \u2192 **Update Now**).\n\n## What changed\n- **Steadier Bluetooth, lower default rates** (Y2Reborn #87): crackling and cut-outs on Sony WH-1000XM4 headphones came from AAC at 320 kbit/s while Wi-Fi was on; the Y2 has one antenna that Wi-Fi and Bluetooth share. AAC now runs at 220 kbit/s by default (was up to 320) and LDAC at 330 kbit/s (was 660).\n- **An extra limit while Wi-Fi is on:** AAC at most 192 kbit/s and SBC one step below its top quality as long as the Wi-Fi radio is on; the full rate returns when Wi-Fi goes off. It changes while the music plays, without a reconnect.\n- **Auto picks AAC first**, then aptX, then SBC; LDAC and aptX HD only when you choose them in the service menu.\n- **Your chosen codec is used even when the headphones connect during playback** (Y2Reborn #87): it is asked for again at the next pause instead of being dropped until the next reconnect.\n\nBefore release: the platform's full check, Reborn's workspace tests and the tests of the release images, with new tests for the Wi-Fi limit (AAC and SBC), the defaults, Auto's order and the codec retry. **Not yet tried on a player**: if Bluetooth sounds worse or behaves differently than in 9.2.15, please send an error report (Settings \u2192 System \u2192 Error Reports).\n\nWhat changed and why, in plain words: **[Beta 9.2.16 report](https://github.com/SchulzCode/Y2Linux/blob/main/docs/validation/Y2-LINUX-1.0-BETA-9.2.16.md)**. Everything from Beta 9.2.15 is included ([Beta 9.2.15 report](https://github.com/SchulzCode/Y2Linux/blob/main/docs/validation/Y2-LINUX-1.0-BETA-9.2.15.md)).\n\n## Install (from stock)\nYou need SP Flash Tool v5.2032, a USB cable, **`Y2Linux-1.0.0-beta.9.2.16-first-install.zip`** below and the **Innioasis Y2 firmware package v3.2.0** from Innioasis (only this version works; it is also your way back to stock).\n\n1. Unpack both.\n2. SP Flash Tool \u2192 **Download Only** \u2192 load `MT6582_Android_scatter.txt` **from the Y2Linux zip**. Exactly BOOTIMG, RECOVERY, ANDROID and USRDATA are ticked.\n3. Click Download and connect the switched-off Y2; wait for the green tick.\n4. Unplug and press Power: the player sets up its Internal Storage (a few seconds), then Y2Linux and Reborn start, music works.\n5. Connect the Y2 to the computer and **copy** (don't move) `system.img` from the Innioasis package into the **Firmware** folder on **Internal Storage**. The player takes the Wi-Fi/Bluetooth firmware from it and turns the radios on.\n\nFull guide: [INSTALL](https://github.com/SchulzCode/Y2Linux/blob/main/docs/INSTALL.md) \u00b7 How updates work: [Recovery and updates](https://github.com/SchulzCode/Y2Linux/blob/main/docs/RECOVERY-AND-UPDATES.md) \u00b7 Storage: [Storage](https://github.com/SchulzCode/Y2Linux/blob/main/docs/STORAGE.md) \u00b7 [Audiobooks](https://github.com/SchulzCode/Y2Linux/blob/main/docs/AUDIOBOOKS.md) \u00b7 Headphone settings: [Headphone output](https://github.com/SchulzCode/Y2Linux/blob/main/docs/HEADPHONE-OUTPUT.md) \u00b7 [Error reports](https://github.com/SchulzCode/Y2Linux/blob/main/docs/ERROR-REPORTS.md) \u00b7 Skins: [skin guide](https://github.com/SchulzCode/Y2Reborn/blob/main/docs/skins.md)\n\n## Known issues (beta)\n- Everything listed for Beta 9.0 still applies. If anything behaves differently from 9.2.14, send an error report (Settings \u2192 System \u2192 Error Reports); **Restore Previous System** (Settings \u2192 System \u2192 About, tap Version seven times, then Diagnostics) goes back to the version you had, with your data kept.\n- Battery life in sleep: about 2 mA overnight on the developer's player (estimated from the battery voltage); stock is about 1.3 mA.\n- Some players turned off by themselves during playback; the cause is not found yet. If yours does, start it again and send a report.\n- The speaker uses the same volume as the headphones; its loudest step is the stock speaker's. Start low the first time.\n- How loud the wheel click should be is a first guess; tell us if it is too loud or too soft.\n- BBC radio stations stream only in HLS, which the player does not play yet. FM radio is in the works for a later beta.\n\n## Files\n- `Y2Linux-1.0.0-beta.9.2.16-first-install.zip`: images, scatter files and checksums for SP Flash Tool. The data image has no SSH key (developers: `tools/production/first_owner.py`).\n- `manifest.json`, `manifest.sig`, `rootfs.ext4.gz`, `bootimg.img.gz`, `recovery.img.gz`: the signed over-the-air update (Ed25519 key `platform-v1-release-20261015`, sequence 13200).\n- `Y2Linux-1.0.0-beta.9.2.16-sources-buildroot-legal-info.tar` (licences, manifests, this project's packages) and the third-party, toolchain and Linux sources linked below: corresponding sources. Our own code: Y2Linux and Y2Reborn at tag `baseline-207`. The speaker amplifier driver is Chris Hendrickson's GPL-2.0 AW87559 driver. The headphone profiles are AutoEq results (MIT, Jaakko Pasanen); their licence ships with them.\n- `SHA256SUMS` for the attached files.\n\nBeta software: use at your own risk. Not affiliated with Innioasis, MediaTek, Awinic, Last.fm, AutoEq, Strawberry or Google. Noto Sans CJK is licensed under the SIL Open Font License 1.1. Details: [Beta 9.2.16 report](https://github.com/SchulzCode/Y2Linux/blob/main/docs/validation/Y2-LINUX-1.0-BETA-9.2.16.md).\n\n## Sources unchanged since an earlier release\n- [`Y2Linux-sources-toolchain-f7cda4c7d213.tar`](https://github.com/SchulzCode/Y2Linux/releases/download/baseline-120/Y2Linux-sources-toolchain-f7cda4c7d213.tar) (attached to `baseline-120`), SHA-256 `f7cda4c7d2134bed15dacc7afd7e1687621a57412d60e49c725efc3880bf1bc6`\n- [`linux-6.18.56.tar.xz`](https://github.com/SchulzCode/Y2Linux/releases/download/baseline-120/linux-6.18.56.tar.xz) (attached to `baseline-120`), SHA-256 `4633bbda2ab95eaf2a7af4041236451d6759c72e6946265531af4b3aacefbf89`\n\n",
+      "assets": [
+        {
+          "name": "Y2Linux-1.0.0-beta.9.2.16-first-install-windows.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.2.16-first-install.zip",
+          "platform": "windows",
+          "size": 303263631,
+          "sha256": "925492838e1142ae8fee358d566594d2175d861e842aef5828a86bf2eb3c7a4f",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-207/Y2Linux-1.0.0-beta.9.2.16-first-install-windows.zip"
+        },
+        {
+          "name": "Y2Linux-1.0.0-beta.9.2.16-first-install-linux.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.2.16-first-install.zip",
+          "platform": "linux",
+          "size": 454574350,
+          "sha256": "815aa0340a3a121192dc84b939fd24eadf3bd4527a2c79c6c89f6985180d34ed",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-207/Y2Linux-1.0.0-beta.9.2.16-first-install-linux.zip"
+        },
+        {
+          "name": "Y2Linux-1.0.0-beta.9.2.16-first-install-macos.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.2.16-first-install.zip",
+          "platform": "macos",
+          "size": 254478609,
+          "sha256": "d87a6efb594b737c811e0a4d041fbc093213756ef7c6bb76ee51c8702b5946b8",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-207/Y2Linux-1.0.0-beta.9.2.16-first-install-macos.zip"
+        }
+      ],
+      "original_assets": [
+        "bootimg.img.gz",
+        "manifest.json",
+        "manifest.sig",
+        "recovery.img.gz",
+        "rootfs.ext4.gz",
+        "SHA256SUMS",
+        "Y2Linux-1.0.0-beta.9.2.16-first-install.zip",
+        "Y2Linux-1.0.0-beta.9.2.16-sources-buildroot-legal-info.tar",
+        "Y2Linux-sources-third-party-16db0acea92d.tar"
+      ],
+      "stats_url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-207/stats.txt"
+    }
+  ],
   "source_readme": {
     "path": "README.md",
     "source_path": "readme.md",
