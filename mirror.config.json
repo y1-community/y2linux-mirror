@@ -56,10 +56,11 @@
     },
     "macos" : {
       "arch" : "universal",
-      "layout" : "beside_app",
+      "layout" : "beside_dmg",
       "os" : "macos",
       "suffix" : "-macos.zip",
-      "updater_asset" : "Innioasis.Updater.for.Mac.zip"
+      "updater_asset" : "Innioasis.Updater.for.Mac.dmg",
+      "updater_repo" : "y1-community/innioasis-updater"
     },
     "windows" : {
       "arch" : "x86-64",
