@@ -1,56 +1,127 @@
 {
-  "source_repo": "schulzcode/y2linux",
-  "mirror_repo": "y1-community/y2linux-mirror",
-  "branch": "main",
-  "updater_repo": "y1-community/updater-ce-neo",
-  "title_prefix": "Portable Flashing Package: ",
-  "copy_original_assets": true,
-  "source_readme": {
-    "enabled": true,
-    "path": "README.md",
-    "commit_message": "Mirror source README"
+  "branch" : "main",
+  "build_workers" : 2,
+  "copy_original_assets" : true,
+  "defaults" : {
+    "description" : "",
+    "software_name" : "Reborn (Y2Linux)",
+    "target_model" : "Y2",
+    "target_type" : "Stock"
   },
-  "build_workers": 2,
-  "max_asset_bytes": 2147483648,
-  "releases": {
-    "include_prereleases": true,
-    "tags": [],
-    "exclude_tags": []
+  "firmware" : {
+    "exclude" : [
+      "*-windows.zip",
+      "*-windows-arm64.zip",
+      "*-linux.zip",
+      "*-linux-arm64.zip",
+      "*-macos.zip",
+      "*portable*.zip",
+      "*source*.zip",
+      "*installer*.zip",
+      "*.dmg",
+      "*.apk",
+      "*.tar.gz",
+      "*.tgz",
+      "*.tar",
+      "*.sha256",
+      "*.json",
+      "*.txt",
+      "*.sig",
+      "*.img.gz",
+      "*.exe",
+      "*.appimage"
+    ],
+    "include" : [
+      "*.zip"
+    ],
+    "require_scatter" : true
   },
-  "defaults": {
-    "software_name": "Reborn (Y2Linux)",
-    "target_model": "Y2",
-    "target_type": "Stock",
-    "description": ""
-  },
-  "rules": [
-    {
-      "match_asset": "(?i)360p",
-      "target_type": "360p"
+  "max_asset_bytes" : 2147483648,
+  "mirror_repo" : "y1-community/y2linux-mirror",
+  "platforms" : {
+    "linux" : {
+      "arch" : "x86-64",
+      "layout" : "sp_flash_tool",
+      "os" : "linux",
+      "suffix" : "-linux.zip",
+      "updater_asset" : "UpdaterCE-Linux-Portable.zip"
     },
-    {
-      "match_asset": "(?i)240p",
-      "target_type": "240p"
+    "linux-arm64" : {
+      "arch" : "arm64",
+      "layout" : "sp_flash_tool",
+      "optional" : true,
+      "os" : "linux",
+      "suffix" : "-linux-arm64.zip",
+      "updater_asset" : "UpdaterCE-Linux-Portable-arm64.zip"
     },
-    {
-      "match_asset": "(?i)rom_y1_type[-_ ]?a",
-      "target_model": "Y1",
-      "target_type": "Type A"
+    "macos" : {
+      "arch" : "universal",
+      "layout" : "beside_app",
+      "os" : "macos",
+      "suffix" : "-macos.zip",
+      "updater_asset" : "Innioasis.Updater.for.Mac.zip"
     },
-    {
-      "match_asset": "(?i)rom_y1_type[-_ ]?b",
-      "target_model": "Y1",
-      "target_type": "Type B"
+    "windows" : {
+      "arch" : "x86-64",
+      "layout" : "sp_flash_tool",
+      "os" : "windows",
+      "suffix" : "-windows.zip",
+      "updater_asset" : "UpdaterCE-Windows-Portable.zip"
     },
-    {
-      "match_asset": "(?i)type[-_ ]?b",
-      "target_model": "Y2",
-      "target_type": "Type B"
-    },
-    {
-      "match_asset": "(?i)(^|[-_.])y2([-_.]|$)",
-      "target_model": "Y2",
-      "target_type": "Stock"
+    "windows-arm64" : {
+      "arch" : "arm64",
+      "layout" : "sp_flash_tool",
+      "optional" : true,
+      "os" : "windows",
+      "suffix" : "-windows-arm64.zip",
+      "updater_asset" : "UpdaterCE-Windows-Portable-arm64.zip"
     }
-  ]
+  },
+  "releases" : {
+    "exclude_tags" : [
+
+    ],
+    "include_prereleases" : true,
+    "tags" : [
+
+    ]
+  },
+  "rules" : [
+    {
+      "match_asset" : "(?i)360p",
+      "target_type" : "360p"
+    },
+    {
+      "match_asset" : "(?i)240p",
+      "target_type" : "240p"
+    },
+    {
+      "match_asset" : "(?i)rom_y1_type[-_ ]?a",
+      "target_model" : "Y1",
+      "target_type" : "Type A"
+    },
+    {
+      "match_asset" : "(?i)rom_y1_type[-_ ]?b",
+      "target_model" : "Y1",
+      "target_type" : "Type B"
+    },
+    {
+      "match_asset" : "(?i)type[-_ ]?b",
+      "target_model" : "Y2",
+      "target_type" : "Type B"
+    },
+    {
+      "match_asset" : "(?i)(^|[-_.])y2([-_.]|$)",
+      "target_model" : "Y2",
+      "target_type" : "Stock"
+    }
+  ],
+  "source_readme" : {
+    "commit_message" : "Mirror source README",
+    "enabled" : true,
+    "path" : "README.md"
+  },
+  "source_repo" : "schulzcode/y2linux",
+  "title_prefix" : "Portable Flashing Package: ",
+  "updater_repo" : "y1-community/updater-ce-neo"
 }
