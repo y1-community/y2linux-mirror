@@ -1,5 +1,5 @@
 {
-  "generated_at" : "2026-11-04T05:53:02Z",
+  "generated_at" : "2026-11-04T05:55:28Z",
   "mirror_repo" : "y1-community/y2linux-mirror",
   "platforms" : [
     {
@@ -3684,12 +3684,12 @@
     {
       "assets" : [
         {
-          "name" : "Y2Linux-1.0.0-beta.3-first-install-linux.zip",
-          "platform" : "linux",
-          "sha256" : "255fc3d053411c7284db557ec3d36d74af5fca19c37c41a83ce070a34b6ecf1e",
-          "size" : 444813290,
+          "name" : "5A5F4EB2-5D18-4FAE-8D3B-FE8176C0C4B2-Y2Linux-1.0.0-beta.3-first-install-macos.zip",
+          "platform" : "macos",
+          "sha256" : "8398b4948b2e9eb8cc1f33c007aa9c9c05637e50a2d7689dd98e15af9f4cfe3c",
+          "size" : 211115358,
           "source_asset" : "Y2Linux-1.0.0-beta.3-first-install.zip",
-          "url" : "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-52/Y2Linux-1.0.0-beta.3-first-install-linux.zip"
+          "url" : "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-52/5A5F4EB2-5D18-4FAE-8D3B-FE8176C0C4B2-Y2Linux-1.0.0-beta.3-first-install-macos.zip"
         },
         {
           "name" : "Y2Linux-1.0.0-beta.3-first-install-windows.zip",
@@ -3700,12 +3700,12 @@
           "url" : "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-52/Y2Linux-1.0.0-beta.3-first-install-windows.zip"
         },
         {
-          "name" : "Y2Linux-1.0.0-beta.3-first-install-macos.zip",
-          "platform" : "macos",
-          "sha256" : "0ac2e3c8a3abec265d34a530360c568b8e663785d24a1b2fd809bbe39c79559e",
-          "size" : 243926134,
+          "name" : "Y2Linux-1.0.0-beta.3-first-install-linux.zip",
+          "platform" : "linux",
+          "sha256" : "255fc3d053411c7284db557ec3d36d74af5fca19c37c41a83ce070a34b6ecf1e",
+          "size" : 444813290,
           "source_asset" : "Y2Linux-1.0.0-beta.3-first-install.zip",
-          "url" : "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-52/Y2Linux-1.0.0-beta.3-first-install-macos.zip"
+          "url" : "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-52/Y2Linux-1.0.0-beta.3-first-install-linux.zip"
         }
       ],
       "original_assets" : [
