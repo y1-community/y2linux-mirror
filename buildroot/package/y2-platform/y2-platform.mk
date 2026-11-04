@@ -17,6 +17,8 @@ Y2_PLATFORM_OVERRIDE_SRCDIR_RSYNC_EXCLUSIONS = --exclude=/target
 # As Reborn: this project's own code; its exact source is the Y2Linux repository at the release's
 # baseline tag (platform/ with its vendored crates). legal-info would pack the Cargo target too.
 Y2_PLATFORM_REDISTRIBUTE = NO
+# y2-radiod talks to BlueZ and BlueALSA through libdbus (the dbus crate, as Reborn).
+Y2_PLATFORM_DEPENDENCIES = dbus host-pkgconf
 
 define Y2_PLATFORM_BUILD_CMDS
 	cd $(@D) && PATH="$(dir $(Y2_PLATFORM_CARGO)):$(BR_PATH)" \
@@ -29,6 +31,8 @@ endef
 define Y2_PLATFORM_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/target/armv7-unknown-linux-gnueabihf/release/y2-platform \
 		$(TARGET_DIR)/usr/sbin/y2-platform
+	$(INSTALL) -D -m 0755 $(@D)/target/armv7-unknown-linux-gnueabihf/release/y2-radiod \
+		$(TARGET_DIR)/usr/sbin/y2-radiod
 endef
 
 $(eval $(generic-package))

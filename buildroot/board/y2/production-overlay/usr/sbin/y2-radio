@@ -1,56 +1,13 @@
 #!/bin/sh
-# Settings convenience only. Network and device management remain the native
-# wpa_supplicant control/D-Bus and BlueZ D-Bus interfaces.
+# The radios' switches for scripts (boot, sleep, shutdown): every request goes to the radio daemon
+# (y2-radiod ctl), which owns Bluetooth and both radios' power. Without the daemon, sleep and wake
+# still switch the radios directly (y2-radiod ctl's fallback).
 set -eu
-umask 077
-case "${1:-}" in
- wifi) state=/data/network/enabled; type=wlan;;
- bluetooth) state=/data/bluetooth/enabled; type=bluetooth;;
- *) echo 'Usage: y2-radio wifi|bluetooth on|off|status' >&2; exit 2;;
+case "${1:-}:${2:-}" in
+ wifi:status) exec wpa_cli -i wlan0 status;;
+ bluetooth:status) exec bluetoothctl show;;
+ wifi:on|wifi:off|wifi:on-runtime|wifi:off-runtime|wifi:restart) ;;
+ bluetooth:on|bluetooth:off|bluetooth:on-runtime|bluetooth:off-runtime) ;;
+ *) echo 'Usage: y2-radio wifi|bluetooth on|off|on-runtime|off-runtime|status | wifi restart' >&2; exit 2;;
 esac
-case "${2:-}" in
- on|on-runtime) enabled=1;;
- off|off-runtime) enabled=0;;
- status)
-    if [ "$type" = wlan ]; then wpa_cli -i wlan0 status; else bluetoothctl show; fi
-    exit;;
- *) exit 2;;
-esac
-case "$2" in *-runtime) ;; *)
-    printf '%s\n' "$enabled" > "$state.new"
-    chmod 600 "$state.new"; mv "$state.new" "$state"
-    sync -f /data
-    ;;
-esac
-if [ "$enabled" = 1 ]; then
-    core=/sys/devices/platform/18070000.connectivity
-    case "$(cat "$core/status")" in
-        *' functions=0 '*' error=0 '*|*' functions=0x0 '*' error=0 '*) ;;
-        *' functions=0 '*' error='*|*' functions=0x0 '*' error='*)
-            echo 1 > "$core/recover"
-            for n in $(seq 1 150); do
-                case "$(cat "$core/status")" in *' error=0 '*) break;; esac
-                sleep .1
-            done
-            ;;
-    esac
-fi
-if [ "$type" = wlan ]; then
-    # Per device, never `rfkill block wlan`: that also sets the type's default,
-    # and cfg80211's phy rfkill, made when the card probes at the next switch-on
-    # (Reborn writes `soft` itself), started blocked: Wi-Fi showed OFF or
-    # INTERFACE_DISABLED until a second tap after any sleep with Wi-Fi off (F37).
-    soft=$((1 - enabled))
-    for device in /sys/class/rfkill/rfkill*; do
-        if [ "$(cat "$device/type" 2>/dev/null)" = wlan ]; then
-            # The phy one may vanish meanwhile: blocking y2-wifi removes the card.
-            echo "$soft" > "$device/soft" 2>/dev/null || [ ! -e "$device" ]
-        fi
-    done
-else
-    if [ "$enabled" = 1 ]; then
-        y2-platform bluetooth-power on
-    else
-        y2-platform bluetooth-power off
-    fi
-fi
+exec /usr/sbin/y2-radiod ctl "$1" "$2"

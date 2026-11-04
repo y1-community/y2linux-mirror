@@ -68,7 +68,8 @@ state separately reports Off / Starting / Scanning / Associating / Authenticated
 AcquiringIP / Online / Failed. Online requires authentication, an address, default
 route and a successful DNS probe younger than 120 seconds, on the same boot,
 address and association. Configured DNS servers and a live PID cannot establish
-Online. Radio and connection owners remain wpa_supplicant and y2-bt-reconnect.
+Online. Connection owners are wpa_supplicant (Wi-Fi association) and `y2-radiod` (Bluetooth and both radios'
+power, [radio-daemon.md](radio-daemon.md)).
 Unavailable Bluetooth observation remains explicit until the D-Bus observer is
 installed; codec requests must never be interpreted as negotiated output.
 

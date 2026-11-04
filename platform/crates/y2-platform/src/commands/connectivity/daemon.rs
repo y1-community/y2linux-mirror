@@ -1,7 +1,8 @@
 //! `y2-platform connectivity-daemon`: monitor the boot-started radio helpers
-//! without shell polling or reconnect ownership. `usr/libexec/y2/connectivity` starts calibration,
-//! wpa_supplicant, BlueALSA and y2-bt-reconnect and then `exec`s this daemon (so
-//! `/run/y2/connectivity.pid` names it); it restarts a dead helper, attaches wpa_supplicant to wlan0
+//! without shell polling or radio ownership. `usr/libexec/y2/connectivity` starts calibration,
+//! wpa_supplicant and the radio daemon (`y2-radiod`, which owns Bluetooth and BlueALSA) and then
+//! `exec`s this daemon (so `/run/y2/connectivity.pid` names it); it restarts a dead helper, attaches
+//! wpa_supplicant to wlan0
 //! with the wpa-event action hook, re-adds a stale interface (F53) and stops every helper when it ends.
 //! While healthy it starts no process: helper death is a pidfd event, link changes a netlink event.
 //!

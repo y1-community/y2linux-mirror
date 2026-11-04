@@ -13,7 +13,7 @@ document links, rather than relocating or deleting proof. See the
 [shared knowledge rules](KNOWLEDGE_BASE.md)
 and the other repository's catalog for product-wide context.
 
-Indexed pages: **342**. Explicit scope notices: **228**.
+Indexed pages: **343**. Explicit scope notices: **228**.
 
 ## Entry
 
@@ -36,7 +36,8 @@ Indexed pages: **342**. Explicit scope notices: **228**.
 | --- | --- |
 | [Platform API v1](architecture/platform-api-v1.md) | Source contract |
 | [Deep suspend — developer architecture](architecture/deep-suspend.md) | Source contract |
-| [Bluetooth platform v1 contract](architecture/platform-bluetooth-v1.md) | Source contract |
+| [Radio daemon (y2-radiod)](architecture/radio-daemon.md) | Architecture (current) |
+| [Bluetooth platform v1 contract](architecture/platform-bluetooth-v1.md) | Source contract (superseded by the radio daemon) |
 | [Owner reset and state export](architecture/platform-maintenance-v1.md) | Source contract |
 | [Network, clock and entropy contract v1](architecture/platform-network-time-v1.md) | Source contract |
 | [Platform power contract v1](architecture/platform-power-v1.md) | Source contract |
@@ -359,6 +360,7 @@ Indexed pages: **342**. Explicit scope notices: **228**.
 | [Y2Linux 1.0 Beta 8.40 report](validation/Y2-LINUX-1.0-BETA-8.40.md) | Beta 8.40 (Baseline 154): power off on a charger opens the charging screen (F46) |
 | [Plugins plan](planning/PLUGINS-PLAN.md) | One unified kind of plugin (WebAssembly only) for everything optional: extension points, the core after the move, security model, store, SDK, phases P0–P6 |
 | [Coding standard](CODING-STANDARD.md) | How the platform and Reborn are written (functions, workers, dispatchers, records, errors, `unsafe`), what the gate and its code-quality ratchet enforce |
+| [Y2Linux 1.0 Beta 9.3.7 report](validation/Y2-LINUX-1.0-BETA-9.3.7.md) | Beta 9.3.7 (Baseline 215): Bluetooth rebuilt around one radio program (reconnects after sleep, self-repair, Connect Automatically #78, codec changes without a restart, #92 library loss); known: a long pause drops the link once |
 | [Y2Linux 1.0 Beta 9.2.16 report](validation/Y2-LINUX-1.0-BETA-9.2.16.md) | Beta 9.2.16 (Baseline 207): steadier Bluetooth sound (Y2Reborn #87: lower default AAC/LDAC rates, a codec ceiling while Wi-Fi is on, Auto picks AAC first, a codec choice refused during playback is applied at the next pause) |
 | [Y2Linux 1.0 Beta 9.2.15 report](validation/Y2-LINUX-1.0-BETA-9.2.15.md) | Beta 9.2.15 (Baseline 206): Settings scrolls smoothly with a large library (Y2Reborn #85, contributor fix #86: the song count was recounted every frame) |
 | [Y2Linux 1.0 Beta 9.2.14 report](validation/Y2-LINUX-1.0-BETA-9.2.14.md) | Beta 9.2.14 (Baseline 205): Bluetooth stays connected on quick radio station changes (the Bluetooth output is kept between streams, error report c0fe2638, F61); issue forms instead of blank issues |
@@ -385,6 +387,7 @@ Indexed pages: **342**. Explicit scope notices: **228**.
 | [Platform Rust idiomatic plan](planning/PLATFORM-RUST-IDIOMATIC-PLAN.md) | From the port to idiomatic Rust: typed records instead of loose JSON (P0–P7, finishing Q1–Q5), owner decisions, test builds 180–185 |
 | [Platform Rust next-agent handoff](planning/PLATFORM-RUST-NEXT-AGENT-HANDOFF.md) | The remaining Rust-logic, refactor and duplication work for one agent: order, method, owner decisions, build/verify |
 | [Speaker and haptics plan](planning/SPEAKER-HAPTICS-PLAN.md) | Stock REA of the vibrator, AW87559 and CS43131 speaker route; plan and device checks |
+| [Bluetooth reimplementation plan](planning/BLUETOOTH-REIMPLEMENTATION-PLAN.md) | One radio daemon for Bluetooth and the shared core: evidence, design, phases, as built (Beta 9.3) |
 | [Y2Linux 1.0 Beta 8.39 report](validation/Y2-LINUX-1.0-BETA-8.39.md) | Beta 8.39 (Baseline 153): Folders by file name, Shuffle Albums, playlist Sort, a 120 000-song card measured and made fast |
 | [Y2Linux 1.0 Beta 8.38 report](validation/Y2-LINUX-1.0-BETA-8.38.md) | Beta 8.38 (Baseline 146): Bluetooth sound after Pause → Play (F43), a smooth wave that moves with the music |
 | [Y2Linux 1.0 Beta 8.37 report](validation/Y2-LINUX-1.0-BETA-8.37.md) | Beta 8.37 (Baseline 144): sleep timer lengths (#29), search Back/See All/playlists (#44), playlist focus, headers stay and only lists scroll |

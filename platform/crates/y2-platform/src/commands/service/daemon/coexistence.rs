@@ -1,13 +1,15 @@
 //! `/run/y2/coexistence.json`: the Wi-Fi transfer rate and the Bluetooth link for the radio policy,
-//! and the Bluetooth codec ceiling while Wi-Fi shares the radio (`/run/y2/bt-codec-ceiling`).
+//! and the Bluetooth codec ceiling while Wi-Fi shares the radio as the radio daemon set it
+//! (`/run/y2/bt-codec-ceiling`, written by `y2-radiod`, which owns both radios' power).
 // SPDX-License-Identifier: GPL-2.0-only
 use super::{atomic_json, json, Failure, Map, Root, Value};
 
 /// Present while the Wi-Fi radio is on: the MT6582 has one 2.4 GHz antenna for Wi-Fi and Bluetooth,
 /// and losses in the air never back up BlueALSA's socket queue, so its adaptive rate cannot see them
 /// (Y2Reborn #87: AAC 320 kbit/s crackled and cut out with Wi-Fi on). BlueALSA's encoders look about
-/// once a second and keep CBR AAC at or below 192 kbit/s and SBC off its top bit-pool (53 -> 45)
-/// meanwhile (BlueALSA patches 0002, 0003: `y2-codec-ceiling.h`). Only its presence counts.
+/// once a second and keep CBR AAC at or below 192 kbit/s, SBC off its top bit-pool (53 -> 45) and
+/// LDAC at its mobile quality meanwhile (BlueALSA patches 0002–0004: `y2-codec-ceiling.h`). Only its
+/// presence counts; `y2-radiod` writes it, this record only reports it.
 pub(super) const CODEC_CEILING: &str = "/run/y2/bt-codec-ceiling";
 
 /// The Wi-Fi transfer rate and the Bluetooth link for the radio policy (`/run/y2/coexistence.json`,
@@ -56,31 +58,24 @@ impl Coexistence {
         );
         value.insert(
             "bluetooth_link".into(),
-            Value::Object(root.json_object("/run/y2/bt-reconnect.json")),
+            match crate::commands::connectivity::radiod::written(root) {
+                Some(state) => json!({"state": state.bluetooth.reconnect_state()}),
+                None => Value::Object(Default::default()),
+            },
         );
         value.insert("provisional".into(), json!(true));
-        let ceiling = codec_ceiling(root, wifi.state != "Off")?;
-        value.insert("codec_bitrate_override".into(), ceiling);
+        value.insert("codec_bitrate_override".into(), codec_ceiling(root));
         atomic_json(&root.path("/run/y2/coexistence.json"), &value, false)?;
         Ok(value)
     }
 }
 
-/// [`CODEC_CEILING`] present while the Wi-Fi radio is on (`on`), absent otherwise; checked every pass,
-/// so a removed `/run/y2` heals. What it means, or null.
-fn codec_ceiling(root: &Root, on: bool) -> Result<Value, Failure> {
-    let path = root.path(CODEC_CEILING);
-    let ceiling =
-        json!({"reason": "wifi_radio_on", "aac_max_bps": 192_000, "sbc_bitpool_percent": 85});
-    match (on, path.exists()) {
-        (true, false) => atomic_json(&path, &ceiling, false)?,
-        (false, true) => match std::fs::remove_file(&path) {
-            Err(e) if e.kind() != std::io::ErrorKind::NotFound => {
-                return Err(Failure::os(e, &path))
-            }
-            _ => {}
-        },
-        _ => {}
+/// What [`CODEC_CEILING`] means while the radio daemon keeps it, or null.
+fn codec_ceiling(root: &Root) -> Value {
+    if root.path(CODEC_CEILING).exists() {
+        json!({"reason": "wifi_radio_on", "aac_max_bps": 192_000, "sbc_bitpool_percent": 85,
+            "ldac": "mobile"})
+    } else {
+        Value::Null
     }
-    Ok(if on { ceiling } else { Value::Null })
 }

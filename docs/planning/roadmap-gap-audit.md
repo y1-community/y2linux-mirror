@@ -9800,3 +9800,27 @@ owners). Gate OK on the release commit (formatting, clippy, armv7, host tests, g
 Reborn contract); Reborn workspace 738 tests (its architecture guard caught a device path in the shared contract
 crate, moved back into the platform). The owner's hardware round on 184/185 (overnight sleep, low-battery shutdown,
 SD repair/format, reset) was not done before publishing; the report's Known issues say so.
+
+## RADIO-V2 (one radio daemon for Bluetooth and the shared core): entry audit — 2026-11-03
+
+**Boundary:** architecture change of a hardware subsystem (Bluetooth control moves from five owners to one
+daemon, `y2-radiod`; the sleep helper's radio steps and Wi-Fi power go through it). Owner request 2026-11-03:
+"a complete new reimplementation built on reliability … without losing the codecs and bitrates", then "do the full
+implementation in one step, build and install on my Y2". Plan: [BLUETOOTH-REIMPLEMENTATION-PLAN.md](BLUETOOTH-REIMPLEMENTATION-PLAN.md).
+
+**Evidence (date, revision, origin, limits):** Y2Linux b8e78d3f / Y2Reborn 6fd259c (Beta 9.2.16, baseline-207);
+field reports 0400eb78 (583b7c23 58e1456e a74ed186), 5692dd73 (962aac6c 46fcbe24) and 11-01..03 others; ledger F64
+(library emptied by a Bluetooth rollback, proven in code), F65 (wake reconnect race), F63 corrected (encoder ABR
+shows the air-time shortfall). No hardware measurement was taken for this audit (the player was not reachable);
+the plan's P0 measurements (air-time matrix, timing table, keep-alive, stock coex REA) are **not done** and the
+first build uses the existing measured constants (page timeout 5.12 s, power-on ≈1.6 s warm, Start up to 6 s).
+
+**Coverage:** kernel connectivity driver, firmware, BlueZ 5.87, BlueALSA 5.0.0 and its patches: kept (no field
+failure starts there). Replaced: `y2-bt-reconnect`, `bluetooth-power`, the intent file and the operation/PCM locks,
+the codec-uncertain marker, Reborn's D-Bus worker. Wi-Fi association (wpa_supplicant, Reborn's join/scan, the
+F52/F53 heals) is **not** rewritten in this step (plan §7, P7); its power, the F60 restart and the wake order go
+through the daemon.
+
+**Readiness:** implementation ready; owner authorised build and install on the owner's player. Risks accepted by the
+owner: no P0 measurements first, no v1/v2 switch on the device (rollback = the installer's kept previous package).
+Hardware authorization covers the owner's player only; publishing is a separate decision.

@@ -9,7 +9,7 @@ Last.fm and sixteen skins. Once it's installed, the player updates itself over W
   <img src="docs/images/reborn-hero.png" alt="Reborn on the Y2: the Home screen, Now Playing with its progress wave, and Cover Flow" width="100%">
 </p>
 
-> **Current version: Y2Linux 1.0 Beta 9.2.16** (2 November 2026), a public beta.
+> **Current version: Y2Linux 1.0 Beta 9.3.7** (3 November 2026), a public beta.
 > **[Download it from the releases page](https://github.com/SchulzCode/Y2Linux/releases/latest)** and follow the
 > [install guide](docs/INSTALL.md). It runs every day on the developer's Y2 and on many others, but it is still a
 > beta: read [Known issues](#known-issues) first.
@@ -32,8 +32,9 @@ Last.fm and sixteen skins. Once it's installed, the player updates itself over W
 - The internal speaker plays when no headphones are plugged in; plugging them in moves the music to them.
 
 **Wireless**
-- **Bluetooth headphones** with SBC and AAC chosen automatically (LDAC when you pick it), at steady rates that leave room for Wi-Fi; the player follows
-  your headphones as they connect and disconnect, and its volume controls theirs.
+- **Bluetooth headphones** with SBC and AAC chosen automatically (LDAC when you pick it), at steady rates that leave
+  room for Wi-Fi; they come back after sleep by themselves, Bluetooth repairs itself when a step fails, and the
+  player's volume controls theirs.
 - **Internet radio** from the free radio-browser.info directory (popular, by country, by genre, search), favorites
   and your own station lists.
 - **Last.fm scrobbling**: sign in by scanning a QR code with your phone; plays wait on the player while offline.
@@ -105,6 +106,8 @@ Wi-Fi ([how updates work](docs/RECOVERY-AND-UPDATES.md)). More guides: [Storage]
   stock is about 1.3 mA.
 - **Some players turned off by themselves during playback.** The cause is not found yet. If yours does, start it
   again and send an error report.
+- **Bluetooth after a long pause:** with AirPods Pro, a pause longer than about 20 seconds drops the connection once;
+  they reconnect within seconds, but pressing play during those 20 seconds can stay silent until they are back.
 - **The speaker** uses the same volume as the headphones; its loudest step is the stock speaker's. Start low the
   first time.
 - **Radio:** stations that stream only in HLS (such as the BBC) don't play yet. FM radio is planned for a later beta.
@@ -125,16 +128,16 @@ calibration and factory partitions untouched. A Y2 with a different board, stora
 
 ## For developers
 
-| | 1.0 Beta 9.2.16 (Baseline 207) |
+| | 1.0 Beta 9.3.7 (Baseline 215) |
 | --- | --- |
-| Git tag (both repositories) | `baseline-207` (previous: `baseline-206`); the GitHub release carries the first-install images, the signed over-the-air update and the GPL sources |
-| Release / kernel | `1.0.0-beta.9.2.16` / `6.18.56-y2linux-1.0.0-beta.9.2.16` (Linux 6.18 long-term line) |
-| Root filesystem | `2026.08-platform-v1.230` (Buildroot 2026.08) |
+| Git tag (both repositories) | `baseline-215` (previous: `baseline-207`); the GitHub release carries the first-install images, the signed over-the-air update and the GPL sources |
+| Release / kernel | `1.0.0-beta.9.3.7` / `6.18.56-y2linux-1.0.0-beta.9.3.7` (Linux 6.18 long-term line) |
+| Root filesystem | `2026.08-platform-v1.238` (Buildroot 2026.08) |
 | Platform | `y2-platform` (Rust 1.99): the battery, sleep, Wi-Fi, Bluetooth, storage, update, USB and report services; no Python on the player |
-| Player | Y2Reborn 1.0.0-beta.9.2.16 (Rust 1.99, OpenGL ES on the Mali-400 GPU through DRM + Lima, FFmpeg, SQLite) |
+| Player | Y2Reborn 1.0.0-beta.9.3.7 (Rust 1.99, OpenGL ES on the Mali-400 GPU through DRM + Lima, FFmpeg, SQLite) |
 | Bluetooth codecs | SBC, AAC (fdk-aac-free) and LDAC |
 | Main components | GCC 15.3 / glibc 2.44, Mesa 26.2.4, FFmpeg 9.0.2, BlueZ 5.87, OpenSSL 4.0.3 |
-| Images built from | Y2Linux `1b7df30e`, Y2Reborn `8667100` ([Beta 9.2.16 report](docs/validation/Y2-LINUX-1.0-BETA-9.2.16.md); every earlier release report is listed in the [documentation catalog](docs/DOCUMENTATION_CATALOG.md)) |
+| Images built from | Y2Linux `153a88cd`, Y2Reborn `8fc6f69` ([Beta 9.3.7 report](docs/validation/Y2-LINUX-1.0-BETA-9.3.7.md); every earlier release report is listed in the [documentation catalog](docs/DOCUMENTATION_CATALOG.md)) |
 
 - **[Build from source](docs/BUILDING.md)**: host setup, the build, the first-install package and releases.
 - **[Coding standard](docs/CODING-STANDARD.md)** for the platform and Reborn; `tools/development/platform-gate.sh`

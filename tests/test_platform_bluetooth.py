@@ -122,36 +122,5 @@ class BluetoothObservation(unittest.TestCase):
         self.assertIsNone(observed['Nonfinite'])
         self.assertEqual(observed['Alias'], 'escaped "name"')
 
-    def test_reconnect_signal_cache_intents_and_bounded_recovery(self):
-        flags = subprocess.run(['pkg-config', '--cflags', '--libs', 'gio-2.0', 'gio-unix-2.0'], capture_output=True, text=True)
-        if flags.returncode:
-            self.skipTest('native GIO unavailable; run real fake-peer reconnect on packaging host and verify fresh ARM build')
-        binary = Path(self.temp.name) / 'reconnect-events'
-        subprocess.run(['cc', '-Wall', '-Wextra', '-Werror', str(ROOT/'tests/native/bt-reconnect-events.c'), *flags.stdout.split(), '-o', str(binary)], check=True)
-        result = subprocess.run([str(binary)], capture_output=True, text=True, timeout=25, check=True)
-        self.assertIn('PASS: idle snapshots=1', result.stdout)
-
-    def test_native_reconnect_budget_does_not_retry_forever_or_reset_on_poll(self):
-        source = Path(self.temp.name)/'budget.c'
-        source.write_text('''#include <assert.h>
-#include "reconnect-policy.h"
-int main(void) {
- struct y2_reconnect_budget b={0};
- assert(y2_reconnect_attempt(&b,100));
- for(int i=0;i<1000;i++) assert(!y2_reconnect_attempt(&b,101+i));
- assert(y2_reconnect_attempt(&b,2000100));
- assert(!y2_reconnect_attempt(&b,999999999));
- /* Restoring the same budget after daemon restart cannot replenish it. */
- struct y2_reconnect_budget restored=b;
- assert(!y2_reconnect_attempt(&restored,1000000000));
- y2_reconnect_reset(&b);
- assert(y2_reconnect_attempt(&b,1000000001));
- assert(!y2_reconnect_attempt(&b,1025000001));
- return 0;
-}''')
-        binary = source.with_suffix('')
-        subprocess.run(['cc','-Wall','-Wextra','-Werror','-I',str(ROOT/'tools/connectivity'),str(source),'-o',str(binary)],check=True)
-        subprocess.run([str(binary)],check=True,timeout=2)
-
 
 if __name__ == '__main__': unittest.main()

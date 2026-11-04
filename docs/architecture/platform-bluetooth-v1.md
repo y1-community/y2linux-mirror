@@ -1,5 +1,8 @@
 # Bluetooth platform v1 contract
 
+> **Superseded since Beta 9.3:** one radio daemon owns Bluetooth, see [radio-daemon.md](radio-daemon.md).
+> `y2-bt-reconnect`, `bluetooth-power`, the intent file and the operation/PCM locks below no longer exist.
+
 <!-- knowledge-base-scope: source-contract; baseline02-sync 2026-10-03 -->
 
 ## Current Baseline02 source and qualification scope

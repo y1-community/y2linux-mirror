@@ -453,9 +453,9 @@ fn service(root: &Root, argv: &[&str]) -> Result<(), E> {
 
 /// Runtime-off one radio, waiting out a platform Bluetooth operation.
 ///
-/// After a Power wake the reconnect owner holds bt-operation.lock while it reconnects the headset,
-/// and `bluetooth-power off` refuses at once. Retry within a bounded window instead of failing the
-/// whole sleep request. A Power or RTC wake meanwhile cancels the sleep at once: the screen is dark
+/// `y2-radio … off-runtime` asks the radio daemon (`y2-radiod`), which answers once the radio is
+/// down (Bluetooth: within 15 s). Retry within a bounded window instead of failing the whole sleep
+/// request. A Power or RTC wake meanwhile cancels the sleep at once: the screen is dark
 /// already, and a page to absent headphones held a wake press for up to 17.6 s (test build 190).
 fn quiesce_radio(
     root: &Root,

@@ -35,7 +35,7 @@
     "start-stop-daemon",
     "-K",
     "-p",
-    "/run/y2/reconnect.pid"
+    "/run/y2/radiod.pid"
    ],
    "timeout": 2.0
   },

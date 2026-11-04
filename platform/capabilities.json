@@ -62,7 +62,7 @@
         "aptX-HD",
         "LDAC"
       ],
-      "automatic_connection_owner": "y2-bt-reconnect",
+      "automatic_connection_owner": "y2-radiod",
       "avrcp": true,
       "codec_auto": {
         "implemented": true,

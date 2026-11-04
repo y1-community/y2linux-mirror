@@ -19,11 +19,10 @@ fn has(args: &[String], arg: &str) -> bool {
 }
 
 /// The production start script (`usr/libexec/y2/connectivity`), which accepts each argument by name.
+/// The codec arguments the radio daemon passes to bluealsad (its allowlist, y2-radiod).
 fn start_script() -> String {
-    std::fs::read_to_string(
-        repository().join("buildroot/board/y2/production-overlay/usr/libexec/y2/connectivity"),
-    )
-    .unwrap()
+    std::fs::read_to_string(repository().join("platform/crates/y2-radiod/src/bt/supervise.rs"))
+        .unwrap()
 }
 
 #[test]
@@ -83,7 +82,7 @@ fn aac_quality_and_adaptive_rate_arguments() {
     let script = start_script();
     for arg in ["--aac-afterburner", "--aac-bitrate=320000", "--aac-abr"] {
         assert!(has(&args, arg), "{arg}");
-        assert!(script.contains(&format!("|{arg}")), "{arg}");
+        assert!(script.contains(&format!("\"{arg}\",")), "{arg}");
     }
     fixture.put_json(
         POLICY,

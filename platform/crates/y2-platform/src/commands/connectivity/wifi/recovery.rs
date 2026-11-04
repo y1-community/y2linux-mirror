@@ -216,8 +216,12 @@ impl WifiRecovery {
 const RADIO_GONE: Duration = Duration::from_secs(3);
 
 /// Wi-Fi off and on as Reborn's switch does it: block, wait for wlan0 to go, unblock. The owner's
-/// preference is Reborn's file, untouched.
+/// preference is Reborn's file, untouched. The radio daemon owns the switch: it does the restart when
+/// it runs (one owner of the rfkill), this process only when it does not.
 fn restart_radio(root: &Root) -> RadioRestart {
+    if let Some(done) = ask_radio_daemon(root) {
+        return done;
+    }
     let Some(soft) = wlan_rfkill_soft(root) else {
         return RadioRestart::default();
     };
@@ -232,6 +236,17 @@ fn restart_radio(root: &Root) -> RadioRestart {
         gone: !netdev.exists(),
         unblocked: fs::write(&soft, "0\n").is_ok(),
     }
+}
+
+/// `y2-radiod`'s Wi-Fi restart, when it answers.
+fn ask_radio_daemon(root: &Root) -> Option<RadioRestart> {
+    let request = y2p_contract::radiod::Request::WifiRestart;
+    let reply = crate::commands::connectivity::radiod::ask(root, &request, Duration::from_secs(8))?;
+    Some(RadioRestart {
+        blocked: reply.ok,
+        gone: reply.ok,
+        unblocked: reply.ok,
+    })
 }
 
 /// What a restart did: blocked Wi-Fi, saw wlan0 go, unblocked it.

@@ -112,10 +112,15 @@ class SuspendPolicy(unittest.TestCase):
         # F37 (72f7e3ee, a19646dd): `rfkill block wlan` at each sleep also set
         # the type's default; with Wi-Fi off the wake never cleared it, and the
         # phy rfkill of the next switch-on started blocked. Every wlan device
-        # is switched by itself; Bluetooth's rfkill is not touched.
+        # is switched by itself; Bluetooth's rfkill is not touched. The switch
+        # is the radio daemon's (y2-radiod); `y2-radio` only hands it over, and
+        # without the daemon `y2-radiod ctl` switches the same way itself.
         radio = HELPER.with_name('y2-radio')
         commands = [line for line in radio.read_text().splitlines() if not line.lstrip().startswith('#')]
-        self.assertFalse([line for line in commands if 'rfkill block' in line or 'rfkill unblock' in line])
+        self.assertFalse([line for line in commands if 'rfkill' in line])
+        binary = ROOT / 'platform/target/debug/y2-radiod'
+        if not binary.is_file():
+            self.skipTest('no host build of y2-radiod (cd platform && cargo build)')
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             devices = {'rfkill0': 'wlan', 'rfkill1': 'bluetooth', 'rfkill3': 'wlan'}
@@ -123,10 +128,16 @@ class SuspendPolicy(unittest.TestCase):
                 (root / 'sys/class/rfkill' / name).mkdir(parents=True)
                 (root / 'sys/class/rfkill' / name / 'type').write_text(kind + '\n')
                 (root / 'sys/class/rfkill' / name / 'soft').write_text('0\n')
-            script = root / 'y2-radio'
-            script.write_text(radio.read_text().replace('/sys/', str(root) + '/sys/'))
+            (root / 'data/network').mkdir(parents=True)
+            (root / 'data/network/enabled').write_text('1\n')
             soft = lambda: {n: (root / 'sys/class/rfkill' / n / 'soft').read_text().strip() for n in devices}
-            result = subprocess.run(['sh', str(script), 'wifi', 'off-runtime'], capture_output=True, text=True)
+            run = lambda word: subprocess.run([str(binary), 'ctl', 'wifi', word], capture_output=True,
+                                              text=True, env=dict(os.environ, Y2_ROOT=str(root)))
+            try:
+                result = run('off-runtime')
+            except OSError:
+                # The release container (musl) sees the host's glibc build but cannot run it.
+                self.skipTest('the host build of y2-radiod does not run here')
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(soft(), {'rfkill0': '1', 'rfkill1': '0', 'rfkill3': '1'})
             # The card's phy rfkill goes away once y2-wifi is blocked.
@@ -134,10 +145,9 @@ class SuspendPolicy(unittest.TestCase):
                 (root / 'sys/class/rfkill/rfkill3' / name).unlink()
             (root / 'sys/class/rfkill/rfkill3').rmdir()
             del devices['rfkill3']
-            result = subprocess.run(['sh', str(script), 'wifi', 'on-runtime'], capture_output=True, text=True)
+            result = run('on-runtime')
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(soft(), {'rfkill0': '0', 'rfkill1': '0'})
-
 
 if __name__ == '__main__':
     unittest.main()

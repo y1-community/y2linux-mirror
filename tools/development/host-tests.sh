@@ -25,7 +25,7 @@ python3 -c 'import elftools' 2>/dev/null || missing="$missing pyelftools"
 if [ -z "${Y2_PLATFORM_RUST:-}" ] && command -v cargo >/dev/null 2>&1; then
     (cd platform && cargo build --offline --locked -q) && export Y2_PLATFORM_RUST="$PWD/platform/target/debug/y2-platform"
     # The player is 32-bit ARM (32-bit time_t, c_long, stat fields): type-check for it too (no linker needed).
-    (cd platform && cargo check --offline --locked -q --target armv7-unknown-linux-gnueabihf) ||
+    (cd platform && PKG_CONFIG_ALLOW_CROSS=1 cargo check --offline --locked -q --target armv7-unknown-linux-gnueabihf) ||
         { echo 'host-tests: platform/ does not build for the ARM target' >&2; exit 1; }
 fi
 # Module names given (tests.test_…) run instead of the whole list; other arguments (-v, -k …) are unittest's.

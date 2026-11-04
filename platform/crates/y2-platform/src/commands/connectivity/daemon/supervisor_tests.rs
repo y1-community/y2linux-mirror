@@ -105,15 +105,13 @@ fn healthy_radio_off_uses_native_reads_and_no_commands() {
         monitor.health(30.0, false).unwrap();
     });
     assert!(calls.is_empty(), "{calls:?}");
-    assert_eq!(monitor.pids.len(), 4);
+    assert_eq!(monitor.pids.len(), 3);
     assert!(!monitor.attached);
 }
 
 #[test]
 fn missing_helper_crash_events_cannot_bypass_restart_rate() {
     let (fixture, steps) = fixture();
-    // BlueALSA's arguments can be made (else it is not started at all).
-    fixture.put("/etc/y2linux/bluetooth-codecs.json", r#"{"schema": 1}"#);
     let mut monitor = Supervisor::new(&fixture.root);
     // Each helper's restart starts it once: start-stop-daemon -S, or wpa_supplicant itself.
     let restarts = |calls: &Calls| {
@@ -123,14 +121,14 @@ fn missing_helper_crash_events_cannot_bypass_restart_rate() {
             .count()
     };
     let (_, calls) = run(&steps, Vec::new(), || monitor.health(0.0, false).unwrap());
-    assert_eq!(restarts(&calls), 4);
+    assert_eq!(restarts(&calls), 3);
     let (_, calls) = run(&steps, Vec::new(), || {
         monitor.health(1.0, true).unwrap();
         monitor.health(29.0, true).unwrap();
     });
     assert_eq!(restarts(&calls), 0);
     let (_, calls) = run(&steps, Vec::new(), || monitor.health(30.0, true).unwrap());
-    assert_eq!(restarts(&calls), 4);
+    assert_eq!(restarts(&calls), 3);
 }
 
 #[test]
@@ -314,14 +312,14 @@ fn failed_interface_attach_has_bounded_backoff() {
 }
 
 #[test]
-fn wpa_restart_preserves_hooks_and_reconnect_single_owner() {
+fn wpa_restart_preserves_hooks_and_the_radio_daemon_restarts() {
     let (fixture, steps) = fixture();
     let mut monitor = Supervisor::new(&fixture.root);
     monitor.attached = true;
     let (_, calls) = run(&steps, Vec::new(), || {
         monitor.restart("wpa").unwrap();
         assert!(!monitor.attached);
-        monitor.restart("reconnect").unwrap();
+        monitor.restart("radiod").unwrap();
     });
     assert!(calls.contains(&words(&[
         "/usr/sbin/y2-platform",
@@ -331,35 +329,8 @@ fn wpa_restart_preserves_hooks_and_reconnect_single_owner() {
     assert!(calls
         .last()
         .unwrap()
-        .contains(&"/usr/sbin/y2-bt-reconnect".to_string()));
+        .contains(&"/usr/sbin/y2-radiod".to_string()));
     assert!(!calls
         .iter()
         .any(|argv| argv.iter().any(|a| a == "connect" || a == "bluetoothctl")));
-}
-
-#[test]
-fn codec_policy_failure_does_not_tear_down_other_helpers() {
-    let (fixture, steps) = fixture();
-    // A policy codec_runtime refuses (ValueError).
-    fixture.put(
-        "/data/bluetooth/codec-policy.json",
-        r#"{"schema": 1, "sbc_quality": "max"}"#,
-    );
-    let mut monitor = Supervisor::new(&fixture.root);
-    let (restarted, calls) = run(&steps, Vec::new(), || monitor.restart("bluealsa"));
-    assert!(restarted.is_ok());
-    assert!(calls.is_empty());
-}
-
-#[test]
-fn an_unreadable_codec_inventory_keeps_bluealsa_down_and_the_daemon_running() {
-    let (fixture, steps) = fixture();
-    fixture.put(
-        "/etc/y2linux/bluetooth-codecs.json",
-        r#"{"schema": 1, "codecs": null}"#,
-    );
-    let mut monitor = Supervisor::new(&fixture.root);
-    let (restarted, calls) = run(&steps, Vec::new(), || monitor.restart("bluealsa"));
-    assert!(restarted.is_ok());
-    assert!(calls.is_empty());
 }

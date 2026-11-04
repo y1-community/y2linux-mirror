@@ -1,17 +1,15 @@
 """Golden cases of port group `connectivity` (see tests/platform_cases/__init__.py):
-`wifi-power-policy`, `bluetooth-power on|off` and `connectivity-daemon` (ended after Y2_DAEMON_TICKS loop
+`wifi-power-policy` and `connectivity-daemon` (ended after Y2_DAEMON_TICKS loop
 iterations). Argument errors and --help are the dispatcher's argparse."""
 import json
 import time
 
 EPOCH = 'b6a2f0de-6a1c-4b7e-9c0e-3f1d2a4b5c6d'
-BOOT = 'c0ffee00-1111-4222-8333-444455556666'
 GET = ['/usr/sbin/iw', 'dev', 'wlan0', 'get', 'power_save']
 SET = ['/usr/sbin/iw', 'dev', 'wlan0', 'set', 'power_save']
 POWER_SAVE = '/data/network/power-save.json'
 WIFI_POWER = '/run/y2/wifi-power.json'
 IFINDEX = '/sys/class/net/wlan0/ifindex'
-INTENT = [(r'sequence=\d+', 'sequence=<us>'), (r'deadline_us=\d+', 'deadline_us=<us>')]
 GLOBAL = ['wpa_cli', '-g', '/run/wpa_supplicant/global']
 ADD = GLOBAL + ['interface_add', 'wlan0', '/data/network/wpa_supplicant.conf', 'nl80211', '/run/wpa_supplicant']
 AUTOSCAN = ['wpa_cli', '-i', 'wlan0', 'autoscan', 'exponential:2:120']
@@ -63,17 +61,6 @@ CASES = [
     ('wifi-power-policy-not-object', ['wifi-power-policy'], {'commands': [readback('off')],
                                                              'files': {POWER_SAVE: '[1]'}}),
     ('wifi-power-policy-help', ['wifi-power-policy', '--help'], {}),
-    ('bluetooth-power-on', ['bluetooth-power', 'on'], {'patterns': INTENT, 'commands': [
-        answer(['bluetoothctl', 'power', 'on'], 'Changing power on succeeded')], 'files': {
-            '/proc/sys/kernel/random/boot_id': BOOT + '\n'}}),
-    ('bluetooth-power-off', ['bluetooth-power', 'off'], {'patterns': INTENT, 'commands': [
-        answer(['bluetoothctl', 'power', 'off'])], 'files': {'/proc/sys/kernel/random/boot_id': BOOT + '\n'}}),
-    ('bluetooth-power-fails', ['bluetooth-power', 'on'], {'patterns': INTENT, 'files': {
-        '/proc/sys/kernel/random/boot_id': BOOT + '\n', '/run/y2/bt-intent/bt-control.ini': 'old\n'}}),
-    ('bluetooth-power-no-boot-identity', ['bluetooth-power', 'off'], {}),
-    ('bluetooth-power-intent-not-directory', ['bluetooth-power', 'on'], {'files': {
-        '/proc/sys/kernel/random/boot_id': BOOT + '\n', '/run/y2/bt-intent': 'file\n'}}),
-    ('bluetooth-power-invalid', ['bluetooth-power', 'maybe'], {}),
     ('connectivity-daemon-cold', ['connectivity-daemon'], daemon()),
     ('connectivity-daemon-attach', ['connectivity-daemon'], daemon(3, commands=ATTACHED, files={IFINDEX: '3\n'})),
     ('connectivity-daemon-reuse', ['connectivity-daemon'], daemon(2, files={IFINDEX: '3\n'}, commands=[

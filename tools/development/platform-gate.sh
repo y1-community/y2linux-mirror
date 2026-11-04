@@ -35,7 +35,9 @@ cd platform || exit 1
 cargo fmt
 out=$(cargo clippy --offline --locked --all-targets -q 2>&1 | grep -E '^(warning|error)' -A6)
 [ -z "$out" ] || { echo "$out" | head -30; echo "GATE FAIL clippy"; exit 1; }
-out=$(cargo check --offline --locked -q --target armv7-unknown-linux-gnueabihf 2>&1 | grep -E '^(warning|error)' -A6)
+# A type check links nothing: libdbus-sys (y2-radiod) only needs pkg-config to answer for the target.
+out=$(PKG_CONFIG_ALLOW_CROSS=1 cargo check --offline --locked -q --target armv7-unknown-linux-gnueabihf 2>&1 |
+    grep -E '^(warning|error)' -A6)
 [ -z "$out" ] || { echo "$out" | head -20; echo "GATE FAIL armv7"; exit 1; }
 if ! out=$(python3 "$project/tools/development/code-quality.py" 2>&1); then
     echo "$out" | head -30

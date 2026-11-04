@@ -203,7 +203,6 @@ pub const COMMANDS: &[Command] = &[
     command("boot-evidence", &[]),
     command("boot-stage", &[positional("stage")]),
     command("cpu-idle-policy", &[positional("action").choices(&["start", "stop"])]),
-    command("bluetooth-power", &[positional("value").choices(ON_OFF)]),
     command("sleep", &[positional("action").choices(&["request", "status", "prepare"])]),
     command("power-daemon", &[]),
     command("service-daemon", &[]),

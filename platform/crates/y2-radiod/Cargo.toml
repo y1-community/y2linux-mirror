@@ -1,0 +1,15 @@
+[package]
+name = "y2-radiod"
+description = "/usr/sbin/y2-radiod: the one owner of Bluetooth and of the shared radio core's power"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+y2p-core = { path = "../y2p-core" }
+y2p-contract = { path = "../y2p-contract" }
+serde.workspace = true
+serde_json.workspace = true
+libc.workspace = true
+dbus.workspace = true

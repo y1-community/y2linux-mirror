@@ -1,6 +1,15 @@
 # Next-session handoff — Y2Linux 1.0 Beta 8.4 candidate (latest entry first; started 2026-10-09 as the deep-sleep continuation)
 
-> **START HERE (2026-11-02): BETA 9.2.16 (BASELINE 207) RELEASE.** Steadier Bluetooth for Y2Reborn #87 (F63 in
+> **START HERE (2026-11-03): BETA 9.3.7 (BASELINE 215) RELEASE.** Bluetooth rebuilt around the radio daemon
+> `y2-radiod` ([architecture](../architecture/radio-daemon.md), [plan, as built, measurements](BLUETOOTH-REIMPLEMENTATION-PLAN.md)).
+> Installed on the developer's player. Owed: (1) the pause drop: every pause > ≈22 s ends in an HCI supervision
+> timeout (0x08), AirPods silent at the baseband ≈2 s after the stream closes, same with Wi-Fi off; find whether it
+> is the headset's idle behaviour or the keep-alive stream without packets (btmon here shows no A2DP media packets
+> even on healthy links); (2) an overnight drain on this build; (3) other headsets; (4) the Wi-Fi join controller
+> (P7); (5) replies on Y2Reborn #78 and #92. Next free label 216, sequence above 14000, next version 9.3.8
+> ([Beta 9.3.7 report](../validation/Y2-LINUX-1.0-BETA-9.3.7.md)).
+>
+> Previous entry: **START HERE (2026-11-02): BETA 9.2.16 (BASELINE 207) RELEASE.** Steadier Bluetooth for Y2Reborn #87 (F63 in
 > UserReports/REVIEWED.md): AAC standard / LDAC mobile defaults, a codec ceiling while the Wi-Fi radio is on
 > (`/run/y2/bt-codec-ceiling`, BlueALSA patches 0002/0003), Auto = AAC, aptX, SBC, and a codec choice refused during
 > playback re-asked at the next pause. NOT tried on a player (it was not connected): owed a device check (AAC rate

@@ -117,6 +117,7 @@ pub(super) const FILES: [&str; 68] = [
     "/data/system/platform/sd-admissions.json",
     "/data/system/platform/sd-repair-last.json",
     "/data/system/platform/wifi-journal*.jsonl",
+    "/data/system/platform/bluetooth-journal*.jsonl",
     "/data/system/platform/retained/*.tar",
     "/data/updates/*.json",
     "/data/updates/current/manifest.json",
@@ -126,14 +127,13 @@ pub(super) const FILES: [&str; 68] = [
     "/run/y2/*.log",
     "/data/bluetooth/codec-history.json",
     "/data/bluetooth/enabled",
+    "/data/bluetooth/radiod.json",
     "/data/network/enabled",
     "/data/network/power-save.json",
     "/data/reborn/logs/*.jsonl",
     "/data/reborn/logs/panic-last.json",
     "/data/reborn/diagnostics/*.tar.gz",
     // (padding entries keep the array length explicit; never matched)
-    "",
-    "",
     "",
     "",
 ];

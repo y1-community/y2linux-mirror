@@ -93,6 +93,19 @@ impl WifiPower {
     }
 }
 
+/// Whether a Bluetooth audio stream plays now (the radio daemon's state, written this boot).
+fn bluetooth_streams(root: &Root) -> bool {
+    root.read("/run/y2/radiod-state.json")
+        .and_then(|text| serde_json::from_str::<y2p_contract::radiod::State>(&text).ok())
+        .is_some_and(|state| {
+            state
+                .bluetooth
+                .pcms
+                .iter()
+                .any(|pcm| pcm.running == Some(true))
+        })
+}
+
 /// Apply the Wi-Fi power-save policy (`heavy`: the service daemon saw a heavy transfer): the record
 /// written to `/run/y2/wifi-power.json`, or the refusal of an invalid policy (nothing written).
 pub fn wifi_policy(root: &Root, heavy: bool) -> Result<WifiPower, Failure> {
@@ -113,8 +126,13 @@ pub fn wifi_policy(root: &Root, heavy: bool) -> Result<WifiPower, Failure> {
     if policy.schema != Some(1) {
         return Ok(invalid());
     }
-    let requested =
-        mode == "standard" || (mode == "automatic" && policy.automatic_standard && !heavy);
+    // Automatic: standard power save when the owner chose it, and while Bluetooth audio streams
+    // (Wi-Fi then leaves the shared antenna to the headphones between its beacons; Y2Reborn #87),
+    // never during a heavy transfer.
+    let requested = mode == "standard"
+        || (mode == "automatic"
+            && !heavy
+            && (policy.automatic_standard || bluetooth_streams(root)));
     let (mut actual, mut result) = readback(root);
     let boot = root.boot_id();
     let epoch = root.read("/run/y2/wifi-epoch");

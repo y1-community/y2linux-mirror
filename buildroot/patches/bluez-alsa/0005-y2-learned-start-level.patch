@@ -1,0 +1,109 @@
+Start each headset where its adaptive rate settled last time (Y2Linux radio daemon).
+
+AAC's adaptive rate (patch 0002) and libldac's ABR start at the top level and
+step down when the link cannot carry it: a headset that always settles lower
+dropped audio during the first seconds of every stream. The platform's radio
+daemon (y2-radiod) learns from EncoderStats (patch 0001) where each headset
+settled and keeps /run/y2/bt-start/<ADDRESS>-<CODEC> (one number, 0 = top);
+the encoders start there (src/y2-start-level.h) and still climb back when the
+link allows. AAC: the level of its CBR levels (only with --aac-abr on a CBR
+stream); LDAC: the EQMID, never higher quality than configured, only with
+--ldac-abr. SBC keeps starting at its configured bit-pool: its packets are
+sized for it, a lower start would size them for less.
+
+--- a/src/a2dp-aac.c
++++ b/src/a2dp-aac.c
+@@ -39,6 +39,7 @@
+ #include "shared/rt.h"
+ #include "y2-aac-abr.h"
+ #include "y2-codec-ceiling.h"
++#include "y2-start-level.h"
+ 
+ static const struct a2dp_bit_mapping a2dp_aac_channels[] = {
+ 	{ AAC_CHANNEL_MODE_MONO, .ch = { 1, a2dp_channel_map_mono } },
+@@ -172,6 +173,12 @@
+ 		bitrate = mtu_bitrate;
+ 	struct y2_aac_abr abr;
+ 	y2_aac_abr_init(&abr, bitrate, config.aac_abr, !configuration->vbr);
++	/* Y2: start where this headset settled last time (y2-start-level.h). */
++	if (abr.enabled) {
++		abr.level = (unsigned int)y2_start_level(&t->d->addr, "AAC", Y2_AAC_ABR_LEVELS);
++		abr.current = abr.rates[abr.level];
++		bitrate = abr.current;
++	}
+ 	unsigned int current_bitrate = bitrate;
+ 	/* PCM frames since the ceiling was last looked at: the first frame looks
+ 	 * (y2-codec-ceiling.h), then about once a second. */
+--- a/src/a2dp-ldac.c
++++ b/src/a2dp-ldac.c
+@@ -30,6 +30,7 @@
+ #include "rtp.h"
+ #include "utils.h"
+ #include "y2-codec-ceiling.h"
++#include "y2-start-level.h"
+ #include "shared/bluetooth-a2dp.h"
+ #include "shared/defs.h"
+ #include "shared/ffb.h"
+@@ -149,7 +150,16 @@
+ 	struct timespec y2_ceiling_seen = { 0 };
+ 	bool y2_ceiling = false;
+ 
+-	if (ldacBT_init_handle_encode(handle, t->mtu_write, config.ldac_eqmid,
++	/* Y2: with the adaptive rate on, start where this headset settled last
++	 * time (y2-start-level.h: an EQMID, higher is a lower rate); libldac's
++	 * ABR climbs back toward HQ when the link allows. */
++	int y2_eqmid = config.ldac_eqmid;
++	if (config.ldac_abr) {
++		const int learned = y2_start_level(&t->d->addr, "LDAC", LDACBT_EQMID_MQ + 1);
++		if (learned > y2_eqmid)
++			y2_eqmid = learned;
++	}
++	if (ldacBT_init_handle_encode(handle, t->mtu_write, y2_eqmid,
+ 				configuration->channel_mode, LDACBT_SMPL_FMT_S32, rate) == -1) {
+ 		error("Couldn't initialize LDAC encoder: %s", ldacBT_strerror(ldacBT_get_error_code(handle)));
+ 		goto fail_init;
+--- /dev/null
++++ b/src/y2-start-level.h
+@@ -0,0 +1,42 @@
++/*
++ * Y2Linux: where an adapting encoder starts for a headset.
++ *
++ * The adaptive rates (y2-aac-abr.h, libldac's ABR) start at the top level and
++ * step down when the link cannot carry it, so a headset that always settles
++ * lower dropped audio in the first seconds of every stream. The platform's
++ * radio daemon learns the level each headset settled at (EncoderStats) and
++ * keeps it in /run/y2/bt-start/<ADDRESS>-<CODEC>: one number, 0 = the top.
++ * The rate still climbs from there when the link allows.
++ *
++ * This file is free software; you can redistribute it and/or modify it under
++ * the terms of the MIT license. See the COPYING file for details.
++ */
++#ifndef Y2_START_LEVEL_H_
++#define Y2_START_LEVEL_H_
++
++#include <stdio.h>
++
++#include <bluetooth/bluetooth.h>
++
++/* The learned start level for this headset and codec, 0..levels-1 (0 when
++ * there is none). */
++static inline int y2_start_level(const bdaddr_t *addr, const char *codec, int levels) {
++	char address[18];
++	char path[64];
++	ba2str(addr, address);
++	snprintf(path, sizeof(path), "/run/y2/bt-start/%s-%s", address, codec);
++	FILE *file = fopen(path, "r");
++	if (file == NULL)
++		return 0;
++	int level = 0;
++	if (fscanf(file, "%d", &level) != 1)
++		level = 0;
++	fclose(file);
++	if (level < 0)
++		level = 0;
++	if (level >= levels)
++		level = levels - 1;
++	return level;
++}
++
++#endif

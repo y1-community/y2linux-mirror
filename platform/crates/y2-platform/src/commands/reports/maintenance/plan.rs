@@ -41,7 +41,7 @@ pub(super) fn busy(root: &Root, scope: &str) -> Result<Vec<u64>, Failure> {
             "udhcpc",
             "bluealsad",
             "bluetoothd",
-            "y2-bt-reconnect",
+            "y2-radiod",
         ]);
     }
     let proc = root.path("/proc");

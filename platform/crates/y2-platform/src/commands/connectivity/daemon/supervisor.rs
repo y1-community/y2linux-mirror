@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 use super::super::published;
 use super::super::wifi::journal;
-use crate::commands::{codec, network::wlan_switched_off};
+use crate::commands::network::wlan_switched_off;
 use crate::reply::{unlink_missing_ok, Failure};
 use serde::Serialize;
 use serde_json::json;
@@ -16,11 +16,11 @@ use y2p_core::json::{Object, ObjectExt};
 use y2p_core::paths::realpath;
 use y2p_core::{command, Root};
 
-pub(crate) const HELPERS: [(&str, &str); 4] = [
+/// The radio daemon starts and supervises BlueZ and BlueALSA itself (platform/crates/y2-radiod).
+pub(crate) const HELPERS: [(&str, &str); 3] = [
     ("calibration", "/usr/sbin/y2-calibration"),
     ("wpa", "/usr/sbin/wpa_supplicant"),
-    ("bluealsa", "/usr/bin/bluealsad"),
-    ("reconnect", "/usr/sbin/y2-bt-reconnect"),
+    ("radiod", "/usr/sbin/y2-radiod"),
 ];
 const HEALTH_S: f64 = 30.0;
 /// Without this the supplicant rescans every ~5 s forever while the saved AP is absent (measured: 11
@@ -122,7 +122,6 @@ impl Supervisor {
     }
 
     pub(crate) fn restart(&mut self, name: &str) -> Result<(), Failure> {
-        let mut extra: Vec<String> = Vec::new();
         let binary = match name {
             "wpa" => {
                 self.run(&["/usr/libexec/y2/wpa-event", "wlan0", "DISCONNECTED"], 3.0);
@@ -146,20 +145,6 @@ impl Supervisor {
                 );
                 return Ok(());
             }
-            "bluealsa" => {
-                match codec::runtime(&self.root, true) {
-                    Ok(reply) => {
-                        extra = ["-p", "a2dp-source", "--loglevel=warning"]
-                            .map(str::to_owned)
-                            .to_vec();
-                        extra.extend(reply.stdout.split(' ').map(str::to_owned));
-                    }
-                    // A policy or inventory codec-runtime refuses (or a receipt it cannot write):
-                    // BlueALSA stays down until the next health look, the other helpers run on.
-                    Err(_) => return Ok(()),
-                }
-                "/usr/bin/bluealsad"
-            }
             _ => match HELPERS.iter().find(|(n, _)| *n == name) {
                 Some((_, binary)) => binary,
                 // Not a helper of this daemon: nothing to start.
@@ -170,7 +155,7 @@ impl Supervisor {
             unlink_missing_ok(&self.root.path("/run/y2/calibration-ready"))?;
         }
         let pidfile = format!("/run/y2/{name}.pid");
-        let mut argv = vec![
+        let argv = [
             "start-stop-daemon",
             "-S",
             "-b",
@@ -181,7 +166,6 @@ impl Supervisor {
             binary,
             "--",
         ];
-        argv.extend(extra.iter().map(String::as_str));
         self.run(&argv, 3.0);
         Ok(())
     }
@@ -364,7 +348,7 @@ impl Supervisor {
             "wifi-action",
             "wifi-dhcp",
             "wpa",
-            "reconnect",
+            "radiod",
             "bluealsa",
             "calibration",
         ] {

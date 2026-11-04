@@ -1,0 +1,59 @@
+LDAC under the platform's codec ceiling (Y2Linux, Y2Reborn #87).
+
+While the platform's ceiling is on (src/y2-codec-ceiling.h, patch 0002: the
+Wi-Fi radio shares the MT6582's one antenna) LDAC runs at its mobile quality
+at most (EQMID MQ, 330 kbit/s at 44.1/88.2 kHz). Field report 0400eb78:
+LDAC at 606 kbit/s with Wi-Fi associated stepped down 20 times in 40 minutes
+and dropped out twice; the AAC and SBC caps (patches 0002, 0003) did not
+cover LDAC. The ceiling is looked at once a second; a higher quality steps
+down at once (counted in EncoderStats' AbrAdjustments, patch 0001). When the
+ceiling turns off, --ldac-abr climbs back by itself; without it the
+configured quality returns.
+
+--- a/src/a2dp-ldac.c
++++ b/src/a2dp-ldac.c
+@@ -29,6 +29,7 @@
+ #include "io.h"
+ #include "rtp.h"
+ #include "utils.h"
++#include "y2-codec-ceiling.h"
+ #include "shared/bluetooth-a2dp.h"
+ #include "shared/defs.h"
+ #include "shared/ffb.h"
+@@ -143,6 +144,10 @@
+ 	g_atomic_int_set(&t_pcm->encoder_bitpool, 0);
+ 	g_atomic_int_set(&t_pcm->encoder_abr, config.ldac_abr);
+ 	const size_t ldac_frame_pcm_samples = LDACBT_ENC_LSU * channels;
++	/* Y2: the platform's ceiling while Wi-Fi shares the antenna, looked at
++	 * about once a second (y2-codec-ceiling.h). */
++	struct timespec y2_ceiling_seen = { 0 };
++	bool y2_ceiling = false;
+ 
+ 	if (ldacBT_init_handle_encode(handle, t->mtu_write, config.ldac_eqmid,
+ 				configuration->channel_mode, LDACBT_SMPL_FMT_S32, rate) == -1) {
+@@ -270,6 +275,25 @@
+ 					if (ldacBT_get_eqmid(handle) != before_eqmid)
+ 						g_atomic_int_inc(&t_pcm->encoder_adjustments);
+ 				}
++				/* Y2: while the ceiling is on, LDAC runs at its mobile
++				 * quality at most (330 kbit/s); afterwards the adaptive
++				 * rate climbs back, or the configured quality returns. */
++				struct timespec y2_now;
++				gettimestamp(&y2_now);
++				if (y2_now.tv_sec != y2_ceiling_seen.tv_sec) {
++					y2_ceiling_seen = y2_now;
++					const bool was = y2_ceiling;
++					y2_ceiling = y2_codec_ceiling();
++					if (was && !y2_ceiling && !config.ldac_abr &&
++							ldacBT_get_eqmid(handle) != config.ldac_eqmid) {
++						ldacBT_set_eqmid(handle, config.ldac_eqmid);
++						g_atomic_int_inc(&t_pcm->encoder_adjustments);
++					}
++				}
++				if (y2_ceiling && ldacBT_get_eqmid(handle) < LDACBT_EQMID_MQ) {
++					ldacBT_set_eqmid(handle, LDACBT_EQMID_MQ);
++					g_atomic_int_inc(&t_pcm->encoder_adjustments);
++				}
+ 				g_atomic_int_set(&t_pcm->encoder_quality, ldacBT_get_eqmid(handle));
+ 				g_atomic_int_set(&t_pcm->encoder_bitrate_kbps, ldacBT_get_bitrate(handle));
+ 				g_atomic_int_set(&t_pcm->encoder_active, 1);

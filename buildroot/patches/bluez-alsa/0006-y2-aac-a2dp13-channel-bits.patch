@@ -1,0 +1,40 @@
+Accept an AAC configuration whose reserved channel bits an A2DP 1.3 sink left set (Y2Linux).
+
+A sink that configures our AAC source endpoint (AirPods Pro reconnecting by
+themselves after the player woke) sends octet 3 = 0x07: stereo (0x04) plus the
+two low channel bits, reserved in A2DP 1.3 and read as 5.1 and 7.1 under A2DP
+1.4. Intersected with our capabilities (fdk-aac offers 5.1 and 7.1) that is no
+single channel mode, so the configuration was refused with
+A2DP.InvalidChannels: the link stayed connected without audio until the
+platform's radio daemon cancelled it 8 s later and connected the headset itself
+(captured with btmon on the developer's player, 2026-11-03; our own
+configuration sends 0x84, 48 kHz stereo, and was always accepted). Stereo (or
+mono) together with those bits is now read as just stereo (or mono), in the
+copy the check and the new transport both use.
+
+--- a/src/bluez.c
++++ b/src/bluez.c
+@@ -507,6 +507,23 @@
+ 			const void *data = g_variant_get_fixed_array(value, &size, sizeof(char));
+ 			memcpy(&configuration, data, MIN(size, sizeof(configuration)));
+ 
++			/* Y2: an A2DP 1.3 sink that configures us may leave AAC's two low
++			 * channel bits set; they are reserved in A2DP 1.3 and mean 5.1 and
++			 * 7.1 in 1.4, so stereo plus them is no valid mode and the
++			 * configuration was refused (AirPods Pro reconnecting by
++			 * themselves: octet 3 = 0x07, A2DP.InvalidChannels). Their pick
++			 * is stereo (or mono): keep that one. */
++			if (sep->config.codec_id == A2DP_CODEC_MPEG24 &&
++					size == sizeof(configuration.aac)) {
++				const uint8_t extra = AAC_CHANNEL_MODE_5_1 | AAC_CHANNEL_MODE_7_1;
++				const uint8_t mode = configuration.aac.channel_mode;
++				if (mode & extra && mode & AAC_CHANNEL_MODE_STEREO)
++					configuration.aac.channel_mode = AAC_CHANNEL_MODE_STEREO;
++				else if (mode & extra && mode & AAC_CHANNEL_MODE_MONO)
++					configuration.aac.channel_mode = AAC_CHANNEL_MODE_MONO;
++				data = &configuration;
++			}
++
+ 			error_code_t err;
+ 			if ((err = a2dp_check_configuration(sep, data, size)) != ERROR_CODE_OK) {
+ 				error("Invalid configuration: %s: %s",

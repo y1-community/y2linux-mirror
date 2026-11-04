@@ -61,33 +61,9 @@
     "-b",
     "-m",
     "-p",
-    "/run/y2/bluealsa.pid",
+    "/run/y2/radiod.pid",
     "-x",
-    "/usr/bin/bluealsad",
-    "--",
-    "-p",
-    "a2dp-source",
-    "--loglevel=warning",
-    "--codec=AAC",
-    "--codec=-LDAC",
-    "--sbc-quality=high",
-    "--sbc-abr",
-    "--aac-abr",
-    "--ldac-quality=mobile",
-    "--ldac-abr"
-   ],
-   "timeout": 3.0
-  },
-  {
-   "argv": [
-    "start-stop-daemon",
-    "-S",
-    "-b",
-    "-m",
-    "-p",
-    "/run/y2/reconnect.pid",
-    "-x",
-    "/usr/sbin/y2-bt-reconnect",
+    "/usr/sbin/y2-radiod",
     "--"
    ],
    "timeout": 3.0
@@ -124,7 +100,7 @@
     "start-stop-daemon",
     "-K",
     "-p",
-    "/run/y2/reconnect.pid"
+    "/run/y2/radiod.pid"
    ],
    "timeout": 2.0
   },
@@ -151,32 +127,6 @@
  "stdout": [],
  "tree": {
   "added": {
-   "/run/y2/codec-runtime.json": {
-    "content": {
-     "arguments": [
-      "--codec=AAC",
-      "--codec=-LDAC",
-      "--sbc-quality=high",
-      "--sbc-abr",
-      "--aac-abr",
-      "--ldac-quality=mobile",
-      "--ldac-abr"
-     ],
-     "boot_id": "boot-a",
-     "settings": {
-      "aac_abr": true,
-      "aac_quality": "standard",
-      "experimental": false,
-      "ldac_abr": true,
-      "ldac_quality": "mobile",
-      "sbc_abr": true,
-      "sbc_quality": "high",
-      "schema": 1
-     }
-    },
-    "mode": "0o600",
-    "type": "file"
-   },
    "/run/y2/connectivity-monitor.lock": {
     "content": [],
     "mode": "0o600",

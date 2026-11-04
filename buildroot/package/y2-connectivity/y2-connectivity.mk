@@ -19,7 +19,6 @@ define Y2_CONNECTIVITY_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/y2-calibration $(TARGET_DIR)/usr/sbin/y2-calibration
 	$(INSTALL) -D -m 0755 $(@D)/y2-radio-activate $(TARGET_DIR)/usr/sbin/y2-radio-activate
 	$(INSTALL) -D -m 0755 $(@D)/y2-a2dp-check $(TARGET_DIR)/usr/sbin/y2-a2dp-check
-	$(INSTALL) -D -m 0755 $(@D)/y2-bt-reconnect $(TARGET_DIR)/usr/sbin/y2-bt-reconnect
 	$(INSTALL) -D -m 0755 $(@D)/y2-bt-observe $(TARGET_DIR)/usr/sbin/y2-bt-observe
 	$(INSTALL) -D -m 0755 $(@D)/y2-audio-contract $(TARGET_DIR)/usr/sbin/y2-audio-contract
 endef

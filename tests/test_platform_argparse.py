@@ -41,7 +41,10 @@ PLAIN_FLOAT = re.compile(r'[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)([eE][+-]?[0-9]+)?\Z
 ERROR = re.compile(r'y2-platform( [a-z-]+)?: error: .+\Z')
 # What the decision dropped, as `reasons` names it.
 REASONS = ['not UTF-8', 'abbreviation', 'ambiguous prefix', 'short-option cluster', 'int spelling',
-           'int beyond 64 bits', 'float spelling', 'float out of range']
+           'int beyond 64 bits', 'float spelling', 'float out of range', 'removed command']
+# Commands the platform no longer has: `bluetooth-power` went with the radio daemon (y2-radiod owns
+# Bluetooth's power since Beta 9.3). Python's help still lists them.
+REMOVED = ['bluetooth-power']
 
 
 def golden():
@@ -160,6 +163,7 @@ def reasons(argv):
                 value = argv[at]
                 at += 1
             found.add(number_reason(argument['type'], value))
+    found.update('removed command' for token in argv if token in REMOVED)
     found.discard(None)
     return found
 
@@ -175,8 +179,10 @@ def same_outcome(python, now):
     if python['canonical'] is not None:
         return now['canonical'] == python['canonical']
     if python['exit'] == 0:
-        return now['stdout'].startswith('usage: y2-platform') and \
-            words(now['stdout']) == words(python['stdout'].replace('main.py', 'y2-platform'))
+        was = python['stdout'].replace('main.py', 'y2-platform')
+        for name in REMOVED:
+            was = was.replace(name + ',', '')
+        return now['stdout'].startswith('usage: y2-platform') and words(now['stdout']) == words(was)
     return now['stdout'] == '' and now['canonical'] is None and refused(now)
 
 

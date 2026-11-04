@@ -148,7 +148,6 @@ fn what_callers_pass_parses_as_given() {
         &["wifi-event", "SERVICE_RESTART"],
         &["dhcp-event", "renew"],
         &["ntp-event", "step"],
-        &["bluetooth-power", "on"],
         &["sleep", "prepare"],
         &["space", "--cleanup"],
         &["update", "health-ack"],

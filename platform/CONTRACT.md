@@ -95,7 +95,8 @@ for sleep admission, Wi-Fi events).
 | `/run/y2/dhcp.lock` (blocking, no timeout) | wifi-event, dhcp-event |
 | `/run/y2/time.lock` (blocking) | time-set, time-remember, ntp-event, service-daemon |
 | `/run/y2/{power,service,ssh,connectivity-monitor}.lock` (single instance) | the four daemons |
-| `/run/y2/{bt-operation,codec-settings,cpu-idle-policy,rtc-alarm}.lock` | bluetooth-power, codec-settings, cpu-idle-policy, rtc-alarm |
+| `/run/y2/{codec-settings,cpu-idle-policy,rtc-alarm}.lock` | codec-settings, cpu-idle-policy, rtc-alarm |
+| `/run/y2/radiod.lock` (single instance) | `y2-radiod`, the radio daemon (Bluetooth and both radios' power; its clients use `/run/y2/radiod.sock`, `y2p_contract::radiod`) |
 | `/data/system/platform/.boot.lock` (blocking) | boot-stage, update health-ack |
 | `/data/system/platform/.power-journal.lock`, `.sleep-diagnostics.lock` | power-daemon, sleep, product-sleep, suspend-record |
 | `/data/system/platform/.maintenance.lock`, `.wifi-journal.lock` | reset + product-sleep; connectivity-daemon |
@@ -119,8 +120,9 @@ Most are `LOCK_EX|LOCK_NB` with a named refusal (`*_in_progress`, `busy`); the b
 - **Boot and shell scripts** (production overlay): `S02y2-media` (internal-media setup --automatic, mount),
   `S03y2-platform` (boot-stage platform_start → kmsg), `S03y2-time` (time-bootstrap), `S05y2-cpu-idle`,
   `platform-supervise` / `power-supervise` / `readiness-supervise` / `ssh-supervise` (a daemon's exit 0 ends its
-  supervision for good), `connectivity` (codec-runtime --record, connectivity-daemon), `wpa-event`, `dhcp-event`,
-  `ntp-event`, `y2-media`, `y2-radio` (bluetooth-power), `y2-suspend` (sleep prepare). `S43y2-time` greps
+  supervision for good), `connectivity` (connectivity-daemon), `wpa-event`, `dhcp-event`,
+  `ntp-event`, `y2-media`, `y2-suspend` (sleep prepare). `y2-radiod` runs `codec-runtime --record` when it starts
+  BlueALSA; `y2-radio` hands every request to `y2-radiod ctl`. `S43y2-time` greps
   `network.json` for the literal `"state":"Online"`, so compact separators in that file are part of the contract.
 - **The platform itself**: power-daemon runs `boot-stage shutdown_pending|shutdown_complete` and `time-remember`
   as shutdown steps (each a new Python process today, ≈0.5 s: F39 trail); service-daemon starts `media reconcile`,

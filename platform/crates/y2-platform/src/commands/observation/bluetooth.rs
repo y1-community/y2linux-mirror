@@ -2,24 +2,10 @@
 //! encoder (y2-bt-observe), next to the codec settings; observations only, never codec requests.
 // SPDX-License-Identifier: GPL-2.0-only
 use super::snapshot::readiness::Readiness;
-use super::util::fields;
 use crate::{commands::codec, reply::Failure};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Map, Value};
-use y2p_core::{
-    command,
-    lenient::{self, BootId},
-    Root,
-};
-
-/// When `/run/y2/bt-reconnect.json` was written (y2-bt-reconnect, every few seconds).
-#[derive(Deserialize, Default)]
-#[serde(default)]
-struct ReconnectStamp {
-    boot_id: BootId,
-    #[serde(deserialize_with = "lenient::integer")]
-    monotonic_us: Option<i64>,
-}
+use y2p_core::{command, lenient, Root};
 
 /// The codec settings the section shows: `codec-settings`' record, or why there is none (a refused
 /// policy or inventory).
@@ -245,7 +231,7 @@ struct Transport {
 }
 
 impl Section {
-    fn new(root: &Root, settings: Option<CodecSettings>, inventory: Option<Value>) -> Section {
+    fn new(settings: Option<CodecSettings>, inventory: Option<Value>) -> Section {
         Section {
             state: Readiness::Unavailable,
             reason: "dbus_observation_unavailable",
@@ -262,8 +248,8 @@ impl Section {
             requested_codec: None,
             actual_bitrate_bps: None,
             packet_loss: None,
-            reconnect_owner: "y2-bt-reconnect",
-            reconnect: root.json("/run/y2/bt-reconnect.json"),
+            reconnect_owner: "y2-radiod",
+            reconnect: None,
             codec_inventory: inventory,
             codec_settings: settings,
             devices: None,
@@ -402,28 +388,23 @@ fn normalize(root: &Root, raw: &Observed) -> Section {
     section
 }
 
-/// The section before y2-bt-observe's answer: the codec settings, inventory and the reconnect
-/// helper's record (shown only while fresh: written this boot within the last 10 s).
+/// The section before y2-bt-observe's answer: the codec settings, inventory and the radio daemon's
+/// reconnect state (asked on its socket).
 fn settled_base(root: &Root) -> Section {
     // The installed inventory is shown as installed.
     let inventory = root.json(codec::INVENTORY);
     let settings = Some(CodecSettings::read(root));
-    let mut section = Section::new(root, settings, inventory);
-    let fresh = match &section.reconnect {
-        Some(Value::Object(record)) => {
-            let stamp: ReconnectStamp = fields(record);
-            stamp.boot_id.is(root.boot_id().as_deref())
-                && stamp.monotonic_us.is_some_and(|us| {
-                    let age = root.clock().monotonic() * 1e6 - us as f64;
-                    (0.0..10_000_000.0).contains(&age)
-                })
-        }
-        _ => false,
-    };
-    if !fresh {
-        section.reconnect =
-            Some(json!({"state": "Unavailable", "reason": "reconnect_record_stale_or_absent"}));
-    }
+    let mut section = Section::new(settings, inventory);
+    // The radio daemon's own answer (y2-radiod); none while it does not run.
+    section.reconnect = Some(match crate::commands::connectivity::radiod::state(root) {
+        Some(state) => json!({
+            "state": state.bluetooth.reconnect_state(),
+            "service": state.bluetooth.service,
+            "recovery": state.bluetooth.recovery,
+            "last_error": state.bluetooth.failure.map(|f| f.reason),
+        }),
+        None => json!({"state": "Unavailable", "reason": "reconnect_record_stale_or_absent"}),
+    });
     section
 }
 
@@ -627,6 +608,6 @@ pub fn bluetooth(root: &Root) -> Result<Section, Failure> {
     let output = answer.output.unwrap_or_default();
     match serde_json::from_str::<Observed>(&output) {
         Ok(observed) if observed.schema == Some(1) => Ok(normalize(root, &observed)),
-        _ => Ok(Section::new(root, None, None)),
+        _ => Ok(Section::new(None, None)),
     }
 }

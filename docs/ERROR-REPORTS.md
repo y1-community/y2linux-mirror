@@ -52,6 +52,8 @@ about half a megabyte. A saved report never leaves the player on its own.
 - **System:** the kernel log, the crash record of the previous start, the system log, memory, processor, sleep,
   power and storage statistics, the state of every driver and service.
 - **Power:** battery and charger readings (voltage, charger state and faults), the power and sleep journals.
+- **Bluetooth (Beta 9.3 on):** the radio daemon's journal (every connect, disconnect with whose side ended it,
+  codec choice, recovery step) and its last state (device names and addresses replaced like everywhere else).
 - **Updates:** update and recovery state and logs.
 - **Reborn:** its logs, its last crash, its live status, and your settings (volume, EQ, output and so on).
 - **Hardware:** the processor, display, storage chip and bootloader versions of your player.

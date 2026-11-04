@@ -61,9 +61,9 @@
     "-b",
     "-m",
     "-p",
-    "/run/y2/reconnect.pid",
+    "/run/y2/radiod.pid",
     "-x",
-    "/usr/sbin/y2-bt-reconnect",
+    "/usr/sbin/y2-radiod",
     "--"
    ],
    "timeout": 3.0
@@ -100,7 +100,7 @@
     "start-stop-daemon",
     "-K",
     "-p",
-    "/run/y2/reconnect.pid"
+    "/run/y2/radiod.pid"
    ],
    "timeout": 2.0
   },

@@ -28,11 +28,11 @@ COMMANDS = [
 # The platform's files Reborn reads.
 FILES = [
     '/run/y2/usb-transfer.json', '/run/y2/media-mount.json', '/run/y2/network.json', '/run/y2/power.json',
-    '/run/y2/time-status.json', '/run/y2/internal-media.json', '/run/y2/coexistence.json',
+    '/run/y2/time-status.json', '/run/y2/internal-media.json',
     '/run/y2/codec-runtime.json', '/run/y2/application-ready.json', '/run/y2/update-progress.json',
-    '/run/y2/report-progress.json', '/run/y2/shutdown.json', '/run/y2/bt-codec-uncertain.json',
-    '/data/bluetooth/codec-history.json', '/data/bluetooth/codec-policy.json',
+    '/run/y2/report-progress.json', '/run/y2/shutdown.json',
 ]
+# Bluetooth's state comes from the radio daemon's socket (y2p_contract::radiod), not from files.
 
 
 def wanted(argv):

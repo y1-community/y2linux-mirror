@@ -104,11 +104,11 @@ fn sbc_adaptive_bitpool_is_on_by_default_and_switchable() {
     let at = |arg: &str| args.iter().position(|a| a == arg).unwrap();
     assert!(args.iter().any(|a| a == "--sbc-abr")); // also for settings saved before 8.17
     assert!(at("--sbc-quality=high") < at("--sbc-abr"));
-    let script = std::fs::read_to_string(
-        repository().join("buildroot/board/y2/production-overlay/usr/libexec/y2/connectivity"),
-    )
-    .unwrap();
-    assert!(script.contains("|--sbc-abr|"));
+    // The radio daemon's allowlist of bluealsad codec arguments.
+    let script =
+        std::fs::read_to_string(repository().join("platform/crates/y2-radiod/src/bt/supervise.rs"))
+            .unwrap();
+    assert!(script.contains("\"--sbc-abr\","));
     let (_, value) = configure_with(
         &fixture,
         Changes {

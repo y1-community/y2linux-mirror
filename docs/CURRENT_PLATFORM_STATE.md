@@ -1,6 +1,33 @@
 # Current Y2Linux platform state
 
-## Y2Linux 1.0 Beta 9.2.16, Baseline 207 — 2026-11-02 (latest, published)
+## Y2Linux 1.0 Beta 9.3.7, Baseline 215 — 2026-11-03 (latest, published)
+
+Release `1.0.0-beta.9.3.7`, tag `baseline-215`, Linux `153a88cd`, Reborn `8fc6f69`, sequence 14000 (test builds
+208–215 = 9.3–9.3.7; only 215 published). The radio daemon below, plus: BlueALSA patch 0006 (AirPods' own AAC
+configuration with A2DP 1.3 reserved channel bits accepted), a link counts as set up once BlueALSA has its stream
+(BlueZ 5.87 resolves no services for a headset that connects to us), the codec decision waits up to 3 s for the
+headset's codec list. On the developer's player: 19 wakes without a failed link, AirPods back by themselves in
+2.5–4.9 s. Open: a pause longer than ≈22 s ends in a supervision timeout (HCI 0x08) and a reconnect; no overnight on
+this build; only AirPods Pro tried. Details: [Beta 9.3.7 report](validation/Y2-LINUX-1.0-BETA-9.3.7.md).
+
+## Y2Linux 1.0 Beta 9.3.4 test build 212 — 2026-11-03 (on the developer's player, not published)
+
+Release `1.0.0-beta.9.3.4`, label 212, sequence 13700 (test builds 208–212 = 9.3–9.3.4). Bluetooth rebuilt around one
+owner, the radio daemon `y2-radiod` ([architecture](architecture/radio-daemon.md),
+[plan and as built](planning/BLUETOOTH-REIMPLEMENTATION-PLAN.md)): `y2-bt-reconnect`, `bluetooth-power`, the intent
+file and the operation/PCM locks are gone; Reborn is a client. BlueALSA patches 0004 (LDAC under the Wi-Fi ceiling)
+and 0005 (learned start rate per headset); `--keep-alive=900`. Wi-Fi power and the wake order go through the daemon;
+power save while Bluetooth streams. Y2Reborn #92 (library emptied by a Bluetooth rollback) fixed in Reborn.
+
+Device checks on 9.3–9.3.4 (owner's player, AirPods Pro): Bluetooth on → Ready 5.6 s; bluealsad killed → Ready
+7.7 s; sleep radio steps down in 0.17–0.25 s, Wi-Fi held at the wake until the headset was back; four pause rounds and
+a 30 s pause without a link drop (with a 10 s keep-alive one Suspend in three went unanswered and dropped the link);
+codec settings applied without a restart (headphones back in 7–9 s); Wi-Fi power save on while playing, off when
+paused, still associated; daemon idle 0 CPU ticks. Open: when the AirPods reconnect on their own after a wake,
+BlueALSA refuses their AAC configuration (`A2DP.InvalidChannels`); the daemon cancels after 8 s and connects them
+itself (wake → Ready ≈ 15 s instead of ≈ 6 s). Not yet: an overnight, other headsets, the Wi-Fi join controller (P7).
+
+## Y2Linux 1.0 Beta 9.2.16, Baseline 207 — 2026-11-02 (published)
 
 Release `1.0.0-beta.9.2.16`, tag `baseline-207`, Linux `1b7df30e`, Reborn `8667100`, sequence 13200. Steadier
 Bluetooth (Y2Reborn #87, F63: XM4 crackled on AAC 320 kbit/s with Wi-Fi on the shared antenna, no host-side loss

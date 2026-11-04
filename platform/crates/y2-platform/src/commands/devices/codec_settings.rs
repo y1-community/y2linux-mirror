@@ -88,6 +88,14 @@ fn configure_inner(
         return Err(Failure::value("aac_encoder_not_compiled"));
     }
     atomic_json(&root.path(POLICY), &policy, true)?;
+    // The radio daemon starts BlueALSA again with them once no stream is open (best effort: without
+    // it the settings apply at the next start, as before).
+    let request = y2p_contract::radiod::Request::ReloadCodecs;
+    let _ = crate::commands::connectivity::radiod::ask(
+        root,
+        &request,
+        std::time::Duration::from_secs(2),
+    );
     settings(root)
 }
 
