@@ -1,5 +1,5 @@
 {
-  "generated_at" : "2026-11-04T05:55:28Z",
+  "generated_at" : "2026-11-04T05:58:46Z",
   "mirror_repo" : "y1-community/y2linux-mirror",
   "platforms" : [
     {
@@ -3684,20 +3684,12 @@
     {
       "assets" : [
         {
-          "name" : "5A5F4EB2-5D18-4FAE-8D3B-FE8176C0C4B2-Y2Linux-1.0.0-beta.3-first-install-macos.zip",
+          "name" : "Y2Linux-1.0.0-beta.3-first-install-macos.zip",
           "platform" : "macos",
-          "sha256" : "8398b4948b2e9eb8cc1f33c007aa9c9c05637e50a2d7689dd98e15af9f4cfe3c",
+          "sha256" : "ce29b2cdbacb2cb26659a984c6f23457fe3b0fc66d7b379dd459edab2504cf29",
           "size" : 211115358,
           "source_asset" : "Y2Linux-1.0.0-beta.3-first-install.zip",
-          "url" : "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-52/5A5F4EB2-5D18-4FAE-8D3B-FE8176C0C4B2-Y2Linux-1.0.0-beta.3-first-install-macos.zip"
-        },
-        {
-          "name" : "Y2Linux-1.0.0-beta.3-first-install-windows.zip",
-          "platform" : "windows",
-          "sha256" : "58e87bd638a49643045e531b003c5cbf36780b39c45e994095e6e3a273496e09",
-          "size" : 293502571,
-          "source_asset" : "Y2Linux-1.0.0-beta.3-first-install.zip",
-          "url" : "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-52/Y2Linux-1.0.0-beta.3-first-install-windows.zip"
+          "url" : "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-52/Y2Linux-1.0.0-beta.3-first-install-macos.zip"
         },
         {
           "name" : "Y2Linux-1.0.0-beta.3-first-install-linux.zip",
@@ -3706,6 +3698,14 @@
           "size" : 444813290,
           "source_asset" : "Y2Linux-1.0.0-beta.3-first-install.zip",
           "url" : "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-52/Y2Linux-1.0.0-beta.3-first-install-linux.zip"
+        },
+        {
+          "name" : "Y2Linux-1.0.0-beta.3-first-install-windows.zip",
+          "platform" : "windows",
+          "sha256" : "58e87bd638a49643045e531b003c5cbf36780b39c45e994095e6e3a273496e09",
+          "size" : 293502571,
+          "source_asset" : "Y2Linux-1.0.0-beta.3-first-install.zip",
+          "url" : "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-52/Y2Linux-1.0.0-beta.3-first-install-windows.zip"
         }
       ],
       "original_assets" : [
