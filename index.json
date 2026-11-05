@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at": "2026-11-04T22:31:45Z",
+  "generated_at": "2026-11-05T01:52:47Z",
   "source_repo": "schulzcode/y2linux",
   "mirror_repo": "y1-community/y2linux-mirror",
   "title_prefix": "Portable Flashing Package: ",
@@ -43,6 +43,59 @@
     }
   ],
   "releases": [
+    {
+      "tag": "baseline-220",
+      "title": "Portable Flashing Package: Y2Linux 1.0 Beta 9.3.12",
+      "source_title": "Y2Linux 1.0 Beta 9.3.12",
+      "source_url": "https://github.com/schulzcode/y2linux/releases/tag/baseline-220",
+      "published_at": "2026-11-04T22:09:54Z",
+      "prerelease": false,
+      "source_notes": "**Y2Linux 1.0 Beta 9.3.12: Bluetooth pauses and skips like a phone.** Linux 6.18 and the native Reborn music player for the Innioasis Y2.\n\n## Already running Y2Linux\nSettings \u2192 System \u2192 Software Update \u2192 **Update Now** (on Beta 9.2.8 and older: Settings \u2192 About & Updates \u2192 Check for Updates \u2192 **Update Now**).\n\n## What changed\nBeta 9.3.7 kept a Bluetooth stream open while you paused, so that no headphones would be asked to stop and start. Phones never do that, and it caused three complaints at once: silence after a pause or after the second or third song (#89), the connection drop about 20 seconds into a pause (AirPods Pro), and Buds that \"disconnected\" a minute into a pause (#90, where the player had in fact gone to sleep). This release goes back to what phones and Beta 9.2.16 do.\n\n- **Pause stops the stream, Play starts a new one.** Headphones that went silent after a pause or a skip, and the drop 20 s into a pause, both came from a stream kept open without sound: the headphones run dry and some (AirPods) never recover until a new stream starts.\n- **A track change no longer interrupts the stream.** The old song's last fraction of a second plays out and the next follows without a gap; before, the stream stopped for about 60 ms per skip (#89: \"the second song is laggy, the third plays without sound\").\n- **A paused player with Bluetooth headphones stays awake 15 minutes** before it sleeps (#90). The hold was there since Beta 8.18 but counted from the first pause after boot, so a later pause slept after 60 s, and sleep ends the Bluetooth link.\n- **No more connect/drop loop for headphones that connect with a different codec than the chosen one** (Y2Reborn #94: Bose SoundLink Flex 2, Sony WF-C710N).\n\nBefore release: the platform's full check, Reborn's workspace tests (new ones for the paused-headset hold and the kept Bluetooth sink) and the 552 tests of the release images. On the developer's player with AirPods Pro: skips in a row and pauses of various lengths, all with sound afterwards. A capture of the previous test build showed the packets to the headphones running on without a gap at the skips and silence only after the pause/resume gaps, which is what settled the cause. Other headphones were not re-tested yet: if yours behave worse than in 9.3.7, please send an error report.\n\nWhat changed and why, in plain words: **[Beta 9.3.12 report](https://github.com/SchulzCode/Y2Linux/blob/main/docs/validation/Y2-LINUX-1.0-BETA-9.3.12.md)**. Versions 9.3.8 to 9.3.11 were unpublished test builds; everything from Beta 9.3.7 is included ([Beta 9.3.7 report](https://github.com/SchulzCode/Y2Linux/blob/main/docs/validation/Y2-LINUX-1.0-BETA-9.3.7.md)).\n\n## Install (from stock)\nYou need SP Flash Tool v5.2032, a USB cable, **`Y2Linux-1.0.0-beta.9.3.12-first-install.zip`** below and the **Innioasis Y2 firmware package v3.2.0** from Innioasis (only this version works; it is also your way back to stock).\n\n1. Unpack both.\n2. SP Flash Tool \u2192 **Download Only** \u2192 load `MT6582_Android_scatter.txt` **from the Y2Linux zip**. Exactly BOOTIMG, RECOVERY, ANDROID and USRDATA are ticked.\n3. Click Download and connect the switched-off Y2; wait for the green tick.\n4. Unplug and press Power: the player sets up its Internal Storage (a few seconds), then Y2Linux and Reborn start, music works.\n5. Connect the Y2 to the computer and **copy** (don't move) `system.img` from the Innioasis package into the **Firmware** folder on **Internal Storage**. The player takes the Wi-Fi/Bluetooth firmware from it and turns the radios on.\n\nFull guide: [INSTALL](https://github.com/SchulzCode/Y2Linux/blob/main/docs/INSTALL.md) \u00b7 How updates work: [Recovery and updates](https://github.com/SchulzCode/Y2Linux/blob/main/docs/RECOVERY-AND-UPDATES.md) \u00b7 Storage: [Storage](https://github.com/SchulzCode/Y2Linux/blob/main/docs/STORAGE.md) \u00b7 [Audiobooks](https://github.com/SchulzCode/Y2Linux/blob/main/docs/AUDIOBOOKS.md) \u00b7 Headphone settings: [Headphone output](https://github.com/SchulzCode/Y2Linux/blob/main/docs/HEADPHONE-OUTPUT.md) \u00b7 [Error reports](https://github.com/SchulzCode/Y2Linux/blob/main/docs/ERROR-REPORTS.md) \u00b7 Skins: [skin guide](https://github.com/SchulzCode/Y2Reborn/blob/main/docs/skins.md)\n\n## Known issues (beta)\n- After a sleep (a pause longer than 15 minutes, or the Power button) the Bluetooth link ends; the player reconnects within a few seconds of waking. Buds that have gone back to a phone meanwhile must be picked again in Settings \u2192 Bluetooth.\n- The Hisense soundbar of Y2Reborn #94 (SBC only, connected but silent) is not resolved; try SBC quality High.\n- Everything listed for Beta 9.0 still applies. If anything behaves differently from 9.3.7, send an error report (Settings \u2192 System \u2192 Error Reports); **Restore Previous System** (Settings \u2192 System \u2192 About, tap Version seven times, then Diagnostics) goes back to the version you had, with your data kept.\n- Battery life in sleep: about 2 mA overnight on the developer's player (estimated from the battery voltage); stock is about 1.3 mA.\n- Some players turned off by themselves during playback; the cause is not found yet. If yours does, start it again and send a report.\n- The speaker uses the same volume as the headphones; its loudest step is the stock speaker's. Start low the first time.\n- BBC radio stations stream only in HLS, which the player does not play yet. FM radio is in the works for a later beta.\n\n## Files\n- `Y2Linux-1.0.0-beta.9.3.12-first-install.zip`: images, scatter files and checksums for SP Flash Tool. The data image has no SSH key (developers: `tools/production/first_owner.py`).\n- `manifest.json`, `manifest.sig`, `rootfs.ext4.gz`, `bootimg.img.gz`, `recovery.img.gz`: the signed over-the-air update (Ed25519 key `platform-v1-release-20261015`, sequence 14500).\n- `Y2Linux-1.0.0-beta.9.3.12-sources-buildroot-legal-info.tar` (licences, manifests, this project's packages) and the third-party, toolchain and Linux sources linked below: corresponding sources. Our own code: Y2Linux and Y2Reborn at tag `baseline-220`. The speaker amplifier driver is Chris Hendrickson's GPL-2.0 AW87559 driver. The headphone profiles are AutoEq results (MIT, Jaakko Pasanen); their licence ships with them.\n- `SHA256SUMS` for the attached files.\n\nBeta software: use at your own risk. Not affiliated with Innioasis, MediaTek, Awinic, Last.fm, AutoEq, Strawberry or Google. Noto Sans CJK is licensed under the SIL Open Font License 1.1. Details: [Beta 9.3.12 report](https://github.com/SchulzCode/Y2Linux/blob/main/docs/validation/Y2-LINUX-1.0-BETA-9.3.12.md).\n\n## Sources unchanged since an earlier release\n- [`Y2Linux-sources-toolchain-f7cda4c7d213.tar`](https://github.com/SchulzCode/Y2Linux/releases/download/baseline-120/Y2Linux-sources-toolchain-f7cda4c7d213.tar) (attached to `baseline-120`), SHA-256 `f7cda4c7d2134bed15dacc7afd7e1687621a57412d60e49c725efc3880bf1bc6`\n- [`linux-6.18.56.tar.xz`](https://github.com/SchulzCode/Y2Linux/releases/download/baseline-120/linux-6.18.56.tar.xz) (attached to `baseline-120`), SHA-256 `4633bbda2ab95eaf2a7af4041236451d6759c72e6946265531af4b3aacefbf89`\n\n",
+      "assets": [
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.12-first-install-linux.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.12-first-install.zip",
+          "platform": "linux",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 454915671,
+          "sha256": "c5c5ea8a61455ded5c0ceb43ee8583146318aa0bf3744c30c128f8725d7f9284",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-220/Y2Linux-1.0.0-beta.9.3.12-first-install-linux.zip"
+        },
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.12-first-install-macos.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.12-first-install.zip",
+          "platform": "macos",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 221504692,
+          "sha256": "165f35a7a3c08529a5a43e2bbdd3d0acdc27df266dbe67e9eba74e842f897a7e",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-220/Y2Linux-1.0.0-beta.9.3.12-first-install-macos.zip"
+        },
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.12-first-install-windows.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.12-first-install.zip",
+          "platform": "windows",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 303700460,
+          "sha256": "50ce651cfe586dd6a5a7463af7e2a5279c976f3ae4322aaded4d472ce5843041",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-220/Y2Linux-1.0.0-beta.9.3.12-first-install-windows.zip"
+        }
+      ],
+      "original_assets": [
+        "bootimg.img.gz",
+        "manifest.json",
+        "manifest.sig",
+        "recovery.img.gz",
+        "rootfs.ext4.gz",
+        "SHA256SUMS",
+        "Y2Linux-1.0.0-beta.9.3.12-first-install.zip",
+        "Y2Linux-1.0.0-beta.9.3.12-sources-buildroot-legal-info.tar",
+        "Y2Linux-sources-third-party-d665a5f06500.tar"
+      ],
+      "stats_url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-220/stats.txt"
+    },
     {
       "tag": "baseline-215",
       "title": "Portable Flashing Package: Y2Linux 1.0 Beta 9.3.7",
