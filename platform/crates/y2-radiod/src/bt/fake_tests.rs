@@ -1,7 +1,8 @@
 //! The controller against a fake BlueZ and BlueALSA on a private bus (`bus::TEST_BUS`; the scenarios
 //! run one after another in one test). Each scenario is
 //! a field failure the old stack mishandled: a stuck page (F65, #92), headphones switched off, a
-//! remote end, the owner's own disconnect, a codec the headphones refuse, a stream that never came.
+//! remote end, the owner's own disconnect, a codec the headphones refuse, a stream that never came,
+//! a codec change that ends the link (#94).
 use super::*;
 use crate::arbiter::Event;
 use dbus::{
@@ -49,6 +50,22 @@ struct Fake {
     arrived: bool,
     /// This many GetCodecs calls list no codec (BlueZ has not asked the headset yet).
     late_codecs: u32,
+    /// The headphones offer AAC too (and accept it).
+    offers_aac: bool,
+    /// The codec every connect negotiates (BlueZ picks BlueALSA's first endpoint, AAC); empty keeps
+    /// the last one.
+    negotiates: String,
+    /// A change within this long of a connect ends the link with EIO: BlueZ still opens the stream
+    /// and the change cancels that (#94).
+    fragile_for: Duration,
+    /// This many changes end the link whenever they come.
+    breaks: u32,
+    /// When the last connect was answered, and how long after it each change came.
+    connected_at: Option<Instant>,
+    select_after: Vec<Duration>,
+    /// A change takes BlueALSA's stream away for this long (it is set up again for the new codec).
+    select_gap: Duration,
+    gap_until: Option<Instant>,
 }
 
 fn variant<T: RefArg + 'static>(value: T) -> Variant<Box<dyn RefArg>> {
@@ -91,7 +108,8 @@ fn bluez_objects(fake: &Fake) -> Objects {
 
 fn bluealsa_objects(fake: &Fake) -> Objects {
     let mut objects = Objects::new();
-    if fake.connected && !fake.no_pcm {
+    let gap = fake.gap_until.is_some_and(|at| Instant::now() < at);
+    if fake.connected && !fake.no_pcm && !gap {
         let mut pcm = PropMap::new();
         pcm.insert("Device".into(), variant(DbusPath::from(DEVICE)));
         pcm.insert("Transport".into(), variant("A2DP-source".to_string()));
@@ -108,6 +126,22 @@ fn bluealsa_objects(fake: &Fake) -> Objects {
         );
     }
     objects
+}
+
+/// BlueALSA adds or removes a PCM object (a codec change replaces the stream).
+fn pcm_event(added: bool) -> Message {
+    let member = if added {
+        "InterfacesAdded"
+    } else {
+        "InterfacesRemoved"
+    };
+    Message::new_signal(
+        "/org/bluealsa",
+        "org.freedesktop.DBus.ObjectManager",
+        member,
+    )
+    .expect("signal")
+    .append1(DbusPath::from(PCM))
 }
 
 fn changed(path: &str, interface: &str) -> Message {
@@ -128,7 +162,7 @@ fn codecs(fake: &Fake) -> HashMap<String, PropMap> {
         p
     };
     let mut all = HashMap::from([("SBC".to_string(), stereo())]);
-    if fake.refuse_aac {
+    if fake.refuse_aac || fake.offers_aac {
         all.insert("AAC".into(), stereo());
     }
     all
@@ -164,6 +198,10 @@ fn answer(fake: &Mutex<Fake>, message: &Message, connection: &Connection) -> Mes
             }
             fake.connected = true;
             fake.arrived = false;
+            fake.connected_at = Some(Instant::now());
+            if !fake.negotiates.is_empty() {
+                fake.codec = fake.negotiates.clone();
+            }
             let _ = connection.send(changed(DEVICE, "org.bluez.Device1"));
             message.method_return()
         }
@@ -174,7 +212,7 @@ fn answer(fake: &Mutex<Fake>, message: &Message, connection: &Connection) -> Mes
         }
         "Get" => {
             let mut runtime = vec!["A2DP-source:SBC".to_string()];
-            if fake.refuse_aac {
+            if fake.refuse_aac || fake.offers_aac {
                 runtime.push("A2DP-source:AAC".into());
             }
             message.return_with_args((variant(runtime),))
@@ -187,6 +225,22 @@ fn answer(fake: &Mutex<Fake>, message: &Message, connection: &Connection) -> Mes
         "SelectCodec" => {
             let codec: String = message.read1().expect("codec");
             fake.selects.push(codec.clone());
+            let after = fake.connected_at.map_or(Duration::MAX, |at| at.elapsed());
+            fake.select_after.push(after);
+            if fake.breaks > 0 || after < fake.fragile_for {
+                fake.breaks = fake.breaks.saturating_sub(1);
+                fake.connected = false;
+                let _ = connection.send(
+                    Message::new_signal(DEVICE, "org.bluez.Device1", "Disconnected")
+                        .expect("signal")
+                        .append2("org.bluez.Reason.Remote", "Connection terminated"),
+                );
+                let _ = connection.send(changed(DEVICE, "org.bluez.Device1"));
+                return message.error(
+                    &"org.freedesktop.DBus.Error.Failed".into(),
+                    c"Input/output error",
+                );
+            }
             if codec == "AAC" && fake.refuse_aac {
                 return message.error(
                     &"org.freedesktop.DBus.Error.NotSupported".into(),
@@ -194,6 +248,10 @@ fn answer(fake: &Mutex<Fake>, message: &Message, connection: &Connection) -> Mes
                 );
             }
             fake.codec = codec;
+            if !fake.select_gap.is_zero() {
+                fake.gap_until = Some(Instant::now() + fake.select_gap);
+                let _ = connection.send(pcm_event(false));
+            }
             message.method_return()
         }
         _ => message.method_return(),
@@ -269,12 +327,21 @@ struct Harness {
 
 impl Harness {
     fn start(name: &str, fake: Fake) -> Option<Harness> {
+        Harness::choosing(name, fake, "Auto")
+    }
+
+    /// The owner chose this codec before the player started.
+    fn choosing(name: &str, fake: Fake, preference: &str) -> Option<Harness> {
         let bus = private_bus()?;
         if let Ok(mut test_bus) = super::bus::TEST_BUS.lock() {
             *test_bus = Some(bus.address.clone());
         }
         let fake = Arc::new(Mutex::new(Fake {
-            codec: "SBC".into(),
+            codec: if fake.codec.is_empty() {
+                "SBC".into()
+            } else {
+                fake.codec.clone()
+            },
             ..fake
         }));
         let stop = Arc::new(AtomicBool::new(false));
@@ -291,6 +358,11 @@ impl Harness {
         std::fs::create_dir_all(dir.join("etc/y2linux")).ok()?;
         std::fs::write(dir.join("data/bluetooth/enabled"), "1\n").ok()?;
         std::fs::write(dir.join("data/bluetooth/preferred-audio"), ADDRESS).ok()?;
+        std::fs::write(
+            dir.join("data/bluetooth/radiod.json"),
+            format!(r#"{{"schema":1,"preference":"{preference}","manual":[]}}"#),
+        )
+        .ok()?;
         let approved =
             r#"{"compiled_locally":true,"distribution_approved":true,"platform_qualified":true}"#;
         std::fs::write(
@@ -392,6 +464,12 @@ fn serve(
         let _ = connection.process(Duration::from_millis(50));
         while let Ok(control) = controls.try_recv() {
             act(&fake, control, &connection);
+        }
+        // The stream is back after a change: BlueALSA announces it.
+        let mut state = fake.lock().expect("fake");
+        if state.gap_until.is_some_and(|at| Instant::now() >= at) {
+            state.gap_until = None;
+            let _ = connection.send(pcm_event(true));
         }
     }
 }
@@ -520,21 +598,122 @@ fn remote_end_one_look_and_owners_disconnect_none() {
 
 /// AAC chosen, the headphones refuse it: SBC stays, the stream is Ready, nothing blocks playback.
 fn refused_codec_falls_back_and_stays_playable() {
-    let Some(h) = Harness::start(
+    let Some(h) = Harness::choosing(
         "codec",
         Fake {
             refuse_aac: true,
             ..Fake::default()
         },
+        "AAC",
     ) else {
         return;
     };
     let ready = h.link(LONG, Link::Ready).expect("ready");
-    assert_eq!(h.fake().selects, ["AAC"], "Auto tried AAC once");
+    assert_eq!(h.fake().selects, ["AAC"], "AAC tried once");
     assert_eq!(ready.pcms[0].codec.as_deref(), Some("SBC"));
     let history =
         std::fs::read_to_string(h.dir.join("data/bluetooth/codec-history.json")).expect("history");
     assert!(history.contains("\"AAC\":1"), "{history}");
+}
+
+/// #94: SBC chosen, the headphones connect with AAC. The change waits until the link is set up
+/// (sent at once it ends the link, and the reconnect met it again ≈40 times); Auto changes nothing.
+fn codec_change_waits_for_the_link() {
+    let aac = || Fake {
+        offers_aac: true,
+        negotiates: "AAC".into(),
+        fragile_for: Duration::from_secs(2),
+        ..Fake::default()
+    };
+    let Some(h) = Harness::choosing("switch", aac(), "SBC") else {
+        return;
+    };
+    let ready = h.link(LONG, Link::Ready).expect("ready");
+    let fake = h.fake();
+    assert_eq!(fake.selects, ["SBC"], "one change");
+    assert!(
+        fake.select_after[0] >= settle::SWITCH_QUIET,
+        "{:?}",
+        fake.select_after
+    );
+    assert!(fake.connected && ready.devices[0].connected);
+    drop(h);
+    let Some(h) = Harness::start("auto", aac()) else {
+        return;
+    };
+    let ready = h.link(LONG, Link::Ready).expect("ready");
+    assert!(
+        h.fake().selects.is_empty(),
+        "Auto keeps the AAC it connected with"
+    );
+    assert_eq!(ready.pcms[0].codec.as_deref(), Some("AAC"));
+}
+
+/// A headset whose link every change ends: one change, then it keeps AAC through the reconnect
+/// instead of dropping again and again (#94).
+fn a_change_that_ends_the_link_is_not_repeated() {
+    let Some(h) = Harness::choosing(
+        "breaks",
+        Fake {
+            offers_aac: true,
+            negotiates: "AAC".into(),
+            breaks: u32::MAX,
+            ..Fake::default()
+        },
+        "SBC",
+    ) else {
+        return;
+    };
+    h.until(LONG, |s| {
+        s.devices.iter().any(|d| d.ended == Some(Ended::Remote))
+    })
+    .expect("the change ended the link");
+    let back = h
+        .until(Duration::from_secs(15), |s| {
+            s.devices.iter().any(|d| d.link == Link::Ready) && !s.pcms.is_empty()
+        })
+        .expect("back and ready");
+    assert_eq!(back.pcms[0].codec.as_deref(), Some("AAC"));
+    std::thread::sleep(settle::SWITCH_QUIET + Duration::from_secs(2));
+    let fake = h.fake();
+    assert_eq!(fake.selects, ["SBC"], "not asked again");
+    assert!(fake.connected, "the link stays");
+}
+
+/// AirPods that connected by themselves (services never resolved) get another codec from the owner:
+/// the stream is briefly gone while it changes, and the link stays (it was cancelled at once as
+/// half connected, owner's player 2026-11-04 10:49:30).
+fn a_codec_change_keeps_a_headset_that_came_by_itself() {
+    let Some(h) = Harness::start(
+        "gap",
+        Fake {
+            host_down: true,
+            offers_aac: true,
+            select_gap: Duration::from_secs(2),
+            ..Fake::default()
+        },
+    ) else {
+        return;
+    };
+    h.link(LONG, Link::Parked).expect("parked");
+    let _ = h.control.send(Control::Arrive);
+    h.link(Duration::from_secs(10), Link::Ready)
+        .expect("back by itself");
+    std::thread::sleep(links::HALF_CONNECTED + Duration::from_secs(1));
+    let answer = h.ask(Request::CodecPreference {
+        preference: "AAC".into(),
+    });
+    assert!(answer.contains("\"ok\":true"), "{answer}");
+    let changed = h
+        .until(Duration::from_secs(10), |s| {
+            s.pcms.first().and_then(|p| p.codec.as_deref()) == Some("AAC")
+        })
+        .expect("changed to AAC");
+    assert!(changed.devices[0].connected);
+    std::thread::sleep(Duration::from_secs(3));
+    let fake = h.fake();
+    assert!(fake.connected, "the link was cancelled during the change");
+    assert_eq!(fake.selects, ["AAC"]);
 }
 
 /// Connected and resolved, but BlueALSA shows no stream: A2DP is asked for, then BlueALSA restarts.
@@ -590,6 +769,9 @@ fn field_failures_against_a_fake_bluez() {
     switched_off_parks_then_returns_by_itself();
     remote_end_one_look_and_owners_disconnect_none();
     refused_codec_falls_back_and_stays_playable();
+    codec_change_waits_for_the_link();
+    a_change_that_ends_the_link_is_not_repeated();
+    a_codec_change_keeps_a_headset_that_came_by_itself();
     missing_stream_asks_a2dp_then_restarts_bluealsa();
     codec_reload_reconnects_cleanly();
 }

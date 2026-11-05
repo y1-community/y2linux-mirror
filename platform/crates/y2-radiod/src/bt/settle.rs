@@ -3,6 +3,11 @@
 //! opens it, never while a stream is open, and only when it differs from what runs. A codec change
 //! that gets no answer leaves the headset as it is and usable (the old "outcome unknown" marker
 //! blocked all playback, F25).
+//!
+//! A change waits until the link is set up (our Connect answered, [`SWITCH_QUIET`] since it came
+//! up): sent while BlueZ still opens the stream, it cancels that open and the link ends; the
+//! reconnect then met the same change, ≈40 times in a row (Y2Reborn #94, F66). A change that ended
+//! a link or failed is not sent again to that headset until the owner picks a codec again.
 // SPDX-License-Identifier: GPL-2.0-only
 use super::{bus::Kind, codec, ladder::Rung, world::SINK, Controller};
 use dbus::{
@@ -24,6 +29,11 @@ const SELECTIONS: u32 = 3;
 /// by itself for its codecs only after the stream is there (≈20 ms on AirPods Pro).
 const CAPABILITIES_WAIT: Duration = Duration::from_secs(3);
 const CAPABILITIES_RETRY: Duration = Duration::from_millis(250);
+/// A codec change waits this long after the link came up (9.2.16 changed ≈2.5 s after Connect
+/// answered, and those headsets kept their link).
+pub const SWITCH_QUIET: Duration = Duration::from_secs(3);
+/// While our Connect is still unanswered: look again this often (its answer also wakes the loop).
+const CONNECT_POLL: Duration = Duration::from_millis(500);
 
 /// One headset's codec decision for one stream generation and choice.
 pub struct Run {
@@ -39,6 +49,8 @@ pub struct Run {
     pub started: Instant,
     /// "Learning": decide again then.
     pub retry_at: Option<Instant>,
+    /// "Pending" until the link is set up: look again then.
+    pub wait: Option<Instant>,
 }
 
 #[derive(Default)]
@@ -49,17 +61,36 @@ pub struct Codecs {
     /// Selections sent during this connection (at most [`SELECTIONS`]: a headset that always
     /// renegotiates something else must not be asked forever).
     pub selections: BTreeMap<String, u32>,
+    /// Headsets whose link a codec change ended or that failed one, with the choice it was for:
+    /// they keep what they negotiate until the owner picks a codec again. Kept across reconnects
+    /// (everything else here belongs to one connection).
+    pub kept: BTreeMap<String, String>,
 }
 
 impl Codecs {
     pub fn next(&self) -> Option<Instant> {
-        self.runs.values().filter_map(|run| run.retry_at).min()
+        self.runs
+            .values()
+            .flat_map(|run| [run.retry_at, run.wait])
+            .flatten()
+            .min()
     }
 
-    pub fn forget(&mut self, address: &str) {
-        self.runs.remove(address);
+    /// The link ended: this connection's decisions go; a change it ended during is remembered.
+    pub fn ended(&mut self, address: &str) {
+        if let Some(run) = self.runs.remove(address) {
+            if run.state == "Selecting" {
+                self.kept.insert(address.to_owned(), run.preference);
+            }
+        }
         self.refused.remove(address);
         self.selections.remove(address);
+    }
+
+    /// The device is gone from BlueZ (forgotten): nothing about it stays.
+    pub fn forget(&mut self, address: &str) {
+        self.ended(address);
+        self.kept.remove(address);
     }
 
     pub fn selecting(&self, address: &str) -> bool {
@@ -99,6 +130,15 @@ impl Controller {
         record.pcm_missing_since = None;
         record.profile_asked = false;
         let preference = self.desired.policy.preference.clone();
+        // The owner picked a codec while this link runs: apply it, even to a headset kept before.
+        let changed = self
+            .codec
+            .runs
+            .get(address)
+            .is_some_and(|run| run.preference != preference);
+        if changed {
+            self.codec.kept.remove(address);
+        }
         let fresh = self.codec.runs.get(address).is_none_or(|run| {
             run.generation != pcm.generation
                 || run.preference != preference
@@ -107,10 +147,11 @@ impl Controller {
         if fresh
             && !self.in_flight(|k| matches!(k, Kind::Select { address: a, .. } if a == address))
         {
-            let run = self.decide(address, &pcm, &preference, now);
+            let run = self.decide(address, &pcm, &preference, changed, now);
             self.codec.runs.insert(address.to_owned(), run);
         }
         let open = self.streams.contains_key(address);
+        let waits = self.switch_waits(address, now);
         let sent = self.codec.selections.get(address).copied().unwrap_or(0);
         let Some(run) = self.codec.runs.get_mut(address) else {
             return;
@@ -122,6 +163,10 @@ impl Controller {
         if open {
             run.state = "Deferred";
             run.reason = Some("stream_open".into());
+            return;
+        }
+        run.wait = waits;
+        if waits.is_some() {
             return;
         }
         let current = pcm.codec.clone().unwrap_or_default();
@@ -150,12 +195,27 @@ impl Controller {
         }
     }
 
-    /// What should run on this stream: settled at once when it already does.
+    /// When a codec change may be sent: not while our Connect is unanswered, nor in the first
+    /// [`SWITCH_QUIET`] of the link (None = now).
+    fn switch_waits(&self, address: &str, now: Instant) -> Option<Instant> {
+        let quiet = self
+            .records
+            .get(address)
+            .and_then(|record| record.connected_since)
+            .map(|at| at + SWITCH_QUIET)
+            .filter(|at| *at > now);
+        let connecting = self.in_flight(|k| matches!(k, Kind::Connect(a) if a == address));
+        quiet.or_else(|| connecting.then(|| now + CONNECT_POLL))
+    }
+
+    /// What should run on this stream: settled at once when it already does, when Auto would run
+    /// it anyway, or when a change already ended this headset's link (unless the owner just chose).
     fn decide(
         &mut self,
         address: &str,
         pcm: &super::world::PcmObs,
         preference: &str,
+        changed: bool,
         now: Instant,
     ) -> Run {
         let mut run = Run {
@@ -169,6 +229,7 @@ impl Controller {
             reason: None,
             started: now,
             retry_at: None,
+            wait: None,
         };
         let (mutual, at_44k, runtime) = match self.capabilities(&pcm.object) {
             Ok(found) => found,
@@ -210,6 +271,20 @@ impl Controller {
             codec::remember(&self.root, address, Some(observed), None);
         }
         let current = pcm.codec.clone().unwrap_or_default();
+        if !changed {
+            if self
+                .codec
+                .kept
+                .get(address)
+                .is_some_and(|p| p == preference)
+            {
+                run.reason = Some("kept_after_failed_change".into());
+                return run;
+            }
+            if codec::auto_keeps(preference, &current, &run.candidates) {
+                return run;
+            }
+        }
         if run.candidates.first().is_some_and(|best| *best != current) {
             run.state = "Pending";
         }
@@ -292,10 +367,13 @@ impl Controller {
                 codec::remember(&self.root, address, None, Some(codec));
             }
             Err((name, _)) => {
-                // No answer or an unexpected one: leave the headset as it runs; the next stream
-                // generation looks again. Nothing blocks playback.
+                // No answer or an unexpected one (BlueZ's EIO when the change broke the stream,
+                // #94): leave the headset as it runs and do not ask it again. Nothing blocks playback.
                 run.state = "Failed";
                 run.reason = Some(format!("codec_change_{name}"));
+                self.codec
+                    .kept
+                    .insert(address.to_owned(), run.preference.clone());
             }
         }
         self.journal.event(

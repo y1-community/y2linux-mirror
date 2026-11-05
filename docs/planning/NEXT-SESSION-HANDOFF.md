@@ -1,6 +1,15 @@
 # Next-session handoff — Y2Linux 1.0 Beta 8.4 candidate (latest entry first; started 2026-10-09 as the deep-sleep continuation)
 
-> **START HERE (2026-11-03): BETA 9.3.7 (BASELINE 215) RELEASE.** Bluetooth rebuilt around the radio daemon
+> **START HERE (2026-11-04): BETA 9.3.12 (BASELINE 220) RELEASE.** Bluetooth pauses and skips like a phone again:
+> `bluealsad --keep-alive=0` (a stream kept started without packets muted AirPods after any gap and caused the 9.3.7
+> pause drop; btmon on test build 219 showed no gap at the skips, only at pause/resume), Reborn keeps a Bluetooth
+> sink's audio at a track change and does no drain, the 15-min paused-headset hold counts from each pause (Y2Linux
+> #90, F68), F66 codec loop (Y2Reborn #94). Owed: reporters' confirmations on #89, #90, Y2Reborn #94 and #87; an
+> overnight on this build; the Wi-Fi join controller (P7); the Reborn format probe at each Play now opens/closes the
+> PCM within 20 ms (Suspend/Start pair before the real Start, as 9.2.16). Next free label 221, sequence above 14500,
+> next version 9.3.13 ([Beta 9.3.12 report](../validation/Y2-LINUX-1.0-BETA-9.3.12.md)).
+>
+> Previous entry: **START HERE (2026-11-03): BETA 9.3.7 (BASELINE 215) RELEASE.** Bluetooth rebuilt around the radio daemon
 > `y2-radiod` ([architecture](../architecture/radio-daemon.md), [plan, as built, measurements](BLUETOOTH-REIMPLEMENTATION-PLAN.md)).
 > Installed on the developer's player. Owed: (1) the pause drop: every pause > ≈22 s ends in an HCI supervision
 > timeout (0x08), AirPods silent at the baseband ≈2 s after the stream closes, same with Wi-Fi off; find whether it

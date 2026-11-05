@@ -83,6 +83,14 @@ impl Controller {
             self.cancel_connect(address);
             return;
         }
+        if self.world.devices.get(address).is_some_and(|d| d.connected) {
+            // The link is up although the call failed (a profile after it did, #94): nothing to tell
+            // the owner; a link that never sets up is cancelled as half connected.
+            let record = self.record(address);
+            record.connecting = None;
+            record.in_progress = false;
+            return;
+        }
         let asked = self.asked.as_deref() == Some(address);
         let name = self
             .world

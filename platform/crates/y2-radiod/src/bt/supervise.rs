@@ -12,13 +12,16 @@ use std::{
 };
 use y2p_core::{command, sys, Root};
 
-/// How long BlueALSA keeps a headset's stream started after the player closed it: a pause and Play
-/// within it reuse the stream instead of an AVDTP Suspend and Start. Headsets answer those late or
-/// not at all and BlueZ then ends the link (F61, the 10-31 drop of #87; owner's AirPods Pro on
-/// 2026-11-03: "No reply to Suspend request" and a dropped link after one pause in three). As long
-/// as a paused player stays awake with headphones (15 min), so no Suspend is sent while they stay
-/// connected; a sleep takes Bluetooth down without one.
-pub const KEEP_ALIVE_S: u32 = 900;
+/// How long BlueALSA keeps a headset's stream started after the player closed it. Zero, as the
+/// phones do: a pause ends the stream (AVDTP Suspend at once) and Play starts a new one. Builds
+/// 210-219 kept it 900 s so that no Suspend was sent while a paused player stayed awake (a Suspend
+/// sent 10 s into an idle stream went unanswered one time in three and BlueZ ended the link); but a
+/// stream kept started with no packets is a state phones never put headphones in: AirPods Pro went
+/// silent after every pause or resume gap longer than their buffer, inside a started stream (the
+/// packets ran on, 47/s, btmon 2026-11-04), as they had in Beta 6 (F43), and stopped answering
+/// the baseband 2 s into a pause (supervision timeout 20 s later). Reborn keeps a sink 2 s between
+/// streams (F61), so a Suspend follows a real pause, not a track change.
+pub const KEEP_ALIVE_S: u32 = 0;
 const SPACING: Duration = Duration::from_secs(5);
 const WINDOW: Duration = Duration::from_secs(600);
 const BUDGET: usize = 5;

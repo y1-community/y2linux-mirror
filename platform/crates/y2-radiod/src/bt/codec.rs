@@ -152,6 +152,13 @@ pub fn candidates(
     order
 }
 
+/// Auto leaves a headset on the codec it connected with when Auto would run that codec itself: a
+/// fresh link is not changed for a small gain, since every change is a reconfiguration a headset can
+/// fail (Y2Reborn #94). Auto still moves off LDAC and aptX HD, which it never picks.
+pub fn auto_keeps(preference: &str, current: &str, candidates: &[String]) -> bool {
+    preference == "Auto" && candidates.iter().any(|c| c == current)
+}
+
 /// BlueALSA's `Manager1.Codecs` ("A2DP-source:SBC", …): the A2DP source codecs it runs. 5.0 spells
 /// the profile "A2DP-source", so the match ignores case.
 pub fn runtime_codecs(names: &[String]) -> Vec<String> {
@@ -406,6 +413,19 @@ mod tests {
             ldac.auto_eligible = false;
         }
         assert_eq!(candidates("LDAC", &no_ldac, &none), ["SBC"]);
+    }
+
+    #[test]
+    fn auto_keeps_what_it_would_run_and_leaves_ldac() {
+        let ranked = candidates("Auto", &all(), &Context::default());
+        assert!(auto_keeps("Auto", "SBC", &ranked), "no SBC→AAC change");
+        assert!(auto_keeps("Auto", "AAC", &ranked));
+        assert!(!auto_keeps("Auto", "LDAC", &ranked), "Auto moves off LDAC");
+        let chosen = candidates("SBC", &all(), &Context::default());
+        assert!(
+            !auto_keeps("SBC", "AAC", &chosen),
+            "an owner's choice is applied"
+        );
     }
 
     #[test]

@@ -1,6 +1,17 @@
 # Current Y2Linux platform state
 
-## Y2Linux 1.0 Beta 9.3.7, Baseline 215 — 2026-11-03 (latest, published)
+## Y2Linux 1.0 Beta 9.3.12, Baseline 220 — 2026-11-04 (latest, published)
+
+Release `1.0.0-beta.9.3.12`, tag `baseline-220`, Linux `31d3987e`, Reborn `d52589a`, sequence 14500 (test builds
+216–220 = 9.3.8–9.3.12; only 220 published). A pause ends the Bluetooth stream again (`bluealsad --keep-alive=0`, as
+9.2.16 and phones): the stream kept started without packets had muted the AirPods after every pause/resume gap and
+after skips, and made them stop answering 2 s into a pause (the 9.3.7 supervision-timeout drop). A track change keeps
+the Bluetooth sink's queued audio and does no drain (no packet gap at all, btmon). The 15-min paused-headset hold now
+counts from each pause (Y2Linux #90, F68: the stale hold let the player sleep 60 s after a pause). F66 codec-change
+loop (Y2Reborn #94) fixed. BlueALSA 0007/0008 (timestamp over a gap, refill). Details: [Beta 9.3.12
+report](validation/Y2-LINUX-1.0-BETA-9.3.12.md).
+
+## Y2Linux 1.0 Beta 9.3.7, Baseline 215 — 2026-11-03 (published)
 
 Release `1.0.0-beta.9.3.7`, tag `baseline-215`, Linux `153a88cd`, Reborn `8fc6f69`, sequence 14000 (test builds
 208–215 = 9.3–9.3.7; only 215 published). The radio daemon below, plus: BlueALSA patch 0006 (AirPods' own AAC

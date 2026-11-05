@@ -586,7 +586,7 @@ The owner asked for everything at once after reading §1–§7. What was built, 
 | Recovery ladder | cancel page → power cycle → BlueALSA restart → BlueZ restart, 3 each per 10 min, then Failed until "Restart Bluetooth" | `bt/ladder.rs`, `bt/reconcile.rs` |
 | Supervision | bluetoothd (its init script) and bluealsad restarted when they end (5 per 10 min) | `bt/supervise.rs` |
 | Codec at connect, never mid-stream | policy moved from Reborn unchanged; SelectCodec only when it differs, only while the stream is not running; no answer leaves the headset usable | `bt/codec.rs`, `bt/settle.rs` |
-| Hold on pause | `bluealsad --keep-alive=900`: no AVDTP Suspend while a paused player stays awake (AirPods Pro left one Suspend in three unanswered and dropped the link, device test 2026-11-03) | `bt/supervise.rs` |
+| Pause ends the stream | `bluealsad --keep-alive=0` (9.3.12): a pause suspends at once as a phone's does, Play starts a new stream; builds 210–219 kept it 900 s (one Suspend in three unanswered when sent 10 s into an idle stream, 2026-11-03), but headphones left in a started stream without packets went silent after every gap longer than their buffer (AirPods, 2026-11-04, as F43 in Beta 6) | `bt/supervise.rs` |
 | Wake order | Wi-Fi waits up to 12 s for the headset connected before the sleep | `arbiter.rs` |
 | Wi-Fi power | `y2-radio`, Reborn's switch and the F60 restart go through the daemon (direct only when it does not run) | §7 |
 | Journal | `/data/system/platform/bluetooth-journal.jsonl`, `/run/y2/radiod-state.json`, both in error reports | `journal.rs` |
@@ -612,6 +612,7 @@ InProgress cancelled and retried, Ready with a generation, sleep); Reborn's clie
 | bluealsad killed → Ready again | 7.7 s (BlueZ ends the link `local`, episode `Lost(Local)`, page after 2 s) | supervision spacing 5 s |
 | Reconnect where BlueALSA refused the configuration (`A2DP.InvalidChannels`) | connected without services, cancelled after `STUCK` 12 s, then Ready | `STUCK` 12 s (shorter would cut real slow set-ups) |
 | Pause with a 10 s keep-alive | one AVDTP Suspend in three unanswered ("No reply to Suspend request"), link dropped 3 s later | keep-alive raised to 900 s (build 210) |
+| Pause and resume inside a started stream (keep-alive 900, 9.3.7–9.3.11) | AirPods Pro silent after every pause/resume gap of 0.4–0.6 s and after track changes that followed one; packets ran on at 47/s with no gap at the skips themselves (btmon 21:10 2026-11-04), so the sink, not the sender, had stopped; a new stream (AVDTP Start) always played | keep-alive back to 0 (9.3.12): Suspend at the pause, Start at Play, as 9.2.16 ran; a kept sink keeps its audio at a track change |
 | Daemon CPU while settled | 0 ticks in 30 s | — |
 | Codec settings change with the headset connected (9.3.3 → 9.3.4) | 34 s (half set-up link) → 7–9 s (clean disconnect, restart, reconnect) | `HALF_CONNECTED` 8 s |
 | Wake with AirPods reconnecting on their own (9.3.4) | ≈15 s: BlueALSA refuses their AAC configuration (`A2DP.InvalidChannels`), cancelled after 8 s, the daemon's own page works. btmon: their SetConfiguration sends AAC octet 3 = 0x07 (stereo plus the two bits A2DP 1.3 reserves and 1.4 reads as 5.1/7.1); ours sends 0x84 | BlueALSA patch 0006 reads stereo plus those bits as stereo (9.3.5, build 213) |

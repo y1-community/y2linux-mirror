@@ -41,9 +41,10 @@ impl Controller {
         }
     }
 
-    /// BlueALSA reports a stream Running for the whole keep-alive after the player closed it (900 s,
-    /// supervise.rs): only a stream the player holds open (its `Stream` lease) counts as playing, so
-    /// a pause allows codec changes, new codec settings, rate learning and Wi-Fi's power save at once.
+    /// BlueALSA reports a stream Running until its keep-alive after the player closed it has passed
+    /// (`KEEP_ALIVE_S`, supervise.rs): only a stream the player holds open (its `Stream` lease) counts as
+    /// playing, so a pause allows codec changes, new codec settings, rate learning and Wi-Fi's power
+    /// save at once.
     fn playing_only_with_a_lease(&self, world: &mut world::World) {
         let devices = world.devices.clone();
         for pcm in world.pcms.iter_mut().filter(|p| p.running == Some(true)) {
@@ -180,7 +181,7 @@ impl Controller {
         record.connected_since = None;
         record.pcm_missing_since = None;
         record.profile_asked = false;
-        self.codec.forget(&dev.address);
+        self.codec.ended(&dev.address);
         self.streams.remove(&dev.address);
         if self.target().as_deref() == Some(dev.address.as_str()) && self.world.powered() {
             self.trigger(&dev.address, links::Trigger::Lost(ended));
@@ -194,6 +195,14 @@ impl Controller {
         if self.discovery.as_ref().is_some_and(|d| d.until <= now) {
             self.stop_discovery(true);
         }
+        for (address, record) in &mut self.records {
+            let unset = self
+                .world
+                .devices
+                .get(address)
+                .is_some_and(|d| d.connected && d.audio && !self.world.set_up(d));
+            record.unset_since = unset.then(|| record.unset_since.unwrap_or(now));
+        }
         let stuck: Vec<String> = self
             .records
             .iter()
@@ -204,9 +213,11 @@ impl Controller {
                         .connecting
                         .is_some_and(|at| now.duration_since(at) >= links::STUCK)
                     && !dev.is_some_and(|d| d.connected);
-                let half = dev.is_some_and(|d| d.connected && d.audio && !self.world.set_up(d))
+                let changing = self
+                    .in_flight(|k| matches!(k, Kind::Select { address: a, .. } if a == *address));
+                let half = !changing
                     && record
-                        .connected_since
+                        .unset_since
                         .is_some_and(|at| now.duration_since(at) >= links::HALF_CONNECTED);
                 waiting || half
             })

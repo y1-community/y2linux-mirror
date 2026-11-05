@@ -112,8 +112,14 @@ struct Record {
     /// Every try failed: wait for something new.
     parked: bool,
     ended: Option<Ended>,
-    /// Connected since (to judge a set-up that does not finish).
+    /// Connected since.
     connected_since: Option<Instant>,
+    /// Connected but not set up (no resolved services and no BlueALSA PCM) since: a set-up that
+    /// does not finish is cancelled. Counted from when the set-up went missing, not from the
+    /// connect: a codec change briefly removes the PCM of a headset that connected by itself
+    /// (never resolved), and counting from the connect cancelled it at once (owner's AirPods,
+    /// 2026-11-04 10:49:30).
+    unset_since: Option<Instant>,
     /// Connected and resolved, but no BlueALSA PCM yet: since when, and whether the A2DP profile
     /// was asked for once already.
     pcm_missing_since: Option<Instant>,
@@ -310,7 +316,7 @@ impl Controller {
         for record in self.records.values() {
             consider(record.episode.as_ref().map(|e| e.next));
             consider(record.connecting.map(|at| at + links::STUCK));
-            consider(record.connected_since.map(|at| at + links::HALF_CONNECTED));
+            consider(record.unset_since.map(|at| at + links::HALF_CONNECTED));
             consider(record.pcm_missing_since.map(|at| at + settle::PCM_WAIT));
         }
         consider(self.discovery.as_ref().map(|d| d.until));
