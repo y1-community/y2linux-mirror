@@ -1,6 +1,23 @@
 # Next-session handoff — Y2Linux 1.0 Beta 8.4 candidate (latest entry first; started 2026-10-09 as the deep-sleep continuation)
 
-> **START HERE (2026-11-04): BETA 9.3.12 (BASELINE 220) RELEASE.** Bluetooth pauses and skips like a phone again:
+> **START HERE (2026-11-05): BETA 9.3.15 (BASELINE 223) RELEASE.** The Quick Menu (Y2Linux #85): holding Power opens
+> a centred, animated tile panel (Reborn `quick_menu.rs`, `views_quick.rs`; settings map section "The Quick Menu");
+> the turn-off ring moved onto its Power Off tile (3 s + 1.2 s). Test build 222 (9.3.14, list version) never
+> published. Installed on the developer's player. Owed: Back from the sleep timer returns to the menu; the items owed
+> under 9.3.13 below. Next free label 224, sequence above 14800, next version 9.3.16
+> ([Beta 9.3.15 report](../validation/Y2-LINUX-1.0-BETA-9.3.15.md)).
+>
+> Previous entry: **START HERE (2026-11-05): BETA 9.3.13 (BASELINE 221) RELEASE.** Fixes from the issue triage: a Wi-Fi join's first
+> NotFound restarts Wi-Fi once via `y2-radiod` `WifiRestart` and retries (Y2Linux #83; the router-refusal part of #83
+> and the join controller P7 stay open); WPA3 is impossible on the Y2 (gen2 firmware SME, see
+> [m5-connectivity-implementation](../knowledge/m5-connectivity-implementation.md)), rows name WPA3 only / Needs a login /
+> WEP (#91); letter jumps at the top (Y2Reborn #91); square Now Playing cover under skins, Winamp centred, Cassette
+> stripe (Y2Reborn #81, #82). Not run on a player before release. Owed: device check of 221 (Wi-Fi retry, skins),
+> the 9.3.12 owed items below, #88 MTP copy of `05 I Still....m4a` to an exFAT card (reproduce with umtprd logs),
+> #84 long-M4B decision. Next free label 222, sequence above 14600, next version 9.3.14
+> ([Beta 9.3.13 report](../validation/Y2-LINUX-1.0-BETA-9.3.13.md)).
+>
+> Previous entry: **START HERE (2026-11-04): BETA 9.3.12 (BASELINE 220) RELEASE.** Bluetooth pauses and skips like a phone again:
 > `bluealsad --keep-alive=0` (a stream kept started without packets muted AirPods after any gap and caused the 9.3.7
 > pause drop; btmon on test build 219 showed no gap at the skips, only at pause/resume), Reborn keeps a Bluetooth
 > sink's audio at a track change and does no drain, the 15-min paused-headset hold counts from each pause (Y2Linux

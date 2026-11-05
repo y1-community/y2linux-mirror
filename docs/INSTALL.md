@@ -76,7 +76,8 @@ first start Y2Linux turns it into Internal Storage, keeping up to about 400 MB o
    music; see [Internal Storage](#internal-storage) for what happens to files that were on it).
    Then Reborn starts, and music works. Wi-Fi and Bluetooth say they still need the radio
    firmware.
-6. **Restart the player once** (hold Power to turn it off, then press Power again), so
+6. **Restart the player once** (hold Power and pick Restart in the Quick Menu; on Beta 9.3.14 and older, hold Power
+   until it turns off, then press Power again), so
    Internal Storage gets its full space.
 7. **Connect the Y2 to the computer again.** It appears like a USB stick (MTP) with
    **Internal Storage** (and *SD Card* if a card is in). Internal Storage contains a folder

@@ -114,7 +114,7 @@ suspend while Linux still owns that MD lifecycle.
 | Component | Candidate configuration |
 | --- | --- |
 | Wi-Fi driver | cfg80211/nl80211/netdev `wlan0`; AHB PIO, bounded firmware/OID requests, shared recovery, rfkill enable/disable. |
-| Initial Wi-Fi capability | 2.4 GHz b/g/n, one spatial stream, HT20 station, open/WPA2-PSK baseline. HT40/AP/P2P/WPA3 are not advertised as qualified. No 5 GHz/ac/ax. |
+| Initial Wi-Fi capability | 2.4 GHz b/g/n, one spatial stream, HT20 station, open/WPA2-PSK baseline. HT40/AP/P2P/WPA3 are not advertised as qualified. No 5 GHz/ac/ax. WPA3 cannot be added (Y2Linux #91, 2026-11-05): the gen2 driver hands the whole connection to the firmware (`mtk_cfg80211_connect` only, no `auth`/`assoc`/external-auth ops), whose auth modes are open, shared, WPA and WPA2 (PSK or 802.1X, `wlan_oid.h` `ENUM_PARAM_AUTH_MODE_T`), and PMF is compiled out (`CFG_SUPPORT_802_11W 0`); SAE and Enhanced Open (OWE) need both. WPA2/WPA3 mixed networks join with WPA2-PSK; Reborn names WPA3-only, login (802.1X) and WEP networks in their rows. |
 | Regulatory | Linux signed regulatory database, initial world domain, firmware channel list and power ceilings derived from cfg80211. Passive-only initiation channels are conservatively excluded. User selects a lawful country in persisted supplicant configuration; no country is inferred from another board. |
 | Wi-Fi userspace | Buildroot 2025.02.17, wpa_supplicant 2.12 (nl80211, control socket and D-Bus), iw 6.9, BusyBox udhcpc, iproute2, curl/TLS/CA certificates, iperf3. |
 | Bluetooth kernel | Standard HCI (`hci0`), H4 fragmentation over reliable STP, bounded retries and coherent AP_DMA FIFOs. Linux retains HCI credit accounting. |
