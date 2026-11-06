@@ -1,6 +1,14 @@
 # Next-session handoff — Y2Linux 1.0 Beta 8.4 candidate (latest entry first; started 2026-10-09 as the deep-sleep continuation)
 
-> **START HERE (2026-11-05): BETA 9.3.15 (BASELINE 223) RELEASE.** The Quick Menu (Y2Linux #85): holding Power opens
+> **START HERE (2026-11-06): BETA 9.3.16 (BASELINE 224) RELEASE.** Steady Bluetooth after the 2026-11-06 review
+> of #96, Y2Reborn #99/#87 and 28 reports (ledger F69–F73): continuous Bluetooth PCM in Reborn (`bridge` feeds the
+> kept sink, no BT drain, 8 × 1024 ring, 3 s pause grace, no probe open), BlueALSA 0005/0007/0008 gone, SBC/AAC fixed
+> rate by default, 44.1 kHz for all, y2-radiod quick-drop park. The Buildroot patch copy now removes dropped Y2
+> patches (5d87f546). Owed: AirPods listening checks (skips, seeks, song ends gapless off, pause < / > 3 s, radio
+> zapping; `bluetooth_xruns` must stay 0), reporter confirmations. Next free label 225, sequence above 14900, next
+> version 9.3.17 ([Beta 9.3.16 report](../validation/Y2-LINUX-1.0-BETA-9.3.16.md)).
+>
+> Previous entry: **START HERE (2026-11-05): BETA 9.3.15 (BASELINE 223) RELEASE.** The Quick Menu (Y2Linux #85): holding Power opens
 > a centred, animated tile panel (Reborn `quick_menu.rs`, `views_quick.rs`; settings map section "The Quick Menu");
 > the turn-off ring moved onto its Power Off tile (3 s + 1.2 s). Test build 222 (9.3.14, list version) never
 > published. Installed on the developer's player. Owed: Back from the sleep timer returns to the menu; the items owed

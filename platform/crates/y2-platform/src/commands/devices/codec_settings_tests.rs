@@ -98,11 +98,20 @@ fn private_integration_enables_all_endpoints_without_qualification_claim() {
 }
 
 #[test]
-fn sbc_adaptive_bitpool_is_on_by_default_and_switchable() {
+fn sbc_adaptive_bitpool_is_off_by_default_and_switchable() {
     let fixture = private_integration();
+    // One fixed bit-pool by default (2026-11-06), as phones send.
+    assert!(!arguments(&fixture, false).iter().any(|a| a == "--sbc-abr"));
+    let (_, value) = configure_with(
+        &fixture,
+        Changes {
+            sbc_abr: Some(true),
+            ..none()
+        },
+    );
+    assert_eq!(value["requested"]["sbc_abr"], true);
     let args = arguments(&fixture, false);
     let at = |arg: &str| args.iter().position(|a| a == arg).unwrap();
-    assert!(args.iter().any(|a| a == "--sbc-abr")); // also for settings saved before 8.17
     assert!(at("--sbc-quality=high") < at("--sbc-abr"));
     // The radio daemon's allowlist of bluealsad codec arguments.
     let script =
@@ -160,7 +169,7 @@ fn aac_settings_are_saved_and_reported() {
             value["requested"]["aac_quality"],
             value["requested"]["aac_abr"]
         ]),
-        json!(["standard", true])
+        json!(["standard", false])
     );
     assert_eq!(
         value["supported"]["aac_quality"],

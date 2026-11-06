@@ -14,7 +14,7 @@
   "effective_scope": "daemon_start_arguments",
   "pending_restart": true,
   "requested": {
-   "aac_abr": true,
+   "aac_abr": false,
    "aac_quality": "standard",
    "experimental": false,
    "ldac_abr": true,
@@ -48,7 +48,7 @@
   "added": {
    "/data/bluetooth/codec-policy.json": {
     "content": {
-     "aac_abr": true,
+     "aac_abr": false,
      "aac_quality": "standard",
      "experimental": false,
      "ldac_abr": true,

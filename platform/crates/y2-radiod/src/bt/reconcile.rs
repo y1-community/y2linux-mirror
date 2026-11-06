@@ -2,7 +2,7 @@
 //! toward what the owner wants: the adapter's power, a sleep's power-down, the headset to keep
 //! connected and every connected headset's stream. Stuck steps go to the recovery ladder.
 // SPDX-License-Identifier: GPL-2.0-only
-use super::{bus::Kind, codec, ladder::Rung, links, world, Controller, Sleep};
+use super::{bus::Kind, ladder::Rung, links, world, Controller, Sleep};
 use std::time::{Duration, Instant};
 use y2p_contract::radiod::{Ended, Reply};
 
@@ -73,7 +73,6 @@ impl Controller {
                 self.trigger_preferred(links::Trigger::PowerOn);
             }
         }
-        self.streams_stopped(old);
         let devices: Vec<world::Dev> = self.world.devices.values().cloned().collect();
         for dev in devices {
             let was = old.devices.get(&dev.address).is_some_and(|d| d.connected);
@@ -93,63 +92,6 @@ impl Controller {
             self.records.remove(&address);
             self.codec.forget(&address);
         }
-    }
-
-    /// A stream that ran and stopped (or whose headset went): learn where its rate settled.
-    fn streams_stopped(&mut self, old: &world::World) {
-        let stopped: Vec<world::PcmObs> = old
-            .pcms
-            .iter()
-            .filter(|pcm| pcm.running == Some(true))
-            .filter(|pcm| {
-                !self
-                    .world
-                    .pcms
-                    .iter()
-                    .any(|now| now.object == pcm.object && now.running == Some(true))
-            })
-            .cloned()
-            .collect();
-        for pcm in stopped {
-            let (Some(address), Some(codec)) = (
-                old.devices
-                    .values()
-                    .find(|d| d.path == pcm.device)
-                    .map(|d| d.address.clone()),
-                pcm.codec.clone(),
-            ) else {
-                continue;
-            };
-            let Some((settled, adjustments)) = self.encoder_stats(&pcm.object) else {
-                continue;
-            };
-            codec::learn(&self.root, &address, &codec, settled, adjustments);
-            self.journal.event(
-                "rate_learned",
-                serde_json::json!({"codec": codec, "settled": settled, "adjustments": adjustments}),
-            );
-        }
-    }
-
-    /// BlueALSA's EncoderStats (patch 0001): the level the adaptive rate ended at and how often it
-    /// changed; none when it did not adapt.
-    fn encoder_stats(&self, object: &str) -> Option<(u32, u32)> {
-        let (bus, owner) = (self.bus.as_ref()?, self.world.bluealsa.as_deref()?);
-        let stats: dbus::arg::PropMap = world::get(
-            &bus.channel,
-            owner,
-            object,
-            "org.bluealsa.PCM1",
-            "EncoderStats",
-        )
-        .ok()?;
-        let number = |key: &str| stats.get(key).and_then(|v| v.0.as_i64()).unwrap_or(0);
-        if number("AbrEnabled") == 0 {
-            return None;
-        }
-        let level = u32::try_from(number("QualityIndex")).ok()?;
-        let adjustments = u32::try_from(number("AbrAdjustments")).unwrap_or(0);
-        Some((level, adjustments))
     }
 
     fn connected(&mut self, dev: &world::Dev, now: Instant) {
@@ -177,15 +119,38 @@ impl Controller {
             Ended::Unknown
         });
         let record = self.record(&dev.address);
+        let lasted = record.connected_since.map(|since| since.elapsed());
+        record.quick_drops = if links::quick_drop(lasted, ended) {
+            record.quick_drops + 1
+        } else {
+            0
+        };
+        let drops = record.quick_drops;
         record.ended = Some(ended);
         record.connected_since = None;
         record.pcm_missing_since = None;
         record.profile_asked = false;
         self.codec.ended(&dev.address);
         self.streams.remove(&dev.address);
-        if self.target().as_deref() == Some(dev.address.as_str()) && self.world.powered() {
-            self.trigger(&dev.address, links::Trigger::Lost(ended));
+        if self.target().as_deref() != Some(dev.address.as_str()) || !self.world.powered() {
+            return;
         }
+        if drops < links::QUICK_DROPS {
+            self.trigger(&dev.address, links::Trigger::Lost(ended));
+            return;
+        }
+        let record = self.record(&dev.address);
+        record.parked = true;
+        record.episode = None;
+        self.journal.event(
+            "reconnect_given_up",
+            serde_json::json!({"address": dev.address, "quick_drops": drops}),
+        );
+        let message = format!(
+            "Couldn't stay connected to {}. Remove them in Bluetooth and pair them again.",
+            dev.name
+        );
+        self.fail("connect_failed", &message, Some(&dev.address));
     }
 
     /// Deadlines: calls, the pairing question, the scan, connects that stopped moving.
@@ -422,8 +387,10 @@ impl Controller {
             let kind = Kind::Connect(target.clone());
             bus.call(call, (world::SINK,), kind, links::CONNECT_DEADLINE);
         }
-        self.journal
-            .event("connect_attempt", serde_json::json!({"attempt": attempt}));
+        self.journal.event(
+            "connect_attempt",
+            serde_json::json!({"address": target, "attempt": attempt}),
+        );
     }
 
     /// A connect stopped moving: cancel it (a Disconnect ends BlueZ's page), count the try; a

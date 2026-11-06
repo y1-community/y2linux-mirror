@@ -1,6 +1,16 @@
 # Current Y2Linux platform state
 
-## Y2Linux 1.0 Beta 9.3.15, Baseline 223 — 2026-11-05 (latest, published)
+## Y2Linux 1.0 Beta 9.3.16, Baseline 224 — 2026-11-06 (latest, published)
+
+Release `1.0.0-beta.9.3.16`, tag `baseline-224`, Linux `5d87f546`, Reborn `ceb4824`, sequence 14900. Steady Bluetooth
+(Y2Linux #96, Y2Reborn #99, #87): Reborn keeps a playing Bluetooth PCM open and fed with music or silence (kept sink
+fed between streams, no drain at a song end, 8 × 1024-frame BlueALSA ring, pause holds 3 s then releases, no probe
+open at Play; F69 had 93 of 114 reuses run dry since 9.3.12); BlueALSA patches 0005/0007/0008 removed, SBC/AAC
+adaptive rate off by default, bluealsad `--a2dp-force-audio-cd`; y2-radiod parks a headset after 3 quick drops (F70).
+Gapless boundaries and wheel clicks no longer underrun (F71, F72). Installed on the developer's player; listening
+checks owed. Details: [Beta 9.3.16 report](validation/Y2-LINUX-1.0-BETA-9.3.16.md).
+
+## Y2Linux 1.0 Beta 9.3.15, Baseline 223 — 2026-11-05 (published)
 
 Release `1.0.0-beta.9.3.15`, tag `baseline-223`, Linux `e9bcdee5`, Reborn `e2555d2`, sequence 14800 (test build 222 =
 9.3.14, the same menu as a list, never published). Holding Power opens the Quick Menu (Y2Linux #85): a centred,

@@ -274,10 +274,13 @@ impl Controller {
                 if let Ok((reason, text)) = message.read2::<String, String>() {
                     let quiescing = !matches!(self.sleep, super::Sleep::Awake);
                     let ended = super::links::ended(&reason, quiescing);
+                    // BlueZ's device path ends in dev_AA_BB_…: the address (reports pseudonymise it).
+                    let address = path.rsplit("/dev_").next().map(|a| a.replace('_', ":"));
                     self.journal.event(
                         "peer_disconnected",
                         serde_json::json!({
-                            "ended": ended, "bluez_reason": reason, "message": text
+                            "address": address, "ended": ended, "bluez_reason": reason,
+                            "message": text
                         }),
                     );
                     self.reasons.insert(path, ended);

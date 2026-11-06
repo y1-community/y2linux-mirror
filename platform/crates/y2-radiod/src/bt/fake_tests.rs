@@ -759,6 +759,41 @@ fn codec_reload_reconnects_cleanly() {
     assert_eq!(h.fake().connects, tries + 1);
 }
 
+/// A headset that drops every link within seconds (install 319dab53, 9.3.12: BlueZ `Permission
+/// denied`, the headset had lost our key; 26 connects in 2 minutes): three quick drops park it with
+/// a message to pair it again, and nothing pages it after that until the owner's tap.
+fn quick_drops_park_the_headset() {
+    let Some(h) = Harness::start("quick", Fake::default()) else {
+        return;
+    };
+    for drop in 1..=links::QUICK_DROPS {
+        h.until(LONG, |s| s.devices.iter().any(|d| d.connected))
+            .expect("connected");
+        let _ = h.control.send(Control::Drop("org.bluez.Reason.Local"));
+        if drop < links::QUICK_DROPS {
+            h.until(Duration::from_secs(5), |s| {
+                s.devices.iter().all(|d| !d.connected)
+            })
+            .expect("dropped");
+        }
+    }
+    let parked = h
+        .link(Duration::from_secs(5), Link::Parked)
+        .expect("parked after quick drops");
+    let failure = parked.failure.expect("the owner is told");
+    assert!(failure.message.contains("pair them again"), "{failure:?}");
+    let tries = h.fake().connects;
+    assert_eq!(tries, links::QUICK_DROPS);
+    std::thread::sleep(Duration::from_secs(5));
+    assert_eq!(h.fake().connects, tries, "no paging after giving up");
+    let answer = h.ask(Request::Connect {
+        address: ADDRESS.into(),
+    });
+    assert!(answer.contains("\"ok\":true"), "{answer}");
+    h.link(LONG, Link::Ready)
+        .expect("the owner's tap connects again");
+}
+
 #[test]
 fn field_failures_against_a_fake_bluez() {
     if private_bus().is_none() {
@@ -774,4 +809,5 @@ fn field_failures_against_a_fake_bluez() {
     a_codec_change_keeps_a_headset_that_came_by_itself();
     missing_stream_asks_a2dp_then_restarts_bluealsa();
     codec_reload_reconnects_cleanly();
+    quick_drops_park_the_headset();
 }

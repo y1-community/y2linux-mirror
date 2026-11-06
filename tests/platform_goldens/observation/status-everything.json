@@ -191,14 +191,14 @@
      "schema": 1
     },
     "effective_scope": "daemon_start_arguments",
-    "pending_restart": false,
+    "pending_restart": true,
     "requested": {
-     "aac_abr": true,
+     "aac_abr": false,
      "aac_quality": "standard",
      "experimental": false,
      "ldac_abr": true,
      "ldac_quality": "mobile",
-     "sbc_abr": true,
+     "sbc_abr": false,
      "sbc_quality": "high",
      "schema": 1
     },
@@ -257,12 +257,12 @@
     "ldac_nominal_choices_kbps": null,
     "ldac_quality_index": null,
     "preference": {
-     "aac_abr": true,
+     "aac_abr": false,
      "aac_quality": "standard",
      "experimental": false,
      "ldac_abr": true,
      "ldac_quality": "mobile",
-     "sbc_abr": true,
+     "sbc_abr": false,
      "sbc_quality": "high",
      "schema": 1
     },

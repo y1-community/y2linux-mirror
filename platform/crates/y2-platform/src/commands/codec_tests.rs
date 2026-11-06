@@ -73,11 +73,15 @@ fn aac_quality_and_adaptive_rate_arguments() {
     fixture.put_json(INVENTORY, &json!({"schema": 1, "codecs": caps}));
     let args = arguments(&fixture);
     assert!(has(&args, "--codec=AAC"));
-    // The defaults (Y2Reborn #87): AAC standard (BlueALSA's 220 kbit/s) adapting, LDAC mobile.
-    assert!(has(&args, "--aac-abr") && has(&args, "--ldac-quality=mobile"));
+    // The defaults (Y2Reborn #87, 2026-11-06): AAC standard (BlueALSA's 220 kbit/s) at one fixed
+    // rate, LDAC mobile.
+    assert!(!has(&args, "--aac-abr") && has(&args, "--ldac-quality=mobile"));
     assert!(!has(&args, "--aac-afterburner") && !has(&args, "--aac-bitrate=320000"));
     // AAC high is the owner's choice; its arguments are exactly the ones the start script accepts.
-    fixture.put_json(POLICY, &json!({"schema": 1, "aac_quality": "high"}));
+    fixture.put_json(
+        POLICY,
+        &json!({"schema": 1, "aac_quality": "high", "aac_abr": true}),
+    );
     let args = arguments(&fixture);
     let script = start_script();
     for arg in ["--aac-afterburner", "--aac-bitrate=320000", "--aac-abr"] {

@@ -39,15 +39,24 @@ changes while one is open.
   ten minutes; then the service is Failed until the owner switches Bluetooth off and on (which restarts BlueALSA and
   BlueZ and starts every budget over).
 - **Supervision** (`bt/supervise.rs`): bluetoothd (its init script) and bluealsad (started here with the build's
-  codec arguments and `--keep-alive=0`) start again when they end, five times in ten minutes. A pause ends the
-  stream (AVDTP Suspend at once, as a phone's pause does) and Play starts a new one; Reborn keeps the sink 2 s
-  between streams, so a track change never suspends. Builds 210–219 kept the stream started for 900 s after a
+  codec arguments, `--keep-alive=0` and `--a2dp-force-audio-cd`: 44.1 kHz for every headset and codec, 48 kHz only
+  where a headset refuses it) start again when they end, five times in ten minutes. Since 9.3.16 Reborn owns the
+  stream's life like a phone's mixer: while the owner plays, its PCM stays open and is written with music or silence
+  (never dropped, drained or prepared again inside BlueALSA: an underrun there is a stop and restart in a started
+  stream, after which AirPods stay silent, F69/Y2Reborn #99); a skip, seek or song end changes only what is written,
+  a pause writes silence for 3 s and then closes the PCM (AVDTP Suspend), so a Play after that starts a fresh stream.
+  With no gap left in a started stream, BlueALSA patches 0007 (RTP timestamp over a gap), 0008 (refill faster than
+  real time after a gap) and 0005 (learned start rate) were dropped: BlueALSA paces as upstream does. Builds 210–219 kept the stream started for 900 s after a
   pause: a Suspend sent 10 s into an idle stream had gone unanswered one time in three. But headphones are never
   left in a started stream without packets by a phone, and AirPods Pro went silent after every pause or resume gap
   longer than their buffer inside such a stream (packets ran on at 47/s, btmon 2026-11-04; the same as F43 in
   Beta 6) and stopped answering the baseband 2 s into a pause (supervision timeout 20 s later). BlueALSA patches
-  0007 (RTP timestamp over a gap) and 0008 (refill after a gap) stay, for skips with a kept sink; Reborn no longer
-  drops a Bluetooth sink's queued audio at a track change, so a skip has no packet gap at all.
+  0007 and 0008 came from that design and went with it (9.3.16).
+- **Quick drops** (`bt/links.rs` `quick_drop`, `bt/reconcile.rs`): a link that ends within 10 s of coming up three
+  times in a row parks the headset with "Couldn't stay connected … pair them again" (journal `reconnect_given_up`);
+  a headset that had lost our key reconnected 26 times in 2 minutes (install 319dab53, BlueZ `Permission denied`),
+  each drop starting a new episode. Bluetooth on, a wake or the owner's tap give it its tries again. Journal events
+  carry the device address (reports pseudonymise it).
 - **Codecs** (`bt/codec.rs`, `bt/settle.rs`): the policy Reborn had (Auto: AAC, aptX, SBC; LDAC and aptX HD only
   when chosen; history of refusals). SelectCodec only when the negotiated codec differs, only while no stream is
   open, at most three per connection; an unanswered one leaves the headset usable. Auto keeps the AAC, aptX or SBC a

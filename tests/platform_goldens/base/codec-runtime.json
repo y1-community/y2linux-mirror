@@ -5,7 +5,7 @@
  "calls": [],
  "exit": 0,
  "stdout": [
-  "--codec=AAC --codec=-LDAC --sbc-quality=high --sbc-abr --aac-abr --ldac-quality=mobile --ldac-abr"
+  "--codec=AAC --codec=-LDAC --sbc-quality=high --ldac-quality=mobile --ldac-abr"
  ],
  "tree": {
   "added": {},

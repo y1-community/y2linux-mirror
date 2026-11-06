@@ -46,14 +46,16 @@ impl Policy {
             schema: 1,
             experimental,
             sbc_quality: "high".into(),
-            sbc_abr: true,
+            // Steady before adaptive (2026-11-06): SBC and AAC send one fixed rate, as phones do;
+            // the adaptive steps stay an owner choice. LDAC keeps libldac's own adaptive rate.
+            sbc_abr: false,
             // Stable before loud numbers (Y2Reborn #87: AAC 320 kbit/s and Wi-Fi on the shared
             // antenna crackled and cut out): BlueALSA's tested AAC rate and LDAC's 330 kbit/s;
             // "high" stays an owner choice.
             ldac_quality: "mobile".into(),
             ldac_abr: true,
             aac_quality: "standard".into(),
-            aac_abr: true,
+            aac_abr: false,
         }
     }
 

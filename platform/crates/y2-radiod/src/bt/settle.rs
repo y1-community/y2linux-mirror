@@ -342,7 +342,7 @@ impl Controller {
         bus.call(target, (codec, properties), kind, SELECT_DEADLINE);
         self.journal.event(
             "codec_select",
-            serde_json::json!({"codec": codec, "from": pcm.codec}),
+            serde_json::json!({"address": address, "codec": codec, "from": pcm.codec}),
         );
     }
 
@@ -379,7 +379,8 @@ impl Controller {
         self.journal.event(
             "codec_answer",
             serde_json::json!({
-                "codec": codec, "state": self.codec.runs.get(address).map(|r| r.state)
+                "address": address, "codec": codec,
+                "state": self.codec.runs.get(address).map(|r| r.state)
             }),
         );
     }

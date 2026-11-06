@@ -36,6 +36,17 @@ pub const STUCK: Duration = Duration::from_secs(12);
 /// 1–2 s on the owner's player; a headset that reconnects by itself after a lost link sometimes
 /// never gets them (AirPods Pro, BlueALSA refusing its configuration).
 pub const HALF_CONNECTED: Duration = Duration::from_secs(8);
+/// A link that ends this soon after it came up (on our side, the headset's or unexplained) counts as
+/// a quick drop; this many in a row stop the reconnects until something new happens. A headset that
+/// refuses our link key (BlueZ `Permission denied`, it was paired again elsewhere) connected and
+/// dropped 26 times in 2 minutes (install 319dab53, 9.3.12), each drop starting a new episode.
+pub const QUICK_DROP: Duration = Duration::from_secs(10);
+pub const QUICK_DROPS: u32 = 3;
+
+/// Whether a link that lasted `lasted` and ended `ended` was a quick drop.
+pub fn quick_drop(lasted: Option<Duration>, ended: Ended) -> bool {
+    lasted.is_some_and(|lasted| lasted < QUICK_DROP) && !matches!(ended, Ended::Sleep | Ended::User)
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Episode {

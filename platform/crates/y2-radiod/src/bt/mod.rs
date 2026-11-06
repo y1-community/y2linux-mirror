@@ -126,6 +126,8 @@ struct Record {
     profile_asked: bool,
     /// Cancels in this episode (a second one escalates).
     cancels: u32,
+    /// Links in a row that dropped right after coming up (`links::QUICK_DROPS` park the headset).
+    quick_drops: u32,
 }
 
 struct Power {
@@ -237,8 +239,6 @@ impl Controller {
             "bluetooth_start",
             serde_json::json!({"wanted": self.desired.bluetooth}),
         );
-        // BlueALSA reads each headset's learned start level from /run (gone after a reboot).
-        codec::publish_starts(&self.root);
         // The first look sees the adapter come on: a power-on for the preferred headset.
         loop {
             let now = Instant::now();
@@ -355,6 +355,10 @@ impl Controller {
         let record = self.records.entry(address.to_owned()).or_default();
         record.parked = false;
         record.cancels = 0;
+        // Something new (Bluetooth on, a wake, the owner's tap): the headset gets its tries again.
+        if !matches!(trigger, links::Trigger::Lost(_)) {
+            record.quick_drops = 0;
+        }
         record.episode = links::Episode::start(trigger, now);
         self.journal.event(
             "reconnect_episode",

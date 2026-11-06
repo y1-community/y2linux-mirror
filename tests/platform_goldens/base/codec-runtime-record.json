@@ -6,7 +6,7 @@
  "calls": [],
  "exit": 0,
  "stdout": [
-  "--codec=AAC --codec=-LDAC --sbc-quality=high --sbc-abr --aac-abr --ldac-quality=mobile --ldac-abr"
+  "--codec=AAC --codec=-LDAC --sbc-quality=high --ldac-quality=mobile --ldac-abr"
  ],
  "tree": {
   "added": {
@@ -16,19 +16,17 @@
       "--codec=AAC",
       "--codec=-LDAC",
       "--sbc-quality=high",
-      "--sbc-abr",
-      "--aac-abr",
       "--ldac-quality=mobile",
       "--ldac-abr"
      ],
      "boot_id": "boot-a",
      "settings": {
-      "aac_abr": true,
+      "aac_abr": false,
       "aac_quality": "standard",
       "experimental": false,
       "ldac_abr": true,
       "ldac_quality": "mobile",
-      "sbc_abr": true,
+      "sbc_abr": false,
       "sbc_quality": "high",
       "schema": 1
      }

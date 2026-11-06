@@ -348,8 +348,16 @@ def apply(buildroot_source: Path) -> None:
     # Local product-policy patches follow the pinned package security fixes.
     # python3: Buildroot's 3.14 patches 0002/0005 rebased onto 3.15.0 (same
     # names, so they replace the originals; the series applies with fuzz 0).
+    # A Y2 patch removed from buildroot/patches leaves the tree too: the copy
+    # below only adds, and a resumed build kept applying BlueALSA 0005/0007/0008
+    # after they were dropped (test build 224, 2026-11-06).
     for package in ('dropbear', 'openssh', 'bluez-alsa', 'python3'):
-        for policy in (Path(__file__).resolve().parents[2] / 'buildroot/patches' / package).glob('*.patch'):
+        policies = sorted((Path(__file__).resolve().parents[2] / 'buildroot/patches' / package).glob('*.patch'))
+        names = {policy.name for policy in policies}
+        for stale in (buildroot_source / 'package' / package).glob('*-y2-*.patch'):
+            if stale.name not in names:
+                stale.unlink()
+        for policy in policies:
             (buildroot_source / 'package' / package / policy.name).write_bytes(policy.read_bytes())
 
 

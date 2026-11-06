@@ -237,10 +237,6 @@ pub struct Peer {
     pub last_negotiated: Option<String>,
     #[serde(default)]
     pub failures: BTreeMap<String, u64>,
-    /// Where its adaptive rate settled (0 = the top), per codec: the next stream starts there
-    /// (BlueALSA patch 0005).
-    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
-    pub start: BTreeMap<String, u32>,
 }
 
 fn read_history(root: &Root) -> History {
@@ -304,61 +300,6 @@ pub fn remember(root: &Root, address: &str, negotiated: Option<&str>, rejected: 
     }
     if let Some(history) = updated(read_history(root), address, negotiated, rejected) {
         let _ = y2p_core::record::atomic_json(&root.path(HISTORY), &history, false, 0o600);
-    }
-}
-
-/// The codecs whose adaptive rate can start lower (AAC levels, LDAC EQMIDs) and how many levels.
-const LEARNED: [(&str, u32); 2] = [("AAC", 4), ("LDAC", 3)];
-const START: &str = "/run/y2/bt-start";
-
-/// The next start level after a stream: where it settled when it had to step, else one level
-/// closer to the top (a clean stream earns the higher rate back).
-pub fn next_start(previous: u32, settled: u32, adjustments: u32, levels: u32) -> u32 {
-    let next = if adjustments > 0 {
-        settled
-    } else {
-        previous.saturating_sub(1)
-    };
-    next.min(levels.saturating_sub(1))
-}
-
-/// A stream of `codec` to `address` ended at `settled` after `adjustments` rate changes.
-pub fn learn(root: &Root, address: &str, codec: &str, settled: u32, adjustments: u32) {
-    let Some((_, levels)) = LEARNED.iter().find(|(name, _)| *name == codec) else {
-        return;
-    };
-    if !crate::desired::valid_address(address) {
-        return;
-    }
-    let mut history = read_history(root);
-    history.schema = 1;
-    let address = address.to_ascii_uppercase();
-    if history.peers.len() >= 64 && !history.peers.contains_key(&address) {
-        return;
-    }
-    let peer = history.peers.entry(address.clone()).or_default();
-    let previous = peer.start.get(codec).copied().unwrap_or(0);
-    let next = next_start(previous, settled, adjustments, *levels);
-    if next == previous && peer.start.contains_key(codec) {
-        return;
-    }
-    peer.start.insert(codec.to_owned(), next);
-    let _ = y2p_core::record::atomic_json(&root.path(HISTORY), &history, false, 0o600);
-    publish_starts(root);
-}
-
-/// Write every headset's start levels where BlueALSA reads them (at the daemon's start, after
-/// each change).
-pub fn publish_starts(root: &Root) {
-    let directory = root.path(START);
-    if y2p_core::record::private_directory(&directory).is_err() {
-        return;
-    }
-    for (address, peer) in read_history(root).peers {
-        for (codec, level) in &peer.start {
-            let path = directory.join(format!("{address}-{codec}"));
-            let _ = std::fs::write(path, format!("{level}\n"));
-        }
     }
 }
 
@@ -437,7 +378,6 @@ mod tests {
             Peer {
                 last_negotiated: Some("invented".into()),
                 failures: [("LDAC".to_string(), 999_999), ("x".to_string(), 3)].into(),
-                start: BTreeMap::new(),
             },
         );
         let history = updated(odd, address, None, Some("LDAC")).expect("updated");
@@ -453,26 +393,6 @@ mod tests {
                 .insert(format!("00:00:00:00:00:{id:02X}"), Peer::default());
         }
         assert!(updated(full, address, Some("SBC"), None).is_none());
-    }
-
-    #[test]
-    fn a_headset_starts_where_it_settled_and_earns_the_top_back() {
-        assert_eq!(next_start(0, 2, 5, 4), 2, "stepped down to 2");
-        assert_eq!(next_start(2, 2, 0, 4), 1, "a clean stream climbs one");
-        assert_eq!(next_start(1, 0, 0, 4), 0);
-        assert_eq!(next_start(0, 9, 3, 3), 2, "never past the last level");
-        let dir = std::env::temp_dir().join(format!("y2-radiod-start-{}", std::process::id()));
-        std::fs::create_dir_all(dir.join("data/bluetooth")).expect("fixture");
-        std::fs::create_dir_all(dir.join("run/y2")).expect("fixture");
-        let root = Root::new(&dir);
-        learn(&root, "aa:bb:cc:dd:ee:ff", "AAC", 3, 4);
-        learn(&root, "aa:bb:cc:dd:ee:ff", "SBC", 2, 4);
-        let file = dir.join("run/y2/bt-start/AA:BB:CC:DD:EE:FF-AAC");
-        assert_eq!(std::fs::read_to_string(&file).expect("start"), "3\n");
-        assert!(!dir.join("run/y2/bt-start/AA:BB:CC:DD:EE:FF-SBC").exists());
-        learn(&root, "AA:BB:CC:DD:EE:FF", "AAC", 3, 0);
-        assert_eq!(std::fs::read_to_string(&file).expect("start"), "2\n");
-        std::fs::remove_dir_all(dir).expect("cleanup");
     }
 
     #[test]

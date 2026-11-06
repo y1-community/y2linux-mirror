@@ -184,6 +184,10 @@ impl Supervise {
                     "a2dp-source",
                     "--loglevel=warning",
                     &keep_alive,
+                    // One rate for every headset and codec, the rate most music has: no LDAC
+                    // at 88.2/96 kHz (Reborn refused those streams and stayed on the jack) and
+                    // no resampling of CD audio. BlueALSA takes 48 kHz where 44.1 is refused.
+                    "--a2dp-force-audio-cd",
                 ];
                 argv.extend(codecs.iter().map(String::as_str));
                 command::run(&self.root, &argv, 5.0).ok
