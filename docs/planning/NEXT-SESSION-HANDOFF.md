@@ -1,6 +1,14 @@
 # Next-session handoff — Y2Linux 1.0 Beta 8.4 candidate (latest entry first; started 2026-10-09 as the deep-sleep continuation)
 
-> **START HERE (2026-11-06): BETA 9.3.16 (BASELINE 224) RELEASE.** Steady Bluetooth after the 2026-11-06 review
+> **START HERE (2026-11-08): BETA 9.3.17 (BASELINE 225) RELEASE.** Report fixes after the 2026-11-08 review of
+> #88, #98, Y2Reborn #102–#105 (ledger F74–F77), written to hold broadly (owner: stability over optimisation): covers
+> settle at ≥ 250 ms queued or 500 ms (`Unsettled::due`), uMTP 0007 (names), `AutoOutput` readiness + retries,
+> thumbnail cache name with `Key::folder_revision` (thumb4-). Open: #104 (reporter: which files), #99 (soundbar +
+> Wi-Fi, report owed), #88's "Kate Bush - π" (path asked), mono-only headsets (stereo sink), Y2Linux #95/#94 not
+> reviewed. Next free label 226, sequence above 15000, next version 9.3.18
+> ([Beta 9.3.17 report](../validation/Y2-LINUX-1.0-BETA-9.3.17.md)).
+>
+> Previous entry: **START HERE (2026-11-06): BETA 9.3.16 (BASELINE 224) RELEASE.** Steady Bluetooth after the 2026-11-06 review
 > of #96, Y2Reborn #99/#87 and 28 reports (ledger F69–F73): continuous Bluetooth PCM in Reborn (`bridge` feeds the
 > kept sink, no BT drain, 8 × 1024 ring, 3 s pause grace, no probe open), BlueALSA 0005/0007/0008 gone, SBC/AAC fixed
 > rate by default, 44.1 kHz for all, y2-radiod quick-drop park. The Buildroot patch copy now removes dropped Y2

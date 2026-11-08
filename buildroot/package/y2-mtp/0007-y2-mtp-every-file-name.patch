@@ -1,0 +1,260 @@
+From: Y2Linux maintainers
+Subject: [PATCH] Accept every file name a computer can send
+
+Some music never copied over USB (Y2Linux #88). Three causes, all in the
+name handling, none in the files:
+
+- A name with ".." anywhere was refused as a path step ("05 I
+  Still....m4a"). Only "." and ".." themselves are refused now: slashes
+  and backslashes already become '_', so no name can leave its folder,
+  and the platform's openat2 RESOLVE_BENEATH stays the real boundary.
+- A character outside the Basic Multilingual Plane (most emoji) arrives
+  as a UTF-16 surrogate pair. Each half became a 3-byte character of its
+  own, invalid UTF-8, so the name was refused. The pair is one code point
+  now, a lone half U+FFFD. The other direction ended a name at its first
+  4-byte character, so a file copied by a card reader showed cut off on
+  the computer: it is a surrogate pair now, never split at the 255-unit
+  limit.
+- ';' became '_'. FAT, exFAT, ext4 and Windows all allow it, and the
+  renamed copy looked like a different file to sync tools (MusicBee
+  copied it again on every sync). The characters FAT and exFAT forbid
+  still become '_'.
+
+A name of 255 UTF-16 units is up to 765 bytes of UTF-8: the name buffers
+take 1024 bytes, so long CJK or emoji names are no longer cut.
+
+diff --git a/inc/fs_handles_db.h b/inc/fs_handles_db.h
+index 4b07cea..a2c8dab 100644
+--- a/inc/fs_handles_db.h
++++ b/inc/fs_handles_db.h
+@@ -34,7 +34,8 @@ typedef struct fs_entry fs_entry;
+ typedef int64_t mtp_size;
+ typedef int64_t mtp_offset;
+ 
+-#define FS_HANDLE_MAX_FILENAME_SIZE 256
++/* Y2 (#88): 255 UTF-16 units are up to 765 bytes of UTF-8 (CJK, emoji). */
++#define FS_HANDLE_MAX_FILENAME_SIZE 1024
+ 
+ struct fs_entry
+ {
+diff --git a/src/mtp.c b/src/mtp.c
+index ded710a..a9f4e5d 100644
+--- a/src/mtp.c
++++ b/src/mtp.c
+@@ -199,7 +199,7 @@ int parse_incoming_dataset(mtp_ctx * ctx,void * datain,int size,uint32_t * newha
+ 	uint32_t type;
+ #endif
+ 	unsigned char string_len;
+-	char tmp_str[256+1];
++	char tmp_str[FS_HANDLE_MAX_FILENAME_SIZE+1];
+ 	uint16_t unicode_str[256+1];
+ 	char * parent_folder;
+ 	char * tmp_path;
+diff --git a/src/mtp_sanitize.c b/src/mtp_sanitize.c
+index d41571b..56d83fa 100644
+--- a/src/mtp_sanitize.c
++++ b/src/mtp_sanitize.c
+@@ -115,7 +115,6 @@ static int is_forbidden_ascii(unsigned char c)
+ 		case '<':
+ 		case '>':
+ 		case '|':
+-		case ';':
+ 			return 1;
+ 		default:
+ 			return 0;
+@@ -144,7 +143,10 @@ int sanitize_name(char *str, int max_len)
+ 	 * Patterns caught: "..", "../", "..\\", "%2e%2e" is NOT decoded here
+ 	 * (URL decoding must happen before calling this function).
+ 	 */
+-	if (strstr(str, "..") != NULL)
++	/* Y2 (#88): only a name that is "." or ".." (or becomes one) is a step out of
++	 * its folder. "Still....m4a" or "a..b" are ordinary names, and slashes and
++	 * backslashes become '_' below, so no name can reach another folder. */
++	if (!strcmp(str, ".") || !strcmp(str, ".."))
+ 		return -1;
+ 
+ 	if (!utf8_validate(str))
+diff --git a/src/usbstring.c b/src/usbstring.c
+index 6df3b26..34033d3 100644
+--- a/src/usbstring.c
++++ b/src/usbstring.c
+@@ -203,12 +203,20 @@ int utf8_encode(char *out, uint32_t unicode)
+ 	}
+ }
+ 
++/*
++ * Y2 (#88): a character outside the Basic Multilingual Plane (most emoji: 🌎, 🪐)
++ * arrives from the host as a UTF-16 surrogate pair. Combine the pair into one
++ * code point (4 UTF-8 bytes); each half used to become a 3-byte "character" of
++ * its own, which is invalid UTF-8, so the name was refused. A lone half becomes
++ * U+FFFD. A name that does not fit is cut at a whole character and reported.
++ */
+ int unicode2charstring(char * str, uint16_t * unicodestr, int maxstrsize)
+ {
+ 	int i,j,ret;
+ 	int chunksize;
+ 	char tmpstr[8];
+ 	unsigned char * byte_access;
++	uint32_t unit, low;
+ 
+ 	// Use bytes accesses instead of half word accesses to support unaligned addresses on pre ARMv7 CPUs.
+ 	byte_access = (unsigned char *)unicodestr;
+@@ -217,9 +225,29 @@ int unicode2charstring(char * str, uint16_t * unicodestr, int maxstrsize)
+ 	i = 0;
+ 	while( byte_access[0] || byte_access[1] )
+ 	{
+-		chunksize = utf8_encode( (char*)&tmpstr, ( ((uint16_t)byte_access[1]) << 8 ) | byte_access[0] );
++		unit = ( ((uint32_t)byte_access[1]) << 8 ) | byte_access[0];
+ 		byte_access += 2;
+ 
++		if( unit >= 0xD800 && unit <= 0xDBFF )
++		{
++			low = ( ((uint32_t)byte_access[1]) << 8 ) | byte_access[0];
++			if( low >= 0xDC00 && low <= 0xDFFF )
++			{
++				unit = 0x10000 + ((unit - 0xD800) << 10) + (low - 0xDC00);
++				byte_access += 2;
++			}
++			else
++			{
++				unit = 0xFFFD;
++			}
++		}
++		else if( unit >= 0xDC00 && unit <= 0xDFFF )
++		{
++			unit = 0xFFFD;
++		}
++
++		chunksize = utf8_encode( (char*)&tmpstr, unit );
++
+ 		if(!chunksize)
+ 		{   // Error -> default character
+ 			tmpstr[0] = '?';
+@@ -237,7 +265,6 @@ int unicode2charstring(char * str, uint16_t * unicodestr, int maxstrsize)
+ 		}
+ 		else
+ 		{
+-			str[ maxstrsize - 1 ] = 0;
+ 			ret = 1;
+ 			break;
+ 		}
+@@ -322,42 +349,90 @@ uint16_t utf2unicode(const unsigned char* pInput, int * ofs)
+ 	return 0x0000;
+ }
+ 
+-int char2unicodestring(char * unicodestr, int index, int maxsize, char * str, int unicodestrsize)
++/* Y2 (#88): one whole UTF-8 character: its code point and length, 0 at the end
++ * of the string. An invalid byte stands for U+FFFD and is skipped alone. */
++static int utf8_decode(const unsigned char *s, uint32_t *cp)
+ {
+-	uint16_t unicode;
+-	int ofs, len, start;
+-	int unicode_size;
+-
+-	start = index;
+-	len = 0;
+-	ofs = 0;
+-	unicode_size = 0;
+-	do
+-	{
+-		unicode = utf2unicode((unsigned char*)str, &ofs);
+-		str = str + ofs;
+-
+-		if(index + 2 >= maxsize)
+-			return -1;
++	int n, i;
++	uint32_t min;
+ 
+-		unicodestr[index++] = unicode & 0xFF;
+-		unicodestr[index++] = (unicode >> 8) & 0xFF;
++	if( !s[0] )
++		return 0;
++	if( s[0] < 0x80 )
++	{
++		*cp = s[0];
++		return 1;
++	}
++	if( (s[0] & 0xE0) == 0xC0 )      { n = 2; min = 0x80;    *cp = s[0] & 0x1F; }
++	else if( (s[0] & 0xF0) == 0xE0 ) { n = 3; min = 0x800;   *cp = s[0] & 0x0F; }
++	else if( (s[0] & 0xF8) == 0xF0 ) { n = 4; min = 0x10000; *cp = s[0] & 0x07; }
++	else                             { *cp = 0xFFFD; return 1; }
+ 
+-		unicode_size += 2;
++	for( i = 1; i < n; i++ )
++	{
++		if( (s[i] & 0xC0) != 0x80 )
++		{
++			*cp = 0xFFFD;
++			return 1;
++		}
++		*cp = (*cp << 6) | (s[i] & 0x3F);
++	}
++	if( *cp < min || *cp > 0x10FFFF || (*cp >= 0xD800 && *cp <= 0xDFFF) )
++		*cp = 0xFFFD;
++	return n;
++}
+ 
+-		len++;
+-	} while(unicode && ofs && unicode_size < unicodestrsize*2 && unicode_size < 255 * 2 );
++/*
++ * Y2 (#88): a name to the host as UTF-16LE, the terminator included, at most
++ * 255 units (the MTP string limit). A 4-byte UTF-8 character (most emoji) is a
++ * surrogate pair; it used to end the name, so a file copied to the card by a
++ * card reader showed on the computer cut off at its first emoji. A pair is
++ * never split by the limit. Returns the units written, -1 if out of room.
++ */
++int char2unicodestring(char * unicodestr, int index, int maxsize, char * str, int unicodestrsize)
++{
++	const unsigned char *s = (const unsigned char *)str;
++	int limit = unicodestrsize < 255 ? unicodestrsize : 255;
++	int len = 0, n, count, i;
++	uint32_t cp = 0;
++	uint16_t units[2];
+ 
+-	if( unicode_size >= 255 * 2 )
++	for(;;)
+ 	{
+-		if(start + ((unicodestrsize*2)-2) >= maxsize)
+-			return -1;
++		n = utf8_decode(s, &cp);
++		count = 0;
++		if( n )
++		{
++			if( cp > 0xFFFF )
++			{
++				units[0] = (uint16_t)(0xD800 + ((cp - 0x10000) >> 10));
++				units[1] = (uint16_t)(0xDC00 + ((cp - 0x10000) & 0x3FF));
++				count = 2;
++			}
++			else
++			{
++				units[0] = (uint16_t)cp;
++				count = 1;
++			}
++		}
+ 
+-		unicodestr[start + ((255*2)-2)] = 0x00;
+-		unicodestr[start + ((255*2)-1)] = 0x00;
++		if( !n || len + count + 1 > limit )
++		{
++			if( index + 2 >= maxsize )
++				return -1;
++			unicodestr[index++] = 0x00;
++			unicodestr[index++] = 0x00;
++			return len + 1;
++		}
+ 
+-		len = 255;
++		for( i = 0; i < count; i++ )
++		{
++			if( index + 2 >= maxsize )
++				return -1;
++			unicodestr[index++] = units[i] & 0xFF;
++			unicodestr[index++] = (units[i] >> 8) & 0xFF;
++		}
++		len += count;
++		s += n;
+ 	}
+-
+-	return len;
+ }

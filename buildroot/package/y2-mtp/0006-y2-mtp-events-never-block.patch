@@ -12,9 +12,10 @@ Queue events and write them from their own thread; a full queue (16)
 drops the oldest event.
 
 diff --git a/src/mtp.c b/src/mtp.c
+index 3629543..455c4e7 100644
 --- a/src/mtp.c
 +++ b/src/mtp.c
-@@ -956,11 +956,58 @@
+@@ -956,11 +956,59 @@ uint32_t mtp_get_storage_flags(mtp_ctx * ctx, uint32_t storage_id)
  	return 0xFFFFFFFF;
  }
  
@@ -59,6 +60,7 @@ diff --git a/src/mtp.c b/src/mtp.c
 +		ret = write_usb( ctx->usb_ctx, EP_DESCRIPTOR_INT_IN, data, size );
 +
 +		PRINT_DEBUG("y2_event_thread : write_usb return: %d", ret );
++		(void)ret; /* PRINT_DEBUG is empty outside debug builds */
 +	}
 +
 +	return NULL;
@@ -74,13 +76,15 @@ diff --git a/src/mtp.c b/src/mtp.c
  
  	size = build_event_dataset( ctx, event_buffer, sizeof(event_buffer), event , ctx->session_id, 0x00000000, nbparams, parameters);
  	if(size < 0)
-@@ -969,9 +1016,30 @@
+@@ -969,9 +1017,30 @@ int mtp_push_event(mtp_ctx * ctx, uint32_t event, int nbparams, uint32_t * param
  	PRINT_DEBUG("mtp_push_event : Event packet buffer - %d Bytes :",size);
  	PRINT_DEBUG_BUF(event_buffer, size);
  
 -	ret = write_usb(ctx->usb_ctx,EP_DESCRIPTOR_INT_IN,event_buffer,size);
 -
 -	PRINT_DEBUG("write_usb return: %d", ret );
+-
+-	return ret;
 +	pthread_mutex_lock( &y2_event_lock );
 +	if( !y2_event_thread_started )
 +	{
@@ -105,7 +109,6 @@ diff --git a/src/mtp.c b/src/mtp.c
 +	y2_event_count++;
 +	pthread_cond_signal( &y2_event_ready );
 +	pthread_mutex_unlock( &y2_event_lock );
- 
--	return ret;
++
 +	return size;
  }

@@ -25,6 +25,7 @@ extern void fill_ep_descriptor(mtp_ctx *, usb_gadget *, struct usb_endpoint_desc
 extern const unsigned short supported_op[];
 extern const int supported_op_size;
 #include "hash_utils.h"
+#include "usbstring.h"
 
 /* MoveObject/CopyObject exactly as a host sends them: three parameters. */
 static uint32_t transfer(mtp_ctx *ctx, uint16_t code, uint32_t handle, uint32_t storage, uint32_t parent, uint32_t *created)
@@ -63,6 +64,40 @@ static int leftovers(const char *folder)
 }
 /* Link the actual operation/parser/descriptor code with isolated media and a
  * pipe for host OUT packets. No device, gadget bind or raw sector operation. */
+
+/* Y2Linux #88: a name exactly as Windows sends it (UTF-16, emoji as surrogate
+ * pairs) is created under its UTF-8 form, and reads back to the computer as
+ * the same UTF-16, so sync tools see the file they copied. */
+static void named_copy(mtp_ctx *ctx, int channel, uint32_t store, const char *root,
+                       const uint16_t *name, const char *expected)
+{
+    unsigned n=0; while(name[n]) n++;
+    assert(n<255);
+    static unsigned char info[1024]; memset(info,0,sizeof info);
+    unsigned char command[32]={0}, data[32]={0};
+    MTP_PACKET_HEADER *ih=(void *)info, *ch=(void *)command, *dh=(void *)data;
+    ih->code=MTP_OPERATION_SEND_OBJECT_INFO; ih->operation=MTP_CONTAINER_TYPE_DATA;
+    unsigned char *dataset=info+sizeof *ih;
+    dataset[5]=0x30; dataset[8]=3; dataset[0x34]=n+1;
+    for(unsigned i=0;i<n;i++) { dataset[0x35+2*i]=name[i]&0xFF; dataset[0x36+2*i]=name[i]>>8; }
+    int length=sizeof *ih+0x35+2*(n+1); ih->length=length;
+    ch->code=MTP_OPERATION_SEND_OBJECT_INFO; ch->operation=MTP_CONTAINER_TYPE_COMMAND;
+    memcpy(command+sizeof *ch,&store,4);
+    assert(write(channel,info,length)==length);
+    int size=sizeof *ch+8, params_size=0; uint32_t params[4]={0};
+    assert(mtp_op_SendObjectInfo(ctx,ch,&size,params,&params_size)==MTP_RESPONSE_OK);
+    dh->code=MTP_OPERATION_SEND_OBJECT; dh->operation=MTP_CONTAINER_TYPE_DATA;
+    memcpy(data+sizeof *dh,"abc",3); size=sizeof *dh+3;
+    assert(mtp_op_SendObject(ctx,dh,&size,params,&params_size)==MTP_RESPONSE_OK);
+    char path[4096]; snprintf(path,sizeof path,"%s/%s",root,expected);
+    struct stat st; assert(!stat(path,&st) && st.st_size==3);
+    fs_entry *entry=get_entry_by_handle(ctx->fs_db,params[2]); assert(entry && !strcmp(entry->name,expected));
+    unsigned char back[600]={0};
+    int units=char2unicodestring((char *)back,0,sizeof back,entry->name,255);
+    assert(units==(int)n+1);
+    for(unsigned i=0;i<n;i++) assert(back[2*i]==(name[i]&0xFF) && back[2*i+1]==(name[i]>>8));
+}
+
 int main(int argc, char **argv)
 {
     assert(argc==2);
@@ -154,6 +189,17 @@ int main(int argc, char **argv)
             close(output[0]); close(output[1]);
         } else assert(access(path,F_OK));
         if(iteration==3) { ctx.fs_db=init_fs_db(&ctx); assert(alloc_root_entry(ctx.fs_db,store)); }
+    }
+    /* Y2Linux #88: every name a computer sends (dots, ';', emoji, long CJK). */
+    {
+        named_copy(&ctx,channel[1],store,argv[1],u"05 I Still....m4a","05 I Still....m4a");
+        named_copy(&ctx,channel[1],store,argv[1],u"Memphis; The Blues.mp3","Memphis; The Blues.mp3");
+        named_copy(&ctx,channel[1],store,argv[1],u"Coldplay - \U0001F30E.mp3","Coldplay - \xF0\x9F\x8C\x8E.mp3");
+        named_copy(&ctx,channel[1],store,argv[1],u"Kate Bush - \u03C0.mp3","Kate Bush - \xCF\x80.mp3");
+        uint16_t cjk[90]; char utf8[300]; unsigned p=0;
+        for(unsigned i=0;i<80;i++) { cjk[i]=0x6F22; memcpy(utf8+p,"\xE6\xBC\xA2",3); p+=3; }
+        memcpy(cjk+80,u".flac",6*sizeof(uint16_t)); memcpy(utf8+p,".flac",6);
+        named_copy(&ctx,channel[1],store,argv[1],cjk,utf8);  /* 245 bytes of UTF-8 */
     }
     /* MoveObject and CopyObject (Windows Explorer, libmtp hosts). */
     {
@@ -269,5 +315,5 @@ int main(int argc, char **argv)
         usb.ep_handles[EP_DESCRIPTOR_INT_IN]=-1; close(events[0]);
     }
     deinit_fs_db(ctx.fs_db); free(ctx.rdbuffer); free(ctx.rdbuffer2); free(ctx.wrbuffer); close(channel[0]); close(channel[1]);
-    puts("PASS events never block requests (#61), FS/HS descriptors, actual SendObjectInfo/SendObject/download: hidden staging, complete, truncated, cancelled, disconnected, new session, concurrent truncation; MoveObject/CopyObject: rename, between storages, folders, read-only, refusals");
+    puts("PASS file names as computers send them (#88: dots, ';', emoji, long CJK), events never block requests (#61), FS/HS descriptors, actual SendObjectInfo/SendObject/download: hidden staging, complete, truncated, cancelled, disconnected, new session, concurrent truncation; MoveObject/CopyObject: rename, between storages, folders, read-only, refusals");
 }

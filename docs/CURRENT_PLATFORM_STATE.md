@@ -1,6 +1,17 @@
 # Current Y2Linux platform state
 
-## Y2Linux 1.0 Beta 9.3.16, Baseline 224 — 2026-11-06 (latest, published)
+## Y2Linux 1.0 Beta 9.3.17, Baseline 225 — 2026-11-08 (latest, published)
+
+Release `1.0.0-beta.9.3.17`, tag `baseline-225`, Linux `132cbec9`, Reborn `e14b17b`, sequence 15000. Report fixes,
+written to hold for every format, name and headset (owner 2026-11-08): Now Playing covers for MP3/AAC/Opus/Ogg again
+(F74, Y2Reborn #102, Y2Linux #98: 9.3.16's 250 ms `settle` cushion was unreachable with 8 small decoder blocks; now
+≥ 250 ms queued or 500 ms after the first block); uMTP patch 0007 accepts every name a computer sends (F75, #88: ".."
+inside names, emoji surrogate pairs both ways, ';' kept, 1024-byte names); Bluetooth output switches once the PCM is
+negotiated and retries a failed switch (F76, Y2Reborn #103); Cover Flow thumbnails follow folder cover images (F77,
+Y2Reborn #105). Installed on the developer's player (Acknowledged in 87 s; folder cover 0.8 s after Play, gapless
+cover, 0 xruns). Details: [Beta 9.3.17 report](validation/Y2-LINUX-1.0-BETA-9.3.17.md).
+
+## Y2Linux 1.0 Beta 9.3.16, Baseline 224 — 2026-11-06 (published)
 
 Release `1.0.0-beta.9.3.16`, tag `baseline-224`, Linux `5d87f546`, Reborn `ceb4824`, sequence 14900. Steady Bluetooth
 (Y2Linux #96, Y2Reborn #99, #87): Reborn keeps a playing Bluetooth PCM open and fed with music or silence (kept sink
