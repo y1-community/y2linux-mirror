@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at": "2026-11-07T23:57:16Z",
+  "generated_at": "2026-11-08T02:42:06Z",
   "source_repo": "schulzcode/y2linux",
   "mirror_repo": "y1-community/y2linux-mirror",
   "title_prefix": "Portable Flashing Package: ",
@@ -59,7 +59,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454938775,
-          "sha256": "9da33d29ce60ffec2f9e6fc15932cb8c272c5b6032447dafb1125de8d50c91da",
+          "sha256": "3c8f885adda6158226c8e7983eba2b72e548cc6c3054ee03d6caf5b6f2c5f6a9",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-224/Y2Linux-1.0.0-beta.9.3.16-first-install-linux.zip"
         },
         {
@@ -68,8 +68,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 187295326,
-          "sha256": "bc7a0fca67b2f4a6ea850cd490a4eccd5057a8f037a775c79aefc7c8ff26b2f1",
+          "size": 187181281,
+          "sha256": "c0d12bef4edec82b6817d59be3b0c3e5c433e5b8e705e269b8f6894c35a0d305",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-224/Y2Linux-1.0.0-beta.9.3.16-first-install-macos.zip"
         },
         {
@@ -79,7 +79,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 273449746,
-          "sha256": "d88540c52d166872c9550be6eb620c5c2dd01ddaf857abe45acf0712b513d2ba",
+          "sha256": "294bd50970f472d1dcd503d63ec1b9ca150f1f6388510d05d94e6fd593ae0ffc",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-224/Y2Linux-1.0.0-beta.9.3.16-first-install-windows.zip"
         }
       ],
@@ -112,7 +112,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454942430,
-          "sha256": "bd34f7f6d479054d21c27f3cd5a1c2d1a33353a38390284e323891ca51f6eae6",
+          "sha256": "95a3c860ec1bc9e594de96bac7ec051e38336ea03e7e89807b1a5ea827fc8bfd",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-223/Y2Linux-1.0.0-beta.9.3.15-first-install-linux.zip"
         },
         {
@@ -121,8 +121,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 187298981,
-          "sha256": "cb941f967b70c70166724c8ef215c5416966ee5b960e19a6726e3b77c15284e1",
+          "size": 187184936,
+          "sha256": "ddb8930c42bd6350fd25165f24c2ce7af887dc6042380350118314551bbb52ae",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-223/Y2Linux-1.0.0-beta.9.3.15-first-install-macos.zip"
         },
         {
@@ -132,7 +132,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 273453401,
-          "sha256": "3f84fbbaf1aa839e7b39608493cac04e3873addbd13d1d8d2411efc70f41c6de",
+          "sha256": "8ad7421bfccfe53ea39deeedaf36a3dc12aa86f239a4501a9fb9e9e41eca02e4",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-223/Y2Linux-1.0.0-beta.9.3.15-first-install-windows.zip"
         }
       ],
@@ -164,7 +164,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454931319,
-          "sha256": "e289958dfc81cd788cf912ef1aa852f3a992f2f1900482814afcf14bb5e95551",
+          "sha256": "c78a6d9804054382352570e96236ab291ed50bc69f92d484bad9a9052b475827",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-221/Y2Linux-1.0.0-beta.9.3.13-first-install-linux.zip"
         },
         {
@@ -173,8 +173,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 187287871,
-          "sha256": "33cba7753b50083d86cfb6568bd84b8d50c1ad9632168b902c5aab42e9d07e85",
+          "size": 187173826,
+          "sha256": "17ac2d7bff701bf56e331ae2b120d69818a5da06cc21097e0782e50a2538f471",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-221/Y2Linux-1.0.0-beta.9.3.13-first-install-macos.zip"
         },
         {
@@ -184,7 +184,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 273442290,
-          "sha256": "2904b99386a3b13125dc6c5496005a63d53180ab640991f150232d606f50f459",
+          "sha256": "b0bb43d3c8116ea2f16ad946e0e5a624fcc41b473fc67eb7e1fbdae81da426b1",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-221/Y2Linux-1.0.0-beta.9.3.13-first-install-windows.zip"
         }
       ],
@@ -216,7 +216,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454930808,
-          "sha256": "432dee109fe9c803bef82bf6a2d9df645a2dda4259dc234c2427ffc4368fc4df",
+          "sha256": "dd333be0ed0da6480903efdd85b9d9917fc06489588cb1689447979187a08ebb",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-220/Y2Linux-1.0.0-beta.9.3.12-first-install-linux.zip"
         },
         {
@@ -225,8 +225,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 187287360,
-          "sha256": "35fb6d91bdaad066be07f98c13f1ebff4bbfea43ed3523dcc585571e860a4284",
+          "size": 187173315,
+          "sha256": "dd8ba58a116e1b19d65f90cebc63b08cf0cde60640f114fae85b03c8be9c4974",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-220/Y2Linux-1.0.0-beta.9.3.12-first-install-macos.zip"
         },
         {
@@ -236,7 +236,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 273441779,
-          "sha256": "85e3583c7ca8c1858ffdfe3671df2ab6a3caa5bca76a2467b3d8a1954e63e5d1",
+          "sha256": "d5522970289f23e5a79f9525681fe09a9aceb2b26787b4104cb27e9c95c347a0",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-220/Y2Linux-1.0.0-beta.9.3.12-first-install-windows.zip"
         }
       ],
@@ -269,7 +269,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454927254,
-          "sha256": "2e73d6cc489a3101819a3beae15e39197cdb6cd2170d490382023362c0740c79",
+          "sha256": "0285e0103d06aaca471b37adcc2282ff824ac4c7f0497163a155ef53f656bdcf",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-215/Y2Linux-1.0.0-beta.9.3.7-first-install-linux.zip"
         },
         {
@@ -278,8 +278,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 187283805,
-          "sha256": "8e68e6027d78c8cdc83681ff767067351c4989b18c9805984cbfbacac75ea195",
+          "size": 187169760,
+          "sha256": "809c325a64028100df3ea82c25c37adf514376eb7e6d395d64431393febde8ec",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-215/Y2Linux-1.0.0-beta.9.3.7-first-install-macos.zip"
         },
         {
@@ -289,7 +289,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 273438225,
-          "sha256": "ac1cd5d871380fec1db90ed21df7cbe544cdc548d429d90e13e14c476fab1250",
+          "sha256": "27ea85f85e87d79c4894ca21cf0391a5cfbe22102088e407e36889e7781f8924",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-215/Y2Linux-1.0.0-beta.9.3.7-first-install-windows.zip"
         }
       ],
@@ -322,7 +322,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454363478,
-          "sha256": "edd42a14477749074bc7b8633faf20c856cf0a4d1e5f704c696968e7e6b301bc",
+          "sha256": "d89d17ab6c4a604ab74c0dddcf5aa68265c2654f3b359630d3ca7153577ce0f4",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-207/Y2Linux-1.0.0-beta.9.2.16-first-install-linux.zip"
         },
         {
@@ -331,8 +331,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186720030,
-          "sha256": "00fd51eaf5f714275bc351dc1e99c3ee6259f887be6609bdb1593ccd2cf05c2c",
+          "size": 186605985,
+          "sha256": "c5cd294e4b33a3f5866f0e9ab6912752c5592c2ee92ce1f6926e8b602911ef78",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-207/Y2Linux-1.0.0-beta.9.2.16-first-install-macos.zip"
         },
         {
@@ -342,7 +342,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272874449,
-          "sha256": "60c7617dadd91d90a9c4dbd40580a2dcde21a22271028d1d0997ebc1b5577f8a",
+          "sha256": "c30806bdb5c5aa1d0635e5adb44ec43056517715490a0489a314f52798cb0dad",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-207/Y2Linux-1.0.0-beta.9.2.16-first-install-windows.zip"
         }
       ],
@@ -375,7 +375,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454364112,
-          "sha256": "334c28ca01d22d081a4663cd709041456e590d59229879562de5f575f16b4078",
+          "sha256": "b70aee3101c50444f6f2fdbefe478f3441a72e0353d5390327ef39142bea625f",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-206/Y2Linux-1.0.0-beta.9.2.15-first-install-linux.zip"
         },
         {
@@ -384,8 +384,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186720663,
-          "sha256": "a693a52f63c6a9c3a7e64304e267d7b5c78102e6f6ad5174a8bc53809918396d",
+          "size": 186606618,
+          "sha256": "5017393912f54c0fe206bf6b0bd614c1960d3294362ce51ac130c36cb0364d70",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-206/Y2Linux-1.0.0-beta.9.2.15-first-install-macos.zip"
         },
         {
@@ -395,7 +395,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272875083,
-          "sha256": "adb9e84690a81f26cab39f67c974b42ba9e1e281ea0cc5c30546749586ee7095",
+          "sha256": "d279a5048cc88edb3272122c234409fd4c7740d3a26b1248dbb30956ff5208bc",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-206/Y2Linux-1.0.0-beta.9.2.15-first-install-windows.zip"
         }
       ],
@@ -427,7 +427,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454364999,
-          "sha256": "5b0edc43a54ddfbdf7b6c9d7f02b93f3b73f0a1776b6946cf7ae174d7bd69966",
+          "sha256": "7ddf046698dc46a0fa44bed450ab4ef6bc8b80b9cd8965402d3f83f4176396ce",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-205/Y2Linux-1.0.0-beta.9.2.14-first-install-linux.zip"
         },
         {
@@ -436,8 +436,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186721550,
-          "sha256": "27ba8c4c5a12fcd60e1f847298d80fbf8f9b918037700f2dadf7af9039112778",
+          "size": 186607505,
+          "sha256": "f44bdc4f7757631cd403cc8510cdbbb10adf895592787ad38e1e40e765994cda",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-205/Y2Linux-1.0.0-beta.9.2.14-first-install-macos.zip"
         },
         {
@@ -447,7 +447,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272875970,
-          "sha256": "b854d177702c66630f33cbd2d770e47544c42bdc5f8cdbedba5398c8746abb15",
+          "sha256": "cd58acdec06b467a48ea60a922fe1540a07cdac4f07210e20f6be6c44b23a968",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-205/Y2Linux-1.0.0-beta.9.2.14-first-install-windows.zip"
         }
       ],
@@ -479,7 +479,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454364797,
-          "sha256": "e07447522d6c7dd7074d0c67b9a5862c8a2dcd7094d8e2d4a8363f5418203a3c",
+          "sha256": "ec772556618454e71f13988c4e74ec55da34e2a15766698a20a3eaa622d49b7a",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-204/Y2Linux-1.0.0-beta.9.2.13-first-install-linux.zip"
         },
         {
@@ -488,8 +488,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186721348,
-          "sha256": "19e424ebc6884e5220ea2709426bfb3dfcc9fb4c54048380511bfb256f1acc55",
+          "size": 186607303,
+          "sha256": "470222604beb0277a7c0c5c5240c9d217cf617775d70962f8dcb90de9a755b6e",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-204/Y2Linux-1.0.0-beta.9.2.13-first-install-macos.zip"
         },
         {
@@ -499,7 +499,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272875768,
-          "sha256": "e887898f4e1d2945a0e853ad10937606984e656b17ff1ddf75c946b7a50337d9",
+          "sha256": "3a0c4d36c9493b89fdc93eda8bd743b5a1a7d57651035816a91bade262d250cb",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-204/Y2Linux-1.0.0-beta.9.2.13-first-install-windows.zip"
         }
       ],
@@ -531,7 +531,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454360453,
-          "sha256": "f10a6112356ab409acb4ce88c00d580b23afb3611edfec46292f670597509913",
+          "sha256": "a24bf207ec3b6eaa91ecc3bcf9cc2cf12ab3ea9d5892ab52a8d90f1f5fda3752",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-203/Y2Linux-1.0.0-beta.9.2.12-first-install-linux.zip"
         },
         {
@@ -540,8 +540,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186717004,
-          "sha256": "0f48b5a981676f57c8482feeafe043ab8cf38d4557d01c30cd6d7fe2181adf29",
+          "size": 186602959,
+          "sha256": "52d7542d2741c7358051aaea3b8f12c48ed1b7f2375b20529a654fcc1e30c320",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-203/Y2Linux-1.0.0-beta.9.2.12-first-install-macos.zip"
         },
         {
@@ -551,7 +551,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272871424,
-          "sha256": "43e474f7e4e265d6686fe774567dd9ffda72e0eb9ad88a1d797effdc58e03719",
+          "sha256": "89f5fb74ec7e02e892af98048d7ca8a77048b56498d7bd27dbfa58e98880c655",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-203/Y2Linux-1.0.0-beta.9.2.12-first-install-windows.zip"
         }
       ],
@@ -583,7 +583,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454360776,
-          "sha256": "6aca4bfc2ce7d48c6d1d7b54f15f2acf98225b3183b24a3ac9dee6e3579755df",
+          "sha256": "12ec869c9c79c6987e1cb497ec4620b1f36e36bea16b095ebc2b3693dd597aeb",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-202/Y2Linux-1.0.0-beta.9.2.11-first-install-linux.zip"
         },
         {
@@ -592,8 +592,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186717327,
-          "sha256": "c5c8b031a85ad44e630a6b3d7b776b8d39eacda039dc074689b17e10ad552796",
+          "size": 186603282,
+          "sha256": "031848c32654a7289d7a9d80b0f782914ad1377b5903072e59bab946e67af0b6",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-202/Y2Linux-1.0.0-beta.9.2.11-first-install-macos.zip"
         },
         {
@@ -603,7 +603,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272871747,
-          "sha256": "7bb9600c44ffcbe00036f8d03ec7ec66f3bd5283587c739e7c69f119a7fe0af2",
+          "sha256": "0d8223bdb804f32806d3e81f04dd610312600566686022b523cc74d4f481c986",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-202/Y2Linux-1.0.0-beta.9.2.11-first-install-windows.zip"
         }
       ],
@@ -635,7 +635,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454360010,
-          "sha256": "107865da56434fbd88c51e3fbcab88ac9e2522e50681cdebc45e2500ed30fd5f",
+          "sha256": "774999f924a192db433a98d50328531af50b31e9d360563836dacb045c3a1234",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-201/Y2Linux-1.0.0-beta.9.2.10-first-install-linux.zip"
         },
         {
@@ -644,8 +644,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186716562,
-          "sha256": "6f1c1d291904cf16c83f20504ab127bd57588927e35409a0da5d188199023271",
+          "size": 186602517,
+          "sha256": "d5e0569c1ce43f1dbdf54f2e8f00a555b576014147b7c87b8027d92354dbe6cc",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-201/Y2Linux-1.0.0-beta.9.2.10-first-install-macos.zip"
         },
         {
@@ -655,7 +655,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272870981,
-          "sha256": "cecdc9e5544ab2fdeea33447ad621690efa692fe13f63d90fec4bf4641826933",
+          "sha256": "e64fcc62a8bf707eef617baeb7b472891b006f99116affeec5a2ca09e9a4f451",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-201/Y2Linux-1.0.0-beta.9.2.10-first-install-windows.zip"
         }
       ],
@@ -687,7 +687,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454339868,
-          "sha256": "3a529cedb5c9167eb09d4953270c94ea8b9a2871ed0353ef70b783473858724f",
+          "sha256": "a7d01db6ad44297c9f056259aaf79d9f9ed7a20df56dd57ab77e1d295fc412ac",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-199/Y2Linux-1.0.0-beta.9.2.8-first-install-linux.zip"
         },
         {
@@ -696,8 +696,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186696420,
-          "sha256": "246220a43df47b0652294e6b17e4f1a095d8945295622a30333354ab6b87abc1",
+          "size": 186582375,
+          "sha256": "33c9e8607fffcb93305cf82a7cc7abb3372cc3bffed9dddfee5542e839ed68d6",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-199/Y2Linux-1.0.0-beta.9.2.8-first-install-macos.zip"
         },
         {
@@ -707,7 +707,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272850839,
-          "sha256": "5793c3c57cbe96ede29e857245c2e40637a4114c7e618623ffc73b850c78f1a0",
+          "sha256": "4e7c3b217eecc74b552663b175ed0379490e5cdb6f34188c23346fdcb8c311e3",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-199/Y2Linux-1.0.0-beta.9.2.8-first-install-windows.zip"
         }
       ],
@@ -739,7 +739,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454338654,
-          "sha256": "c23904b473dbbf30562b523052924794c2d80a8e2bcf21444de55acd398f6f64",
+          "sha256": "97d39ad42b23ac0fd760010aa6f0e46189dd4bb2220b24a0ce612d52ddbc2c72",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-198/Y2Linux-1.0.0-beta.9.2.7-first-install-linux.zip"
         },
         {
@@ -748,8 +748,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186695206,
-          "sha256": "5c1de22df6c07d08c72d579357495f1bd3281298ed6bd8c25f4361d85ffa3bc8",
+          "size": 186581161,
+          "sha256": "87a587600f591c010619044de988dbe8c109460c283e6de433cefd75d358375f",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-198/Y2Linux-1.0.0-beta.9.2.7-first-install-macos.zip"
         },
         {
@@ -759,7 +759,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272849625,
-          "sha256": "4e26d380a9930073f780f9474c53625ccf696e3803d5bd1cfefb6bfa76915069",
+          "sha256": "6b6876e67c290499c2979cc45f384d8acf0691257f0e3d2be74720c95ed98364",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-198/Y2Linux-1.0.0-beta.9.2.7-first-install-windows.zip"
         }
       ],
@@ -791,7 +791,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454333687,
-          "sha256": "d532a3fd895f9703c08e4c4909550709e7c1bce7dbb0da030f98335134418564",
+          "sha256": "d9abd6341a8abbe4eea3650b2b7a9bdad7c45a455998cbede995905d87c9e68b",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-197/Y2Linux-1.0.0-beta.9.2.6-first-install-linux.zip"
         },
         {
@@ -800,8 +800,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186690239,
-          "sha256": "7ab5741accb9fa62104238ab19a9072c8b97932993ec2eb9b505f59c53c3e678",
+          "size": 186576194,
+          "sha256": "e966cd4cbfd3ac3bc11f1a742b551326bd84d9f7017ec68dfce4974d53ddc228",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-197/Y2Linux-1.0.0-beta.9.2.6-first-install-macos.zip"
         },
         {
@@ -811,7 +811,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272844658,
-          "sha256": "81cdc6e8ce487ef162b3467030925188be9210c3f79ece14cd8e98c6278eaf30",
+          "sha256": "4e1b2742cefd52bad8b4acfd0aafc87775f217edb89b828d802a293a21f4f09d",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-197/Y2Linux-1.0.0-beta.9.2.6-first-install-windows.zip"
         }
       ],
@@ -843,7 +843,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454340741,
-          "sha256": "adf2a9bfdf81d345eb9a9501cafd279780a0ccb65519e1f92c088001e30c61e3",
+          "sha256": "9d6afddc88d6452b3024cf208c46808eeaf57eb45609c16406a52958607fb3ba",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-196/Y2Linux-1.0.0-beta.9.2.5-first-install-linux.zip"
         },
         {
@@ -852,8 +852,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186697292,
-          "sha256": "1cbda61962df4a48c9109840d2b8c029ffbfb9a6dfd57fc64ca9302eb192ead6",
+          "size": 186583247,
+          "sha256": "bdcd13da6879037779e65dc935a125e597018410a7dfb4c0688b9cc36778fb62",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-196/Y2Linux-1.0.0-beta.9.2.5-first-install-macos.zip"
         },
         {
@@ -863,7 +863,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272851712,
-          "sha256": "be821424fc0a9ea77c249264e68692c08be9c230633c5cfc94eaecd403399525",
+          "sha256": "ab0cd7f641be5ca678d130b2febbab23c375a56d3b152d690150c9ff4b96378c",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-196/Y2Linux-1.0.0-beta.9.2.5-first-install-windows.zip"
         }
       ],
@@ -895,7 +895,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454344016,
-          "sha256": "1267307a3a540411ccd03dd598d9f9836f8e6e44a8d068cbcbf4f1c12017b022",
+          "sha256": "720ccaffd5563e885890c58d44a50c8807db78d55b6950bd63b8ddc1db381423",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-195/Y2Linux-1.0.0-beta.9.2.4-first-install-linux.zip"
         },
         {
@@ -904,8 +904,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186700567,
-          "sha256": "eab1247e707a3f53866d2ca283f4bbb647804c7d24366dfac6e3faaa9afe8134",
+          "size": 186586522,
+          "sha256": "535d580a5b53934b9f8a1f116e3785de7f1d5e6070927fc08997efa144a41b8a",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-195/Y2Linux-1.0.0-beta.9.2.4-first-install-macos.zip"
         },
         {
@@ -915,7 +915,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272854987,
-          "sha256": "d3bb8a0e660d6075b447f74a3472adb010aed734beb28678abb9b7682dc3b5b5",
+          "sha256": "57564678d6de9845c8a3e7f95dd9c73a46a9584d73cf8f089bd6c6f2c3b933f4",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-195/Y2Linux-1.0.0-beta.9.2.4-first-install-windows.zip"
         }
       ],
@@ -947,7 +947,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454333301,
-          "sha256": "db8ac8bbd7f1de3cc030974845ce097439d06654f78c870349eb75298ec7b3ec",
+          "sha256": "7794b92fea1a41f5337b41b5e2d043e3bda0c95395d6c8d73420a75672d99d5c",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-194/Y2Linux-1.0.0-beta.9.2.3-first-install-linux.zip"
         },
         {
@@ -956,8 +956,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186689852,
-          "sha256": "d3eae573ac03c4122da67b0ef39dcd55da8abdd55e92b5e29c8113babd137ed6",
+          "size": 186575807,
+          "sha256": "bc98dbfcc150369fbff070aa062d9b5d6974f7d18c2617cef34ac77fd751f29e",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-194/Y2Linux-1.0.0-beta.9.2.3-first-install-macos.zip"
         },
         {
@@ -967,7 +967,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272844272,
-          "sha256": "e2b1686083d7af5d680ea8e49cae39e23cf83ba960c5bab27e80ec09e0beccce",
+          "sha256": "8778abda3fdf009fa3d0b2639d7ca894016530132df9445d2b038aa89851640b",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-194/Y2Linux-1.0.0-beta.9.2.3-first-install-windows.zip"
         }
       ],
@@ -999,7 +999,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454309522,
-          "sha256": "95789788fbcdd6aeec9b849ccd308c1e81939ddea62cde37b0bfb894fd4b7521",
+          "sha256": "f4cac0400b55427032484743bb0d66e51ee81971a1a21577227ccd23f56acdbb",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-193/Y2Linux-1.0.0-beta.9.2.2-first-install-linux.zip"
         },
         {
@@ -1008,8 +1008,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186666074,
-          "sha256": "cd102de66b6b367195a5b6c7dfe107c41f84aa43b085e5648e02b2262db53079",
+          "size": 186552029,
+          "sha256": "2b874d8f0c9f40ead9bfdae185275f42f22b47af40d9075ad6f7e56290856797",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-193/Y2Linux-1.0.0-beta.9.2.2-first-install-macos.zip"
         },
         {
@@ -1019,7 +1019,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272820493,
-          "sha256": "491304714bdbb225cc7ad11de1918bf7c81f07bccdb968b923ade24c74c6de97",
+          "sha256": "3660338372194b6a3d4ed8362fc590b28ee83646dd387f7e540f1ef5b9b4a865",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-193/Y2Linux-1.0.0-beta.9.2.2-first-install-windows.zip"
         }
       ],
@@ -1051,7 +1051,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454305154,
-          "sha256": "04de26fc7f759a34f0f547bae77edc57a053386d08e7c3088df4ed7ba5e905fc",
+          "sha256": "2f952d393e4d50d6841ac6571f508479f9336609dfa910c3e9b759f65e3076bc",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-191/Y2Linux-1.0.0-beta.9.2-first-install-linux.zip"
         },
         {
@@ -1060,8 +1060,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186661707,
-          "sha256": "4111a8bec7fac4beaa29726cf321324f8d7f86189e4b28aa4818fedf12f819ff",
+          "size": 186547662,
+          "sha256": "45874635e6b674146175247ad711ced2718df3e9a4e7bccaa4f8f871f342009b",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-191/Y2Linux-1.0.0-beta.9.2-first-install-macos.zip"
         },
         {
@@ -1071,7 +1071,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272816125,
-          "sha256": "d8756c9c54c2195fe9c833c797610a320f8224016e4eb03be993205191cbed9f",
+          "sha256": "9d4d57e94ac0e3f9d1781beb083f32fcfa915c0b567b9134e0292af59d735bde",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-191/Y2Linux-1.0.0-beta.9.2-first-install-windows.zip"
         }
       ],
@@ -1103,7 +1103,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454295939,
-          "sha256": "10d0e12f104a2f981711299208b34b44876e84aed77d4d7de7e14351020d29ee",
+          "sha256": "692430df27af2382c1ad6e4bc7d074c8a34ec4d4a5aea9e731d0a5d819b6fe1f",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-189/Y2Linux-1.0.0-beta.9.1-first-install-linux.zip"
         },
         {
@@ -1112,8 +1112,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186652492,
-          "sha256": "d3b73d7013765548285c8710652180a7ee690d7e2fc85f65d5075772c5b6f5e2",
+          "size": 186538447,
+          "sha256": "9fab5b108468aa86c11de087c4014b2aa84d3614e766a08a9f12f8dcabc7d3bf",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-189/Y2Linux-1.0.0-beta.9.1-first-install-macos.zip"
         },
         {
@@ -1123,7 +1123,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272806910,
-          "sha256": "d5078ff7a368065faae8f538e51bcfe7c9a3e1ccfa6341fb2a5cd3c7b130d5ff",
+          "sha256": "14fcf4636a5e4fbcb87604f454d43b6fb37b83d76d543436e2bd94f983493ebd",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-189/Y2Linux-1.0.0-beta.9.1-first-install-windows.zip"
         }
       ],
@@ -1155,7 +1155,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 454159168,
-          "sha256": "776cef2d6e388b9e9ea90ed8b558f92ef61722bd0f7a34e289380208492f316d",
+          "sha256": "70efa85c2e9eaecaff2050ea0e3c11ce34b91b7405a1568e778d0ca96582f527",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-186/Y2Linux-1.0.0-beta.9.0-first-install-linux.zip"
         },
         {
@@ -1164,8 +1164,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 186515720,
-          "sha256": "461ef126095a5d959338b1943bf95aff1780a0c58f96d3367c2b2da9ecce1f92",
+          "size": 186401675,
+          "sha256": "eb1f9bfff40c20a4f6425475fffc214fcceaab93154160286f910466156da19b",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-186/Y2Linux-1.0.0-beta.9.0-first-install-macos.zip"
         },
         {
@@ -1175,7 +1175,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 272670139,
-          "sha256": "92514fa72ae985bd9979cf74936bb6680728a1d976916e5711a5d8a4ccc500b5",
+          "sha256": "27edd842bc9a48381bf637a0894fca92711141f33d7e4229048fe44e90e7c1ab",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-186/Y2Linux-1.0.0-beta.9.0-first-install-windows.zip"
         }
       ],
@@ -1208,7 +1208,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459964491,
-          "sha256": "7254b86c76d99ba791d36855b687f969d4b7d13f86061736919548bd8107d9ce",
+          "sha256": "1744d6aa81c9784976022a4e985bcbb5921cea233f1338f708029d9c5efa9eb8",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-164/Y2Linux-1.0.0-beta.8.43-first-install-linux.zip"
         },
         {
@@ -1217,8 +1217,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 192321042,
-          "sha256": "10e5b2e66031cde26c702b255c91e463b2ba683b8716fc93e121b2482eecc72b",
+          "size": 192206997,
+          "sha256": "4724e0be3f52b05d59a426554b7105237f825ddfcdd2dfd526ff06c5e70cd1f1",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-164/Y2Linux-1.0.0-beta.8.43-first-install-macos.zip"
         },
         {
@@ -1228,7 +1228,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278475462,
-          "sha256": "260d4281d5f2fbf8836142d25b0b864b81fc635904fd012d342edc1465bfb3f5",
+          "sha256": "bd29ca087d44a9863ba0d23ce984d81988a47627678969895b833b72883a6f30",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-164/Y2Linux-1.0.0-beta.8.43-first-install-windows.zip"
         }
       ],
@@ -1260,7 +1260,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459938368,
-          "sha256": "1ae34b228489ba1480b73de8b1ddeef174f214bd42fff28b1e0839c6b08eae5e",
+          "sha256": "2dd3c99769b787d0cf463c528e282b6cb6746eadfc750f392af3be506097964d",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-163/Y2Linux-1.0.0-beta.8.42-first-install-linux.zip"
         },
         {
@@ -1269,8 +1269,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 192294921,
-          "sha256": "380254b847113d97074a3ed81b5ac7fec551005eb6e0a130339a083654a31a8e",
+          "size": 192180876,
+          "sha256": "b93bcf810df599835547f9d48d38fa7623e5cb31ee9e44563621c6e827c47c37",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-163/Y2Linux-1.0.0-beta.8.42-first-install-macos.zip"
         },
         {
@@ -1280,7 +1280,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278449339,
-          "sha256": "5e14e579265ca855d0db1b83adca877b326b9b1adacf163c647e927844e47767",
+          "sha256": "d3a7d2f80f4f80d370c870091c238ea33497265662ada4b268b4e3868af3a9ff",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-163/Y2Linux-1.0.0-beta.8.42-first-install-windows.zip"
         }
       ],
@@ -1312,7 +1312,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459878392,
-          "sha256": "5d24a892aa0e4da22b1126af737c9cce4eee25ed440e3606f2e27ff2dd04d647",
+          "sha256": "09507b9f4478c7afffd461af24ce3391d809d3a9be9df41066d4badb9b0ef255",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-159/Y2Linux-1.0.0-beta.8.41-first-install-linux.zip"
         },
         {
@@ -1321,8 +1321,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 192234944,
-          "sha256": "3e69a5e52b2e8a045e430f2ec0d791a61be5d707cff3d3d0b3df88bc5036d147",
+          "size": 192120899,
+          "sha256": "e6b3f6b9d60e2879e64a1934df7ff12526d2606f769eaf0d972c6e4ddf384181",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-159/Y2Linux-1.0.0-beta.8.41-first-install-macos.zip"
         },
         {
@@ -1332,7 +1332,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278389363,
-          "sha256": "a58223f2165c3b4f56317a09876ce04bd0ca5513c135c2a19dd40f72106f5bff",
+          "sha256": "07c18157ba5d2310d392a06ac9e13c373d8a8dc534a2934ea1caec82e8f4635f",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-159/Y2Linux-1.0.0-beta.8.41-first-install-windows.zip"
         }
       ],
@@ -1364,7 +1364,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459859154,
-          "sha256": "cba1887834effb4fe5c5d0d4ec0eb5d198511c29dd0c661732229200b33e400b",
+          "sha256": "e39303bdb04581e14905ff75dcfc0f83cba426fc4014dc49dd94b50a67d11ffb",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-154/Y2Linux-1.0.0-beta.8.40-first-install-linux.zip"
         },
         {
@@ -1373,8 +1373,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 192215706,
-          "sha256": "ee0a4f064fdc46330efff9014c793c7a0aa53a76ea2eab776e13557e61e5bb10",
+          "size": 192101661,
+          "sha256": "487c455febe4485c92348ce7f7f29b4d44d661e6b7d31b3b484b9a26f93bed87",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-154/Y2Linux-1.0.0-beta.8.40-first-install-macos.zip"
         },
         {
@@ -1384,7 +1384,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278370125,
-          "sha256": "9bf19d9e99d8f6006ac08bb2661b831b8cfc016134ca473429ac09388c6d3d04",
+          "sha256": "607869ff4993ef910621b4b964155da336f0d6deae027a8aa0d998c4f1e0fdf5",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-154/Y2Linux-1.0.0-beta.8.40-first-install-windows.zip"
         }
       ],
@@ -1416,7 +1416,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459858964,
-          "sha256": "c8c3d963685724d040cae2e92d0f139ea76419e9e9772c29daaa285467592309",
+          "sha256": "179acdf7409769163fe4cfb53816ff81a29c3a2926cccefbca01f85e9adbb5e8",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-153/Y2Linux-1.0.0-beta.8.39-first-install-linux.zip"
         },
         {
@@ -1425,8 +1425,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 192215516,
-          "sha256": "87c432ebbbd43f1f5579bcdbcdc98bcee78a343c10fa389c11184f9dd329301e",
+          "size": 192101471,
+          "sha256": "530b6a86729c92367521dc3620134499de2bbdcb41f926ad644c78ecc62ae9eb",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-153/Y2Linux-1.0.0-beta.8.39-first-install-macos.zip"
         },
         {
@@ -1436,7 +1436,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278369935,
-          "sha256": "dddabaacfc1252697b713fd7dcb60d1063e89f0cda027e5ea2b60b1f0fac7990",
+          "sha256": "ee45129aa02be4b4fd172cce4fa40381c0f9df2b77f9f73db036a5100f99fc6f",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-153/Y2Linux-1.0.0-beta.8.39-first-install-windows.zip"
         }
       ],
@@ -1468,7 +1468,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459777929,
-          "sha256": "ff962b67f2cace7c2a08c3dc5868e52bcaef6d2889c60cd2fc0c227f13b1cccf",
+          "sha256": "a6fe72804d4ca77df12b43ef3843b8b49194cb00cb2c2c6f1bbb5c22cc5584c6",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-146/Y2Linux-1.0.0-beta.8.38-first-install-linux.zip"
         },
         {
@@ -1477,8 +1477,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 192134481,
-          "sha256": "c11dde20dad387591ecb85b8fb5481abf7450ce1f9223040a8eb5eae502448dc",
+          "size": 192020436,
+          "sha256": "4c0660366e77b0c9fefa1d4f188f2dded75788dea25fc7197382b3385ee1b7ba",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-146/Y2Linux-1.0.0-beta.8.38-first-install-macos.zip"
         },
         {
@@ -1488,7 +1488,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278288900,
-          "sha256": "8812504040ef7a8f0c3a4715e35a7b9cb3e8b29a0112817f8511e73505c9beb7",
+          "sha256": "234680975768fdad510075ae96154851d58ef19de8c45a85a527f8254498649d",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-146/Y2Linux-1.0.0-beta.8.38-first-install-windows.zip"
         }
       ],
@@ -1520,7 +1520,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459767115,
-          "sha256": "d8eb0d8bbf82bb72f217c7684f4e67ece59390932b858e0b77c43a6788820933",
+          "sha256": "5ce56daf8f7956e041c17ceddd2930172d410d92558414b34d4817705069e5f3",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-144/Y2Linux-1.0.0-beta.8.37-first-install-linux.zip"
         },
         {
@@ -1529,8 +1529,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 192123667,
-          "sha256": "07708362dd80761b67a719259a9061f72a19c83227e5815bec82dcbda7038289",
+          "size": 192009622,
+          "sha256": "9d4897f6f6c53942245f6448c81bf7dbf2f6b3697e19f21bbddd44173c511b62",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-144/Y2Linux-1.0.0-beta.8.37-first-install-macos.zip"
         },
         {
@@ -1540,7 +1540,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278278086,
-          "sha256": "204830f72a9389df4110f2f674b637724c2fd11795dcc69a1af80f70250b3077",
+          "sha256": "064d3d3c98a3fbbcd9e226d27a2a128c5d9a8bf42109cdcaa20359afb9089bdd",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-144/Y2Linux-1.0.0-beta.8.37-first-install-windows.zip"
         }
       ],
@@ -1572,7 +1572,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459758851,
-          "sha256": "4edfe9a32bd4dada958696d02da96a1c7cae35223a55326e9815a3a7194644a3",
+          "sha256": "0158fd8e503259f43abf404dd9f616bbdb7ee3ea73e2926b68747064e0be0aa9",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-138/Y2Linux-1.0.0-beta.8.36-first-install-linux.zip"
         },
         {
@@ -1581,8 +1581,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 192115403,
-          "sha256": "7db719223bc92e5df97195e32e50a92b68a5d850dda3191b0ec2335feed8c274",
+          "size": 192001358,
+          "sha256": "b2f326db1b19b8ce5ba6a3cbe4613bcffaf5b8f972ba74df33cffd138828c275",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-138/Y2Linux-1.0.0-beta.8.36-first-install-macos.zip"
         },
         {
@@ -1592,7 +1592,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278269822,
-          "sha256": "6bce7b0b5618f5bd13d80a9f878d4a88c82867b462184f37c78791697cf112d9",
+          "sha256": "0157e2186ac04aa0cb9f9e87e346c9f82d416943121e08534a8264f5253eb051",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-138/Y2Linux-1.0.0-beta.8.36-first-install-windows.zip"
         }
       ],
@@ -1624,7 +1624,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459744329,
-          "sha256": "65079b2b767a3eb0b6cb882619bc20c8e0af4203fb5b879056cf0a3dd2d128fc",
+          "sha256": "1ff394b22dfae83a8c9200f6e21b0716efb5e75f800beaa326f180f32b301fab",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-136/Y2Linux-1.0.0-beta.8.35-first-install-linux.zip"
         },
         {
@@ -1633,8 +1633,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 192100881,
-          "sha256": "4009552c2d4232b33ce3bd37bf9d0f1f131feda6e19d52c6148e315191dd1b83",
+          "size": 191986836,
+          "sha256": "a0792fa65ccf64c89eee0e862e0f7f202e2cbeb57f2dd83490d8ee7a7451cc30",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-136/Y2Linux-1.0.0-beta.8.35-first-install-macos.zip"
         },
         {
@@ -1644,7 +1644,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278255300,
-          "sha256": "328eda3516829f7898e0bc89c941e238aa36934dc38704ed7ac66ed79d0af503",
+          "sha256": "10ef503d2090222015dbcc50afaebd6426271584e6da38f92866aa86d5ea7eae",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-136/Y2Linux-1.0.0-beta.8.35-first-install-windows.zip"
         }
       ],
@@ -1676,7 +1676,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459743470,
-          "sha256": "e6ce8e46fcf161f9ef557b2bbcde8b7b337e77d0b25181c4854fbdf86752494e",
+          "sha256": "7438fb6025e0476b6cb78f8c7424e1b8f462a8161e76422d38c2efbaa3722f9a",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-135/Y2Linux-1.0.0-beta.8.34-first-install-linux.zip"
         },
         {
@@ -1685,8 +1685,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 192100021,
-          "sha256": "4d9eae78d1e57c87c04b0dc05f759c39bda543ab1af091b0d4f3b9ead11f8830",
+          "size": 191985976,
+          "sha256": "ff61373f2ba6758c2a3408a17cfd44417d5950e558b07d98fe22a267cabcd1f2",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-135/Y2Linux-1.0.0-beta.8.34-first-install-macos.zip"
         },
         {
@@ -1696,7 +1696,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278254441,
-          "sha256": "488384d231b4d94d2e78ede567a34cdd753447c33b54a7b4f87013884fef6a20",
+          "sha256": "8711882695dcab77144cc9b9f8dbcfc7d2b0b242aa321b3320d5ddfe44456e9d",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-135/Y2Linux-1.0.0-beta.8.34-first-install-windows.zip"
         }
       ],
@@ -1728,7 +1728,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459743033,
-          "sha256": "2f09be6377fe35f6d964bd65970f5c459febb54440abcbf17ec508c168c966db",
+          "sha256": "98eafab3ce7106ecf88ee7aec6412930ce05a44a9936ee767cfa56189fd67708",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-134/Y2Linux-1.0.0-beta.8.33-first-install-linux.zip"
         },
         {
@@ -1737,8 +1737,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 192099585,
-          "sha256": "f3d8cf996e2d72bc1e832b5174c7269cfa87b7e632a2dff3dee4d112c1f88993",
+          "size": 191985540,
+          "sha256": "b761a867a6fcc9d5c4dad7fc0fc44d6f0f2b42a0dd7b0c2da6df1a8412cc08e6",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-134/Y2Linux-1.0.0-beta.8.33-first-install-macos.zip"
         },
         {
@@ -1748,7 +1748,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278254004,
-          "sha256": "ad04eabb5e06a21ca6bc75c0f66b5bd098f6d31d248ae400466c13f4c269b43e",
+          "sha256": "26e34aa0993bff6964fd82e9c8274eb64e4920ecdd21656c0e3c7964847ff896",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-134/Y2Linux-1.0.0-beta.8.33-first-install-windows.zip"
         }
       ],
@@ -1780,7 +1780,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459637725,
-          "sha256": "a1a55fd7c44aab1cf39ee12e87638d9a8f63f616fcdc550d1376e1e42fc212e7",
+          "sha256": "b37f3ec8fb42cf1fb64f0e792fb315ce29f8e6693318eb2e70d76080c7d60322",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-130/Y2Linux-1.0.0-beta.8.31-first-install-linux.zip"
         },
         {
@@ -1789,8 +1789,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191994277,
-          "sha256": "843f55e9aa4eaf9a35c9eab8b86de39fab3c2553be31151ef60421dffe4a19a3",
+          "size": 191880232,
+          "sha256": "0f7165917359c7c9c0bb417224a72a14f624612b5a90dc5a36d0f64a3940f4d8",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-130/Y2Linux-1.0.0-beta.8.31-first-install-macos.zip"
         },
         {
@@ -1800,7 +1800,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278148696,
-          "sha256": "171fdbb93e6f7ce34f281c5b7a06a8dbdbb621b3260a32849aa3ad9214feafa0",
+          "sha256": "47c662697c2eab480d9149053e4fef79c48269a394bc8bd36126ed0d7972a16d",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-130/Y2Linux-1.0.0-beta.8.31-first-install-windows.zip"
         }
       ],
@@ -1832,7 +1832,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459634929,
-          "sha256": "3718e86d04fb363ba311be2b7f7fd515d763d26ab8133ec179299eed24c7348a",
+          "sha256": "60a02962458a9b828287afc08e9075ff0ef26a201a52d9400318cf2c9809e8c4",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-129/Y2Linux-1.0.0-beta.8.30-first-install-linux.zip"
         },
         {
@@ -1841,8 +1841,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191991481,
-          "sha256": "8ecc7251e556ac020a6470a32ed284c15a15a2be44d2e68285da4c0d2cde7bef",
+          "size": 191877436,
+          "sha256": "f65cf7de3257f3600ae94889b8ad6accc8401d5d0fd390bba2d18fd37db9fb61",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-129/Y2Linux-1.0.0-beta.8.30-first-install-macos.zip"
         },
         {
@@ -1852,7 +1852,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278145900,
-          "sha256": "a8b452db3423494c953b0406fa1f0238d6b82adac89bfa724132f4a36b1ed554",
+          "sha256": "5a7bd3d4b1c531792688cfe0401a0b1ef6fc290796d1164f40510cc4fa1d3999",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-129/Y2Linux-1.0.0-beta.8.30-first-install-windows.zip"
         }
       ],
@@ -1884,7 +1884,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459619154,
-          "sha256": "1d3490cb8f707038693f0a2873e475dc527b0e50a2ed93a0da8e38f98e850c68",
+          "sha256": "299e7d8766a561948636545442f032419d398021dee9029a582eb865ab2952bb",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-128/Y2Linux-1.0.0-beta.8.29-first-install-linux.zip"
         },
         {
@@ -1893,8 +1893,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191975706,
-          "sha256": "1995b8e690c9563321a28dbb67f0209d3ec4a76375a577ddb15c0791ef6805b1",
+          "size": 191861661,
+          "sha256": "8c96102ae5d1b67169a111993157c3169793e10ee24b2377feec6708a5a62e5e",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-128/Y2Linux-1.0.0-beta.8.29-first-install-macos.zip"
         },
         {
@@ -1904,7 +1904,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278130125,
-          "sha256": "90c95b98b79c1fde1baa19bcc08cbb281b0102f028e5b6e0564940bab1a5178b",
+          "sha256": "c32da5b81bf36043bad7ec850d3c4a04f6c9a87a89f51fa91c2ec8f29d71f21d",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-128/Y2Linux-1.0.0-beta.8.29-first-install-windows.zip"
         }
       ],
@@ -1936,7 +1936,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459616108,
-          "sha256": "e2da8782669e892a3635d92a780817ef81e29064abc92ccee0a908f0d8148ea3",
+          "sha256": "ff652a8c661392b05bf2630d8f5094758e5fecc4504cce2a9a75965f59ead68d",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-127/Y2Linux-1.0.0-beta.8.28-first-install-linux.zip"
         },
         {
@@ -1945,8 +1945,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191972660,
-          "sha256": "00c2b7e8a1bb860c36d482f7d82c3025cad456ea15c9673eb4565aa26dafe6aa",
+          "size": 191858615,
+          "sha256": "3b123ec19771254a9bac05272f74784d2fbb2992395ae82624f1f53350844147",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-127/Y2Linux-1.0.0-beta.8.28-first-install-macos.zip"
         },
         {
@@ -1956,7 +1956,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278127079,
-          "sha256": "66a1187b04918c48b3b1bd09709137a9d3ddb623cd694b2fe0dd34bf7ae96555",
+          "sha256": "2a57fe33061e9e8c0c687bdc8a0b207b5ffa79b9d9cfc95cb2ca6918b6e085e0",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-127/Y2Linux-1.0.0-beta.8.28-first-install-windows.zip"
         }
       ],
@@ -1988,7 +1988,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459610331,
-          "sha256": "b61c869c39cdf16d2a299340085291c3ecbc3b9b2b2ea8317d8cf7926a3343d9",
+          "sha256": "32afb2a77fc3e4b50ddd36a7bb62964702ff43775c8dce279b239a9640811f60",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-126/Y2Linux-1.0.0-beta.8.27-first-install-linux.zip"
         },
         {
@@ -1997,8 +1997,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191966883,
-          "sha256": "25e39a917368713befff00e33bcd3f21ba63a817dba020dc0c7aabbf9da5b3d9",
+          "size": 191852838,
+          "sha256": "020a720033466a79b43bf42e0ec3156d453c0ba8ea62846ab798a3d028467bdf",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-126/Y2Linux-1.0.0-beta.8.27-first-install-macos.zip"
         },
         {
@@ -2008,7 +2008,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278121302,
-          "sha256": "b9b5f536cbefc991037ab4718da11dd3f2e7d79c56b0d9e79ace3213a8e9cb44",
+          "sha256": "50450af8fe364084a5f39bde2271b4254f4c55fc11aababe6ee6d1884d675a56",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-126/Y2Linux-1.0.0-beta.8.27-first-install-windows.zip"
         }
       ],
@@ -2040,7 +2040,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459601124,
-          "sha256": "45bc72c31b23c059f985678b841825067ecf17c29b564fd8860b74c23d3abfd5",
+          "sha256": "29fe2afdaab5e1ec5c3f0b23878678f957793dce93354bf3364b34f394b0526e",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-125/Y2Linux-1.0.0-beta.8.26-first-install-linux.zip"
         },
         {
@@ -2049,8 +2049,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191957676,
-          "sha256": "c8c7672fd5221376df6e4462bc90bf60a938087fc905bd29b55afc19c5ede8f4",
+          "size": 191843631,
+          "sha256": "266a426a6910c7829e2fa61a0cef9d6d77bd4a5940784252fa30516dcba14047",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-125/Y2Linux-1.0.0-beta.8.26-first-install-macos.zip"
         },
         {
@@ -2060,7 +2060,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278112095,
-          "sha256": "f4e31960cd2d40e4e67c75bee4b6895b3ddf639122faa2072280f3f74e365784",
+          "sha256": "4e8b17b6e28ce62dc9495be4159b900aa5ce3a6ebd20ca6a876aedb142c74150",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-125/Y2Linux-1.0.0-beta.8.26-first-install-windows.zip"
         }
       ],
@@ -2092,7 +2092,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459600549,
-          "sha256": "4ae26b4f0864c169d829141c1c5a43d8c586915f2861569e87abea1e9a1758c2",
+          "sha256": "f444c7b9c49fee15497c00df43832c0f4e63c9f86882eb36acc9f48a878a520f",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-124/Y2Linux-1.0.0-beta.8.25-first-install-linux.zip"
         },
         {
@@ -2101,8 +2101,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191957101,
-          "sha256": "5e4ab9c2b9e332e599cca74702c1ad3ce73c725fbf0edfd982a8b04d84acded9",
+          "size": 191843056,
+          "sha256": "a7a42adfd025b1df82ad6592b01bce9926c5b6d9f03c90a9f74384d6d29cef82",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-124/Y2Linux-1.0.0-beta.8.25-first-install-macos.zip"
         },
         {
@@ -2112,7 +2112,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278111520,
-          "sha256": "6f97ba5014f3ead0ddf061643cea572c0dedf87ba5e88f9ced20c45629c9d456",
+          "sha256": "c0cfe4c4015957692a9180c5656655d46fcf3cd6951e9dccebc6a560e5996a19",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-124/Y2Linux-1.0.0-beta.8.25-first-install-windows.zip"
         }
       ],
@@ -2144,7 +2144,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459598988,
-          "sha256": "c9e5c3cf95fbf3c722b29cc779af83f54fdbcbdfc8638486611112aa0e9ea4a4",
+          "sha256": "f5458ff60964dbf2ddc824a67a559500fac8bdc8b42a58895376e9f1617df3ad",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-123/Y2Linux-1.0.0-beta.8.24-first-install-linux.zip"
         },
         {
@@ -2153,8 +2153,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191955540,
-          "sha256": "207870e9ec271bed6f35e66c7f23f9ff221be04d73e5100e6a0322da2fe2706e",
+          "size": 191841495,
+          "sha256": "c786505ccf710d53ba9c7737ab37954b9da285ad596f1095713435b7ce4358b8",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-123/Y2Linux-1.0.0-beta.8.24-first-install-macos.zip"
         },
         {
@@ -2164,7 +2164,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278109959,
-          "sha256": "c4cf813f40dccffb2bda55153e6aad26abfda70e5d31aeae0b8c1f9c1ad219f8",
+          "sha256": "fbbda059fcc92f45db98b14335b8056c2d3f64428b0764aa4efe1923355c33e7",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-123/Y2Linux-1.0.0-beta.8.24-first-install-windows.zip"
         }
       ],
@@ -2196,7 +2196,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459603021,
-          "sha256": "28a17b5020bd61e0f38631758c0c8316424175ace182b7ced3386ab944d01dc4",
+          "sha256": "3f75a9ead5c63cfbdbb831e96c0fb2881fa4d55fd85afa94e35752aa260caf20",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-122/Y2Linux-1.0.0-beta.8.23-first-install-linux.zip"
         },
         {
@@ -2205,8 +2205,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191959573,
-          "sha256": "37de948f9df0cd07aab21d78a51e896310eeca8ec36e78272cf6595781776c31",
+          "size": 191845528,
+          "sha256": "a461dc398be14000197ee48a8ee0c20af7b7d0ee2d468b35d92095d9342aa316",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-122/Y2Linux-1.0.0-beta.8.23-first-install-macos.zip"
         },
         {
@@ -2216,7 +2216,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278113992,
-          "sha256": "9e3c115b5c5f5e87410750cf233f9d6478df73d3982176987fd28bde3a3ffbea",
+          "sha256": "da7c495436b74dac0567e1583429e8cebd8f79d47a426cc3f505c617096a715f",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-122/Y2Linux-1.0.0-beta.8.23-first-install-windows.zip"
         }
       ],
@@ -2248,7 +2248,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459580912,
-          "sha256": "f8fd69997aaaf6bda2d76be76c77802d3effdd55c832663d41798763765d7090",
+          "sha256": "86197898d10fbe6c425ebeff6bb1570d7bb2cb4c469d78d90776d0870f7e5b6a",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-121/Y2Linux-1.0.0-beta.8.22-first-install-linux.zip"
         },
         {
@@ -2257,8 +2257,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191937464,
-          "sha256": "5d8da846dd988c01dba37403b3be4b450331dce8c6fdb98089fc71d8735a5730",
+          "size": 191823419,
+          "sha256": "b8ca17585321b15a14a76efff66fe51573d326320f57187fbd560346132f3572",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-121/Y2Linux-1.0.0-beta.8.22-first-install-macos.zip"
         },
         {
@@ -2268,7 +2268,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278091883,
-          "sha256": "744485e59c4fdf75d66275ab55b4e81d8e6bb737321369905d7a0952cedb699e",
+          "sha256": "feefd29ba6fd22a39f163f8054c7195c0923d122541f651ce5bae05827a1494c",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-121/Y2Linux-1.0.0-beta.8.22-first-install-windows.zip"
         }
       ],
@@ -2300,7 +2300,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459556329,
-          "sha256": "fbe2d644ae8816c05a2d4a7fab936de48d5b1d257dcd7cf779379832cb361041",
+          "sha256": "f64975f04d98c44a0d9aab2437b777b6cbfa3521f1cfd26104e80832e5d81e0d",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-120/Y2Linux-1.0.0-beta.8.21-first-install-linux.zip"
         },
         {
@@ -2309,8 +2309,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191912880,
-          "sha256": "22d5037a4927411d88b092194656e078725d5d7d48a64a2030c54df13e7c5e7f",
+          "size": 191798835,
+          "sha256": "336a28294757d0067383c0c169e2e1fbe4e4f573cb3eb710ef645b3d12246dcf",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-120/Y2Linux-1.0.0-beta.8.21-first-install-macos.zip"
         },
         {
@@ -2320,7 +2320,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278067300,
-          "sha256": "58558888708333b46e7e2d094423b999760d966ac2297c16ffc883bc3eec2518",
+          "sha256": "7907e963ca54402eba0ede887dcb50e85fed18474247a681e9c51faf3f9fd2b6",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-120/Y2Linux-1.0.0-beta.8.21-first-install-windows.zip"
         }
       ],
@@ -2355,7 +2355,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459555868,
-          "sha256": "ef11c4b072a9ea9ea2b91364daaa0a20df98744a5b2bfed3a626a8c03319e923",
+          "sha256": "d87ffbc7c5b89e10f0725ff3110fe6d19997acb9eb84025dbdb4c589d17840b7",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-119/Y2Linux-1.0.0-beta.8.20-first-install-linux.zip"
         },
         {
@@ -2364,8 +2364,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191912419,
-          "sha256": "aef1c58bb02cf662a292400e0d09881ca68376b8acc540c6a4d152abb323941b",
+          "size": 191798374,
+          "sha256": "2d99758eaa7a6de23032a42e44de445561d67193626c10bc9ddb4bfa98756a4f",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-119/Y2Linux-1.0.0-beta.8.20-first-install-macos.zip"
         },
         {
@@ -2375,7 +2375,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278066839,
-          "sha256": "96fbe724ea697d6c0c510455dfd4398e9e409ed2b7b5c0862a06faeaf31b0188",
+          "sha256": "221b3c4c5d5c0ec6da40b608250ebf0cae628e7b773d33e4cb2e53d080adbdcf",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-119/Y2Linux-1.0.0-beta.8.20-first-install-windows.zip"
         }
       ],
@@ -2407,7 +2407,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459555779,
-          "sha256": "de0131badbf2381a9e73fe8d8b2bd488441a5dd8cafd465087fd7a06d34a6e8f",
+          "sha256": "66c7c80f6ddb0bccc00ab035da0735f1a1c0ece745c75584a032d51d4bc5381e",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-118/Y2Linux-1.0.0-beta.8.19-first-install-linux.zip"
         },
         {
@@ -2416,8 +2416,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191912331,
-          "sha256": "9618b7afb0c6b44916a9a0811595ab7bda39bd0d7fcb70e21d7f6556fa70310e",
+          "size": 191798286,
+          "sha256": "a983cf4cd2925e6565521ff8e6fb7795195adc956558d0b43a8f34f06cd5dc7c",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-118/Y2Linux-1.0.0-beta.8.19-first-install-macos.zip"
         },
         {
@@ -2427,7 +2427,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 278066750,
-          "sha256": "a2eb8eb433c1ca0172d1c0df5d5d19c7cdd09c8da661be14219c6a636417b757",
+          "sha256": "062f9f9acbae21da33128b6bd61a36c7a748b3fd2e4136a7ef2edce79244dc0c",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-118/Y2Linux-1.0.0-beta.8.19-first-install-windows.zip"
         }
       ],
@@ -2459,7 +2459,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459345802,
-          "sha256": "c8a771e4a35ec0237ee004a6c8782e81bd7d78992bab619ea06ce94b388f41db",
+          "sha256": "a648a63fecea3346d7490cbcd1ee4c7004e0be95822127e19dfdf4fe13552d03",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-114/Y2Linux-1.0.0-beta.8.17-first-install-linux.zip"
         },
         {
@@ -2468,8 +2468,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191702354,
-          "sha256": "725308ce061ee745e28861aae3a3c5c4487266684ec04a39cdcecd1306ecf281",
+          "size": 191588309,
+          "sha256": "fdfe3957d7fc8146004fdb7497ddcd053b4397ea7681dbcc3b8fd934304b5314",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-114/Y2Linux-1.0.0-beta.8.17-first-install-macos.zip"
         },
         {
@@ -2479,7 +2479,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 277856773,
-          "sha256": "bbb596e632ffe2cadb4e2d1f71ae2d8139f0d94ad61652c5919953c41c56e78a",
+          "sha256": "12e084b1fc3a85800f48e445602b3ec32433f35f591906991770324eca345a0f",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-114/Y2Linux-1.0.0-beta.8.17-first-install-windows.zip"
         }
       ],
@@ -2512,7 +2512,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459327061,
-          "sha256": "989430476f10f83d1154a031600f26be23db2957262c4d83835eb3c32ba95750",
+          "sha256": "c369b7787d87b57b274526be50e2120baefa5483a19391a4d60c4e609fc4fd2c",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-113/Y2Linux-1.0.0-beta.8.16-first-install-linux.zip"
         },
         {
@@ -2521,8 +2521,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191683613,
-          "sha256": "e9499f29eead35b30f187ff082600d8807b01bade70398c5dc3eac909e7716f0",
+          "size": 191569568,
+          "sha256": "0b54557d785662eb6450f0fe113ff148b0d73ab5691956224b90c636916f2a44",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-113/Y2Linux-1.0.0-beta.8.16-first-install-macos.zip"
         },
         {
@@ -2532,7 +2532,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 277838032,
-          "sha256": "fff761943c55d9cfebf7f445e48917e17d26fb0efea06b9040d793c4b8535bc7",
+          "sha256": "6dde557a6db1fc033f8d15acf47a7159e882eb8fed47934b5bbf6df72af2a7b2",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-113/Y2Linux-1.0.0-beta.8.16-first-install-windows.zip"
         }
       ],
@@ -2564,7 +2564,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 459309856,
-          "sha256": "cd8e637658647a16fa5d9bffac19251504ae88ebd4e81c74a542191be0388cff",
+          "sha256": "c19ea577dc728089fbb8afe9f9c06d276f91533061f3bea6d8118f4e117a33b7",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-112/Y2Linux-1.0.0-beta.8.15-first-install-linux.zip"
         },
         {
@@ -2573,8 +2573,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 191666408,
-          "sha256": "e9bdeb0cd5899db4d5f48d6b21f6382a90b8ea56ee0afc452d5129800119d1f4",
+          "size": 191552363,
+          "sha256": "4ba7e570c8d4793da467f60155e7c6cdf88d7122d84559d5f1fa9dd04b0e40af",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-112/Y2Linux-1.0.0-beta.8.15-first-install-macos.zip"
         },
         {
@@ -2584,7 +2584,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 277820827,
-          "sha256": "d538d07e2d087759ee7dfa6ad5e68b6231d60aa854fdb36ae77a6d8a0db7bb17",
+          "sha256": "0ce72325d3aa840351360a633e227a0c5138df5fadd130ddbcd65551ed67934e",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-112/Y2Linux-1.0.0-beta.8.15-first-install-windows.zip"
         }
       ],
@@ -2616,7 +2616,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445600591,
-          "sha256": "4d7815faa0ad2be241f1901357b43386f432504e500087c7aa36146ab3105bf7",
+          "sha256": "cd76005594fda57eabc2d79cce8e8c0f21caad8754fb262dff6d94bca4fcbf65",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-111/Y2Linux-1.0.0-beta.8.14-first-install-linux.zip"
         },
         {
@@ -2625,8 +2625,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177957143,
-          "sha256": "fbf3f1b60076355ce3007c5cc7618ecd69b92015dfce1be1773b41da7d9214e0",
+          "size": 177843098,
+          "sha256": "76baaa40557b710130213f359d1d21746a5eaa7f025cc596c0954758e487126b",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-111/Y2Linux-1.0.0-beta.8.14-first-install-macos.zip"
         },
         {
@@ -2636,7 +2636,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 264111562,
-          "sha256": "db085dbf1ad362f10636b7cc706f68e3c8d75d52bc848bda7e27a754bcc627aa",
+          "sha256": "045936ea3f138c113fcd378a04aa3e47ddf1439ca562f2e60dce9cdcfb50d75b",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-111/Y2Linux-1.0.0-beta.8.14-first-install-windows.zip"
         }
       ],
@@ -2668,7 +2668,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445603838,
-          "sha256": "c5c6ef6a4b7f06e4c1c0bee701f0974161c7f60fc2d94e5367745be205c41da5",
+          "sha256": "7a9654b9f3199f02b75597c69a232100322a0724277ce838e162c51bc05c79ce",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-110/Y2Linux-1.0.0-beta.8.13-first-install-linux.zip"
         },
         {
@@ -2677,8 +2677,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177960390,
-          "sha256": "45c00c6b3cd1ac040e7d6f90a5e7e8db7ce44457a0dfb1e81e759f1a4dc984c1",
+          "size": 177846345,
+          "sha256": "901bec83cd2782e10b42465abd90f98a3bd02e2a7ab1356210c4bb464c367123",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-110/Y2Linux-1.0.0-beta.8.13-first-install-macos.zip"
         },
         {
@@ -2688,7 +2688,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 264114809,
-          "sha256": "3eb494f1024b9ee3dc49c803e84b4f5e7b22a5a3383548c0dd4c2ce9a8934414",
+          "sha256": "c9c2517a369e4f2931fbd83f6c7b11f5dce826006536b447021c32c0ff1c4acc",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-110/Y2Linux-1.0.0-beta.8.13-first-install-windows.zip"
         }
       ],
@@ -2720,7 +2720,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445596539,
-          "sha256": "4989da09e25b6c1d136f3b29b98a95e13d2e1c68dfff9e559fd1a1a09284bad2",
+          "sha256": "5d2e9991b3fb3cbb0643781c5a5c06ae22eca85bb389aeaa305d91ccee95a3ee",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-108/Y2Linux-1.0.0-beta.8.12-first-install-linux.zip"
         },
         {
@@ -2729,8 +2729,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177953091,
-          "sha256": "ca929b969932ad859a6adc9b2aaa9648fa270a6016d5cd503d57b4bb00d4244e",
+          "size": 177839046,
+          "sha256": "c78eeb398ccae0d499907e951ddd062ccd0aa4e14f1d77658171b499d84b5a24",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-108/Y2Linux-1.0.0-beta.8.12-first-install-macos.zip"
         },
         {
@@ -2740,7 +2740,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 264107510,
-          "sha256": "2bf00367d4d88abfba1effd4d6259a838dbb66a80efe5186f328e4fa1f68b2f7",
+          "sha256": "0f40035fbb16cece8d698a0c3fe4b2392c8e4291e37e9c84c87ac66eb2426065",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-108/Y2Linux-1.0.0-beta.8.12-first-install-windows.zip"
         }
       ],
@@ -2772,7 +2772,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445583851,
-          "sha256": "d4ca7d38a1308a437a16ea919289da0d46c48d28a941f25158251b0074967ff3",
+          "sha256": "f39a1fa78530a9e8e1e5e340619e391dc18b75958ddc6cd5049ffeba478e3349",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-106/Y2Linux-1.0.0-beta.8.11-first-install-linux.zip"
         },
         {
@@ -2781,8 +2781,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177940402,
-          "sha256": "907abe3e5e013a923cf34d63b1609b1dcd051793664843592109f65eecc8fbde",
+          "size": 177826357,
+          "sha256": "6e033476b2d370562446d2d3acaea279fcf8dab15a4c54f42cd71f8249f60102",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-106/Y2Linux-1.0.0-beta.8.11-first-install-macos.zip"
         },
         {
@@ -2792,7 +2792,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 264094822,
-          "sha256": "7d93fc5a0670012a560f414a3a3b62370f4ee6a527322706f975c0d6cd8f24b8",
+          "sha256": "53a47add26ad3c188aa582b2f3af45d72d33370aff01a18f0c78cd0b4bf7a536",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-106/Y2Linux-1.0.0-beta.8.11-first-install-windows.zip"
         }
       ],
@@ -2824,7 +2824,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445586129,
-          "sha256": "3bd95bde11c43475bb1cb97b427c68703babe5ea5d0d91817cc0ece877dbd9fb",
+          "sha256": "47c5656344a484287f20ae8b78481b221d4c1fe8034594a9d5f7fce9ebea3af8",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-105/Y2Linux-1.0.0-beta.8.10-first-install-linux.zip"
         },
         {
@@ -2833,8 +2833,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177942680,
-          "sha256": "2bffde5fd34ff107a2ff1634f1ce8a1ea8d7171ad4a6784e8159064f1cb6779e",
+          "size": 177828635,
+          "sha256": "5ee18af0277a8f256d23b60b0816b13ec5769841502b5a534722cefcd0a0a969",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-105/Y2Linux-1.0.0-beta.8.10-first-install-macos.zip"
         },
         {
@@ -2844,7 +2844,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 264097100,
-          "sha256": "ee18c3acf1b783ad99b0ecc8af2ef1caa0b24adb91ac57985e12fadaab8d53b8",
+          "sha256": "09aa253635504665328c4c2eee6164a32c29f7e3ee0d61fffa035fca21b44bd4",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-105/Y2Linux-1.0.0-beta.8.10-first-install-windows.zip"
         }
       ],
@@ -2876,7 +2876,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445572350,
-          "sha256": "643d8e080b38f562a9ca24340ab17a569d2e36bd382f741b303b10d806b764f1",
+          "sha256": "343602ab7a41e2fb7ebf0b5cb43321adb958982fcfa01b95bfb109c34dd7ffa4",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-101/Y2Linux-1.0.0-beta.8.8-first-install-linux.zip"
         },
         {
@@ -2885,8 +2885,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177928902,
-          "sha256": "6698b69d7d0dd38cc15a26a6244587d84126ec90399bf7b1c1cd1769d6198559",
+          "size": 177814857,
+          "sha256": "4ea7227f44376e271b8cd03185e6cca56d9804f5e7505d1cfd793f86f7dc38ae",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-101/Y2Linux-1.0.0-beta.8.8-first-install-macos.zip"
         },
         {
@@ -2896,7 +2896,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 264083321,
-          "sha256": "974bd281cc748cf9d75bcd3195a00f83858f8795cdbe8691e1757018950c06c5",
+          "sha256": "9ef87c7acb394d20950266f661499dd643e37b7c465d10513a7c1bfe658bb22b",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-101/Y2Linux-1.0.0-beta.8.8-first-install-windows.zip"
         }
       ],
@@ -2928,7 +2928,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445548911,
-          "sha256": "5d41d33d65c3beb6b6cd33688b99072f248d206739f7110e4eaf467f356750ee",
+          "sha256": "7e1a8d013c5565ac227bbc2d9d1687a088140fa48502ab1adbe5728708ad8475",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-95/Y2Linux-1.0.0-beta.8.7-first-install-linux.zip"
         },
         {
@@ -2937,8 +2937,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177905463,
-          "sha256": "28d5abf431e7eca89d6d89ab14d129e1c1240270dca5373c058bdd32255cab37",
+          "size": 177791418,
+          "sha256": "e0099f743ce591fe636a8cc955a0723d5be819a884f91b41e9adb088dd87fe28",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-95/Y2Linux-1.0.0-beta.8.7-first-install-macos.zip"
         },
         {
@@ -2948,7 +2948,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 264059882,
-          "sha256": "2a10ee16d46314d807073bcb08edab1c8443ed3a1884f9cc05b6f4687034ff96",
+          "sha256": "7e620ad0a24574a936ce66efb60e49bbecb6d95303c3ecfafb9dc37e6c1e17f7",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-95/Y2Linux-1.0.0-beta.8.7-first-install-windows.zip"
         }
       ],
@@ -2980,7 +2980,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445549240,
-          "sha256": "0b3a23568a765d1b4508d488ef53f9f632b4fd8233b4995918050518c1334341",
+          "sha256": "4bb158b95a6501ac6c1e5ba884620a69f63e6bada44183a8998a9b4d74a0c908",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-94/Y2Linux-1.0.0-beta.8.6-first-install-linux.zip"
         },
         {
@@ -2989,8 +2989,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177905792,
-          "sha256": "fe1b885b6177d07519d7d0e3bac1324b32c46eb0fcb8538be53552a5fb82d045",
+          "size": 177791747,
+          "sha256": "747e145058418823c2de043ec3685adce60df1cdfdb9204a7320173504e9e0a5",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-94/Y2Linux-1.0.0-beta.8.6-first-install-macos.zip"
         },
         {
@@ -3000,7 +3000,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 264060211,
-          "sha256": "4abe1c8fb81c61c0b5e707ca1b6bd0ab1dcce166037e2c6dfb7d52de733e41c1",
+          "sha256": "1552d7dd97fb5db16849f9cd195142764140222c70383b73fe97f6c0074507a8",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-94/Y2Linux-1.0.0-beta.8.6-first-install-windows.zip"
         }
       ],
@@ -3032,7 +3032,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445411679,
-          "sha256": "4690b899878a71b71fc758168554ab4b312ef6d3ee5457e56ef91942be4c35c8",
+          "sha256": "e3c04e479cdba035cbf24077ea10ccb7ccbaeaeab300cfda69af4254c0b8e420",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-93/Y2Linux-1.0.0-beta.8.5-first-install-linux.zip"
         },
         {
@@ -3041,8 +3041,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177768231,
-          "sha256": "1397b47629d050a2ad259f3c6a7023d624f18c7e8e6cfc75492d1df5ebb3ba3b",
+          "size": 177654186,
+          "sha256": "d894cc785cc2e16aa3359cf7c0f02518e4fd1be8de1b0acf3e819c7b3f892c11",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-93/Y2Linux-1.0.0-beta.8.5-first-install-macos.zip"
         },
         {
@@ -3052,7 +3052,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263922650,
-          "sha256": "d65d35c9354f629d0712d646574b1af566f9e6c0ba5cb1bbb7200d79a717b428",
+          "sha256": "a55f8505c6342559af26d6d7d0c9b643faad3dc0ce03240e54f26218c95eb267",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-93/Y2Linux-1.0.0-beta.8.5-first-install-windows.zip"
         }
       ],
@@ -3084,7 +3084,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445361649,
-          "sha256": "48aaffe059e5f59517e78576e738678967028b0fbd06a4ea4edebab83aeafdd2",
+          "sha256": "bf5bc9c3492d4b67f8156171f1ed5bb83562c93ab4f29e05b5e4f268f8506c08",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-90/Y2Linux-1.0.0-beta.8.4-first-install-linux.zip"
         },
         {
@@ -3093,8 +3093,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177718201,
-          "sha256": "0f860cde3cb6966cfb8d62857ea1243c1a883b0d0a2d2610ec142911d6be9981",
+          "size": 177604156,
+          "sha256": "a264af4e0aa11c5e3b6c510b78831d2c3a2fcb1eb0f75a505d01d9a7ec6c2251",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-90/Y2Linux-1.0.0-beta.8.4-first-install-macos.zip"
         },
         {
@@ -3104,7 +3104,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263872620,
-          "sha256": "6956e4148306129e078f17b5d09c5deff4a19e659a3f7c8336d85aac751590dd",
+          "sha256": "59a13394d0014fc4684bfe4c2fd00502deb2ee882e0055155e43bd8851269bff",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-90/Y2Linux-1.0.0-beta.8.4-first-install-windows.zip"
         }
       ],
@@ -3136,7 +3136,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445361117,
-          "sha256": "355a9b58ddec7f7250774085575e8683e27de89220fcd082d0a8515d785fab5e",
+          "sha256": "c052a735d1b67b9ed315c32a63d177f867c7d868a92f6c21b132a9fec6ffdd52",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-89/Y2Linux-1.0.0-beta.8.3-first-install-linux.zip"
         },
         {
@@ -3145,8 +3145,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177717669,
-          "sha256": "e4ed7a7a9f7b77417fb5f070254a79ea763f18a6586b7af97fcfdb71649fcb21",
+          "size": 177603624,
+          "sha256": "a8be75e60d867b2b50f56f78286c3ae961227549c08f24ae66e56e6f2884f772",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-89/Y2Linux-1.0.0-beta.8.3-first-install-macos.zip"
         },
         {
@@ -3156,7 +3156,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263872088,
-          "sha256": "ca0befe51f439f80f0931dedfa57eb2bc6c6dee6f3b9a64878d806890619ee31",
+          "sha256": "39738697676401a7c7a07a90345f2fe146d757c19a6351c41a308013517c9a1d",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-89/Y2Linux-1.0.0-beta.8.3-first-install-windows.zip"
         }
       ],
@@ -3188,7 +3188,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445353691,
-          "sha256": "79a293176167f818c840b896ca1292d62719a81003851af70f201379db7b5c80",
+          "sha256": "7f03fca2c80537236d813d70ff5b3aeff5064a7696ca9d9ea1fd1ea6c407f81b",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-88/Y2Linux-1.0.0-beta.8.2-first-install-linux.zip"
         },
         {
@@ -3197,8 +3197,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177710244,
-          "sha256": "48de916aed1ef72fceabd02dfabf088a10195ce88d7afba65b321a405654d8af",
+          "size": 177596199,
+          "sha256": "4cabdf75c918d7674f12bb9f73809fa7ca0c39a2ac3f6de2dad3bbd3ebcc9570",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-88/Y2Linux-1.0.0-beta.8.2-first-install-macos.zip"
         },
         {
@@ -3208,7 +3208,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263864662,
-          "sha256": "cfd736e333df4c02515393ff018418312cc08d866ba67e00dad66c2cf4e9743f",
+          "sha256": "4a5bf56ade8a87673379b23c9780a1c3b708a4f977fac50f09e2037afadf9f3e",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-88/Y2Linux-1.0.0-beta.8.2-first-install-windows.zip"
         }
       ],
@@ -3240,7 +3240,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445337188,
-          "sha256": "eedacaecefe43985260a8d586b49fdf432fd3fad5973611cc3045e76ac86f9f8",
+          "sha256": "17543398d88f6850c33a98a7422421d6f856c258bf03eb838a70380d21321931",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-86/Y2Linux-1.0.0-beta.8.1-first-install-linux.zip"
         },
         {
@@ -3249,8 +3249,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177693741,
-          "sha256": "8ed23991136e3fbd38823561c8e0e1a92ca0382ce3c446ed1dfd51f7379893b6",
+          "size": 177579696,
+          "sha256": "f613a1ffab8e5795d006d5bf21fadede649a14ba98a7ad0f8526654040c2a2c5",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-86/Y2Linux-1.0.0-beta.8.1-first-install-macos.zip"
         },
         {
@@ -3260,7 +3260,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263848159,
-          "sha256": "f7390831d93532800bc8bd8f20af93804d10dde0da8d14196f7e21429507da66",
+          "sha256": "623a341bf5efd09ad310227d32c6f6b8930c691579e542d5dcb97c9754a9a5e8",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-86/Y2Linux-1.0.0-beta.8.1-first-install-windows.zip"
         }
       ],
@@ -3292,7 +3292,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445327961,
-          "sha256": "bfa4310c770a89f015ce4fc121fe1b5508fb5a818202dcdb30ce5df356fcf104",
+          "sha256": "10c90a2875f34396deaf238614e2f735bbc5953b68708488b5e3fa499700c7dd",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-75/Y2Linux-1.0.0-beta.8.0-first-install-linux.zip"
         },
         {
@@ -3301,8 +3301,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177684513,
-          "sha256": "102944b02388637d21234c6bb0a3a409bb78182ccfc078edb1cf3ca34ee18605",
+          "size": 177570468,
+          "sha256": "f2e39707cfd367ba1a272498ffe335b5be2918df09f82dc7787af326bb66b985",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-75/Y2Linux-1.0.0-beta.8.0-first-install-macos.zip"
         },
         {
@@ -3312,7 +3312,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263838932,
-          "sha256": "ab7a88e10d1e14d1d4f286ed13de0c9fc95dc02ad94b2536fac52757f61bc734",
+          "sha256": "6e69c258c16fed4e99896a5a22dd2cb3bcf78e9d2b546d636996cb5605ccd258",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-75/Y2Linux-1.0.0-beta.8.0-first-install-windows.zip"
         }
       ],
@@ -3345,7 +3345,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445300709,
-          "sha256": "97f48fc6253fee6316f470f8d338bf6bfe5d0a6814be26235e513bb7f01572d5",
+          "sha256": "6e2a84523f67d624607be31e013db098007a275d3a00484c78643950711b78d3",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-74/Y2Linux-1.0.0-beta.7.11-first-install-linux.zip"
         },
         {
@@ -3354,8 +3354,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177657260,
-          "sha256": "63b68f4c3808d25483754fe86bbc21dafbc61972dc1eac4016e85d004ba2a939",
+          "size": 177543215,
+          "sha256": "82e77084898c2619ae1f40c9a8aeaf336244657a9637a44ec539c897298b111c",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-74/Y2Linux-1.0.0-beta.7.11-first-install-macos.zip"
         },
         {
@@ -3365,7 +3365,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263811680,
-          "sha256": "16904ff47a7b15e66e34af543c359e95a6f82b134cae99f1508064796819983e",
+          "sha256": "3ac6a1d44df227227492084633d7f95fa0b5ffdb1d7f6df196dc115fda9ba05b",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-74/Y2Linux-1.0.0-beta.7.11-first-install-windows.zip"
         }
       ],
@@ -3397,7 +3397,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445296906,
-          "sha256": "e671c37f3aec727c5806e480001720604dcbe5266a845f2478c7f73cfcd9f839",
+          "sha256": "4ac1d6ce4d883f22cb0028c4171916d7263e1f3c41ded6b8e5425f12b4d3d659",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-73/Y2Linux-1.0.0-beta.7.10-first-install-linux.zip"
         },
         {
@@ -3406,8 +3406,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177653457,
-          "sha256": "8ee4739ecdc94b8cb28d48c68894aa36a1f2effc203043c98f9224000377c091",
+          "size": 177539412,
+          "sha256": "a1373416c9a18f1c4c2cd924a086f28dd84694e4e5f2a493a35f0440a6fbeabd",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-73/Y2Linux-1.0.0-beta.7.10-first-install-macos.zip"
         },
         {
@@ -3417,7 +3417,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263807877,
-          "sha256": "f376ac39d488f46ea642f55b1f3734b52aaa4bf4310ce2637c49d3b731cda6cf",
+          "sha256": "a6f827cc3715a0b4e55784136452f560425d41f5a3d9d8543ae035d8c3f3f002",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-73/Y2Linux-1.0.0-beta.7.10-first-install-windows.zip"
         }
       ],
@@ -3449,7 +3449,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445295570,
-          "sha256": "a38e00378b31f82aad2ef86db94c7b310e3341ec873aeb1794352f055e3d2ffe",
+          "sha256": "5a282572b594cab66d279f25f1214aa95fbf50e1d468c4bf81c8d42e602c21a6",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-72/Y2Linux-1.0.0-beta.7.9-first-install-linux.zip"
         },
         {
@@ -3458,8 +3458,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177652122,
-          "sha256": "65c1fe81b6fde16fce45138867d846f312f8143ab0b19c7820d044e93becd3b4",
+          "size": 177538077,
+          "sha256": "0d39ce6a1ca2570998c432b1e103f61d89bc77e62584cbf75782ea80c0bcabd7",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-72/Y2Linux-1.0.0-beta.7.9-first-install-macos.zip"
         },
         {
@@ -3469,7 +3469,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263806541,
-          "sha256": "e900d5b9093590505bb30a2ee747b48c4334b0949ff24838318f00c315c52ed1",
+          "sha256": "c56f7fbb5d383360c7ade7493da2b124b676c557e537543f7af7c6ba7b8f37bd",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-72/Y2Linux-1.0.0-beta.7.9-first-install-windows.zip"
         }
       ],
@@ -3501,7 +3501,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445282398,
-          "sha256": "8480ed105c4e55e54fdd910c84045957d6e811ac1215c0e6ae5c3ac052f9cf98",
+          "sha256": "8c7c928702a0ac9a89620e54205e805e75d866448e7b77b21adc7df2163326bd",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-71/Y2Linux-1.0.0-beta.7.8-first-install-linux.zip"
         },
         {
@@ -3510,8 +3510,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177638950,
-          "sha256": "71d3563f3ad95d6ed4d56b89219201c1701d0f38cd4fa795e278eebb674fb79e",
+          "size": 177524905,
+          "sha256": "8c0cde31a2b500c03c1086bb65f901caa924b84042242fd56106cb067d3fe8ca",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-71/Y2Linux-1.0.0-beta.7.8-first-install-macos.zip"
         },
         {
@@ -3521,7 +3521,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263793369,
-          "sha256": "9ab415c35d73d6037249448c2f318163e06c1f3817cc9106f16f0bc79fdc5a5b",
+          "sha256": "f291d3392f3a1c9b03540676e1aaba07fc059004c722f3b262887fac7cae6f3e",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-71/Y2Linux-1.0.0-beta.7.8-first-install-windows.zip"
         }
       ],
@@ -3553,7 +3553,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445283330,
-          "sha256": "a495ba77a2bb61ecb04e433b9ed280a585e9da0bc2d54a64d7407e40c2c916cf",
+          "sha256": "a25e6f34aca3ffa8e0bcef54a8dbe4aeba1ea2e5bc14ada5cfb9c6d3b1bdeffd",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-70/Y2Linux-1.0.0-beta.7.7-first-install-linux.zip"
         },
         {
@@ -3562,8 +3562,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177639882,
-          "sha256": "9e47370da819b6a8ffd9ded16f2d68e459bbe8e72c4f58ef6a83603e7dab2ec5",
+          "size": 177525837,
+          "sha256": "151406c4af11c60e05e982a16eae5d9463a4e726afac25bd56f9828ad60bca10",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-70/Y2Linux-1.0.0-beta.7.7-first-install-macos.zip"
         },
         {
@@ -3573,7 +3573,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263794301,
-          "sha256": "cade8a44e6fd41f15e27be1743f378b51558472503550f4a329cd718108946c7",
+          "sha256": "281091f05edb5b4ed3faebdfb7e75a9ba0829d243a8cc175a47d70cfc3e4b23b",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-70/Y2Linux-1.0.0-beta.7.7-first-install-windows.zip"
         }
       ],
@@ -3605,7 +3605,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445213859,
-          "sha256": "ca2d6ae313937d94086315959e9d4c486c034bea0d69a963c58c235f02818a3b",
+          "sha256": "c025bc1766ad64d41d09fe60f0e65fda287f1f3edd92570fd986cc769df3195a",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-67/Y2Linux-1.0.0-beta.7.6-first-install-linux.zip"
         },
         {
@@ -3614,8 +3614,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177570411,
-          "sha256": "4599d1ca783cf0fb4d7317834393b03336fc6b3f8972d36563b534163204ef74",
+          "size": 177456366,
+          "sha256": "8829195130cb429d4dabe5f00b48d8ced950136ca7023002313ee19a79adc56f",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-67/Y2Linux-1.0.0-beta.7.6-first-install-macos.zip"
         },
         {
@@ -3625,7 +3625,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263724830,
-          "sha256": "3f733af16b78b788f37c8510dc40f76fa857055558ec3fbd0660bd7e19d8cc2f",
+          "sha256": "ebfab9d5c85f4913493aebd49079df8616324d4bec2960061604ad1f2906c7c8",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-67/Y2Linux-1.0.0-beta.7.6-first-install-windows.zip"
         }
       ],
@@ -3657,7 +3657,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445213447,
-          "sha256": "9646c9f38e42e1ed1661d17dfc89ead52c582ceb1fb35a35378fc4207d17313d",
+          "sha256": "fc1be8acd876e64181d83a4f8b13bed94c2c18574414fed8ba303e4e28c9ea3a",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-66/Y2Linux-1.0.0-beta.7.5-first-install-linux.zip"
         },
         {
@@ -3666,8 +3666,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177569999,
-          "sha256": "1a9603fdc1773ebaf516aecbf2dac8681e5ecc173ffe8eee4c158742ba571e00",
+          "size": 177455954,
+          "sha256": "edbee309138adce17548ebedd3e5f2d495716b5c45d3baec9bdbc955713fc060",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-66/Y2Linux-1.0.0-beta.7.5-first-install-macos.zip"
         },
         {
@@ -3677,7 +3677,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263724418,
-          "sha256": "f06243ecc96065873136272a1a9b49103586b6018c444a58276e2c4284c7db09",
+          "sha256": "131775d05583dfab4b360af3625796cc81e657332ca2361673c50b253e638e51",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-66/Y2Linux-1.0.0-beta.7.5-first-install-windows.zip"
         }
       ],
@@ -3709,7 +3709,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445211632,
-          "sha256": "be89286eb50c942958ed90718d76cfb85b171f88412af500665f9a612dc91154",
+          "sha256": "e5bf3b61d532770d0c1b60dd6c3e29294ddfd2b09902e014d63e6c232ad027ce",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-65/Y2Linux-1.0.0-beta.7.4-first-install-linux.zip"
         },
         {
@@ -3718,8 +3718,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177568184,
-          "sha256": "600a1e4cda72b810c1fa7c22b6b1749db9f5a81c932600d79385e93e46f602af",
+          "size": 177454139,
+          "sha256": "9e1c0569940d0b80c9df308b9e48e873180f56157bd9f05dfb44fda32405880b",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-65/Y2Linux-1.0.0-beta.7.4-first-install-macos.zip"
         },
         {
@@ -3729,7 +3729,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263722603,
-          "sha256": "528b34a7384dff7fc16184b1165b0cabb5390dab1d67f8d38b3aaad12703683f",
+          "sha256": "26e966b0b4ff7ac1a0e923e7e3b5cc79041260275718b889ed8f88544b55127e",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-65/Y2Linux-1.0.0-beta.7.4-first-install-windows.zip"
         }
       ],
@@ -3761,7 +3761,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445210091,
-          "sha256": "c56e3bb96b460307a8410c99a9c667dae51c2965fe59ede7e29728739e7d3a29",
+          "sha256": "4af8468abe8b1406df4d86bc6dcbf6baf2f2e423c58e01df852110da0a30ee6b",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-64/Y2Linux-1.0.0-beta.7.3-first-install-linux.zip"
         },
         {
@@ -3770,8 +3770,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177566643,
-          "sha256": "07ff1fafc9d8cf412d5168e6eb8517635f314f0a5e4c7ea513f96fbc28769585",
+          "size": 177452598,
+          "sha256": "957fee00b2e14b7772c2dff3c2827eb6dab4ea1e897d706e14eaa5e113c87d87",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-64/Y2Linux-1.0.0-beta.7.3-first-install-macos.zip"
         },
         {
@@ -3781,7 +3781,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263721062,
-          "sha256": "6ff12ae36e26a34194f4d75e1403376ce3ed21103c21da667805b5910ab219a0",
+          "sha256": "de86476d7ef7ac04139a0b20427482dfaac960e2526539a6af86ef53d070d755",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-64/Y2Linux-1.0.0-beta.7.3-first-install-windows.zip"
         }
       ],
@@ -3813,7 +3813,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445213107,
-          "sha256": "be3316ceef03fd136f9bf512f1dfb685fbd45f45fb93e7c1b61d01d91605522f",
+          "sha256": "8fc429636694d8ff8b3b0949aff17d6cf45bd236fbab1fb39256f82b4e626ef1",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-63/Y2Linux-1.0.0-beta.7.2-first-install-linux.zip"
         },
         {
@@ -3822,8 +3822,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177569660,
-          "sha256": "8c367efd9129b509ed3e5e106346e25f2d1e3fd70930bc1cf65c5b29bccdf1f4",
+          "size": 177455615,
+          "sha256": "81176047ec2eed740b89c795c20c54fcb303ecb68a855e1b20126ecec70b2458",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-63/Y2Linux-1.0.0-beta.7.2-first-install-macos.zip"
         },
         {
@@ -3833,7 +3833,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263724078,
-          "sha256": "9b6762a346b8fa045a569bd656cbae26b28b54458ca31b2230f452c24734c3ab",
+          "sha256": "4b211c32c856e17431b0ba57a4b5c3a9fc5e1bd57622978674224066a590b33c",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-63/Y2Linux-1.0.0-beta.7.2-first-install-windows.zip"
         }
       ],
@@ -3865,7 +3865,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445190082,
-          "sha256": "3753d4a73d012b4db4c7ba1b568943c0e355dc2a9669634b222b89203ad230ff",
+          "sha256": "8091d4eea525d7e7c41d080d4b47e249cccfe09c7ea6ae5eea63a990fe02c74f",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-62/Y2Linux-1.0.0-beta.7.1-first-install-linux.zip"
         },
         {
@@ -3874,8 +3874,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177546635,
-          "sha256": "a66008c9776827e43d8cb1c9bbbb64626c0b16d2208d8e3cfeb0a68c1d106e97",
+          "size": 177432590,
+          "sha256": "227f25e93ee9b3de88f6a469adaf2678ec06bd3f668aae663f840c70f321469a",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-62/Y2Linux-1.0.0-beta.7.1-first-install-macos.zip"
         },
         {
@@ -3885,7 +3885,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263701053,
-          "sha256": "5098417a39fd02333d6881f62286a6ba78cf7894d2e934b4d0288694112ab60c",
+          "sha256": "3694e431462f538ec9d0dcf826c76c4719dac764c9e2a3c691502474c63f9e11",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-62/Y2Linux-1.0.0-beta.7.1-first-install-windows.zip"
         }
       ],
@@ -3917,7 +3917,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445150694,
-          "sha256": "00d76898c369411c2cdbd1b72f6a9a3057399c81aba847ed0b26b6c5298e5f2c",
+          "sha256": "20f057a9b6c25f8aed063ac15251e5d406b58ce6e981fd0ac5ab500c88326c2f",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-61/Y2Linux-1.0.0-beta.7-first-install-linux.zip"
         },
         {
@@ -3926,8 +3926,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177507244,
-          "sha256": "24216c3d247152b053427f3798bd55cc60f269c29980f02555a6af0127f40d52",
+          "size": 177393199,
+          "sha256": "a28cf35e1faf350713840de6e111f2efee74b8cf5fa91cf46c0df9a89a3e6eec",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-61/Y2Linux-1.0.0-beta.7-first-install-macos.zip"
         },
         {
@@ -3937,7 +3937,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263661665,
-          "sha256": "bb678ebb6798ed549467dc36d4c3b4066d61d0b24f8434e585a9c2ef5c11dc9a",
+          "sha256": "b119ff91b6f5b06a5cf8f4e208acd69340ea44a2cb94657ad00ae794d19c3515",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-61/Y2Linux-1.0.0-beta.7-first-install-windows.zip"
         }
       ],
@@ -3969,7 +3969,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445138769,
-          "sha256": "65f929da0489d08434c520b0263ef8830a83f2e3de080180316924b6ad1e799e",
+          "sha256": "a28a0a546a98d04da1fd28858482662e584d232a1c3a3c5b2ec88ff8ee893c3b",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-60/Y2Linux-1.0.0-beta.6.3-first-install-linux.zip"
         },
         {
@@ -3978,8 +3978,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177495322,
-          "sha256": "684c2a9bb81a7ce32fb241baadee545fc9e91875815dfd5766e388aec32733c1",
+          "size": 177381277,
+          "sha256": "aa3c3afad138cfb89fa566519d60e8904df65f93afff9d787982afb954eb878d",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-60/Y2Linux-1.0.0-beta.6.3-first-install-macos.zip"
         },
         {
@@ -3989,7 +3989,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263649740,
-          "sha256": "3e95d1f27fe27a82db98b87ebed247d3608c4f1a3d2c6daa770e580252d38874",
+          "sha256": "3f3b81a7d294e81539c89f14e1a7e68b7f6642f1055a54ea70ab216533167b17",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-60/Y2Linux-1.0.0-beta.6.3-first-install-windows.zip"
         }
       ],
@@ -4021,7 +4021,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445136851,
-          "sha256": "8ea08309f15d4d8fd11e2bb47ee9391fa013524cce1643fb8ef2fa884eb53a13",
+          "sha256": "9e88f75ab86e3e614f793060f4a2366cdc1f382c58431fef11ab9c6bea22ac26",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-59/Y2Linux-1.0.0-beta.6.2-first-install-linux.zip"
         },
         {
@@ -4030,8 +4030,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177493404,
-          "sha256": "2027c2281dd13c16bad3851389b7211c7282cb3fd4608d2fa878f1926dbf98e7",
+          "size": 177379359,
+          "sha256": "ebd84c41ca84cea94e2f4f92a78f344e577a5450e1f28472a5930f4251db8d8f",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-59/Y2Linux-1.0.0-beta.6.2-first-install-macos.zip"
         },
         {
@@ -4041,7 +4041,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263647822,
-          "sha256": "b5b374fb93f8402dbdb06588422cbd04fd75125f90edafeeaf80c5302ee8cdf3",
+          "sha256": "30b7d544722ddcf60e800c43957a9b8a813709230e35a877ff6f524b685f6eaf",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-59/Y2Linux-1.0.0-beta.6.2-first-install-windows.zip"
         }
       ],
@@ -4073,7 +4073,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445010561,
-          "sha256": "aa78432e3a31801724a9a1241273d95cb6a23e8b16041bced2fddba004f1f4a8",
+          "sha256": "799905691a57eaed6deaeb255a56d932115385419b7ac2fd205042b5793495a6",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-58/Y2Linux-1.0.0-beta.6.1-first-install-linux.zip"
         },
         {
@@ -4082,8 +4082,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177367114,
-          "sha256": "7febf07b81f4c4a507e7983dab4c8795d7f35b380093be3c695fcab1c6e3b4a0",
+          "size": 177253069,
+          "sha256": "dd51374c5a6176c16aeb7cc11de7d7063ea12b10467faa2cf3de1c9eda7181bd",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-58/Y2Linux-1.0.0-beta.6.1-first-install-macos.zip"
         },
         {
@@ -4093,7 +4093,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263521532,
-          "sha256": "155217047c236f6824a66508088f23a365bcd3c63e7739a1ce2f9c7e352a3d67",
+          "sha256": "76fffbc56549b169c52c2008fa26075b296ad98b03cb4bc1e989956e9511eb3a",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-58/Y2Linux-1.0.0-beta.6.1-first-install-windows.zip"
         }
       ],
@@ -4125,7 +4125,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 445001435,
-          "sha256": "b0dbcb735d4a5a93d3a679c96705f1bb6697ea4ea3b4a9790fb0ec220a85e2bb",
+          "sha256": "4ca406de1a2842d656d8ac7f9ccb29f5dfcc15717d8584960490827dbb7bc481",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-57/Y2Linux-1.0.0-beta.6-first-install-linux.zip"
         },
         {
@@ -4134,8 +4134,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177357985,
-          "sha256": "1389044659b8755ef02cebc7da62e3b0788c4426c2f74f2661c5fedac5fccd6e",
+          "size": 177243940,
+          "sha256": "6741f424b423ef6b640bc2fa6cac0f06ba61d6d9fd4b9d031bd04c9a33eb6cb4",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-57/Y2Linux-1.0.0-beta.6-first-install-macos.zip"
         },
         {
@@ -4145,7 +4145,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263512406,
-          "sha256": "c74ca47a2b77582b0f50f40c1f71992a6dd04e1cbd4de578ea84c968327ae6a8",
+          "sha256": "255413d036f4ffec3b158993e4e359009bd2d2da8135a0ed03c597809bae65e9",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-57/Y2Linux-1.0.0-beta.6-first-install-windows.zip"
         }
       ],
@@ -4177,7 +4177,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 444894186,
-          "sha256": "8f8f79da1f98f022d94d6a2bc3d0f52187362e95326fd0acbbc4769472abccc4",
+          "sha256": "9b23a2025d7f334353c51395cb3c5e8a9c2e5a7c33e61d1e7f71ea46834f4464",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-56/Y2Linux-1.0.0-beta.5.1-first-install-linux.zip"
         },
         {
@@ -4186,8 +4186,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177250738,
-          "sha256": "f6b482ab7d679e6dd0436338efaa1c9919ec329c35a131e72ea545e8ff9a6d01",
+          "size": 177136693,
+          "sha256": "2e9afaea7b7ede1936ba9d1857027c9b5cb2220f39dd4154835a313ffd40ab40",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-56/Y2Linux-1.0.0-beta.5.1-first-install-macos.zip"
         },
         {
@@ -4197,7 +4197,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263405157,
-          "sha256": "a32d88db707705c16d303e5cf74c35f3792e388d4b23684d769f0a6221c7ea57",
+          "sha256": "7dcf7dbdf47a8ac80ac13d07fb84b9d0db0daf785b14c3134fb307f6295a5a2b",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-56/Y2Linux-1.0.0-beta.5.1-first-install-windows.zip"
         }
       ],
@@ -4229,7 +4229,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 444823127,
-          "sha256": "b0eedcad8c5f52c5ed60d688a7cdfb3bfc4f6d6aa49d6743be8f1ea877442c3e",
+          "sha256": "e1e9e6501a34e4ce3171edf1fd8f6122245003e391fc11e7bbbf7a0b66924bca",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-55/Y2Linux-1.0.0-beta.5-first-install-linux.zip"
         },
         {
@@ -4238,8 +4238,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177179677,
-          "sha256": "4dc07fffa2d3c561f2eb1ee9d9bda48920d7258ddd2f9e7fe9ad53231d92d0f2",
+          "size": 177065632,
+          "sha256": "b6d6504420b37dc101e6d0c5d604511342a535d3f91ce180d9e26ed3ed6285f1",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-55/Y2Linux-1.0.0-beta.5-first-install-macos.zip"
         },
         {
@@ -4249,7 +4249,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263334098,
-          "sha256": "bcaa22b7e2ff13bb94cc2bc736ce945a471e304a76a1014a41c0fefa305e639a",
+          "sha256": "b8b0721763347c01abc1cb07e064d7593afbec08614b683a242cd84112473840",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-55/Y2Linux-1.0.0-beta.5-first-install-windows.zip"
         }
       ],
@@ -4281,7 +4281,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 444777320,
-          "sha256": "9f82faa92136c8808aa993d2c7a6f58ff866e212bf373da7ef1e2f75ca735734",
+          "sha256": "0b052661f3c828e67f1e713a5ac5820ea4ad6bf21b48a713d6aeb30bcfe379eb",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-54/Y2Linux-1.0.0-beta.4.1-first-install-linux.zip"
         },
         {
@@ -4290,8 +4290,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177133872,
-          "sha256": "4714cfb42f663d2ea64c3a2220653a8c42567aeb6a9e78521ec309b096c97d27",
+          "size": 177019827,
+          "sha256": "c355d8e2468aec530fa7b7324dc9f50b1dc3ba593a69daeab6fb78e8f1abb43f",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-54/Y2Linux-1.0.0-beta.4.1-first-install-macos.zip"
         },
         {
@@ -4301,7 +4301,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263288291,
-          "sha256": "d8c24dbb22ed338889fd6291cd9fa1d2e658b2851ffc75a36bf690dc8e50782a",
+          "sha256": "e8d7f8ac0f245ae3205070bed159359a086d79fb4d8df025657b6db71465d1a4",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-54/Y2Linux-1.0.0-beta.4.1-first-install-windows.zip"
         }
       ],
@@ -4333,7 +4333,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 444777617,
-          "sha256": "864fd0b58ef45b7f6bb5869a919822e33bd50133f6da2fe70cca37fca67e7d9e",
+          "sha256": "d9422b0bf0b9b7e8dcd3b5a7c80f63dfba746ca1f71784c143a8bccd28676130",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-53/Y2Linux-1.0.0-beta.4-first-install-linux.zip"
         },
         {
@@ -4342,8 +4342,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177134166,
-          "sha256": "271fe93fadb77d212bee616c3a0af96b748561ac20dfc2e23fbaabbe08568a60",
+          "size": 177020121,
+          "sha256": "9760b33bb2a7d83ba2862f38a9d24d4565e1833938afc65c8948a5ff7b006055",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-53/Y2Linux-1.0.0-beta.4-first-install-macos.zip"
         },
         {
@@ -4353,7 +4353,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263288588,
-          "sha256": "a548949798dee6f570a364605a2fa85d77826c4c99ab473feca95952056eb6a1",
+          "sha256": "a5cbf809d29e081297e6daa907f122a159b0f08ac63e6fcd011f30abc440d339",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-53/Y2Linux-1.0.0-beta.4-first-install-windows.zip"
         }
       ],
@@ -4385,7 +4385,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 444704282,
-          "sha256": "c230a5236847184e5e3122552caa4ca8424833ac042a53505b75d0c4209fe194",
+          "sha256": "90ea14e18c15b830e27aa92035cb4b264ed44de35d0b36534ae811c443100b78",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-52/Y2Linux-1.0.0-beta.3-first-install-linux.zip"
         },
         {
@@ -4394,8 +4394,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177060833,
-          "sha256": "c9154b2ff3483563fee050d303ce8da08c0ae7a27a251cfb623738a69e0de489",
+          "size": 176946788,
+          "sha256": "9b6433458f2c74d9e8dd58a0e54f0462f569f243215e4ccfe5d556f790fc3183",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-52/Y2Linux-1.0.0-beta.3-first-install-macos.zip"
         },
         {
@@ -4405,7 +4405,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263215253,
-          "sha256": "5b57cd8c7255351665ca23be5defb236638bff3230c7cfe2c936cdc39854a031",
+          "sha256": "099489b269b8d5ba127e0faa9dfeda2e7cad0356431780b55b1f9318d14dc1ab",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-52/Y2Linux-1.0.0-beta.3-first-install-windows.zip"
         }
       ],
@@ -4439,7 +4439,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 444726718,
-          "sha256": "d73236446b277e38fbf2eb946f1dd348dce2797b8560ac0df9e1cea0d038a36c",
+          "sha256": "87f8f59976c7cf31d6229df2df9614be10367b701124e11bf5da54aebf0cebe0",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-51/Y2Linux-1.0.0-beta.2-first-install-linux.zip"
         },
         {
@@ -4448,8 +4448,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177083268,
-          "sha256": "9443ac445523dc0d3f84a2dedb7d5619e9552d253ba6bd4293dd4f78aa03d086",
+          "size": 176969223,
+          "sha256": "ba76b680d09c336568d4a9c0bb290712a16758a50773e9c5bc59e2174cd66839",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-51/Y2Linux-1.0.0-beta.2-first-install-macos.zip"
         },
         {
@@ -4459,7 +4459,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263237689,
-          "sha256": "541f6546a0c5a14d5780403f09d096be64e7513fe50c4682df787f5550c086f5",
+          "sha256": "107c992483fe956f8a868b0a142ecf885b9265dfbcedd5952f040964db8f87f1",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-51/Y2Linux-1.0.0-beta.2-first-install-windows.zip"
         }
       ],
@@ -4492,7 +4492,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 444726390,
-          "sha256": "8e3adb5cd4702a0554d9fa00cbcdb8f997e60050460ff5f9e52b68003de79419",
+          "sha256": "ca169f9b8bd277f9fedd068ead56d096ea5b2ade7cf7cf2cbc771ee48ec7cf6d",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-50/Y2Linux-1.0.0-beta.1-first-install-linux.zip"
         },
         {
@@ -4501,8 +4501,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177082939,
-          "sha256": "06de1a815b8101d3e127a04032e9729cf4fae654b18829cadad5884a691a4b05",
+          "size": 176968894,
+          "sha256": "3e00f8f8fa067af0a23edc0bdd3b938c36d8fc89ad34d9b4ceda9ea2431acabd",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-50/Y2Linux-1.0.0-beta.1-first-install-macos.zip"
         },
         {
@@ -4512,7 +4512,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263237361,
-          "sha256": "9baaf0fe6ac75e275c6d67366536a6ca224a336e02910c057b3c2733724bb48d",
+          "sha256": "e7c3e49316501a69bd6e505bc5cd90fe5bcd152402c2f94ec92fa066912908d1",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-50/Y2Linux-1.0.0-beta.1-first-install-windows.zip"
         }
       ],
@@ -4545,7 +4545,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 444726156,
-          "sha256": "181d3f4b63d36f487ecdd45f8adbdaf844adec5fe2aafd1771843cf22513b26b",
+          "sha256": "31c94f947c96a3333d68c9da52111b73e6b948e6df6baa829bbadca5bbac6917",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-49/Y2Linux-49-first-install-linux.zip"
         },
         {
@@ -4554,8 +4554,8 @@
           "platform": "macos",
           "model": "Y2",
           "type": "Stock",
-          "size": 177082701,
-          "sha256": "6ab4d42da01ec38911e83574a989907d751fbf550b9876be893d8687f2d8bea6",
+          "size": 176968656,
+          "sha256": "d5dea546acb7bda4fa14969785a25321bc728675bec52a74248176c5e490962c",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-49/Y2Linux-49-first-install-macos.zip"
         },
         {
@@ -4565,7 +4565,7 @@
           "model": "Y2",
           "type": "Stock",
           "size": 263237127,
-          "sha256": "7a24a02b80f27aaacaf5a235462e05af5ed2a90287a752fc16337487aceb4ddd",
+          "sha256": "0898fe74c20dac6bee7bfb8a78f68e772101bcdf038b783ceb3f249c2f6074a6",
           "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-49/Y2Linux-49-first-install-windows.zip"
         }
       ],
