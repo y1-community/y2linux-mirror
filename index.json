@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at": "2026-11-08T21:22:25Z",
+  "generated_at": "2026-11-09T01:18:04Z",
   "source_repo": "schulzcode/y2linux",
   "mirror_repo": "y1-community/y2linux-mirror",
   "title_prefix": "Portable Flashing Package: ",
@@ -43,6 +43,110 @@
     }
   ],
   "releases": [
+    {
+      "tag": "baseline-228",
+      "title": "Portable Flashing Package: Y2Linux 1.0 Beta 9.3.19",
+      "source_title": "Y2Linux 1.0 Beta 9.3.19",
+      "source_url": "https://github.com/schulzcode/y2linux/releases/tag/baseline-228",
+      "published_at": "2026-11-08T22:50:06Z",
+      "prerelease": false,
+      "source_notes": "**Y2Linux 1.0 Beta 9.3.19**: update notifications, if you want them.\n\n## What's new\n- **Update Notifications**: Settings \u2192 System \u2192 Software Update \u2192 **Update Notifications**. Turn it on and the player tells you once when a new version is out, on whatever screen you are on. It's off by default, so nothing changes if you'd rather not be told.\n\n## Fixed\n- **\"Software update available\" never showed**: the player kept checking for new versions, but the message only came if you happened to open Settings. With Update Notifications on, it now comes by itself, once for each new version.\n\n## Known issues\n- A charge-only USB cable only charges. If your computer doesn't see the player, try a cable that transfers data with a phone.\n- Skins with their own fonts (Luna XP, Winamp and others) show boxes instead of Chinese, Japanese and Korean titles.\n- After a sleep, Bluetooth headphones reconnect within a few seconds of waking. Headphones that went back to a phone meanwhile must be picked again in Settings \u2192 Bluetooth.\n- WPA3-only Wi-Fi networks can't be joined; a \"WPA2/WPA3 mixed\" setting on the router works.\n- Some players turned off by themselves during playback; the cause isn't found yet.\n- Something wrong? Send an error report (Settings \u2192 System \u2192 Error Reports). **Restore Previous System** (Settings \u2192 System \u2192 About, tap Version seven times, then Diagnostics) takes you back to the version you had, with your data kept.\n\nMore details in plain words: **[Beta 9.3.19 report](https://github.com/SchulzCode/Y2Linux/blob/main/docs/validation/Y2-LINUX-1.0-BETA-9.3.19.md)**.\n\n<!-- github-only -->\n\n## Already running Y2Linux\nSettings \u2192 System \u2192 Software Update \u2192 **Update Now**. Your music, playlists, settings, Wi-Fi networks and Bluetooth pairings stay. (On Beta 9.2.8 and older: Settings \u2192 About & Updates \u2192 Check for Updates \u2192 **Update Now**.)\n\n## Install with the Innioasis Updater (easiest)\nThe community **Innioasis Updater CE** installs Y2Linux for you, on **Windows, macOS and Linux**. No SP Flash Tool needed.\n\n1. Download Innioasis Updater CE for your computer from [innioasis.app](https://innioasis.app/guide.html#download-updater) and open it.\n2. Choose **Y2**, then **Reborn (Y2Linux)** and the latest release.\n3. Click **Install / Restore**, switch the Y2 off and connect it when the updater asks. Wait until it confirms, then unplug.\n4. Connect the Y2 to the computer and **copy** `system.img` from the Innioasis Y2 firmware package v3.2.0 into the **Firmware** folder on **Internal Storage**. The player takes the Wi-Fi/Bluetooth firmware from it and turns the radios on.\n\nStep-by-step guides for each computer: [Reborn (Y2Linux) install guide](https://innioasis.app/guides/reborn-y2linux-y2.html). The way back to stock is in the updater too: choose **Y2** and **Original Software**.\n\n## Install with SP Flash Tool\nYou need SP Flash Tool v5.2032, a USB cable, **`Y2Linux-1.0.0-beta.9.3.19-first-install.zip`** below and the **Innioasis Y2 firmware package v3.2.0** from Innioasis (only this version works; it is also your way back to stock).\n\n1. Unpack both.\n2. SP Flash Tool \u2192 **Download Only** \u2192 load `MT6582_Android_scatter.txt` **from the Y2Linux zip**. Exactly BOOTIMG, RECOVERY, ANDROID and USRDATA are ticked.\n3. Click Download and connect the switched-off Y2; wait for the green tick.\n4. Unplug and press Power: the player sets up its Internal Storage (a few seconds), then Y2Linux and Reborn start, music works.\n5. Connect the Y2 to the computer and **copy** (don't move) `system.img` from the Innioasis package into the **Firmware** folder on **Internal Storage**. The player takes the Wi-Fi/Bluetooth firmware from it and turns the radios on.\n\nFull guide: [INSTALL](https://github.com/SchulzCode/Y2Linux/blob/main/docs/INSTALL.md) \u00b7 How updates work: [Recovery and updates](https://github.com/SchulzCode/Y2Linux/blob/main/docs/RECOVERY-AND-UPDATES.md) \u00b7 Storage: [Storage](https://github.com/SchulzCode/Y2Linux/blob/main/docs/STORAGE.md) \u00b7 [Audiobooks](https://github.com/SchulzCode/Y2Linux/blob/main/docs/AUDIOBOOKS.md) \u00b7 Headphone settings: [Headphone output](https://github.com/SchulzCode/Y2Linux/blob/main/docs/HEADPHONE-OUTPUT.md) \u00b7 [Error reports](https://github.com/SchulzCode/Y2Linux/blob/main/docs/ERROR-REPORTS.md) \u00b7 Skins: [skin guide](https://github.com/SchulzCode/Y2Reborn/blob/main/docs/skins.md)\n\n## How it was tested\nOn the developer's player, a check result offering a newer version was placed while the Music screen showed: with the switch off no message came; with it on, a version already named stayed quiet and a new one was announced (screenshot). New tests cover when the message is shown, kept quiet or recorded. The platform's full check, Reborn's workspace tests and the tests of the release images passed. Installed by update on the developer's player.\n\n## Files\n- `Y2Linux-1.0.0-beta.9.3.19-first-install.zip`: images, scatter files and checksums for SP Flash Tool. The data image has no SSH key (developers: `tools/production/first_owner.py`).\n- `manifest.json`, `manifest.sig`, `rootfs.ext4.gz`, `bootimg.img.gz`, `recovery.img.gz`: the signed over-the-air update (Ed25519 key `platform-v1-release-20261015`, sequence 15300).\n- `Y2Linux-1.0.0-beta.9.3.19-sources-buildroot-legal-info.tar` (licences, manifests, this project's packages) and the third-party, toolchain and Linux sources linked below: corresponding sources. Our own code: Y2Linux and Y2Reborn at tag `baseline-228`. The speaker amplifier driver is Chris Hendrickson's GPL-2.0 AW87559 driver. The headphone profiles are AutoEq results (MIT, Jaakko Pasanen); their licence ships with them.\n- `SHA256SUMS` for the attached files.\n\nBeta software: use at your own risk. Not affiliated with Innioasis, MediaTek, Awinic, Last.fm, AutoEq, Strawberry, MusicBee or Google. Noto Sans CJK is licensed under the SIL Open Font License 1.1.\n\n<!-- /github-only -->\n\n<!-- github-only -->\n\n## Sources unchanged since an earlier release\n- [`Y2Linux-sources-third-party-2f565b901c03.tar`](https://github.com/SchulzCode/Y2Linux/releases/download/baseline-224/Y2Linux-sources-third-party-2f565b901c03.tar) (attached to `baseline-224`), SHA-256 `2f565b901c03b7e6dc431c7a48656a356e4687bc2844ec0724464ad5480c8f79`\n- [`Y2Linux-sources-toolchain-f7cda4c7d213.tar`](https://github.com/SchulzCode/Y2Linux/releases/download/baseline-120/Y2Linux-sources-toolchain-f7cda4c7d213.tar) (attached to `baseline-120`), SHA-256 `f7cda4c7d2134bed15dacc7afd7e1687621a57412d60e49c725efc3880bf1bc6`\n- [`linux-6.18.56.tar.xz`](https://github.com/SchulzCode/Y2Linux/releases/download/baseline-120/linux-6.18.56.tar.xz) (attached to `baseline-120`), SHA-256 `4633bbda2ab95eaf2a7af4041236451d6759c72e6946265531af4b3aacefbf89`\n\n<!-- /github-only -->\n",
+      "assets": [
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.19-first-install-linux.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.19-first-install.zip",
+          "platform": "linux",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 455248922,
+          "sha256": "24174cd7da663329d72c6e0e589747fa640505225808ecaba4d73c9a6a28ac97",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-228/Y2Linux-1.0.0-beta.9.3.19-first-install-linux.zip"
+        },
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.19-first-install-macos.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.19-first-install.zip",
+          "platform": "macos",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 187415713,
+          "sha256": "0fd5b98aa392c6820cdf46a572d71ca37c03dfbcf7a2f8459e39f4158b130731",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-228/Y2Linux-1.0.0-beta.9.3.19-first-install-macos.zip"
+        },
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.19-first-install-windows.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.19-first-install.zip",
+          "platform": "windows",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 273759893,
+          "sha256": "0c994153e9c91848fadea6dfb363e92685641ab4ed099b02f1912e884d5a9059",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-228/Y2Linux-1.0.0-beta.9.3.19-first-install-windows.zip"
+        }
+      ],
+      "original_assets": [
+        "bootimg.img.gz",
+        "manifest.json",
+        "manifest.sig",
+        "recovery.img.gz",
+        "rootfs.ext4.gz",
+        "SHA256SUMS",
+        "Y2Linux-1.0.0-beta.9.3.19-first-install.zip",
+        "Y2Linux-1.0.0-beta.9.3.19-sources-buildroot-legal-info.tar"
+      ],
+      "stats_url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-228/stats.txt"
+    },
+    {
+      "tag": "baseline-227",
+      "title": "Portable Flashing Package: Y2Linux 1.0 Beta 9.3.18",
+      "source_title": "Y2Linux 1.0 Beta 9.3.18",
+      "source_url": "https://github.com/schulzcode/y2linux/releases/tag/baseline-227",
+      "published_at": "2026-11-08T20:50:17Z",
+      "prerelease": false,
+      "source_notes": "**Y2Linux 1.0 Beta 9.3.18**: USB that always reconnects, a new skin and quicker settings.\n\n## What's new\n- **Luna XP skin**: blue title bars, a green start button and rolling hills, made by eNKay. Pick it in Settings \u2192 Skin.\n- **Quick settings from the Quick Menu**: hold Power to open the Quick Menu, then hold Select on Wi-Fi, Bluetooth or Brightness to jump straight to that setting.\n- **Sort an artist's albums your way**: Settings \u2192 Customize \u2192 Browsing \u2192 Artist's Albums: Oldest First, Newest First or A to Z.\n- **Cover Flow matches your skin**: its colours, fonts and cover shape now follow the skin you picked.\n- **Updates without Wi-Fi**: when Wi-Fi is off, Software Update shows **Connect to Wi-Fi** and takes you there, instead of a check that can't work.\n- **Songs the player can't play**: if your card has files the player can't play (WMA or DSD, for example), Settings \u2192 Library now tells you how many and which kind, so they no longer just seem to be missing.\n- **For skin makers**: `{bitrate}` shows a song's bitrate, like \"320 kbps\".\n\n## Fixed\n- **USB connection**: after unplugging at the wrong moment, a computer sometimes never found the player again until it was restarted. The player now reconnects every time.\n\n## Known issues\n- A charge-only USB cable only charges. If your computer doesn't see the player, try a cable that transfers data with a phone.\n- Skins with their own fonts (Luna XP, Winamp and others) show boxes instead of Chinese, Japanese and Korean titles.\n- After a sleep, Bluetooth headphones reconnect within a few seconds of waking. Headphones that went back to a phone meanwhile must be picked again in Settings \u2192 Bluetooth.\n- WPA3-only Wi-Fi networks can't be joined; a \"WPA2/WPA3 mixed\" setting on the router works.\n- Some players turned off by themselves during playback; the cause isn't found yet.\n- Something wrong? Send an error report (Settings \u2192 System \u2192 Error Reports). **Restore Previous System** (Settings \u2192 System \u2192 About, tap Version seven times, then Diagnostics) takes you back to the version you had, with your data kept.\n\nMore details in plain words: **[Beta 9.3.18 report](https://github.com/SchulzCode/Y2Linux/blob/main/docs/validation/Y2-LINUX-1.0-BETA-9.3.18.md)**.\n\n<!-- github-only -->\n\n## Already running Y2Linux\nSettings \u2192 System \u2192 Software Update \u2192 **Update Now**. Your music, playlists, settings, Wi-Fi networks and Bluetooth pairings stay. (On Beta 9.2.8 and older: Settings \u2192 About & Updates \u2192 Check for Updates \u2192 **Update Now**.)\n\n## Install with the Innioasis Updater (easiest)\nThe community **Innioasis Updater CE** installs Y2Linux for you, on **Windows, macOS and Linux**. No SP Flash Tool needed.\n\n1. Download Innioasis Updater CE for your computer from [innioasis.app](https://innioasis.app/guide.html#download-updater) and open it.\n2. Choose **Y2**, then **Reborn (Y2Linux)** and the latest release.\n3. Click **Install / Restore**, switch the Y2 off and connect it when the updater asks. Wait until it confirms, then unplug.\n4. Connect the Y2 to the computer and **copy** `system.img` from the Innioasis Y2 firmware package v3.2.0 into the **Firmware** folder on **Internal Storage**. The player takes the Wi-Fi/Bluetooth firmware from it and turns the radios on.\n\nStep-by-step guides for each computer: [Reborn (Y2Linux) install guide](https://innioasis.app/guides/reborn-y2linux-y2.html). The way back to stock is in the updater too: choose **Y2** and **Original Software**.\n\n## Install with SP Flash Tool\nYou need SP Flash Tool v5.2032, a USB cable, **`Y2Linux-1.0.0-beta.9.3.18-first-install.zip`** below and the **Innioasis Y2 firmware package v3.2.0** from Innioasis (only this version works; it is also your way back to stock).\n\n1. Unpack both.\n2. SP Flash Tool \u2192 **Download Only** \u2192 load `MT6582_Android_scatter.txt` **from the Y2Linux zip**. Exactly BOOTIMG, RECOVERY, ANDROID and USRDATA are ticked.\n3. Click Download and connect the switched-off Y2; wait for the green tick.\n4. Unplug and press Power: the player sets up its Internal Storage (a few seconds), then Y2Linux and Reborn start, music works.\n5. Connect the Y2 to the computer and **copy** (don't move) `system.img` from the Innioasis package into the **Firmware** folder on **Internal Storage**. The player takes the Wi-Fi/Bluetooth firmware from it and turns the radios on.\n\nFull guide: [INSTALL](https://github.com/SchulzCode/Y2Linux/blob/main/docs/INSTALL.md) \u00b7 How updates work: [Recovery and updates](https://github.com/SchulzCode/Y2Linux/blob/main/docs/RECOVERY-AND-UPDATES.md) \u00b7 Storage: [Storage](https://github.com/SchulzCode/Y2Linux/blob/main/docs/STORAGE.md) \u00b7 [Audiobooks](https://github.com/SchulzCode/Y2Linux/blob/main/docs/AUDIOBOOKS.md) \u00b7 Headphone settings: [Headphone output](https://github.com/SchulzCode/Y2Linux/blob/main/docs/HEADPHONE-OUTPUT.md) \u00b7 [Error reports](https://github.com/SchulzCode/Y2Linux/blob/main/docs/ERROR-REPORTS.md) \u00b7 Skins: [skin guide](https://github.com/SchulzCode/Y2Reborn/blob/main/docs/skins.md)\n\n## How it was tested\nThe USB fault was reproduced on the developer's player and is gone with this build (it reconnects half a second after plugging in; before, never). Every change has new tests, and the platform's full check, Reborn's workspace tests and the tests of the release images passed. Installed by update on the developer's player.\n\n## Files\n- `Y2Linux-1.0.0-beta.9.3.18-first-install.zip`: images, scatter files and checksums for SP Flash Tool. The data image has no SSH key (developers: `tools/production/first_owner.py`).\n- `manifest.json`, `manifest.sig`, `rootfs.ext4.gz`, `bootimg.img.gz`, `recovery.img.gz`: the signed over-the-air update (Ed25519 key `platform-v1-release-20261015`, sequence 15200).\n- `Y2Linux-1.0.0-beta.9.3.18-sources-buildroot-legal-info.tar` (licences, manifests, this project's packages) and the third-party, toolchain and Linux sources linked below: corresponding sources. Our own code: Y2Linux and Y2Reborn at tag `baseline-227`. The speaker amplifier driver is Chris Hendrickson's GPL-2.0 AW87559 driver. The headphone profiles are AutoEq results (MIT, Jaakko Pasanen); their licence ships with them.\n- `SHA256SUMS` for the attached files.\n\nBeta software: use at your own risk. Not affiliated with Innioasis, MediaTek, Awinic, Last.fm, AutoEq, Strawberry, MusicBee or Google. Noto Sans CJK is licensed under the SIL Open Font License 1.1.\n\n<!-- /github-only -->\n\n<!-- github-only -->\n\n## Sources unchanged since an earlier release\n- [`Y2Linux-sources-third-party-2f565b901c03.tar`](https://github.com/SchulzCode/Y2Linux/releases/download/baseline-224/Y2Linux-sources-third-party-2f565b901c03.tar) (attached to `baseline-224`), SHA-256 `2f565b901c03b7e6dc431c7a48656a356e4687bc2844ec0724464ad5480c8f79`\n- [`Y2Linux-sources-toolchain-f7cda4c7d213.tar`](https://github.com/SchulzCode/Y2Linux/releases/download/baseline-120/Y2Linux-sources-toolchain-f7cda4c7d213.tar) (attached to `baseline-120`), SHA-256 `f7cda4c7d2134bed15dacc7afd7e1687621a57412d60e49c725efc3880bf1bc6`\n- [`linux-6.18.56.tar.xz`](https://github.com/SchulzCode/Y2Linux/releases/download/baseline-120/linux-6.18.56.tar.xz) (attached to `baseline-120`), SHA-256 `4633bbda2ab95eaf2a7af4041236451d6759c72e6946265531af4b3aacefbf89`\n\n<!-- /github-only -->\n",
+      "assets": [
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.18-first-install-linux.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.18-first-install.zip",
+          "platform": "linux",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 455247514,
+          "sha256": "a2a8467f03b9ed1f6789f4fe6672caa54d575e22218f44924c820442564c7358",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-227/Y2Linux-1.0.0-beta.9.3.18-first-install-linux.zip"
+        },
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.18-first-install-macos.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.18-first-install.zip",
+          "platform": "macos",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 187414304,
+          "sha256": "cc5e2699e915758df2d214d675520607922e33734347f1f7765dd285bf047cea",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-227/Y2Linux-1.0.0-beta.9.3.18-first-install-macos.zip"
+        },
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.18-first-install-windows.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.18-first-install.zip",
+          "platform": "windows",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 273758485,
+          "sha256": "2e10f24a3f3a4c369794195351cd556bcb5485ac4b337191d1ec630f7f129f03",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-227/Y2Linux-1.0.0-beta.9.3.18-first-install-windows.zip"
+        }
+      ],
+      "original_assets": [
+        "bootimg.img.gz",
+        "manifest.json",
+        "manifest.sig",
+        "recovery.img.gz",
+        "rootfs.ext4.gz",
+        "SHA256SUMS",
+        "Y2Linux-1.0.0-beta.9.3.18-first-install.zip",
+        "Y2Linux-1.0.0-beta.9.3.18-sources-buildroot-legal-info.tar"
+      ],
+      "stats_url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-227/stats.txt"
+    },
     {
       "tag": "baseline-225",
       "title": "Portable Flashing Package: Y2Linux 1.0 Beta 9.3.17",
