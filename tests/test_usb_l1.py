@@ -87,7 +87,8 @@ static void y2_usb_set_power(void *a, int b) { (void)a; (void)b; ++power_cleared
 static int y2_usb_runtime_get(void) { ++gets; y2_usb_pm_held = true; return 0; }
 static void y2_usb_runtime_put(void) { if (y2_usb_pm_held) ++puts; y2_usb_pm_held = false; }
 static void y2_usb_phase(unsigned stage) { y2_live.stage = stage; ++phases; }
-static void musb_g_disconnect(struct musb *m) { assert(m->lock); ++disconnected; }
+/* musb_g_disconnect + the peripheral rule (kernel/usb/role.h). */
+static void y2_musb_disconnect(struct musb *m) { assert(m->lock); ++disconnected; }
 static void musb_stop(struct musb *m) { assert(m->lock && disconnected); ++stopped; }
 static void iounmap(void *p) { (void)p; ++iounmapped; }
 static void release_mem_region(unsigned a, unsigned b) { (void)a; (void)b; }

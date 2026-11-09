@@ -461,6 +461,48 @@ def published_assets():
     return found
 
 
+# The release text is read on GitHub and inside updaters such as the community Innioasis Updater,
+# which flashes the player itself. What only makes sense on the GitHub page (SP Flash Tool steps,
+# the file list, how it was tested) sits between these markers, each on a line of its own:
+# GitHub hides the comments and an updater that knows them drops what is between them.
+# docs/RELEASE-NOTES-TEMPLATE.md is the format.
+GITHUB_ONLY = '<!-- github-only -->'
+GITHUB_ONLY_END = '<!-- /github-only -->'
+UPDATER_LIMIT = 3800  # the Innioasis Updater app shows 4000 characters
+
+
+def check_notes(notes):
+    """Refuse release text whose GitHub-only markers are missing, unbalanced or not on own lines."""
+    lines = [line.strip() for line in notes.splitlines()]
+    opened = False
+    for line in lines:
+        if line in (GITHUB_ONLY, GITHUB_ONLY_END):
+            if (line == GITHUB_ONLY) == opened:
+                raise SystemExit(f'release notes: {line} out of order')
+            opened = not opened
+        elif 'github-only' in line:
+            raise SystemExit(f'release notes: put the marker on a line of its own: {line}')
+    if opened:
+        raise SystemExit(f'release notes: {GITHUB_ONLY} is never closed')
+    if GITHUB_ONLY not in lines:
+        raise SystemExit('release notes: mark the install steps and the file list with '
+                         f'{GITHUB_ONLY} … {GITHUB_ONLY_END} (docs/RELEASE-NOTES-TEMPLATE.md)')
+    # What the Innioasis Updater app shows: it cuts the notes at 4000 characters and hides
+    # everything up to a line that starts with the word "Changes" (src/translate.py there).
+    shown, hiding = [], False
+    for line in notes.splitlines():
+        if line.strip() in (GITHUB_ONLY, GITHUB_ONLY_END):
+            hiding = line.strip() == GITHUB_ONLY
+        elif not hiding:
+            shown.append(line)
+    if len('\n'.join(shown)) > UPDATER_LIMIT:
+        raise SystemExit(f'release notes: the part updaters show is longer than {UPDATER_LIMIT} '
+                         'characters; shorten it or move detail into the GitHub-only part')
+    if any(re.match(r'\s*[#*_\->\s]*changes\b', line, re.IGNORECASE) for line in shown):
+        raise SystemExit('release notes: a line starting with "Changes" makes the Innioasis Updater '
+                         'hide everything above it; reword it')
+
+
 def publish(args):
     if not args.yes:
         raise SystemExit('publishing is outward-facing: pass --yes once the owner said to publish')
@@ -490,10 +532,12 @@ def publish(args):
                 continue
         upload.append(path)
     notes = Path(args.notes).read_text().rstrip('\n')
+    check_notes(notes)
     if linked:
-        notes += '\n\n## Sources unchanged since an earlier release\n' + ''.join(
+        notes += f'\n\n{GITHUB_ONLY}\n\n## Sources unchanged since an earlier release\n' + ''.join(
             f'- [`{path.name}`]({url}) (attached to `{where}`), SHA-256 `{sha256(path)}`\n'
-            for path, (where, url, _, _) in linked)
+            for path, (where, url, _, _) in linked) + f'\n{GITHUB_ONLY_END}'
+
     notes_file = release / 'release-notes.md'
     notes_file.write_text(notes + '\n')
 

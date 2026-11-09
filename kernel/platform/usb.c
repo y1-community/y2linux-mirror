@@ -183,6 +183,7 @@ static const struct file_operations y2_fops = {
 #include "/src/drivers/usb/musb/musb_dma.h"
 #include "/project/kernel/usb/session.h"
 #include "/project/kernel/usb/savecurrent.h"
+#include "/project/kernel/usb/role.h"
 
 
 static void __iomem *y2_usb_phy;
@@ -946,7 +947,7 @@ int y2_musb_system_quiesce(struct musb *musb)
 	spin_lock_irqsave(&musb->lock, flags);
 	y2_pm_disconnect = !!(readb(musb->mregs + MUSB_POWER) & MUSB_POWER_SOFTCONN);
 	writeb(readb(musb->mregs + MUSB_POWER) & ~MUSB_POWER_SOFTCONN, musb->mregs + MUSB_POWER);
-	musb_g_disconnect(musb);
+	y2_musb_disconnect(musb);
 	for (i = 0; i < 8; i++) {
 		/* Gadget disconnect must have retired every channel. Refuse sleep
 		 * while a DMA enable remains; do not reset a live DMA buffer. */
@@ -1083,7 +1084,7 @@ static void y2_usb_finish(void)
             /* Return every queued gadget request and stop the controller,
              * exactly like a cable removal (see y2_usb_detach()). */
             WRITE_ONCE(y2_usb_detached,true);
-            musb_g_disconnect(y2_musb);
+            y2_musb_disconnect(y2_musb);
             musb_stop(y2_musb);
         }
         spin_unlock_irqrestore(&y2_musb->lock,flags);
@@ -1118,7 +1119,7 @@ static void y2_usb_detach(void)
     spin_lock_irqsave(&y2_musb->lock,flags);
     writel(0,y2_musb->mregs+0xa4);
     writeb(readb(y2_musb->mregs+MUSB_POWER)&~MUSB_POWER_SOFTCONN,y2_musb->mregs+MUSB_POWER);
-    musb_g_disconnect(y2_musb);
+    y2_musb_disconnect(y2_musb);
     musb_stop(y2_musb);
     spin_unlock_irqrestore(&y2_musb->lock,flags);
     y2_session_end(&session,&y2_session);
@@ -1155,6 +1156,7 @@ static int y2_usb_reconnect(bool *wrote)
     y2_musb_clearb(y2_musb->mregs,MUSB_INTRUSB);
     y2_musb_clearw(y2_musb->mregs,MUSB_INTRTX);
     y2_musb_clearw(y2_musb->mregs,MUSB_INTRRX);
+    y2_musb_peripheral(y2_musb); /* never a host after any earlier disconnect (role.h) */
     musb_start(y2_musb);
     if(!READ_ONCE(y2_live.result)) {
         WRITE_ONCE(y2_usb_detached,false);

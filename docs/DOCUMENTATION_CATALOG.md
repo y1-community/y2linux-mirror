@@ -13,7 +13,7 @@ document links, rather than relocating or deleting proof. See the
 [shared knowledge rules](KNOWLEDGE_BASE.md)
 and the other repository's catalog for product-wide context.
 
-Indexed pages: **343**. Explicit scope notices: **228**.
+Indexed pages: **346**. Explicit scope notices: **228**.
 
 ## Entry
 
@@ -359,8 +359,11 @@ Indexed pages: **343**. Explicit scope notices: **228**.
 | [Error reports](ERROR-REPORTS.md) | User guide: save a report, send it, what is in it and what never is |
 | [Y2Linux 1.0 Beta 8.40 report](validation/Y2-LINUX-1.0-BETA-8.40.md) | Beta 8.40 (Baseline 154): power off on a charger opens the charging screen (F46) |
 | [Plugins plan](planning/PLUGINS-PLAN.md) | One unified kind of plugin (WebAssembly only) for everything optional: extension points, the core after the move, security model, store, SDK, phases P0–P6 |
+| [Release notes format](RELEASE-NOTES-TEMPLATE.md) | How the GitHub release text is written for listeners, the `github-only` markers updaters leave out, and the template `release.py publish` checks |
 | [Coding standard](CODING-STANDARD.md) | How the platform and Reborn are written (functions, workers, dispatchers, records, errors, `unsafe`), what the gate and its code-quality ratchet enforce |
 | [Y2Linux 1.0 Beta 9.3.16 report](validation/Y2-LINUX-1.0-BETA-9.3.16.md) | Beta 9.3.16 (Baseline 224): steady Bluetooth: the stream never runs empty between songs or in a pause (#96, Y2Reborn #99, #87), plainer BlueALSA, quick-drop reconnect limit |
+| [Y2Linux 1.0 Beta 9.3.19 report](validation/Y2-LINUX-1.0-BETA-9.3.19.md) | Beta 9.3.19 (Baseline 228): the update message works again and is opt-in: Update Notifications on Software Update, off by default (Y2Reborn #97) |
+| [Y2Linux 1.0 Beta 9.3.18 report](validation/Y2-LINUX-1.0-BETA-9.3.18.md) | Beta 9.3.18 (Baseline 227): USB always reconnects (#102), Luna XP skin, bitrate (#87), update page without Wi-Fi (Y2Reborn #96), Quick Menu hold (#101), Artist's Albums order (#75), Cover Flow follows the skin (#100), unplayable files named (#104) |
 | [Y2Linux 1.0 Beta 9.3.17 report](validation/Y2-LINUX-1.0-BETA-9.3.17.md) | Beta 9.3.17 (Baseline 225): Now Playing covers for MP3/AAC again (Y2Reborn #102, #98), every file name copies over USB (#88), Bluetooth output on the first connect (Y2Reborn #103), Cover Flow follows folder covers (Y2Reborn #105) |
 | [Y2Linux 1.0 Beta 9.3.15 report](validation/Y2-LINUX-1.0-BETA-9.3.15.md) | Beta 9.3.15 (Baseline 223): the Quick Menu on a held Power (#85): Wi-Fi, Bluetooth, brightness, sleep timer, Restart, Power Off in an animated panel |
 | [Y2Linux 1.0 Beta 9.3.13 report](validation/Y2-LINUX-1.0-BETA-9.3.13.md) | Beta 9.3.13 (Baseline 221): a Wi-Fi join that finds nothing restarts Wi-Fi once (#83), networks the player cannot join say why (WPA3 impossible, #91), letter jumps land at the top (Y2Reborn #91), square covers in skins and Cassette's stripe (Y2Reborn #81, #82) |

@@ -24,6 +24,9 @@ class ShippedSkins(unittest.TestCase):
         self.assertIn('skins/paper/fonts/Noto-OFL.txt', self.mk)
         self.assertIn('Noto and Pixelify Sans fonts of the shipped skins', self.mk)
         self.assertIn('skins/bunny-bow/fonts/PixelifySans-OFL.txt', self.mk)
+        # Luna XP (contributed 2026-11-08): DejaVu fonts and CC0 pictures.
+        self.assertIn('Bitstream-Vera (DejaVu fonts of the Luna XP skin)', self.mk)
+        self.assertIn('skins/luna-xp/fonts/DejaVu-LICENSE.txt skins/luna-xp/LICENSE.txt', self.mk)
 
 
 if __name__ == '__main__':

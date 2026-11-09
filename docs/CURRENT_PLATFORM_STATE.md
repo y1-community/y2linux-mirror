@@ -1,6 +1,28 @@
 # Current Y2Linux platform state
 
-## Y2Linux 1.0 Beta 9.3.17, Baseline 225 — 2026-11-08 (latest, published)
+## Y2Linux 1.0 Beta 9.3.19, Baseline 228 — 2026-11-08 (latest, published)
+
+Release `1.0.0-beta.9.3.19`, tag `baseline-228`, Linux `d6c404e4`, Reborn `520c4b8`, sequence 15300, root v1.251.
+Update Notifications (Y2Reborn #97): a toggle on Software Update, off by default; with it on, Reborn observes the
+platform on any screen every 120 s while online and the screen is lit, and says "Software update available" once per
+version (`update_announced` persisted). Before, only Settings screens observed, so the daily `update auto-check`
+answer reached Reborn only when Settings was opened. Device-checked on test build 228 (switch off: nothing; named
+version: nothing; new version: toast after 64 s). Release text in the listener format with `github-only` markers
+(docs/RELEASE-NOTES-TEMPLATE.md). Details: [Beta 9.3.19 report](validation/Y2-LINUX-1.0-BETA-9.3.19.md).
+
+## Y2Linux 1.0 Beta 9.3.18, Baseline 227 — 2026-11-08 (published)
+
+Release `1.0.0-beta.9.3.18`, tag `baseline-227`, Linux `9e864a3d`, Reborn `56298e9`, sequence 15200, root v1.250.
+USB always enumerates again (F78, Y2Linux #102): a disconnect while no gadget was bound left musb in host mode
+(`musb_g_disconnect` default case), so every bus reset was "Babble" until a restart; `kernel/usb/role.h` keeps the
+controller a peripheral after every disconnect and before every reconnect (device repro: 226 Babble + no enumeration,
+227 configured 0.5 s after reconnect). Reborn: Luna XP skin (eNKay, seventeen skins), skin var
+`{bitrate}` (#87; the Song Info page that also shows it has no menu entry since UI v3), update page "Connect to Wi-Fi" offline (Y2Reborn #96), Quick Menu hold opens settings (#101),
+Artist's Albums order (#75), Cover Flow follows the skin (`cover_shape`, captions; #100), unplayable files counted
+and named in Settings → Library (#104). Installed on the developer's player as test build 227. Details:
+[Beta 9.3.18 report](validation/Y2-LINUX-1.0-BETA-9.3.18.md).
+
+## Y2Linux 1.0 Beta 9.3.17, Baseline 225 — 2026-11-08 (published)
 
 Release `1.0.0-beta.9.3.17`, tag `baseline-225`, Linux `132cbec9`, Reborn `e14b17b`, sequence 15000. Report fixes,
 written to hold for every format, name and headset (owner 2026-11-08): Now Playing covers for MP3/AAC/Opus/Ogg again

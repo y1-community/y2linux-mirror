@@ -76,12 +76,16 @@ static void session_write(void *p,unsigned r,unsigned v) {
 static void session_delay(void *p) {assert(p==y2_musb);}
 static struct y2_session_io y2_session_io(struct musb *p)
 {return (struct y2_session_io){p,session_read,session_write,session_delay};}
-static void musb_g_disconnect(struct musb *p) {
+/* musb_g_disconnect + the peripheral rule (kernel/usb/role.h, tests/test_usb_role.py). */
+static void y2_musb_disconnect(struct musb *p) {
     assert(pm_held && p->lock && y2_usb_detached && !(mac[1]&0x40) && y2_live.stage==Y2_USB_DETACHED);
     ++disconnected;
 }
 static void musb_stop(struct musb *p) {assert(p->lock && disconnected);++stopped;}
+static unsigned peripheral;
+static void y2_musb_peripheral(struct musb *p) {assert(p->lock);++peripheral;}
 static void musb_start(struct musb *p) {
+    assert(peripheral > started); /* never started as a host (#102) */
     assert(pm_held && p->lock && y2_usb_detached && phy[0x6c]==0x2e && phy[0x6d]==0x3e);
     ++started;if(fifo_bad)y2_live.result=-5;
 }
