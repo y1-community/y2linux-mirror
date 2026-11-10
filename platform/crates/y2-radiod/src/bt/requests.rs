@@ -41,8 +41,10 @@ impl Controller {
             Request::Restore {
                 radio: Radio::Bluetooth,
             } => {
-                // A wake before the power-down finished: whoever waits for it hears it ended.
+                // A wake before the power-down finished: whoever waits for it hears it ended,
+                // and no wake follows that the sleep's headset state could speak for.
                 if let Sleep::Going { clients, .. } = std::mem::take(&mut self.sleep) {
+                    self.asleep_alone = None;
                     for waiting in clients {
                         waiting.reply(Reply::refused("woken_before_power_down"));
                     }
@@ -55,6 +57,8 @@ impl Controller {
     }
 
     fn set_power(&mut self, on: bool, persist: bool) -> Reply {
+        // The owner's switch is a power-on of its own (three tries), not a wake.
+        self.asleep_alone = None;
         self.desired.bluetooth = on;
         if persist {
             self.desired.save_bluetooth(&self.root);
@@ -327,6 +331,9 @@ impl Controller {
 
     /// A sleep: stop scanning, switch the adapter off, answer when it is off.
     fn quiesce(&mut self, client: Client) {
+        if matches!(self.sleep, Sleep::Awake) {
+            self.asleep_alone = Some(self.world.connected_audio().next().is_none());
+        }
         self.stop_discovery(false);
         self.confirm(false);
         if !self.desired.bluetooth && !self.world.powered() {

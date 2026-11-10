@@ -1,6 +1,12 @@
 # Next-session handoff — Y2Linux 1.0 Beta 8.4 candidate (latest entry first; started 2026-10-09 as the deep-sleep continuation)
 
-> **START HERE (2026-11-08): BETA 9.3.19 (BASELINE 228) RELEASE.** Update Notifications (Y2Reborn #97, closed):
+> **START HERE (2026-11-10): BETA 9.3.20 (BASELINE 229) RELEASE.** Bug fixes for #103 (audiobook buttons/place),
+> Y2Reborn #113 (one album in order, closed), #112 (skin Cover Flow captions, closed), #83 (Wi-Fi after wake, F79),
+> #84 (long M4B counted unreadable), #99 (SBC Auto Rate). Host-tested only: Wi-Fi/BT wake and audiobook buttons owe
+> a device check. Open: #103 Clear All favourites, #84 own MP4 index reader, #99 reporter test. Next free label 230,
+> sequence above 15400, next version 9.3.21 ([Beta 9.3.20 report](../validation/Y2-LINUX-1.0-BETA-9.3.20.md)).
+>
+> Previous entry: **START HERE (2026-11-08): BETA 9.3.19 (BASELINE 228) RELEASE.** Update Notifications (Y2Reborn #97, closed):
 > opt-in toggle, any screen observes every 120 s while online so the daily check's answer reaches Reborn, once per
 > version. Release text now follows docs/RELEASE-NOTES-TEMPLATE.md (`github-only` markers; Innioasis Updater PR
 > y1-community/Innioasis-Updater#62 open). Open: Song Info has no menu entry since UI v3, CBR/VBR (#87), #104

@@ -1,6 +1,16 @@
 # Current Y2Linux platform state
 
-## Y2Linux 1.0 Beta 9.3.19, Baseline 228 — 2026-11-08 (latest, published)
+## Y2Linux 1.0 Beta 9.3.20, Baseline 229 — 2026-11-10 (latest, published)
+
+Release `1.0.0-beta.9.3.20`, tag `baseline-229`, Linux `d5403d04`, Reborn `f6ba913`, sequence 15400, root v1.252.
+Bug fixes for the open issues: audiobook Previous/Next step to a chapter start only within 10 min, else 30 s, plus
+Previous/Next Chapter in the Now Playing menu and the place kept at 0:00 (#103); a one-album queue plays in order
+(Y2Reborn #113); skin Cover Flow captions glide (Y2Reborn #112); Wi-Fi join NotFound only when not associating and
+absent from the scan, radiod `Trigger::Wake` (one page) after a sleep without a headset (#83, F79); EFBIG files
+counted in Settings → Library (#84); service-menu SBC Auto Rate (#99). Host-tested only (HEAD comparison: no test
+regressions, 3,760 preview renders identical). Details: [Beta 9.3.20 report](validation/Y2-LINUX-1.0-BETA-9.3.20.md).
+
+## Y2Linux 1.0 Beta 9.3.19, Baseline 228 — 2026-11-08 (published)
 
 Release `1.0.0-beta.9.3.19`, tag `baseline-228`, Linux `d6c404e4`, Reborn `520c4b8`, sequence 15300, root v1.251.
 Update Notifications (Y2Reborn #97): a toggle on Software Update, off by default; with it on, Reborn observes the

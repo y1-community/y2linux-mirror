@@ -13,7 +13,7 @@ document links, rather than relocating or deleting proof. See the
 [shared knowledge rules](KNOWLEDGE_BASE.md)
 and the other repository's catalog for product-wide context.
 
-Indexed pages: **346**. Explicit scope notices: **228**.
+Indexed pages: **347**. Explicit scope notices: **228**.
 
 ## Entry
 
@@ -362,6 +362,7 @@ Indexed pages: **346**. Explicit scope notices: **228**.
 | [Release notes format](RELEASE-NOTES-TEMPLATE.md) | How the GitHub release text is written for listeners, the `github-only` markers updaters leave out, and the template `release.py publish` checks |
 | [Coding standard](CODING-STANDARD.md) | How the platform and Reborn are written (functions, workers, dispatchers, records, errors, `unsafe`), what the gate and its code-quality ratchet enforce |
 | [Y2Linux 1.0 Beta 9.3.16 report](validation/Y2-LINUX-1.0-BETA-9.3.16.md) | Beta 9.3.16 (Baseline 224): steady Bluetooth: the stream never runs empty between songs or in a pause (#96, Y2Reborn #99, #87), plainer BlueALSA, quick-drop reconnect limit |
+| [Y2Linux 1.0 Beta 9.3.20 report](validation/Y2-LINUX-1.0-BETA-9.3.20.md) | Beta 9.3.20 (Baseline 229): bug fixes: audiobook buttons and place (#103), one album in order (Y2Reborn #113), skin Cover Flow captions (Y2Reborn #112), Wi-Fi after waking (#83), long M4B note (#84), SBC Auto Rate (#99) |
 | [Y2Linux 1.0 Beta 9.3.19 report](validation/Y2-LINUX-1.0-BETA-9.3.19.md) | Beta 9.3.19 (Baseline 228): the update message works again and is opt-in: Update Notifications on Software Update, off by default (Y2Reborn #97) |
 | [Y2Linux 1.0 Beta 9.3.18 report](validation/Y2-LINUX-1.0-BETA-9.3.18.md) | Beta 9.3.18 (Baseline 227): USB always reconnects (#102), Luna XP skin, bitrate (#87), update page without Wi-Fi (Y2Reborn #96), Quick Menu hold (#101), Artist's Albums order (#75), Cover Flow follows the skin (#100), unplayable files named (#104) |
 | [Y2Linux 1.0 Beta 9.3.17 report](validation/Y2-LINUX-1.0-BETA-9.3.17.md) | Beta 9.3.17 (Baseline 225): Now Playing covers for MP3/AAC again (Y2Reborn #102, #98), every file name copies over USB (#88), Bluetooth output on the first connect (Y2Reborn #103), Cover Flow follows folder covers (Y2Reborn #105) |

@@ -172,6 +172,9 @@ pub struct Controller {
     /// Streams the player holds open, per device (a probe and a sink may overlap).
     streams: BTreeMap<String, u32>,
     sleep: Sleep,
+    /// Set when a sleep begins: whether no headset was connected then. The adapter's next power-on
+    /// (the wake) looks for the headset once instead of three times (`links::Trigger::Wake`).
+    asleep_alone: Option<bool>,
     power: Power,
     discovery: Option<Discovery>,
     scan: Scan,
@@ -217,6 +220,7 @@ impl Controller {
             streams: BTreeMap::new(),
             reload_codecs: false,
             sleep: Sleep::Awake,
+            asleep_alone: None,
             power: Power {
                 in_flight: false,
                 failures: 0,

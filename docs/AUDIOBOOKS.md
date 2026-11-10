@@ -44,9 +44,12 @@ and **Forget Progress**.
 **Chapters** are the book's own chapter marks when its files have them (M4B, MP3 and Ogg files
 usually do), otherwise each file is a chapter. While a book plays:
 
-- **Next / Previous** go to the next or previous chapter. Previous more than 5 seconds into a
-  chapter goes back to that chapter's start. Next in the last chapter does nothing: your place is
-  never lost.
+- **Next / Previous** go to the next or previous chapter when its start is less than 10 minutes
+  away; further away they skip 30 seconds (so a press in a pocket never costs you an hour of a long
+  chapter). Previous more than 5 seconds into a chapter goes back to that chapter's start. Next in
+  the last chapter does nothing: your place is never lost.
+- Hold Select on Now Playing for **Previous Chapter** and **Next Chapter**: they go to the chapter
+  start however far away it is.
 - **Holding Next / Previous** winds through the book: 10 seconds a step at first, then half a
   minute, then a minute.
 - Now Playing shows the chapter, the book and its author, the chapter's progress and how much of

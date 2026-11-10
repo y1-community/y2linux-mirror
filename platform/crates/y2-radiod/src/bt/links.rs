@@ -9,8 +9,13 @@ use y2p_contract::radiod::Ended;
 /// Why the daemon wants to connect now.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Trigger {
-    /// Bluetooth came on (boot, the owner's switch).
+    /// Bluetooth came on (boot, the owner's switch, a wake with a headset connected before it).
     PowerOn,
+    /// A wake with no headset connected before the sleep: one look. Three pages of an absent
+    /// headset kept the shared radio busy for about a minute, and Wi-Fi could neither scan nor
+    /// join meanwhile (Y2Linux #83: every failed join after a wake overlapped them). A headset
+    /// switched on later connects by itself.
+    Wake,
     /// The owner asked for this headset.
     User,
     /// The link ended this way.
@@ -62,6 +67,7 @@ impl Episode {
     pub fn start(trigger: Trigger, now: Instant) -> Option<Episode> {
         let (delay, limit) = match trigger {
             Trigger::PowerOn => (ADOPTION, 3),
+            Trigger::Wake => (ADOPTION, 1),
             Trigger::User => (Duration::ZERO, 3),
             Trigger::Lost(Ended::Timeout | Ended::Local | Ended::Unknown) => {
                 (Duration::from_secs(2), 3)
@@ -148,6 +154,20 @@ mod tests {
         episode.begin();
         assert!(!episode.failed(now));
         assert!(!episode.due(now + Duration::from_secs(600)));
+    }
+
+    #[test]
+    fn a_wake_without_a_headset_looks_once() {
+        // Y2Linux #83: three pages of absent earbuds after every wake kept Wi-Fi from joining.
+        let now = Instant::now();
+        let mut wake = Episode::start(Trigger::Wake, now).expect("one look");
+        assert_eq!(wake.limit, 1);
+        assert!(
+            !wake.due(now) && wake.due(now + ADOPTION),
+            "headsets get to come first"
+        );
+        wake.begin();
+        assert!(!wake.failed(now + ADOPTION), "no second page");
     }
 
     #[test]

@@ -35,7 +35,7 @@
   "Y2Reborn/app/reborn/src/views.rs": 16,
   "Y2Reborn/crates/reborn-library/src/benchmark.rs": 2,
   "Y2Reborn/crates/reborn-observability/src/lib.rs": 7,
-  "Y2Reborn/crates/reborn-platform/src/client.rs": 368,
+  "Y2Reborn/crates/reborn-platform/src/client.rs": 372,
   "Y2Reborn/crates/reborn-platform/src/codecs.rs": 3,
   "Y2Reborn/crates/reborn-platform/src/geo.rs": 3,
   "Y2Reborn/crates/reborn-platform/src/power.rs": 9,
@@ -46,10 +46,10 @@
  "long_files": {
   "Y2Reborn/app/reborn/src/bin/reborn-preview.rs": 2283,
   "Y2Reborn/app/reborn/src/main_loop.rs": 2366,
-  "Y2Reborn/crates/reborn-core/src/lib.rs": 2412,
+  "Y2Reborn/crates/reborn-core/src/lib.rs": 2413,
   "Y2Reborn/crates/reborn-library/src/lib.rs": 2235,
-  "Y2Reborn/crates/reborn-platform/src/client.rs": 1558,
-  "Y2Reborn/crates/reborn-ui/src/pages.rs": 1903
+  "Y2Reborn/crates/reborn-platform/src/client.rs": 1564,
+  "Y2Reborn/crates/reborn-ui/src/pages.rs": 1910
  },
  "long_functions": {
   "Y2Linux/platform/crates/y2-platform/src/commands/connectivity/wifi/monitor.rs::event": 152,
@@ -84,9 +84,9 @@
   "Y2Reborn/crates/reborn-ui/src/actions.rs::action_inner": 187,
   "Y2Reborn/crates/reborn-ui/src/actions.rs::select_row": 307,
   "Y2Reborn/crates/reborn-ui/src/catalog.rs::build": 250,
-  "Y2Reborn/crates/reborn-ui/src/context_menus.rs::context_action": 289,
+  "Y2Reborn/crates/reborn-ui/src/context_menus.rs::context_action": 286,
   "Y2Reborn/crates/reborn-ui/src/motion.rs::apply": 188,
-  "Y2Reborn/crates/reborn-ui/src/rows.rs::context_rows": 179,
+  "Y2Reborn/crates/reborn-ui/src/rows.rs::context_rows": 173,
   "Y2Reborn/crates/reborn-ui/src/screens.rs::skinned_overlays": 190,
   "Y2Reborn/crates/reborn-ui/src/skin/compile.rs::compile": 315,
   "Y2Reborn/crates/reborn-ui/src/skin/compile.rs::compile#2": 173,

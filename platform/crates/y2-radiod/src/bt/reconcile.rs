@@ -69,8 +69,12 @@ impl Controller {
                     .and_then(|r| r.episode.as_ref())
                     .is_some_and(|e| e.trigger == links::Trigger::User)
             });
+            let alone = self.asleep_alone.take() == Some(true);
             if !tapped {
-                self.trigger_preferred(links::Trigger::PowerOn);
+                self.trigger_preferred(match alone {
+                    true => links::Trigger::Wake,
+                    false => links::Trigger::PowerOn,
+                });
             }
         }
         let devices: Vec<world::Dev> = self.world.devices.values().cloned().collect();
