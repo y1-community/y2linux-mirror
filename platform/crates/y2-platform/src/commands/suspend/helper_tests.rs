@@ -642,7 +642,8 @@ fn reborn_is_restored_when_its_preparation_cannot_be_recorded() {
     let receipt = p.receipt();
     assert_eq!(receipt["product"]["state"], "restore_failed");
     assert_eq!(receipt["product"]["reason"], "suspend_receipt_unreadable");
-    assert_eq!(p.rpc(), ["sleep_prepare", "sleep_restore"]);
+    // Restored, with the screen left dark: the kernel was never entered and nobody woke the player.
+    assert_eq!(p.rpc(), ["sleep_prepare", "sleep_restore:dark"]);
     assert!(p.commands().is_empty()); // the radios were never quiesced
     assert_eq!(p.guard()["pending"], false);
 }
@@ -1119,7 +1120,10 @@ fn radio_quiesce_failure_before_kernel_entry_never_quarantines() {
     let guard = p.guard();
     assert_eq!(guard["pending"], false);
     assert_eq!(guard["kernel_entry"], false);
-    assert_eq!(p.rpc(), ["sleep_prepare", "sleep_restore"]);
+    // The screen stays dark: it went dark with the request, the player never slept and nobody woke
+    // it. Lit after each such failure, a player whose radios never start showed its screen coming on
+    // by itself at every automatic attempt (Y2Reborn #116, Y2Player #132).
+    assert_eq!(p.rpc(), ["sleep_prepare", "sleep_restore:dark"]);
     assert_eq!(admission(&p.root), Ok(()));
     // The next request succeeds normally.
     p.tree.power();

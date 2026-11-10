@@ -29,6 +29,7 @@ use serde_json::{json, Map, Value};
 use std::{env, sync::atomic::Ordering};
 use y2p_core::{command, json::ObjectExt, py::is_true, root::read, Root};
 
+mod channels;
 mod coexistence;
 mod jobs;
 mod signals;
@@ -36,7 +37,7 @@ mod signals;
 // The error-report tests read the due time as the service does.
 #[cfg(test)]
 pub(crate) use self::jobs::{next_upload, Due};
-use self::{coexistence::*, jobs::*, signals::*};
+use self::{channels::ChannelMask, coexistence::*, jobs::*, signals::*};
 
 // Fix02 background attribution: every iteration used to start a complete Python interpreter for
 // `media reconcile` (every 3 s) plus two more every 30 s. On the Y2 that recurring start-up work drove
@@ -136,6 +137,7 @@ impl Service {
         let (mut maintenance_timer, mut ntp_timer) = (Timer::default(), Timer::default());
         let mut associating_since: Option<f64> = None;
         let mut coexistence = Coexistence::default();
+        let mut channel_mask = ChannelMask::default();
         let mut radio_policy_timer = Timer::default();
         let mut settled = false;
         let mut drawn_recorded = false;
@@ -191,6 +193,7 @@ impl Service {
             };
             atomic_json(&runtime.join("network.json"), &record, false)?;
             let activity = coexistence.observe(root, &value, before)?;
+            channel_mask.follow(root, &value, before);
             if value.association.as_deref() == Some("COMPLETED")
                 && radio_policy_timer.due(before, 30.0)
             {

@@ -221,8 +221,10 @@ SERVED_CASES = [
                                          'commands': COMMANDS}, {'reborn': REBORN, 'inherit': True}),
     ('product-sleep-kernel-unproven', PRODUCT, {**ready(**{**HELPER, '/sys/firmware/y2_pm/state': 'valid=0\n'}),
                                                 'commands': COMMANDS}, {'reborn': REBORN, 'inherit': True}),
+    # A failure before the kernel is entered restores dark, like a refusal: the player never slept and
+    # nobody woke it (Y2Reborn #116, Y2Player #132: the screen came on at every failed automatic sleep).
     ('product-sleep-sync-fails', PRODUCT, {**ready(**HELPER), 'commands': COMMANDS[:2]},
-     {'reborn': REBORN, 'inherit': True}),
+     {'reborn': {'sleep_prepare': OK, 'sleep_restore': DARK}, 'inherit': True}),
     ('product-sleep-restore-unanswered', PRODUCT, {**ready(**HELPER), 'commands': COMMANDS},
      {'reborn': {'sleep_prepare': OK}, 'inherit': True}),
     # The kernel write fails: a failed attempt stays quarantined (lit restore), or, when no task froze, the

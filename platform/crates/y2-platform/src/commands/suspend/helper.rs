@@ -331,9 +331,18 @@ impl Run {
             // F47: a refusal leaves the screen dark (it went dark with the request); only a wake —
             // Power or RTC during the preparation, or a real return from the kernel — lights it.
             // Lit after every refusal, a kernel that refused each sleep turned the screen on every
-            // two minutes for hours. Failures still light it to explain.
-            let dark =
+            // two minutes for hours. A failure before the kernel was entered is the same case:
+            // the screen went dark with the request, the player never slept and nobody woke it.
+            // Lit "to explain", it showed nothing but the screen coming on by itself at every
+            // automatic attempt (a player whose radios never start failed each one at the
+            // Bluetooth step: Y2Reborn #116, and the screen turning on every few minutes in
+            // Y2Player #132). What failed stays in the sleep state and its journal. A failure
+            // after the kernel was entered still lights the screen: the player was woken, or its
+            // return is not proven.
+            let unwoken_refusal =
                 self.result == 2 && self.refusal.as_deref() != Some("wake_event_in_progress");
+            let failed_before_entry = self.result == 1 && !self.attempted;
+            let dark = unwoken_refusal || failed_before_entry;
             let screen = screen_first(root, dark);
             let answered = screen.as_ref().is_some_and(|s| !s.is_empty());
             progress(

@@ -22,6 +22,13 @@ use y2p_core::{command, sys, Root};
 /// the baseband 2 s into a pause (supervision timeout 20 s later). Reborn keeps a sink 2 s between
 /// streams (F61), so a Suspend follows a real pause, not a track change.
 pub const KEEP_ALIVE_S: u32 = 0;
+/// BlueALSA's encoder threads run at this real-time priority (SCHED_FIFO), the lowest one: they
+/// encode a packet every ~20 ms and then sleep, and a late packet is a gap in the headphones. A
+/// busy player (a library scan, a copy over USB, covers) must not delay them; every kernel
+/// thread that works with a real-time priority stays above them. Phones run this thread the same
+/// way. With four cores fully loaded the packets still left on time (2026-11-10: 99 % within
+/// 33 ms, 24 ms idle), so this is a margin, not a repair.
+pub const IO_RT_PRIORITY: u32 = 1;
 const SPACING: Duration = Duration::from_secs(5);
 const WINDOW: Duration = Duration::from_secs(600);
 const BUDGET: usize = 5;
@@ -170,6 +177,7 @@ impl Supervise {
                     return false;
                 };
                 let keep_alive = format!("--keep-alive={KEEP_ALIVE_S}");
+                let io_priority = format!("--io-rt-priority={IO_RT_PRIORITY}");
                 let mut argv = vec![
                     "start-stop-daemon",
                     "-S",
@@ -184,6 +192,7 @@ impl Supervise {
                     "a2dp-source",
                     "--loglevel=warning",
                     &keep_alive,
+                    &io_priority,
                     // One rate for every headset and codec, the rate most music has: no LDAC
                     // at 88.2/96 kHz (Reborn refused those streams and stayed on the jack) and
                     // no resampling of CD audio. BlueALSA takes 48 kHz where 44.1 is refused.

@@ -153,3 +153,133 @@ fn counters_that_are_no_numbers_count_as_none() {
         json!(5.0)
     );
 }
+
+/// The channel-mask passes of one test: the tool's and wpa_cli's commands a fixture recorded.
+fn channel_commands(fixture: &Fixture) -> Vec<String> {
+    fixture
+        .calls()
+        .into_iter()
+        .map(|(argv, _)| argv.join(" "))
+        .filter(|line| line.starts_with(channels::TOOL) || line.starts_with("wpa_cli"))
+        .collect()
+}
+
+fn channel_fixture(freq: &'static str) -> Fixture {
+    let fixture = Fixture::new().responding(move |argv, _| y2p_core::command::Outcome {
+        ok: true,
+        reason: None,
+        output: Some(match argv {
+            ["wpa_cli", "-i", "wlan0", "status"] => format!("wpa_state=COMPLETED\nfreq={freq}\n"),
+            [_, "clear"] => "{\"ok\":true,\"wifi_mhz\":0,\"masked\":0}\n".into(),
+            _ => "{\"ok\":true,\"wifi_mhz\":2427,\"masked\":23}\n".into(),
+        }),
+    });
+    fixture.mkdir("/run/y2");
+    fixture
+}
+
+/// The radio daemon's published state with the adapter switched `on`.
+fn bluetooth_power(fixture: &Fixture, on: bool) {
+    use y2p_contract::radiod::{Bluetooth, State, WifiPower, SCHEMA};
+    let state = State {
+        schema: SCHEMA.into(),
+        sequence: 1,
+        bluetooth: Bluetooth {
+            powered: on,
+            ..Default::default()
+        },
+        wifi: WifiPower::default(),
+    };
+    fixture.put_json(
+        "/run/y2/radiod-state.json",
+        &serde_json::to_value(&state).unwrap(),
+    );
+}
+
+fn wifi_on(network: Option<&str>) -> Wifi {
+    serde_json::from_value(match network {
+        Some(id) => json!({"state": "Online", "association": "COMPLETED", "association_id": id}),
+        None => json!({"state": "Disconnected", "association": "DISCONNECTED"}),
+    })
+    .unwrap()
+}
+
+#[test]
+fn bluetooth_is_told_the_wifi_networks_channel_and_told_again_when_it_changes() {
+    let fixture = channel_fixture("2427");
+    bluetooth_power(&fixture, true);
+    let mut mask = ChannelMask::default();
+    let home = wifi_on(Some("78:c5:7d:a9:79:41"));
+    mask.follow(&fixture.root, &home, 10.0);
+    let tool = channels::TOOL;
+    assert_eq!(
+        channel_commands(&fixture),
+        ["wpa_cli -i wlan0 status".to_owned(), format!("{tool} 2427")]
+    );
+    assert_eq!(fixture.json(channels::RECORD)["wifi_mhz"], json!(2427));
+    assert_eq!(
+        fixture.json(channels::RECORD)["answer"]["masked"],
+        json!(23)
+    );
+    // Nothing more while nothing changes, until the mask is due again (a controller reset that was
+    // not seen here, an access point that changed its channel).
+    mask.follow(&fixture.root, &home, 13.0);
+    mask.follow(&fixture.root, &home, 39.0);
+    assert_eq!(channel_commands(&fixture).len(), 2);
+    mask.follow(&fixture.root, &home, 40.0);
+    assert_eq!(channel_commands(&fixture).len(), 4);
+    // Another network: at once.
+    mask.follow(&fixture.root, &wifi_on(Some("00:11:22:33:44:55")), 41.0);
+    assert_eq!(channel_commands(&fixture).len(), 6);
+    // Wi-Fi leaves: every channel is free again, said once.
+    mask.follow(&fixture.root, &wifi_on(None), 42.0);
+    mask.follow(&fixture.root, &wifi_on(None), 500.0);
+    let commands = channel_commands(&fixture);
+    assert_eq!(commands.len(), 7);
+    assert_eq!(commands[6], format!("{tool} clear"));
+    assert!(fixture.json(channels::RECORD)["wifi_mhz"].is_null());
+}
+
+#[test]
+fn nothing_is_sent_while_bluetooth_is_off_and_a_controller_that_came_on_is_told_again() {
+    let fixture = channel_fixture("2462");
+    let mut mask = ChannelMask::default();
+    let home = wifi_on(Some("78:c5:7d:a9:79:41"));
+    // No radio daemon state, then Bluetooth off: no command at all.
+    mask.follow(&fixture.root, &home, 1.0);
+    bluetooth_power(&fixture, false);
+    mask.follow(&fixture.root, &home, 2.0);
+    assert!(channel_commands(&fixture).is_empty());
+    bluetooth_power(&fixture, true);
+    mask.follow(&fixture.root, &home, 3.0);
+    assert_eq!(channel_commands(&fixture).len(), 2);
+    // Off and on again (a sleep, the owner's switch): the controller forgot, so it is told at once.
+    bluetooth_power(&fixture, false);
+    mask.follow(&fixture.root, &home, 4.0);
+    bluetooth_power(&fixture, true);
+    mask.follow(&fixture.root, &home, 5.0);
+    let commands = channel_commands(&fixture);
+    assert_eq!(commands.len(), 4);
+    assert_eq!(commands[3], format!("{} 2462", channels::TOOL));
+}
+
+#[test]
+fn a_5_ghz_network_or_an_unreadable_frequency_masks_nothing() {
+    assert_eq!(
+        channels::frequency("bssid=aa\nfreq=2412\nssid=x\n"),
+        Some(2412)
+    );
+    assert_eq!(channels::frequency("freq=2484\n"), Some(2484));
+    assert_eq!(channels::frequency("freq=5180\n"), None);
+    assert_eq!(channels::frequency("freq=2400\n"), None);
+    assert_eq!(channels::frequency("freq=\nwpa_state=COMPLETED\n"), None);
+    assert_eq!(channels::frequency("wpa_state=COMPLETED\n"), None);
+    let fixture = channel_fixture("5180");
+    bluetooth_power(&fixture, true);
+    let mut mask = ChannelMask::default();
+    mask.follow(&fixture.root, &wifi_on(Some("78:c5:7d:a9:79:41")), 1.0);
+    assert_eq!(
+        channel_commands(&fixture)[1],
+        format!("{} clear", channels::TOOL)
+    );
+}

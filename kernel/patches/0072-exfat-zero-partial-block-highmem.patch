@@ -1,0 +1,32 @@
+--- a/fs/exfat/inode.c
++++ b/fs/exfat/inode.c
+@@ -5,6 +5,7 @@
+ 
+ #include <linux/init.h>
+ #include <linux/buffer_head.h>
++#include <linux/highmem.h>
+ #include <linux/mpage.h>
+ #include <linux/bio.h>
+ #include <linux/blkdev.h>
+@@ -385,8 +386,19 @@
+ 		if (err < 0)
+ 			goto done;
+ 
+-		/* Zero unwritten part of a block */
+-		memset(bh_result->b_data + size, 0, bh_result->b_size - size);
++		/*
++		 * Zero unwritten part of a block.
++		 * Y2: through the folio, not through b_data. A page-cache folio in
++		 * high memory has no kernel address: its b_data is only the offset
++		 * in the page (folio_set_bh), which the check above compares with
++		 * the equally unmapped folio_address(), and memset() then wrote to
++		 * that offset from address 0. The oops left the exFAT lock held,
++		 * so every later access to the card hung until a restart.
++		 */
++		folio_zero_segment(bh_result->b_folio,
++				offset_in_folio(bh_result->b_folio, pos) + size,
++				offset_in_folio(bh_result->b_folio, pos) +
++				bh_result->b_size);
+ 		err = 0;
+ 		goto done;
+ 	}

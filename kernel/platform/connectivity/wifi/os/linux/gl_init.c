@@ -2239,8 +2239,15 @@ wlanNetCreate(
     prWdev->wiphy->signal_type      = CFG80211_SIGNAL_TYPE_MBM;
     prWdev->wiphy->cipher_suites    = (const u32 *)mtk_cipher_suites;
     prWdev->wiphy->n_cipher_suites  = ARRAY_SIZE(mtk_cipher_suites);
+    /* Y2: a beacon heard on a listen-only channel lifts its restriction (cfg80211's beacon
+     * hint), and the next scan finds the channel an ordinary one (regulatory.c, y2_listen.h).
+     * With the hints disabled a network on channel 12 or 13 could never be used without a
+     * country (Y2Linux #110). The notifier is not asked to run for a hint
+     * (WIPHY_FLAG_CHANNEL_CHANGE_ON_BEACON): cfg80211 calls it under a spinlock there, and
+     * it waits for the driver's thread ("scheduling while atomic", build 231). */
     prWdev->wiphy->flags            = WIPHY_FLAG_SUPPORTS_FW_ROAM;
-    prWdev->wiphy->regulatory_flags = REGULATORY_DISABLE_BEACON_HINTS;
+    prWdev->wiphy->regulatory_flags = 0;
+    y2_wifi_reg_reset();
     prWdev->wiphy->reg_notifier = y2_wifi_reg_notifier;
 
     //4 <2> Create Glue structure

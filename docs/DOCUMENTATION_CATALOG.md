@@ -13,7 +13,7 @@ document links, rather than relocating or deleting proof. See the
 [shared knowledge rules](KNOWLEDGE_BASE.md)
 and the other repository's catalog for product-wide context.
 
-Indexed pages: **347**. Explicit scope notices: **228**.
+Indexed pages: **350**. Explicit scope notices: **228**.
 
 ## Entry
 
@@ -357,12 +357,15 @@ Indexed pages: **347**. Explicit scope notices: **228**.
 | [Last.fm scrobbling plan](planning/LASTFM-SCROBBLE-PLAN.md) | Last.fm sign-in, scrobble queue and offline plays |
 | [Error reports plan](planning/ERROR-REPORTS-PLAN.md) | Opt-in error reports: content, scrubbing, triggers, Cloudflare Worker + R2 receiver |
 | [Error reports](ERROR-REPORTS.md) | User guide: save a report, send it, what is in it and what never is |
+| [Ideas that won't be built, and why](NOT-PLANNED.md) | User guide: requests declined so far with the reason and the issue, linked from the issue forms |
 | [Y2Linux 1.0 Beta 8.40 report](validation/Y2-LINUX-1.0-BETA-8.40.md) | Beta 8.40 (Baseline 154): power off on a charger opens the charging screen (F46) |
 | [Plugins plan](planning/PLUGINS-PLAN.md) | One unified kind of plugin (WebAssembly only) for everything optional: extension points, the core after the move, security model, store, SDK, phases P0–P6 |
 | [Release notes format](RELEASE-NOTES-TEMPLATE.md) | How the GitHub release text is written for listeners, the `github-only` markers updaters leave out, and the template `release.py publish` checks |
 | [Coding standard](CODING-STANDARD.md) | How the platform and Reborn are written (functions, workers, dispatchers, records, errors, `unsafe`), what the gate and its code-quality ratchet enforce |
 | [Y2Linux 1.0 Beta 9.3.16 report](validation/Y2-LINUX-1.0-BETA-9.3.16.md) | Beta 9.3.16 (Baseline 224): steady Bluetooth: the stream never runs empty between songs or in a pause (#96, Y2Reborn #99, #87), plainer BlueALSA, quick-drop reconnect limit |
 | [Y2Linux 1.0 Beta 9.3.20 report](validation/Y2-LINUX-1.0-BETA-9.3.20.md) | Beta 9.3.20 (Baseline 229): bug fixes: audiobook buttons and place (#103), one album in order (Y2Reborn #113), skin Cover Flow captions (Y2Reborn #112), Wi-Fi after waking (#83), long M4B note (#84), SBC Auto Rate (#99) |
+| [Y2Linux 1.0 Beta 9.3.21 report](validation/Y2-LINUX-1.0-BETA-9.3.21.md) | Beta 9.3.21 (Baseline 232): Bluetooth on a weak signal (bounded catch-up, silence filler, Wi-Fi channel mask; Y2Reborn #87, #99), Wi-Fi channels 12 and 13 (#110), sleep without radios (Y2Reborn #116), exFAT partial block, FLAC and Opus bitrate (#87) |
+| [Y2Linux 1.0 Beta 9.3.22 report](validation/Y2-LINUX-1.0-BETA-9.3.22.md) | Beta 9.3.22 (Baseline 233): a sleep that fails before the kernel is entered leaves the screen dark (Y2Player #132, Y2Reborn #116); issue forms and the list of declined ideas |
 | [Y2Linux 1.0 Beta 9.3.19 report](validation/Y2-LINUX-1.0-BETA-9.3.19.md) | Beta 9.3.19 (Baseline 228): the update message works again and is opt-in: Update Notifications on Software Update, off by default (Y2Reborn #97) |
 | [Y2Linux 1.0 Beta 9.3.18 report](validation/Y2-LINUX-1.0-BETA-9.3.18.md) | Beta 9.3.18 (Baseline 227): USB always reconnects (#102), Luna XP skin, bitrate (#87), update page without Wi-Fi (Y2Reborn #96), Quick Menu hold (#101), Artist's Albums order (#75), Cover Flow follows the skin (#100), unplayable files named (#104) |
 | [Y2Linux 1.0 Beta 9.3.17 report](validation/Y2-LINUX-1.0-BETA-9.3.17.md) | Beta 9.3.17 (Baseline 225): Now Playing covers for MP3/AAC again (Y2Reborn #102, #98), every file name copies over USB (#88), Bluetooth output on the first connect (Y2Reborn #103), Cover Flow follows folder covers (Y2Reborn #105) |

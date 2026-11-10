@@ -395,4 +395,6 @@
 
 
 void y2_wifi_reg_notifier(struct wiphy *, struct regulatory_request *);
+void y2_wifi_reg_reset(void);
 unsigned y2_wifi_scan_channels(P_ADAPTER_T, P_MSG_SCN_SCAN_REQ);
+bool y2_wifi_scan_listen(P_ADAPTER_T, ENUM_AIS_STATE_T);

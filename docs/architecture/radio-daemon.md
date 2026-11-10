@@ -39,7 +39,8 @@ changes while one is open.
   ten minutes; then the service is Failed until the owner switches Bluetooth off and on (which restarts BlueALSA and
   BlueZ and starts every budget over).
 - **Supervision** (`bt/supervise.rs`): bluetoothd (its init script) and bluealsad (started here with the build's
-  codec arguments, `--keep-alive=0` and `--a2dp-force-audio-cd`: 44.1 kHz for every headset and codec, 48 kHz only
+  codec arguments, `--keep-alive=0`, `--io-rt-priority=1` (its encoder threads run before the player's other work)
+  and `--a2dp-force-audio-cd`: 44.1 kHz for every headset and codec, 48 kHz only
   where a headset refuses it) start again when they end, five times in ten minutes. Since 9.3.16 Reborn owns the
   stream's life like a phone's mixer: while the owner plays, its PCM stays open and is written with music or silence
   (never dropped, drained or prepared again inside BlueALSA: an underrun there is a stop and restart in a started
@@ -81,3 +82,25 @@ changes while one is open.
 
 `status` asks the daemon on its socket for `bluetooth.reconnect`. BlueZ's and BlueALSA's objects and the encoder
 statistics in `status` still come from `y2-bt-observe` (read-only).
+
+## The stream under a weak link or a late client (2026-11-10)
+
+Measured on a player with AirPods Pro (btmon): on the desk the stream is exact (a packet every 23.2 ms, no
+underrun, the pacing clock within 11 ppm); with the player moved away the link stalled up to 2.88 s, and
+BlueALSA then sent everything it had missed as fast as the link took it (6.1 s of audio in 3 s). Headphones
+answer that with a dropout and fast playback (Y2Reborn #87), and the player sees nothing, since the
+back-pressure only reaches the client. Three BlueALSA and platform rules follow:
+
+- **Bounded catch-up** (`buildroot/patches/bluez-alsa/0009`, `src/shared/y2-catchup.h`): at most 200 ms of
+  audio is owed after a stall, sent at no more than 4/3 of real time; the rest is forgotten (the music
+  continues from where it stopped). On time, or late by ordinary jitter, nothing changes.
+- **Silence while a client is late** (`0010`, `src/y2-filler.h`): once a client has played, an A2DP source
+  stream that gets no audio for 100 ms is fed silence until audio returns, the client drains or closes. A
+  started stream therefore always carries packets, whatever the player's own audio thread does.
+- **Bluetooth keeps off the Wi-Fi channel** (`y2-bt-afh`, service daemon `daemon/channels.rs`): while Wi-Fi is
+  connected on 2.4 GHz the controller is told that network's channels (AFH host channel classification) and
+  told again every 30 s; `clear` when Wi-Fi leaves. On the player the link left all 23 channels of the
+  router's within 2 s (before: 66-70 of 79 in use, 4 of the router's left out).
+
+Reborn's audio thread runs at the same real-time priority as BlueALSA's encoder threads, and a Bluetooth
+start waits 8 s (BlueZ gives headphones 6 s to answer a stream start).

@@ -107,7 +107,17 @@ fn fallback(root: &Root, request: &Request) -> i32 {
         }
         Request::Quiesce {
             radio: Radio::Bluetooth,
-        } => return i32::from(!bluetooth(false).ok),
+        } => {
+            // Bluetooth that does not run is off already. On a player whose radios never start
+            // (no radio data: the connectivity start gives up before this daemon is started)
+            // BlueZ has no adapter, `bluetoothctl power off` fails, and every sleep failed at
+            // this step: 80 attempts in one night, one every 103 s, 79 % to 11 % by morning
+            // (Y2Reborn #116, 9.3.17).
+            if !bluetooth_runs(root) {
+                return 0;
+            }
+            return i32::from(!bluetooth(false).ok);
+        }
         Request::Restore {
             radio: Radio::Bluetooth,
         } => {
@@ -128,9 +138,60 @@ fn fallback(root: &Root, request: &Request) -> i32 {
     0
 }
 
+/// The radio core's Bluetooth function (`functions` bit 0 in its status). Unknown counts as
+/// running: then BlueZ is asked, as before.
+fn bluetooth_runs(root: &Root) -> bool {
+    let core = crate::wifi::core(root);
+    !core.known || core.functions & 1 != 0
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A root whose radio core reports `status`.
+    fn root_with_core(name: &str, status: Option<&str>) -> (std::path::PathBuf, Root) {
+        let dir = std::env::temp_dir().join(format!("y2-radiod-ctl-{name}-{}", std::process::id()));
+        let core = dir.join("sys/devices/platform/18070000.connectivity");
+        std::fs::create_dir_all(&core).expect("fixture");
+        if let Some(status) = status {
+            std::fs::write(core.join("status"), status).expect("fixture");
+        }
+        let root = Root::new(&dir);
+        (dir, root)
+    }
+
+    #[test]
+    fn a_sleep_without_the_daemon_does_not_fail_on_bluetooth_that_never_started() {
+        // Y2Reborn #116: the radios never started, so there is no daemon and no adapter.
+        let quiesce = Request::Quiesce {
+            radio: Radio::Bluetooth,
+        };
+        let (dir, root) = root_with_core(
+            "never",
+            Some("activated=0 powered=0 functions=0x0 calibrated=0 error=0\n"),
+        );
+        assert!(!bluetooth_runs(&root));
+        assert_eq!(fallback(&root, &quiesce), 0);
+        std::fs::remove_dir_all(dir).expect("cleanup");
+        // Wi-Fi alone running is not Bluetooth running.
+        let (dir, root) = root_with_core(
+            "wifi",
+            Some("activated=1 powered=1 functions=0x8 error=0\n"),
+        );
+        assert_eq!(fallback(&root, &quiesce), 0);
+        std::fs::remove_dir_all(dir).expect("cleanup");
+        // Bluetooth runs, or nothing is known: BlueZ is asked (and here cannot answer).
+        let (dir, root) =
+            root_with_core("on", Some("activated=1 powered=1 functions=0x1 error=0\n"));
+        assert!(bluetooth_runs(&root));
+        assert_eq!(fallback(&root, &quiesce), 1);
+        std::fs::remove_dir_all(dir).expect("cleanup");
+        let (dir, root) = root_with_core("unknown", None);
+        assert!(bluetooth_runs(&root));
+        assert_eq!(fallback(&root, &quiesce), 1);
+        std::fs::remove_dir_all(dir).expect("cleanup");
+    }
 
     #[test]
     fn script_words_become_requests() {

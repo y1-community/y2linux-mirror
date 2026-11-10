@@ -1,0 +1,139 @@
+Bound the catch-up after a stalled stream (Y2Linux).
+
+The rate synchronization counts frames from one start time and, when it is
+behind, sends without a pause until it has caught up. Whatever stops the
+transfer for a while (a radio link that stalls, a write that blocks, a client
+that delivers late) is followed by all the missed audio at once, as fast as
+the link takes it. Headphones answer with a dropout and then fast playback
+(Y2Reborn #87, Sony WH-1000XM4), and the player never sees it: nothing
+underruns, the back-pressure just reaches the client.
+
+Measured on a Y2 with AirPods Pro and the player moved away until the sound
+broke up (btmon, 2026-11-10): 49 gaps over 60 ms in 5 minutes, the longest
+2.88 s without a packet, then 6.1 s of audio in the next 3 s; 63 packets in
+one 500 ms window where real time is 21. Nothing was dropped: 300.3 s of
+audio went out in 299.8 s.
+
+Now at most 200 ms of audio is owed after a stall (the start time moves
+forward by the rest; the music continues from where it stopped, nothing is
+skipped), and what is owed goes out at no more than 4/3 of real time, so the
+headphones' buffer fills up again without a burst. A stream that is on time
+or late by ordinary scheduling jitter is paced exactly as before. The rule
+is in src/shared/y2-catchup.h (pure arithmetic, tested on the host by
+tests/test_bluetooth_catchup.py); it applies to bluealsad's encoder threads
+and to the ALSA plug-in's transfer thread, which share this code.
+
+--- a/src/shared/rt.c
++++ b/src/shared/rt.c
+@@ -5,6 +5,7 @@
+  */
+ 
+ #include "rt.h"
++#include "y2-catchup.h"
+ 
+ #include <stdlib.h>
+ #include <sys/time.h>
+@@ -38,6 +39,7 @@
+ 	struct timespec ts_rate;
+ 	struct timespec ts;
+ 
++	const uint32_t frames_before = asrs->frames;
+ 	asrs->frames += frames;
+ 	frames = asrs->frames;
+ 
+@@ -46,6 +48,8 @@
+ 
+ 	gettimestamp(&ts);
+ 
++	struct timespec ts_now = ts;
++
+ 	asrs->synced = false;
+ 	/* maintain constant rate */
+ 	timespecsub(&ts, &asrs->ts0, &ts);
+@@ -53,6 +57,30 @@
+ 		nanosleep(&asrs->ts_idle, NULL);
+ 		asrs->synced = true;
+ 	}
++	else {
++		/* Y2: behind real time. Owe a bounded amount and send it at a
++		 * bounded speed instead of everything at once (y2-catchup.h). */
++		struct timespec ts_last;
++		timespecsub(&ts_now, &asrs->ts, &ts_last);
++		int64_t shift_ns;
++		const int64_t sleep_ns = y2_catchup(
++				asrs->ts_idle.tv_sec * INT64_C(1000000000) + asrs->ts_idle.tv_nsec,
++				(int64_t)(asrs->frames - frames_before) * INT64_C(1000000000) / rate,
++				ts_last.tv_sec * INT64_C(1000000000) + ts_last.tv_nsec,
++				&shift_ns);
++		if (shift_ns > 0) {
++			const struct timespec ts_shift = {
++				.tv_sec = shift_ns / INT64_C(1000000000),
++				.tv_nsec = shift_ns % INT64_C(1000000000) };
++			timespecadd(&asrs->ts0, &ts_shift, &asrs->ts0);
++		}
++		if (sleep_ns > 0) {
++			const struct timespec ts_sleep = {
++				.tv_sec = sleep_ns / INT64_C(1000000000),
++				.tv_nsec = sleep_ns % INT64_C(1000000000) };
++			nanosleep(&ts_sleep, NULL);
++		}
++	}
+ 
+ 	gettimestamp(&asrs->ts);
+ 
+--- /dev/null
++++ b/src/shared/y2-catchup.h
+@@ -0,0 +1,53 @@
++/*
++ * Y2Linux - y2-catchup.h
++ * SPDX-License-Identifier: MIT
++ *
++ * How the rate synchronization treats a stream that is behind real time.
++ *
++ * BlueALSA counts frames from one start time and, when it is behind, sends
++ * without any pause until it has caught up. A radio link that stalls for
++ * three seconds is then followed by three seconds of audio sent as fast as
++ * the link takes it; headphones answer with a dropout and fast playback
++ * (measured on a Y2 with a weak link, 2026-11-10: 2.88 s without a packet,
++ * then 6.1 s of audio in 3 s).
++ *
++ * Phones bound this, and so does this file:
++ *  - at most Y2_CATCHUP_MAX_NS of audio is ever owed: what is behind beyond
++ *    that is forgotten by moving the start time (nothing is skipped in the
++ *    music, the stream just continues from where it stopped);
++ *  - what is owed is sent at no more than 4/3 of real time, so the
++ *    headphones' buffer fills up again without a burst.
++ * A stream that is on time, or late by ordinary scheduling jitter, is paced
++ * exactly as before. Pure arithmetic: no clock, no state.
++ */
++
++#ifndef Y2_CATCHUP_H_
++#define Y2_CATCHUP_H_
++
++#include <stdint.h>
++
++/* The most audio owed after a stall: about what headphones keep buffered. */
++#define Y2_CATCHUP_MAX_NS INT64_C(200000000)
++
++/**
++ * Pacing of one transfer that ended behind real time.
++ *
++ * @param behind_ns How late the stream is, this transfer included (0 or more).
++ * @param transfer_ns Play time of the frames of this transfer.
++ * @param since_last_ns Time since the previous synchronization returned.
++ * @param shift_ns Set to how far the start time moves forward (0 or more).
++ * @return How long to sleep now (0 or more). */
++static inline int64_t y2_catchup(int64_t behind_ns, int64_t transfer_ns,
++		int64_t since_last_ns, int64_t *shift_ns) {
++	*shift_ns = behind_ns > Y2_CATCHUP_MAX_NS ? behind_ns - Y2_CATCHUP_MAX_NS : 0;
++	/* One transfer every 3/4 of its play time is 4/3 of real time. Time
++	 * already spent since the last transfer (encoding, a blocked write, the
++	 * sleep of an on-time transfer) counts, so ordinary jitter adds no
++	 * delay and the stream is never slowed below real time. */
++	const int64_t spacing_ns = transfer_ns / 4 * 3;
++	if (since_last_ns < 0)
++		since_last_ns = 0;
++	return since_last_ns < spacing_ns ? spacing_ns - since_last_ns : 0;
++}
++
++#endif

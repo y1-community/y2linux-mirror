@@ -1,6 +1,28 @@
 # Current Y2Linux platform state
 
-## Y2Linux 1.0 Beta 9.3.20, Baseline 229 — 2026-11-10 (latest, published)
+## Y2Linux 1.0 Beta 9.3.22, Baseline 233 — 2026-11-10 (latest, published)
+
+Release `1.0.0-beta.9.3.22`, tag `baseline-233`, Linux `bc043e92`, Reborn `63a2052`, sequence 15800, root v1.256.
+A sleep that fails before the kernel is entered restores dark, like an unwoken refusal (`suspend/helper.rs`; the
+screen came on at every failed automatic sleep: Y2Player #132, one cause in Y2Reborn #116). Issue forms ask for a
+search first, `docs/NOT-PLANNED.md` lists declined ideas, a workflow hints at similar issues. Installed on the
+developer's player; a failing sleep was not provoked there. Details:
+[Beta 9.3.22 report](validation/Y2-LINUX-1.0-BETA-9.3.22.md).
+
+## Y2Linux 1.0 Beta 9.3.21, Baseline 232 — 2026-11-10 (published)
+
+Release `1.0.0-beta.9.3.21`, tag `baseline-232`, Linux `8fb7b826`, Reborn `b42c10f`, sequence 15700, root v1.255
+(test builds 230 at 15500 and 231 at 15600 were only on the developer's player). From a day of Bluetooth
+measurements on a player (btmon): BlueALSA bounded catch-up after a stalled link (patch 0009) and silence while a
+client is late (0010), encoder threads and Reborn's audio thread at real-time priority 1, AFH host channel
+classification from the Wi-Fi channel (`y2-bt-afh`, service daemon), Bluetooth start deadline 8 s; exFAT partial
+block zeroed through the folio (kernel patch 0072); sleep quiesce succeeds when Bluetooth never started (Y2Reborn
+#116); listen-only scan pass for NO_IR channels with beacon hints on (#110); bitrate from size over length (#87).
+On the developer's player: clean Bluetooth stream through pauses, seek and skips, Wi-Fi scan and join, channel
+mask, exFAT read. Not tried: the weak-signal capture with this build, a join on channel 12/13, other headsets.
+Details: [Beta 9.3.21 report](validation/Y2-LINUX-1.0-BETA-9.3.21.md).
+
+## Y2Linux 1.0 Beta 9.3.20, Baseline 229 — 2026-11-10 (published)
 
 Release `1.0.0-beta.9.3.20`, tag `baseline-229`, Linux `d5403d04`, Reborn `f6ba913`, sequence 15400, root v1.252.
 Bug fixes for the open issues: audiobook Previous/Next step to a chapter start only within 10 min, else 30 s, plus

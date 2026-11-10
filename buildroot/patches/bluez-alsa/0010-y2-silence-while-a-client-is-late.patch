@@ -1,0 +1,183 @@
+Feed a started A2DP source stream silence while its client is late (Y2Linux).
+
+A started stream carried packets only while its client wrote audio. A client
+that was late (a busy player, an underrun and its recovery, a pause that
+keeps the PCM open) left the stream started with no packets at all, a state
+phones never put headphones in: their mixer keeps writing, music or silence,
+until the stream is suspended. AirPods Pro stayed silent after such a gap
+until a new stream started (Y2Linux #96, F43, F69). The player feeds silence
+itself since Beta 9.3.16, but that only holds while the player's own audio
+thread runs on time, and it does not cover an underrun's Drop and Start.
+
+Now the encoder thread fills in. Once a client has played, a stream that gets
+no audio for 100 ms is fed silence at real time until audio arrives again.
+The 100 ms it waited is made up by the bounded catch-up (patch 0009), so the
+headphones' buffer returns to its level. Nothing changes for a client that
+is on time. The end of playback (drain) and a closed PCM stop the stream as
+before; a paused PCM now carries silence, as it stays started. Only A2DP
+source streams are filled, never calls or capture.
+
+The rule is in src/y2-filler.h (pure, tested on the host by
+tests/test_bluetooth_filler.py). Checked against the real
+io_poll_and_read_pcm() on the host with a scripted client: late for 600 ms,
+the longest gap between packets is 100 ms (600 before) and 604 ms of audio
+went out in those 600 ms; paused for 800 ms, 104 ms (800 before); after a
+drain or a close no silence follows; a call's stream is untouched.
+
+--- a/src/io.c
++++ b/src/io.c
+@@ -19,9 +19,11 @@
+ 
+ #include "audio.h"
+ #include "ba-config.h"
++#include "ba-transport.h"
+ #include "shared/defs.h"
+ #include "shared/ffb.h"
+ #include "shared/log.h"
++#include "y2-filler.h"
+ 
+ /**
+  * Read data from the BT transport (SCO or SEQPACKET) socket. */
+@@ -272,6 +274,9 @@
+ 	io->tainted = false;
+ 	io->draining = false;
+ 	io->timeout = -1;
++	/* Y2: playback ended; no silence follows it. */
++	io->y2_played = false;
++	io->y2_filling = false;
+ 
+ }
+ 
+@@ -332,15 +337,37 @@
+ 	pthread_mutex_lock(&pcm->mutex);
+ 	/* Add PCM socket to the poll if it is not paused. */
+ 	fds[1].fd = pcm->paused ? -1 : pcm->fd;
++	/* Y2: silence takes the place of late audio while a client that has
++	 * played holds an A2DP source stream (y2-filler.h). */
++	const bool y2_armed = io->y2_played && !io->draining && pcm->fd != -1 &&
++		pcm->t->profile == BA_TRANSPORT_PROFILE_A2DP_SOURCE;
++	const unsigned int y2_channels = pcm->channels;
+ 	pthread_mutex_unlock(&pcm->mutex);
+ 
++	const int y2_timeout = y2_filler_timeout(io->timeout, y2_armed, io->y2_filling);
++	const bool y2_waiting = y2_timeout != io->timeout;
++
+ 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+-	int poll_rv = poll(fds, ARRAYSIZE(fds), io->timeout);
++	int poll_rv = poll(fds, ARRAYSIZE(fds), y2_timeout);
+ 	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+ 
+ 	/* Poll for reading with optional drain timeout. */
+ 	switch (poll_rv) {
+ 	case 0:
++		if (y2_waiting) {
++			const size_t silence = y2_filler_samples(ffb_len_in(buffer), y2_channels);
++			if (silence == 0) {
++				/* No room for a frame: wait for the audio as before. */
++				io->y2_filling = false;
++				goto repoll;
++			}
++			memset(buffer->tail, 0, ffb_blen_in(buffer));
++			if (io->asrs.frames == 0)
++				asrsync_init(&io->asrs, pcm->rate);
++			io->y2_filling = true;
++			ffb_seek(buffer, silence);
++			return silence;
++		}
+ 		if (io->draining)
+ 			/* If draining, use the logic in the read code block. */
+ 			break;
+@@ -411,6 +438,9 @@
+ 	if (samples <= 0) {
+ 		if (io->draining)
+ 			io_poll_drain_complete(io, pcm);
++		/* Y2: the client is gone; the stream stops as before. */
++		io->y2_played = false;
++		io->y2_filling = false;
+ 		return samples;
+ 	}
+ 
+@@ -424,6 +454,8 @@
+ 	/* Mark the IO as tainted, so in case of a drain operation we will
+ 	 * flush any remaining frames in the encoder buffers to BT. */
+ 	io->tainted = true;
++	io->y2_played = true;
++	io->y2_filling = false;
+ 
+ 	ffb_seek(buffer, samples);
+ 	return samples;
+--- a/src/io.h
++++ b/src/io.h
+@@ -36,6 +36,10 @@
+ 	bool draining;
+ 	/* keep-alive and drain timeout */
+ 	int timeout;
++	/* Y2: a client has played since it opened or last drained */
++	bool y2_played;
++	/* Y2: the previous transfer was silence in place of late audio */
++	bool y2_filling;
+ };
+ 
+ ssize_t io_bt_read(
+--- /dev/null
++++ b/src/y2-filler.h
+@@ -0,0 +1,59 @@
++/*
++ * Y2Linux - y2-filler.h
++ * SPDX-License-Identifier: MIT
++ *
++ * Silence for an A2DP source stream whose client delivers nothing.
++ *
++ * A started stream carried packets only while its client wrote audio. A
++ * client that was late (a busy player, an underrun and its recovery, a
++ * pause that keeps the PCM open) left the stream started with no packets,
++ * a state phones never put headphones in: AirPods Pro stayed silent after
++ * such a gap until a new stream started (Y2Linux #96, F43, F69). The
++ * player's own silence only helps while the player itself runs on time.
++ *
++ * Now the encoder thread fills in: once a client has played, a stream that
++ * gets no audio for Y2_FILLER_AFTER_MS is fed silence at real time until
++ * audio arrives again, the client drains (the end of its playback) or it
++ * closes the PCM (which stops the stream as before). Pure arithmetic.
++ */
++
++#ifndef Y2_FILLER_H_
++#define Y2_FILLER_H_
++
++#include <stdbool.h>
++#include <stddef.h>
++
++/* How long a client may be late before silence takes its place: longer
++ * than any scheduling delay of a healthy client, shorter than what
++ * headphones keep buffered. The rate synchronization makes this time up
++ * afterwards (y2-catchup.h), so their buffer returns to its level. */
++#define Y2_FILLER_AFTER_MS 100
++
++/**
++ * The poll timeout while waiting for a client's audio.
++ *
++ * @param timeout The timeout the caller would use (-1: none; others belong
++ *   to a drain and are kept).
++ * @param armed A client is attached to an A2DP source stream and has played
++ *   since it opened or last drained.
++ * @param filling The previous transfer already was silence.
++ * @return The timeout in milliseconds, -1 for none. */
++static inline int y2_filler_timeout(int timeout, bool armed, bool filling) {
++	if (timeout != -1 || !armed)
++		return timeout;
++	/* Once filling, every transfer that finds no audio is silence at once:
++	 * the stream keeps real time. */
++	return filling ? 0 : Y2_FILLER_AFTER_MS;
++}
++
++/**
++ * How many samples of silence fit: whole frames only.
++ *
++ * @param space Free samples in the encoder's input buffer.
++ * @param channels Channels of the stream.
++ * @return Samples to fill; 0 when not even one frame fits. */
++static inline size_t y2_filler_samples(size_t space, unsigned int channels) {
++	return channels == 0 ? 0 : space - space % channels;
++}
++
++#endif

@@ -12,6 +12,7 @@ maintainer downloads them with `fetch.py`, on the PC or on the home server. Desi
 | `worker/test/worker.test.js` | `node --test` in `worker/` (Node 20+, no packages) |
 | `new_upload_key.py` | Makes the build-wide upload key, once |
 | `fetch.py` | Downloads new reports from R2 (S3 API, standard library only) |
+| `summary.py` | A few lines per report: release, radio firmware, Wi-Fi/Bluetooth (and their switches), battery, storage, Reborn's startup failure (`--pending` for what REVIEWED.md lacks) |
 
 ## What the Worker checks
 

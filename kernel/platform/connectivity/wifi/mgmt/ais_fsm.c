@@ -2555,6 +2555,13 @@ aisFsmRunEventScanDone (
         DBGLOG(AIS, WARN, ("SEQ NO of AIS SCN DONE MSG is not matched %d %d.\n",
 				ucSeqNumOfCompMsg, prAisFsmInfo->ucSeqNumOfScanReq));
     }
+    else if ((prAisFsmInfo->eCurrentState == AIS_STATE_SCAN ||
+              prAisFsmInfo->eCurrentState == AIS_STATE_ONLINE_SCAN ||
+              prAisFsmInfo->eCurrentState == AIS_STATE_LOOKING_FOR) &&
+             y2_wifi_scan_listen(prAdapter, prAisFsmInfo->eCurrentState)) {
+        /* Y2: the pass over the listen-only channels runs; its end completes the scan. */
+        return;
+    }
     else {
         switch (prAisFsmInfo->eCurrentState) {
         case AIS_STATE_SCAN:

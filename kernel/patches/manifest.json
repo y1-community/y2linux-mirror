@@ -317,6 +317,12 @@
       "patch": "0071-y2-sd-poweroff-notify-fallback.patch",
       "base_sha256": "70f3c63f37772a20d42e25d8e0b045f85248ce4f8f5ee273c2feedea3169f191",
       "result_sha256": "5a73182f3562a6b707f0bd162fa8d3ea2e8d106d204250a0fb087b351d4177ea"
+    },
+    {
+      "path": "fs/exfat/inode.c",
+      "patch": "0072-exfat-zero-partial-block-highmem.patch",
+      "base_sha256": "31af082c4a2670daf05b0bdbd3207f97fb7a4bae0e30a8a9fe6796a6ac36f2c5",
+      "result_sha256": "f612cf0cc3a73c74e794b8de1b91839176fc4097b6fa1e159b8fef9a50af709c"
     }
   ]
 }
