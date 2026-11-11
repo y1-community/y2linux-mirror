@@ -102,8 +102,8 @@ mod tests {
             _ => false,
         };
         assert!(runs(&["codec-settings"]));
-        assert!(runs(&["codec-settings", "--sbc-quality", "xq+"]));
-        assert!(runs(&["codec-settings", "--sbc-quality=xq"]));
+        assert!(runs(&["codec-settings", "--sbc-quality", "high"]));
+        assert!(!runs(&["codec-settings", "--sbc-quality=xq"]));
         assert!(!runs(&["codec-settings", "--sbc-quality", "max"]));
         assert!(!runs(&["codec-settings", "--sbc", "xq"]));
         assert!(runs(&["transfer", "status", "--id", "x"]));

@@ -146,7 +146,7 @@
     "reason": "runtime enablement uses compiled inventory and explicit Experimental gate; physical qualification pending"
    },
    "bluetooth_sbc_xq": {
-    "enabled": true,
+    "enabled": false,
     "experimental": true,
     "fallback": "SBC",
     "implemented": true,

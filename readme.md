@@ -9,7 +9,7 @@ Last.fm and seventeen skins. Once it's installed, the player updates itself over
   <img src="docs/images/reborn-hero.png" alt="Reborn on the Y2: the Home screen, Now Playing with its progress wave, and Cover Flow" width="100%">
 </p>
 
-> **Current version: Y2Linux 1.0 Beta 9.3.23** (10 November 2026), a public beta.
+> **Current version: Y2Linux 1.0 Beta 9.3.24** (11 November 2026), a public beta.
 > **[Download it from the releases page](https://github.com/SchulzCode/Y2Linux/releases/latest)** and follow the
 > [install guide](docs/INSTALL.md). It runs every day on the developer's Y2 and on many others, but it is still a
 > beta: read [Known issues](#known-issues) first.
@@ -130,16 +130,16 @@ calibration and factory partitions untouched. A Y2 with a different board, stora
 
 ## For developers
 
-| | 1.0 Beta 9.3.23 (Baseline 234) |
+| | 1.0 Beta 9.3.24 (Baseline 235) |
 | --- | --- |
-| Git tag (both repositories) | `baseline-234` (previous: `baseline-233`); the GitHub release carries the first-install images, the signed over-the-air update and the GPL sources |
-| Release / kernel | `1.0.0-beta.9.3.23` / `6.18.56-y2linux-1.0.0-beta.9.3.23` (Linux 6.18 long-term line) |
-| Root filesystem | `2026.08-platform-v1.257` (Buildroot 2026.08) |
+| Git tag (both repositories) | `baseline-235` (previous: `baseline-234`); the GitHub release carries the first-install images, the signed over-the-air update and the GPL sources |
+| Release / kernel | `1.0.0-beta.9.3.24` / `6.18.56-y2linux-1.0.0-beta.9.3.24` (Linux 6.18 long-term line) |
+| Root filesystem | `2026.08-platform-v1.258` (Buildroot 2026.08) |
 | Platform | `y2-platform` (Rust 1.99): the battery, sleep, Wi-Fi, Bluetooth, storage, update, USB and report services; no Python on the player |
-| Player | Y2Reborn 1.0.0-beta.9.3.23 (Rust 1.99, OpenGL ES on the Mali-400 GPU through DRM + Lima, FFmpeg, SQLite) |
+| Player | Y2Reborn 1.0.0-beta.9.3.24 (Rust 1.99, OpenGL ES on the Mali-400 GPU through DRM + Lima, FFmpeg, SQLite) |
 | Bluetooth codecs | SBC, AAC (fdk-aac-free) and LDAC |
 | Main components | GCC 15.3 / glibc 2.44, Mesa 26.2.4, FFmpeg 9.0.2, BlueZ 5.87, OpenSSL 4.0.3 |
-| Images built from | Y2Linux `8f357e92`, Y2Reborn `9930022` ([Beta 9.3.23 report](docs/validation/Y2-LINUX-1.0-BETA-9.3.23.md); every earlier release report is listed in the [documentation catalog](docs/DOCUMENTATION_CATALOG.md)) |
+| Images built from | Y2Linux `e0a57350`, Y2Reborn `0537b06` ([Beta 9.3.24 report](docs/validation/Y2-LINUX-1.0-BETA-9.3.24.md); every earlier release report is listed in the [documentation catalog](docs/DOCUMENTATION_CATALOG.md)) |
 
 - **[Build from source](docs/BUILDING.md)**: host setup, the build, the first-install package and releases.
 - **[Coding standard](docs/CODING-STANDARD.md)** for the platform and Reborn; `tools/development/platform-gate.sh`

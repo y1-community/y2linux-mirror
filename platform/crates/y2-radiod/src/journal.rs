@@ -30,9 +30,17 @@ impl Journal {
 
     /// Append one row (bounded, rotated once); a /data that is not ours keeps no journal.
     pub fn event(&self, event: &str, fields: Value) {
-        if !data_ready(&self.root) {
-            return;
+        if data_ready(&self.root) {
+            self.append(JOURNAL, LIMIT, event, fields);
         }
+    }
+
+    /// One row in a file under /run (lost at a restart): for what changes too often for /data.
+    pub fn runtime(&self, name: &str, limit: u64, event: &str, fields: Value) {
+        self.append(name, limit, event, fields);
+    }
+
+    fn append(&self, name: &str, limit: u64, event: &str, fields: Value) {
         let fields = match fields {
             Value::Object(_) => fields,
             _ => Value::Object(Default::default()),
@@ -47,9 +55,9 @@ impl Journal {
         if let Ok(text) = dumps(&row) {
             let _ = append_bounded(
                 &self.root,
-                JOURNAL,
+                name,
                 format!("{text}\n").as_bytes(),
-                LIMIT,
+                limit,
                 false,
             );
         }

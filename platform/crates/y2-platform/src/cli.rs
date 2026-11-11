@@ -210,7 +210,7 @@ pub const COMMANDS: &[Command] = &[
     command("usb-mode", &[positional("mode").choices(&["mtp", "developer"])]),
     command("codec-runtime", &[flag("--record")]),
     command("codec-settings", &[
-        option("--sbc-quality").choices(&["high", "xq", "xq+"]),
+        option("--sbc-quality").choices(&[crate::commands::codec::SBC_QUALITY]),
         option("--sbc-abr").choices(ON_OFF),
         option("--ldac-quality").choices(&["mobile", "standard", "high"]),
         option("--ldac-abr").choices(ON_OFF),

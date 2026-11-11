@@ -44,17 +44,17 @@ fn experimental_gate_is_explicit_and_sbc_fallback_is_retained() {
     let args = arguments(&fixture);
     assert!(has(&args, "--codec=LDAC"));
     assert!(has(&args, "--codec=AAC"));
-    assert!(has(&args, "--sbc-quality=xq"));
+    // SBC XQ is gone: a saved "xq" or "xq+" is read as standard SBC, never refused.
+    assert!(has(&args, "--sbc-quality=high"));
     assert!(!has(&args, "--codec=-SBC"));
     caps["AAC"]["compiled_locally"] = json!(false);
     fixture.put_json(INVENTORY, &json!({"schema": 1, "codecs": caps}));
     assert!(!has(&arguments(&fixture), "--codec=AAC"));
-    // SBC XQ is an owner choice now, not an experiment.
     fixture.put_json(
         POLICY,
-        &json!({"schema": 1, "experimental": false, "sbc_quality": "xq"}),
+        &json!({"schema": 1, "experimental": false, "sbc_quality": "xq+"}),
     );
-    assert!(has(&arguments(&fixture), "--sbc-quality=xq"));
+    assert!(has(&arguments(&fixture), "--sbc-quality=high"));
     fixture.put_json(POLICY, &json!({"schema": 1, "sbc_quality": "max"}));
     assert!(matches!(
         runtime(&fixture.root, false),

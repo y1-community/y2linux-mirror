@@ -549,6 +549,40 @@ fn start_on_a_charger_after_a_low_battery_poweroff_runs() {
 }
 
 #[test]
+fn cold_start_after_charging_while_off_shows_the_charge() {
+    // F81 (a204f45a, 9.3.23, Y2Linux #113): off at 63 % and 3.82 V, charged while off, started
+    // on battery at 4.07 V under load with a power-on OCV of 4.114 V; the display said 63 %.
+    let fixture = fixture();
+    let start = |state: &str, voltage, ocv, boot| {
+        Soc::new(Some(stock(&fixture)), saved(state)).observe(
+            12.,
+            &Reading {
+                boot_ocv: Some(ocv),
+                boot,
+                ..at(voltage, 1, "Discharging")
+            },
+        )
+    };
+    let saved63 = r#"{"schema": 1, "ui_percent": 63, "anchor_percent": 97.93}"#;
+    let charged = start(saved63, 4072192, 4114000, Some("cold"));
+    assert!(shown(&charged) >= 85, "{}", shown(&charged));
+    assert_eq!(text(&charged, "start").as_deref(), Some("cold/ocv"));
+    // Rest recovery alone (a few points) keeps the saved value.
+    let rested = start(saved63, 3823000, 3870000, Some("cold"));
+    assert_eq!(
+        (shown(&rested), text(&rested, "start")),
+        (63, Some("cold/saved".into()))
+    );
+    // A warm or unknown restart still holds the old power-on OCV: the saved value stays.
+    for boot in [Some("warm"), None] {
+        assert_eq!(shown(&start(saved63, 4072192, 4114000, boot)), 63);
+    }
+    // A lower OCV never raises anything: the 40-point rule decides as before.
+    let high = r#"{"schema": 1, "ui_percent": 90, "anchor_percent": null}"#;
+    assert_eq!(shown(&start(high, 3900000, 3950000, Some("cold"))), 90);
+}
+
+#[test]
 fn warm_restart_keeps_the_saved_percent_not_the_old_power_on_ocv() {
     // F54, 98499743 (8.38): cold start near empty, charged to 95 %, then an
     // update restart (boot_reason=4) read the old 0x724 OCV and showed 13 %.

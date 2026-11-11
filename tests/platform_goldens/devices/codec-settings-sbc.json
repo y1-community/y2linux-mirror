@@ -2,7 +2,7 @@
  "argv": [
   "codec-settings",
   "--sbc-quality",
-  "xq+",
+  "high",
   "--sbc-abr",
   "off"
  ],
@@ -20,7 +20,7 @@
    "ldac_abr": true,
    "ldac_quality": "mobile",
    "sbc_abr": false,
-   "sbc_quality": "xq+",
+   "sbc_quality": "high",
    "schema": 1
   },
   "schema": "org.y2linux.codec-settings/v1",
@@ -38,9 +38,7 @@
    ],
    "sbc_abr": true,
    "sbc_quality": [
-    "high",
-    "xq",
-    "xq+"
+    "high"
    ]
   }
  },
@@ -54,7 +52,7 @@
      "ldac_abr": true,
      "ldac_quality": "mobile",
      "sbc_abr": false,
-     "sbc_quality": "xq+",
+     "sbc_quality": "high",
      "schema": 1
     },
     "mode": "0o600",

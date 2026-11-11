@@ -33,9 +33,13 @@ pub struct Policy {
     pub aac_abr: bool,
 }
 
-/// The qualities each encoder takes. SBC XQ is an owner choice (some SBC-only headphones sound much
-/// better, a few refuse it); the default stays "high".
-const SBC_QUALITIES: [&str; 3] = ["high", "xq", "xq+"];
+/// The qualities each encoder takes. SBC has one: standard SBC ("high", bit-pool 53). SBC XQ and
+/// XQ+ are gone (2026-11-11): about 450 and 550 kbit/s over the antenna Wi-Fi shares stuttered
+/// (Y2Reborn #123, F67), and Auto Rate's lowest step from there was still the standard rate.
+pub const SBC_QUALITY: &str = "high";
+const SBC_QUALITIES: [&str; 1] = [SBC_QUALITY];
+/// What an owner could save before; read as "high" so that their Bluetooth keeps starting.
+const SBC_QUALITIES_GONE: [&str; 2] = ["xq", "xq+"];
 const AAC_QUALITIES: [&str; 2] = ["standard", "high"];
 const LDAC_QUALITIES: [&str; 3] = ["mobile", "standard", "high"];
 
@@ -176,7 +180,9 @@ pub fn requested(root: &Root) -> Result<Policy, Failure> {
     policy.ldac_abr = switch("ldac_abr")?.unwrap_or(policy.ldac_abr);
     policy.aac_abr = switch("aac_abr")?.unwrap_or(policy.aac_abr);
     if let Some(q) = quality("sbc_quality", "invalid_sbc_quality")? {
-        policy.sbc_quality = q;
+        if !SBC_QUALITIES_GONE.contains(&q.as_str()) {
+            policy.sbc_quality = q;
+        }
     }
     if let Some(q) = quality("aac_quality", "invalid_aac_quality")? {
         policy.aac_quality = q;

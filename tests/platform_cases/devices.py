@@ -97,7 +97,7 @@ CASES = [
     ('rtc-alarm-not-a-number', ['rtc-alarm', '1h'], {}),
     # codec-settings
     ('codec-settings', ['codec-settings'], {}),
-    ('codec-settings-sbc', ['codec-settings', '--sbc-quality', 'xq+', '--sbc-abr', 'off'], {}),
+    ('codec-settings-sbc', ['codec-settings', '--sbc-quality', 'high', '--sbc-abr', 'off'], {}),
     ('codec-settings-aac-ldac', ['codec-settings', '--aac-quality=standard', '--ldac-abr', 'off', '--aac-abr', 'on',
                                  '--ldac-quality', 'mobile'], {'files': {POLICY: json.dumps(
                                      {'schema': 1, 'experimental': True, 'sbc_quality': 'xq'})}}),
@@ -108,7 +108,7 @@ CASES = [
     ('codec-settings-bad-policy', ['codec-settings'], {'files': {POLICY: '{"schema": 2}'}}),
     ('codec-settings-repair-refused', ['codec-settings', '--sbc-quality', 'high'], {'files': {
         POLICY: '{"schema": 1, "sbc_quality": "max"}'}}),
-    ('codec-settings-bad-boolean', ['codec-settings', '--sbc-quality', 'xq'], {'files': {
+    ('codec-settings-bad-boolean', ['codec-settings', '--sbc-quality', 'high'], {'files': {
         POLICY: '{"schema": 1, "aac_abr": 1}'}}),
     ('codec-settings-live', ['codec-settings'], {'files': LIVE}),
     ('codec-settings-live-pending', ['codec-settings', '--sbc-abr', 'off'], {'files': LIVE}),
@@ -237,7 +237,7 @@ EXTRA_CASES = [
         **LIVE, '/run/y2/codec-runtime.json': '{"boot_id": "boot-a", "arguments": 1.5}'}}),
     ('codec-settings-broken-inventory', ['codec-settings'], {'files': {
         INVENTORY: '{"schema": 1, "codecs": {"AAC": 3}}'}}),
-    ('codec-settings-null-codecs', ['codec-settings', '--sbc-quality', 'xq'], {'files': {
+    ('codec-settings-null-codecs', ['codec-settings', '--sbc-quality', 'high'], {'files': {
         INVENTORY: '{"schema": 1, "codecs": null}'}}),
     ('codec-settings-list-ldac', ['codec-settings'], {'files': {
         INVENTORY: '{"schema": 1, "codecs": {"AAC": {}, "LDAC": []}}'}}),

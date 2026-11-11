@@ -192,9 +192,7 @@
     "positional": false,
     "type": "str",
     "choices": [
-     "high",
-     "xq",
-     "xq+"
+     "high"
     ],
     "default": null,
     "required": false,

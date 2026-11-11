@@ -6,6 +6,9 @@ use super::soc::{py_max, py_min, round2, round_int, Soc};
 
 // Stock dod_init reuses the saved value only within 40 points of the boot estimate.
 const UI_RESTORE_POINTS: f64 = 40.0;
+// F81 (Y2Linux #113): a cold start whose power-on OCV reads this far above the saved value was
+// charged while off. A battery gains nothing by resting: rest recovery is a few points.
+const UI_CHARGED_OFF_POINTS: f64 = 10.0;
 // Stock mt_battery_update_status: at Full the display counts up one point per
 // 10-s battery-thread tick to 100 (100Percent tracking).
 const FULL_STEP_SECONDS: f64 = 10.0;
@@ -24,7 +27,8 @@ impl Soc {
     }
 
     /// First sample: reuse the saved display value within 40 points, or after a warm restart unless
-    /// the live estimate is 40+ points above it. The estimate and the display value it starts from.
+    /// the live estimate is 40+ points above it; a charger, LK's charging screen or a cold start's
+    /// power-on OCV 10+ points above it let the live estimate win. The estimate and the display value it starts from.
     pub(super) fn restore(
         &mut self,
         estimate: f64,
@@ -44,6 +48,16 @@ impl Soc {
         // charger reads high (F54, c0a4f35d: 28 % shown as 42 %).
         if ((charging && boot != Some("warm")) || boot == Some("charged"))
             && ui.is_some_and(|u| (u as f64) < shown)
+        {
+            ui = None;
+        }
+        // F81 (a204f45a, 9.3.23): switched off at 63 %, charged on LK's charging screen, cable
+        // pulled, started the next day at an OCV of 4.114 V: 63 % again, and on battery the
+        // display only follows down. The fresh power-on OCV of a cold start (start "ocv": no
+        // load yet, within range of the live sample) is a measurement, the saved value is not.
+        if boot == Some("cold")
+            && self.start.as_deref() == Some("ocv")
+            && ui.is_some_and(|u| shown - u as f64 >= UI_CHARGED_OFF_POINTS)
         {
             ui = None;
         }

@@ -1,6 +1,14 @@
 # Current Y2Linux platform state
 
-## Y2Linux 1.0 Beta 9.3.23, Baseline 234 — 2026-11-10 (latest, published)
+## Y2Linux 1.0 Beta 9.3.24, Baseline 235 — 2026-11-11 (latest, published)
+
+Release `1.0.0-beta.9.3.24`, tag `baseline-235`, Linux `e0a57350`, Reborn `0537b06`, sequence 16000, root v1.258.
+SBC XQ and XQ+ are gone (owner decision after Y2Reborn #123: stutter on XQ with Wi-Fi on; saved values read as
+standard SBC). A cold start after charging while switched off shows the measured level (#113, F81). y2-radiod logs
+the encoder's rate over time into reports. Open: F80, underruns while the Wi-Fi radio starts. Host-tested only, not
+on a player. Details: [Beta 9.3.24 report](validation/Y2-LINUX-1.0-BETA-9.3.24.md).
+
+## Y2Linux 1.0 Beta 9.3.23, Baseline 234 — 2026-11-10 (published)
 
 Release `1.0.0-beta.9.3.23`, tag `baseline-234`, Linux `8f357e92`, Reborn `9930022`, sequence 15900, root v1.257.
 Now Playing's progress wave takes the cover's colour, as Home's card does (#108; owner: no toggle). Issue forms ask

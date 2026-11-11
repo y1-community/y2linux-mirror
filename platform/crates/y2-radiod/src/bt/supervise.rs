@@ -34,7 +34,7 @@ const WINDOW: Duration = Duration::from_secs(600);
 const BUDGET: usize = 5;
 
 /// The codec arguments `bluealsad` accepts from `codec-runtime` (never anything else).
-const CODEC_ARGUMENTS: [&str; 19] = [
+const CODEC_ARGUMENTS: [&str; 17] = [
     "--codec=-AAC",
     "--codec=-aptX",
     "--codec=-aptX-HD",
@@ -44,8 +44,6 @@ const CODEC_ARGUMENTS: [&str; 19] = [
     "--codec=aptX-HD",
     "--codec=LDAC",
     "--sbc-quality=high",
-    "--sbc-quality=xq",
-    "--sbc-quality=xq+",
     "--sbc-abr",
     "--ldac-quality=mobile",
     "--ldac-quality=standard",

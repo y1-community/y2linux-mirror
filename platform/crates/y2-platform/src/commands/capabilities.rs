@@ -56,8 +56,8 @@ pub fn run(root: &Root) -> Outcome {
             );
         }
         if let Some(cap) = caps.get_mut("bluetooth_sbc_xq") {
-            cap.enabled =
-                policy.experimental && matches!(policy.sbc_quality.as_str(), "xq" | "xq+");
+            // SBC XQ is gone (codec.rs SBC_QUALITIES); the entry stays for older readers.
+            cap.enabled = false;
         }
         if let Some(cap) = caps.get_mut("wifi_power_save") {
             cap.enabled =

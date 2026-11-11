@@ -175,10 +175,7 @@ fn aac_settings_are_saved_and_reported() {
         value["supported"]["aac_quality"],
         json!(["standard", "high"])
     );
-    assert_eq!(
-        value["supported"]["sbc_quality"],
-        json!(["high", "xq", "xq+"])
-    );
+    assert_eq!(value["supported"]["sbc_quality"], json!(["high"]));
     let (_, value) = configure_with(
         &fixture,
         Changes {

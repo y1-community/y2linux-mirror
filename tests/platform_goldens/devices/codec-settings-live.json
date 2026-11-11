@@ -43,9 +43,7 @@
    ],
    "sbc_abr": true,
    "sbc_quality": [
-    "high",
-    "xq",
-    "xq+"
+    "high"
    ]
   }
  },

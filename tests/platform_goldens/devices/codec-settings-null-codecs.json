@@ -2,7 +2,7 @@
  "argv": [
   "codec-settings",
   "--sbc-quality",
-  "xq"
+  "high"
  ],
  "calls": [],
  "exit": 1,

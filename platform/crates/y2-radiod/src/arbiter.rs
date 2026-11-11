@@ -3,7 +3,7 @@
 //! before Wi-Fi starts, so they do not fight over the one antenna), the codec ceiling while Wi-Fi
 //! is on, and the published state (subscribers and `/run/y2/radiod-state.json`).
 // SPDX-License-Identifier: GPL-2.0-only
-use crate::{bt, desired::Desired, journal::Journal, server::Client, wifi};
+use crate::{bt, desired::Desired, journal::Journal, rate, server::Client, wifi};
 use std::{
     sync::mpsc::{channel, Receiver, RecvTimeoutError},
     time::{Duration, Instant},
@@ -39,6 +39,8 @@ struct Arbiter {
     sequence: u64,
     /// A Bluetooth stream played at the last look (Wi-Fi's power save follows it).
     streaming: bool,
+    /// The playing stream's encoder rate goes to the report rows.
+    rate: rate::Watch,
 }
 
 /// `y2-radiod`: exit status 1 when another instance runs or the socket cannot be made.
@@ -73,6 +75,7 @@ pub fn serve(root: &Root) -> i32 {
         subscribers: Vec::new(),
         sequence: 0,
         streaming: false,
+        rate: rate::Watch::default(),
     };
     arbiter.start();
     arbiter.run(received);
@@ -210,11 +213,14 @@ impl Arbiter {
     /// Wi-Fi's power save follows Bluetooth streaming at once (the service daemon's policy pass
     /// comes only every 30 s): the policy reads this daemon's state. Its own thread, never waited for.
     fn follow_streaming(&mut self) {
-        let streaming = self
+        let playing = self
             .bluetooth
             .pcms
             .iter()
-            .any(|pcm| pcm.running == Some(true));
+            .find(|pcm| pcm.running == Some(true));
+        self.rate
+            .follow(&self.journal, playing, self.root.is_real());
+        let streaming = playing.is_some();
         if streaming == self.streaming {
             return;
         }

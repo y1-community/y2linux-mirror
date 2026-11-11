@@ -8,6 +8,7 @@ mod bt;
 mod ctl;
 mod desired;
 mod journal;
+mod rate;
 mod server;
 mod wake;
 mod wifi;
