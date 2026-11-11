@@ -1,6 +1,12 @@
 # Next-session handoff — Y2Linux 1.0 Beta 8.4 candidate (latest entry first; started 2026-10-09 as the deep-sleep continuation)
 
-> **START HERE (2026-11-10): BETA 9.3.22 (BASELINE 233) RELEASE.** A failed sleep before kernel entry restores
+> **START HERE (2026-11-10): BETA 9.3.23 (BASELINE 234) RELEASE.** Now Playing's wave in the cover's colour
+> (#108), issue forms (install method, radio state, "Install, start or update"), `needs-info` workflow,
+> `tools/reports/summary.py`. Not on a player yet. Waiting for answers: Y2Reborn #120 (fresh install, Couldn't
+> Start), #116 (overnight). Next free label 235, sequence above 15900, next version 9.3.24
+> ([Beta 9.3.23 report](../validation/Y2-LINUX-1.0-BETA-9.3.23.md)).
+>
+> Previous entry: **START HERE (2026-11-10): BETA 9.3.22 (BASELINE 233) RELEASE.** A failed sleep before kernel entry restores
 > dark (Y2Player #132, Y2Reborn #116); issue forms, `docs/NOT-PLANNED.md` and the similar-issues workflow. Still
 > owed from 9.3.21: the weak-signal capture, a join on channel 12/13, other headsets, reporter answers. Next free
 > label 234, sequence above 15800, next version 9.3.23

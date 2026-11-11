@@ -1,6 +1,14 @@
 # Current Y2Linux platform state
 
-## Y2Linux 1.0 Beta 9.3.22, Baseline 233 — 2026-11-10 (latest, published)
+## Y2Linux 1.0 Beta 9.3.23, Baseline 234 — 2026-11-10 (latest, published)
+
+Release `1.0.0-beta.9.3.23`, tag `baseline-234`, Linux `8f357e92`, Reborn `9930022`, sequence 15900, root v1.257.
+Now Playing's progress wave takes the cover's colour, as Home's card does (#108; owner: no toggle). Issue forms ask
+the install method and whether Wi-Fi and Bluetooth work; the install form covers "Couldn't Start"; a `needs-info`
+workflow; `tools/reports/summary.py`. Checked in the host preview only, not on a player. Details:
+[Beta 9.3.23 report](validation/Y2-LINUX-1.0-BETA-9.3.23.md).
+
+## Y2Linux 1.0 Beta 9.3.22, Baseline 233 — 2026-11-10 (published)
 
 Release `1.0.0-beta.9.3.22`, tag `baseline-233`, Linux `bc043e92`, Reborn `63a2052`, sequence 15800, root v1.256.
 A sleep that fails before the kernel is entered restores dark, like an unwoken refusal (`suspend/helper.rs`; the
