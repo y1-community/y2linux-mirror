@@ -3,7 +3,11 @@ name: Portable flashing packages
 
 on:
   schedule:
-    - cron: "41 3,9,15,21 * * *"
+    # Hourly fallback.  The central watcher dispatches this workflow as soon
+    # as a source release, seed release or manifest row changes.
+    - cron: "17 * * * *"
+  repository_dispatch:
+    types: [firmware-release, portable-seed]
   workflow_dispatch:
     inputs:
       tags:
