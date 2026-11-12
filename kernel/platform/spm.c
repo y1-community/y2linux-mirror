@@ -398,6 +398,32 @@ int y2_spm_radio_power(unsigned domain, int on)
 	return ret;
 }
 
+/* Video decoder domain (VDE_PWR_CON, status bit 7): stock spm_mtcmos_ctrl_vdec is the MFG sequence
+ * on its own register and has no bus protection. One caller (vdec.c) under its own lock. */
+static bool vde_broken;
+int y2_spm_vde_status(void)
+{
+	unsigned a, b;
+	if (!smp_load_acquire(&spm_base)) return -EPROBE_DEFER;
+	if (READ_ONCE(vde_broken)) return -EIO;
+	a = readl(spm_base + SPM_PWR_STATUS) & BIT(7);
+	b = readl(spm_base + SPM_PWR_STATUS_S) & BIT(7);
+	return a != b ? -EIO : !!a;
+}
+int y2_spm_vde_power(int on)
+{
+	unsigned long flags;
+	int ret;
+	if (!smp_load_acquire(&spm_base)) return -EPROBE_DEFER;
+	if (READ_ONCE(vde_broken)) return -EIO;
+	raw_spin_lock_irqsave(&spm_lock, flags);
+	ret = y2_mtcmos_sequence(&spm_io, 0x210, 0x80, on);
+	/* A domain that did not acknowledge is never offered again in this boot. */
+	if (ret) vde_broken = true;
+	raw_spin_unlock_irqrestore(&spm_lock, flags);
+	return ret;
+}
+
 int y2_spm_cpu_disable(unsigned cpu)
 {
 	if (!cpu) return -EPERM;

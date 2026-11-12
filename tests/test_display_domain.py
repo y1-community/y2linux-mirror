@@ -83,7 +83,8 @@ int main(void) {
         dts = (ROOT / 'kernel/dts/innioasis-y2.dts').read_text()
         self.assertIn('#power-domain-cells = <1>;', dts)
         self.assertIn('power-domains = <&spm 0>;', dts)
-        self.assertEqual(dts.count('power-domains = <&spm 1>'), 2)
+        # OVL, RDMA and, while it decodes, the video decoder (its SMI lives in MMSYS).
+        self.assertEqual(dts.count('power-domains = <&spm 1>'), 3)
 
     def test_a_restart_leaves_the_smi_gates_open_for_lk(self):
         # Beta 8.4 (POWER-FINAL-42 back): a watchdog restart keeps

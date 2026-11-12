@@ -7,14 +7,28 @@ import shutil
 import subprocess
 from pathlib import Path
 
-REQUIRED_DEMUXERS = {"flac", "mp3", "mov", "ogg", "wav", "aac", "aiff", "ape", "wv"}
+REQUIRED_DEMUXERS = {
+    "flac", "mp3", "mov", "ogg", "wav", "aac", "aiff", "ape", "wv",
+    # Video (docs/planning/VIDEO-PLAYBACK-PLAN.md): Matroska/WebM, AVI, subtitle files.
+    "matroska", "avi", "srt", "ass", "webvtt",
+}
 REQUIRED_DECODERS = {
     "flac", "mp3", "mp3float", "aac", "alac", "vorbis", "opus", "ape", "wavpack",
     "pcm_s16le", "pcm_s16be", "pcm_s24le", "pcm_s24be", "pcm_s32le", "pcm_s32be",
     "pcm_f32le", "pcm_f32be",
+    # The sound of video files.
+    "ac3",
 }
 REQUIRED_ARTWORK = {"mjpeg", "png", "webp"}
-REQUIRED_PARSERS = {"flac", "mpegaudio", "aac", "opus", "vorbis"}
+# Video in software (H.264 and MPEG-4 also on the hardware decoder through the hwaccels
+# h264_y2vdec and mpeg4_y2vdec) and
+# subtitles as text. HEVC and AV1 stay out (owner decision 2026-11-11).
+REQUIRED_VIDEO = {"h264", "mpeg4", "h263", "msmpeg4v3", "vp8", "vp9"}
+REQUIRED_SUBTITLES = {"subrip", "ass", "movtext", "webvtt"}
+REQUIRED_PARSERS = {
+    "flac", "mpegaudio", "aac", "opus", "vorbis",
+    "h264", "mpeg4video", "h263", "vp8", "vp9", "ac3",
+}
 REQUIRED_FILTERS = {
     "abuffer", "abuffersink", "aformat", "aresample", "volume", "equalizer", "lowshelf",
     "highshelf", "alimiter", "acrossfade", "amix", "atrim", "afade", "asetnsamples",
@@ -28,9 +42,8 @@ EXPECTED_LIBRARIES = {
 EXPECTED_DEMUXERS = REQUIRED_DEMUXERS
 EXPECTED_PARSERS = REQUIRED_PARSERS
 EXPECTED_FILTERS = REQUIRED_FILTERS - {"abuffer", "abuffersink"}
-# FFmpeg's WebP decoder is implemented on top of its VP8 decoder. VP8 is an
-# intentional artwork-only dependency; VP9 and all other video decoders remain
-# disabled.
+# FFmpeg's WebP decoder is implemented on top of its VP8 decoder (also a video decoder of
+# its own since the video plan).
 ALLOWED_ARTWORK_DEPENDENCY_DECODERS = {"vp8", "webp_anim"}
 
 
@@ -168,8 +181,9 @@ def check_buildroot(output: Path) -> list[str]:
         missing = sorted(required - actual[name])
         if missing:
             failures.append(f"generated FFmpeg missing {name}: {', '.join(missing)}")
-    allowed_decoders = REQUIRED_DECODERS | REQUIRED_ARTWORK | ALLOWED_ARTWORK_DEPENDENCY_DECODERS
-    missing_decoders = sorted((REQUIRED_DECODERS | REQUIRED_ARTWORK) - actual["decoders"])
+    required_decoders = REQUIRED_DECODERS | REQUIRED_ARTWORK | REQUIRED_VIDEO | REQUIRED_SUBTITLES
+    allowed_decoders = required_decoders | ALLOWED_ARTWORK_DEPENDENCY_DECODERS
+    missing_decoders = sorted(required_decoders - actual["decoders"])
     if missing_decoders:
         failures.append(f"generated FFmpeg missing decoders: {', '.join(missing_decoders)}")
     unexpected_decoders = sorted(actual["decoders"] - allowed_decoders)

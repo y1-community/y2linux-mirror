@@ -351,7 +351,7 @@ def apply(buildroot_source: Path) -> None:
     # A Y2 patch removed from buildroot/patches leaves the tree too: the copy
     # below only adds, and a resumed build kept applying BlueALSA 0005/0007/0008
     # after they were dropped (test build 224, 2026-11-06).
-    for package in ('dropbear', 'openssh', 'bluez-alsa', 'python3'):
+    for package in ('dropbear', 'openssh', 'bluez-alsa', 'python3', 'ffmpeg'):
         policies = sorted((Path(__file__).resolve().parents[2] / 'buildroot/patches' / package).glob('*.patch'))
         names = {policy.name for policy in policies}
         for stale in (buildroot_source / 'package' / package).glob('*-y2-*.patch'):

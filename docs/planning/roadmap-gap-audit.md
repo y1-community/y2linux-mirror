@@ -9824,3 +9824,62 @@ through the daemon.
 **Readiness:** implementation ready; owner authorised build and install on the owner's player. Risks accepted by the
 owner: no P0 measurements first, no v1/v2 switch on the device (rollback = the installer's kept previous package).
 Hardware authorization covers the owner's player only; publishing is a separate decision.
+
+## VIDEO (hardware video decoder, video playback in Reborn): entry gap audit — 2026-11-12
+
+**Boundary:** new hardware subsystem (the SoC's video decoder: power domain VDE, three clock gates, SMI larb1, one
+interrupt) and a new product function (video playback). Owner request 2026-11-11 (plan, decisions) and 2026-11-12
+("do the full thing, own driver, hardware acceleration"). Plan: [VIDEO-PLAYBACK-PLAN.md](VIDEO-PLAYBACK-PLAN.md).
+Register read-out: [video-decoder.md](../knowledge/video-decoder.md).
+
+**Evidence (date, revision, origin, limits):** owner's player over USB network 2026-11-12, read-only:
+kernel `6.18.56-y2linux-1.0.0-beta.9.3.22`, root `baseline-232-3-gbc043e92`; `/proc/iomem` has no `0x16000000`
+region claimed; `pm_genpd_summary` lists `y2-dis` (on) and `y2-mfg` only; `clk_summary` has the MMSYS gates and
+`mm_smi_common`, no VDEC gate; no `/dev/video*`, no `/dev/media*`; 926 MB RAM, 844 MB available. Stock
+`y2_v3.2.0_FM-20260813` kernel and `libvcodecdrv.so` read with REA/Ghidra the same day (decoder base, interrupt,
+clock ids, power-domain sequence, the complete H.264 register sequence). No decoder register has been read or
+written on the player yet; nothing has been built.
+
+| Area | State before | Plan / gap |
+| --- | --- | --- |
+| Power domain VDE (SPM `+0x210`) | NOT DECLARED; off since boot | third domain of the SPM provider, stock sequence; off whenever no video is open and across every sleep |
+| Clocks | only the `VDEC_SEL` mux id exists | gates at `0x16000000` (VDEC, larb), `mm_smi_common` as the bus clock |
+| Decoder registers `0x16020000`, hwirq 171 | NOT MAPPED | own driver (`y2-vdec`), one user at a time |
+| M4U (IOMMU) | NOT BUILT; display runs on physical addresses | bring-up decides: plain physical addresses first; an IOMMU driver only if the hardware refuses them |
+| Memory | no contiguous pool for video | contiguous frame, motion-vector and bitstream buffers; a reserved pool is a memory-scope change and is named in the plan before it is added |
+| Userspace | FFmpeg 9.0.2 without video decoders or hardware paths | four software decoders plus our own hardware path; FFmpeg 9.0.2 has no V4L2 request path |
+| Reborn | no video anywhere | library table, Videos, player, subtitles, skins (plan steps 5–9) |
+| Sleep/idle | — | decoder closed and domain off before every suspend; deep idle while a video plays is measured, not assumed |
+| Device checks | OWED | plan gates A (read-out complete), B (bit-exact I-frame), C (conformance, sleep/wake) |
+
+**Gate decision:** Gate A is met for H.264 (the sequence is written down from open code; no closed code is needed
+at run time); MPEG-4 Part 2 is not read out yet. Ready for source work, host builds and read-only device work.
+Live register writes on the owner's player (plan step 2) are a separate step with the owner's go, and nothing is
+installed until the plan's gates pass. Not a release authorization; publishing stays a later owner decision.
+
+### VIDEO addendum: MPEG-4 Part 2 on the same decoder — 2026-11-12
+
+**Boundary:** a second codec on the hardware subsystem audited above; no new power domain, clock, interrupt or
+memory pool. Owner request 2026-11-12 ("do it all", after the list of optimisations).
+
+**Evidence:** owner's player, test build 245 (kernel `6.18.56-y2linux-1.0.0-beta.9.3.24`), same day. The stock
+MPEG-4 sequence (chip type 6) was read out of `libvcodecdrv.so` and `libvcodec_utility.so` and run on the player
+through the bench (`vdec-lab`, the driver's register file in userspace over debugfs): I, P and B pictures,
+quarter sample, MPEG quantiser matrices decode with the hardware's own inverse transform (one or two levels from
+FFmpeg in about 1 % of the samples). Limits found: the stock path shows a deblocked copy (we take the picture
+from motion compensation instead); B pictures of interlaced streams are wrong in some macroblocks; a video
+packet header in front of a skipped B macroblock is missed (worked around by cutting such headers out). Details:
+[video-decoder.md](../knowledge/video-decoder.md#mpeg-4-part-2-read-out-and-brought-up-2026-11-12).
+
+**One incident:** a debugging sweep that read every register offset of the decoder blocks hung the player
+until the watchdog reset it (boot reason 4). No data was written; the bench now reads only registers the stock
+library reads.
+
+| Area | State before | Now |
+| --- | --- | --- |
+| Driver | H.264 only | `Y2_VDEC_CODEC_MPEG4`, `Y2_VDEC_MPEG4_DECODE` (`kernel/platform/vdec-mpeg4.c`); side buffers sized as stock |
+| FFmpeg | hardware path `h264_y2vdec` | plus `mpeg4_y2vdec`: progressive, no sprites, no data partitioning; the rest in software |
+| Reborn | takes whatever FFmpeg offers | unchanged |
+| Device checks | — | OWED on a build with the new kernel: hardware against software on files, films in Reborn, drain |
+
+**Gate decision:** source work and an owner-only test build. Not a release authorization.

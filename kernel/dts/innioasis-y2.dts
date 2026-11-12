@@ -108,6 +108,17 @@
         /* Stock domain owns reset. Supply and PLL retain loader settings;
          * no per-GPU voltage control, OPP guessing or reserved-memory heap. */
     };
+    vdec: video-decoder@16000000 {
+        /* Stock videocodec driver: VDEC_GCON 0x16000000, decoder 0x16020000..0x16028fff,
+         * MT_VDEC_IRQ_ID = GIC hwirq 171, level low. SMI common is its bus clock; DIS holds the
+         * SMI it reaches memory through. Its own domain (VDE) and gates are the driver's. */
+        compatible = "innioasis,y2-vdec";
+        reg = <0x16000000 0x1000>, <0x16020000 0x9000>;
+        interrupts = <GIC_SPI 139 IRQ_TYPE_LEVEL_LOW>;
+        clocks = <&mmsys CLK_MM_SMI_COMMON>;
+        clock-names = "bus";
+        power-domains = <&spm 1>;
+    };
     rgu: watchdog@10007000 {
         /* Exact upstream 6.18 mt6582.dtsi compatibility, verified RGU layout. */
         compatible = "mediatek,mt6582-wdt", "mediatek,mt6589-wdt";

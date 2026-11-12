@@ -524,6 +524,22 @@ int y2_ccf_radio_protect(unsigned domain, bool protect)
 	return readl_poll_timeout(infra + 0x228, value,
 		(value & mask) == (protect ? mask : 0), 10, 10000);
 }
+/* Video decoder source: the VDEC mux of CLK_CFG_1 (selector bits 8..11, power-down bit 15). The
+ * selector is the loader's and stays; only the power-down bit moves, under the lock the MFG source
+ * shares this register with. `config` receives the register as found. */
+int y2_ccf_vdec_source(int on, unsigned *config)
+{
+	void __iomem *top = y2_clock_bases[0];
+	unsigned value; unsigned long flags;
+	if (!top) return -EPROBE_DEFER;
+	spin_lock_irqsave(&y2_clk_lock, flags);
+	value = readl(top + 0x50);
+	if (config) *config = value;
+	writel(on ? value & ~BIT(15) : value | BIT(15), top + 0x50);
+	value = readl(top + 0x50);
+	spin_unlock_irqrestore(&y2_clk_lock, flags);
+	return on && (value & BIT(15)) ? -EIO : 0;
+}
 /* POWER-FINAL-16: DIS bus protection, stock spm_mtcmos_ctrl_disp: INFRA
  * TOPAXI_PROT_EN bit 1 and its PROT_STA1 acknowledgement. Atomic poll: genpd
  * may call this from the system-suspend noirq phase. */

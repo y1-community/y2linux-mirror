@@ -1,0 +1,1069 @@
+From: Y2Linux
+Subject: [PATCH] avcodec: H.264 and MPEG-4 on the Innioasis Y2 hardware decoder (/dev/y2-vdec)
+
+FFmpeg parses and keeps the references; the kernel driver (Y2Linux kernel/platform/vdec.c)
+programs the MT6582 decoder, one call per picture. H.264: 4:2:0 8-bit streams, frames and fields.
+MPEG-4 Part 2: progressive, without sprites and data partitioning. The rest stays in software.
+libavcodec/y2_vdec_uapi.h is a copy of kernel/platform/y2-vdec.h.
+---
+diff --color -Nru a/configure b/configure
+diff -Nru a/configure b/configure
+--- a/configure	2026-11-12 15:35:59.750362829 +0100
++++ b/configure	2026-11-12 18:22:04.727855565 +0100
+@@ -3446,6 +3446,7 @@
+ h264_vaapi_hwaccel_select="h264_decoder"
+ h264_vdpau_hwaccel_deps="vdpau"
+ h264_vdpau_hwaccel_select="h264_decoder"
++h264_y2vdec_hwaccel_select="h264_decoder"
+ h264_videotoolbox_hwaccel_deps="videotoolbox"
+ h264_videotoolbox_hwaccel_select="h264_decoder"
+ h264_vulkan_hwaccel_deps="vulkan"
+@@ -3500,6 +3501,7 @@
+ mpeg4_vaapi_hwaccel_select="mpeg4_decoder"
+ mpeg4_vdpau_hwaccel_deps="vdpau"
+ mpeg4_vdpau_hwaccel_select="mpeg4_decoder"
++mpeg4_y2vdec_hwaccel_select="mpeg4_decoder"
+ mpeg4_videotoolbox_hwaccel_deps="videotoolbox"
+ mpeg4_videotoolbox_hwaccel_select="mpeg4_decoder"
+ prores_videotoolbox_hwaccel_deps="videotoolbox"
+diff -Nru a/libavcodec/h263dec.c b/libavcodec/h263dec.c
+--- a/libavcodec/h263dec.c	2026-11-12 18:21:42.437542791 +0100
++++ b/libavcodec/h263dec.c	2026-11-12 18:22:04.728399657 +0100
+@@ -66,6 +66,14 @@
+     AV_PIX_FMT_NONE
+ };
+ 
++#if CONFIG_MPEG4_Y2VDEC_HWACCEL
++static const enum AVPixelFormat mpeg4_y2vdec_pixfmt_list_420[] = {
++    AV_PIX_FMT_DRM_PRIME,
++    AV_PIX_FMT_YUV420P,
++    AV_PIX_FMT_NONE
++};
++#endif
++
+ static enum AVPixelFormat h263_get_format(AVCodecContext *avctx)
+ {
+     /* MPEG-4 Studio Profile only, not supported by hardware */
+@@ -80,6 +88,11 @@
+         return AV_PIX_FMT_GRAY8;
+     }
+ 
++#if CONFIG_MPEG4_Y2VDEC_HWACCEL
++    if (avctx->codec_id == AV_CODEC_ID_MPEG4)
++        return avctx->pix_fmt = ff_get_format(avctx, mpeg4_y2vdec_pixfmt_list_420);
++#endif
++
+     if (avctx->codec_id == AV_CODEC_ID_H263  ||
+         avctx->codec_id == AV_CODEC_ID_H263P ||
+         avctx->codec_id == AV_CODEC_ID_MPEG4)
+diff -Nru a/libavcodec/h264dec.c b/libavcodec/h264dec.c
+--- a/libavcodec/h264dec.c	2026-11-12 15:35:59.754274980 +0100
++++ b/libavcodec/h264dec.c	2026-11-12 15:39:04.635786894 +0100
+@@ -1146,6 +1146,9 @@
+ #if CONFIG_H264_VULKAN_HWACCEL
+                                HWACCEL_VULKAN(h264),
+ #endif
++#if CONFIG_H264_Y2VDEC_HWACCEL
++                               HW_CONFIG_HWACCEL(0, 0, 1, DRM_PRIME, NONE, ff_h264_y2vdec_hwaccel),
++#endif
+                                NULL
+                            },
+     .caps_internal         = FF_CODEC_CAP_EXPORTS_CROPPING |
+diff -Nru a/libavcodec/h264_slice.c b/libavcodec/h264_slice.c
+--- a/libavcodec/h264_slice.c	2026-11-12 15:35:59.755475788 +0100
++++ b/libavcodec/h264_slice.c	2026-11-12 15:39:04.635960287 +0100
+@@ -793,7 +793,8 @@
+                      CONFIG_H264_VAAPI_HWACCEL + \
+                      CONFIG_H264_VIDEOTOOLBOX_HWACCEL + \
+                      CONFIG_H264_VDPAU_HWACCEL + \
+-                     CONFIG_H264_VULKAN_HWACCEL)
++                     CONFIG_H264_VULKAN_HWACCEL + \
++                     CONFIG_H264_Y2VDEC_HWACCEL)
+     enum AVPixelFormat pix_fmts[HWACCEL_MAX + 2], *fmt = pix_fmts;
+ 
+     switch (h->ps.sps->bit_depth_luma) {
+@@ -901,6 +902,9 @@
+ #if CONFIG_H264_VAAPI_HWACCEL
+             *fmt++ = AV_PIX_FMT_VAAPI;
+ #endif
++#if CONFIG_H264_Y2VDEC_HWACCEL
++            *fmt++ = AV_PIX_FMT_DRM_PRIME;
++#endif
+             if (h->avctx->color_range == AVCOL_RANGE_JPEG)
+                 *fmt++ = AV_PIX_FMT_YUVJ420P;
+             else
+diff -Nru a/libavcodec/hwaccels.h b/libavcodec/hwaccels.h
+--- a/libavcodec/hwaccels.h	2026-11-12 15:35:59.753092697 +0100
++++ b/libavcodec/hwaccels.h	2026-11-12 18:22:04.727986569 +0100
+@@ -42,6 +42,7 @@
+ extern const struct FFHWAccel ff_h264_vdpau_hwaccel;
+ extern const struct FFHWAccel ff_h264_videotoolbox_hwaccel;
+ extern const struct FFHWAccel ff_h264_vulkan_hwaccel;
++extern const struct FFHWAccel ff_h264_y2vdec_hwaccel;
+ extern const struct FFHWAccel ff_hevc_d3d11va_hwaccel;
+ extern const struct FFHWAccel ff_hevc_d3d11va2_hwaccel;
+ extern const struct FFHWAccel ff_hevc_d3d12va_hwaccel;
+@@ -68,6 +69,7 @@
+ extern const struct FFHWAccel ff_mpeg4_vaapi_hwaccel;
+ extern const struct FFHWAccel ff_mpeg4_vdpau_hwaccel;
+ extern const struct FFHWAccel ff_mpeg4_videotoolbox_hwaccel;
++extern const struct FFHWAccel ff_mpeg4_y2vdec_hwaccel;
+ extern const struct FFHWAccel ff_prores_videotoolbox_hwaccel;
+ extern const struct FFHWAccel ff_prores_vulkan_hwaccel;
+ extern const struct FFHWAccel ff_prores_raw_videotoolbox_hwaccel;
+diff -Nru a/libavcodec/Makefile b/libavcodec/Makefile
+--- a/libavcodec/Makefile	2026-11-12 15:35:59.751835430 +0100
++++ b/libavcodec/Makefile	2026-11-12 18:22:04.728167769 +0100
+@@ -1063,6 +1063,7 @@
+ OBJS-$(CONFIG_H264_QSV_HWACCEL)           += qsvdec.o
+ OBJS-$(CONFIG_H264_VAAPI_HWACCEL)         += vaapi_h264.o
+ OBJS-$(CONFIG_H264_VDPAU_HWACCEL)         += vdpau_h264.o
++OBJS-$(CONFIG_H264_Y2VDEC_HWACCEL)        += y2vdec.o y2vdec_h264.o
+ OBJS-$(CONFIG_H264_VIDEOTOOLBOX_HWACCEL)  += videotoolbox.o
+ OBJS-$(CONFIG_H264_VULKAN_HWACCEL)        += vulkan_decode.o vulkan_h264.o
+ OBJS-$(CONFIG_HEVC_D3D11VA_HWACCEL)       += dxva2_hevc.o
+@@ -1090,6 +1091,7 @@
+ OBJS-$(CONFIG_MPEG4_VAAPI_HWACCEL)        += vaapi_mpeg4.o
+ OBJS-$(CONFIG_MPEG4_VDPAU_HWACCEL)        += vdpau_mpeg4.o
+ OBJS-$(CONFIG_MPEG4_VIDEOTOOLBOX_HWACCEL) += videotoolbox.o
++OBJS-$(CONFIG_MPEG4_Y2VDEC_HWACCEL)       += y2vdec.o y2vdec_mpeg4.o
+ OBJS-$(CONFIG_VC1_D3D11VA_HWACCEL)        += dxva2_vc1.o
+ OBJS-$(CONFIG_VC1_DXVA2_HWACCEL)          += dxva2_vc1.o
+ OBJS-$(CONFIG_VC1_D3D12VA_HWACCEL)        += dxva2_vc1.o d3d12va_vc1.o
+diff -Nru a/libavcodec/mpeg4videodec.c b/libavcodec/mpeg4videodec.c
+--- a/libavcodec/mpeg4videodec.c	2026-11-12 18:21:42.439003956 +0100
++++ b/libavcodec/mpeg4videodec.c	2026-11-12 18:22:04.728316246 +0100
+@@ -4111,6 +4111,9 @@
+ #if CONFIG_MPEG4_VIDEOTOOLBOX_HWACCEL
+                                HWACCEL_VIDEOTOOLBOX(mpeg4),
+ #endif
++#if CONFIG_MPEG4_Y2VDEC_HWACCEL
++                               HW_CONFIG_HWACCEL(0, 0, 1, DRM_PRIME, NONE, ff_mpeg4_y2vdec_hwaccel),
++#endif
+                                NULL
+                            },
+ };
+diff -Nru a/libavcodec/y2vdec.c b/libavcodec/y2vdec.c
+--- a/libavcodec/y2vdec.c	1970-01-01 01:00:00.000000000 +0100
++++ b/libavcodec/y2vdec.c	2026-11-12 18:22:33.023541592 +0100
+@@ -0,0 +1,176 @@
++/*
++ * The Innioasis Y2's MT6582 hardware video decoder (/dev/y2-vdec): device and frames.
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#include <errno.h>
++#include <fcntl.h>
++#include <sys/ioctl.h>
++#include <sys/mman.h>
++#include <unistd.h>
++
++#include "libavutil/mem.h"
++
++#include "decode.h"
++#include "internal.h"
++#include "y2vdec.h"
++
++#define Y2_DEVICE "/dev/y2-vdec"
++
++typedef struct Y2FrameRef {
++    AVBufferRef *device;
++    unsigned index;
++} Y2FrameRef;
++
++static AVBufferRef **y2_device_ref(AVCodecContext *avctx)
++{
++    return avctx->internal->hwaccel_priv_data;
++}
++
++static void y2_device_free(void *opaque, uint8_t *data)
++{
++    Y2Device *d = (Y2Device *)data;
++    size_t size = (size_t)d->config.y_size + d->config.c_size;
++
++    if (d->bitstream)
++        munmap(d->bitstream, d->config.bitstream_size);
++    for (unsigned i = 0; i < Y2_VDEC_MAX_FRAMES; i++)
++        if (d->frames[i])
++            munmap(d->frames[i], size);
++    if (d->fd >= 0)
++        close(d->fd);
++    av_free(d);
++}
++
++static void y2_frame_free(void *opaque, uint8_t *data)
++{
++    Y2FrameRef *ref = opaque;
++    Y2Device *d = (Y2Device *)ref->device->data;
++
++    atomic_fetch_and(&d->used, ~(1U << ref->index));
++    av_buffer_unref(&ref->device);
++    av_free(ref);
++}
++
++int ff_y2vdec_alloc_frame(AVCodecContext *avctx, AVFrame *frame)
++{
++    AVBufferRef *device = *y2_device_ref(avctx);
++    Y2Device *d = (Y2Device *)device->data;
++    size_t size = (size_t)d->config.y_size + d->config.c_size;
++    Y2FrameRef *ref;
++    unsigned used = atomic_load(&d->used), index;
++
++    do {
++        for (index = 0; index < d->config.frames && (used & (1U << index)); index++)
++            ;
++        if (index == d->config.frames) {
++            av_log(avctx, AV_LOG_ERROR, "y2vdec: all %u frames are in use\n", d->config.frames);
++            return AVERROR(ENOMEM);
++        }
++    } while (!atomic_compare_exchange_weak(&d->used, &used, used | (1U << index)));
++
++    ref = av_mallocz(sizeof(*ref));
++    if (ref)
++        ref->device = av_buffer_ref(device);
++    if (ref && ref->device) {
++        ref->index = index;
++        frame->buf[0] = av_buffer_create(d->frames[index], size, y2_frame_free, ref,
++                                         AV_BUFFER_FLAG_READONLY);
++    }
++    if (!ref || !ref->device || !frame->buf[0]) {
++        if (ref)
++            av_buffer_unref(&ref->device);
++        av_free(ref);
++        atomic_fetch_and(&d->used, ~(1U << index));
++        return AVERROR(ENOMEM);
++    }
++    frame->data[0]     = d->frames[index];
++    frame->data[1]     = d->frames[index] + d->config.y_size;
++    frame->data[3]     = (uint8_t *)(uintptr_t)(index + 1);
++    frame->linesize[0] = d->config.width;
++    frame->linesize[1] = d->config.width;
++    return ff_attach_decode_data(avctx, frame);
++}
++
++int ff_y2vdec_open(AVCodecContext *avctx, unsigned codec, unsigned mb_width, unsigned mb_height,
++                   unsigned frames)
++{
++    AVBufferRef **device = y2_device_ref(avctx);
++    Y2Device *d;
++    size_t size;
++    int ret;
++
++    if (mb_width < 4 || mb_height < 4 || mb_width * 16 > 1920 || mb_height * 16 > 1920 ||
++        mb_width * mb_height > 1920 * 1088 / 256)
++        return AVERROR(ENOSYS);
++
++    d = av_mallocz(sizeof(*d));
++    if (!d)
++        return AVERROR(ENOMEM);
++    d->fd = -1;
++    atomic_init(&d->used, 0);
++    *device = av_buffer_create((uint8_t *)d, sizeof(*d), y2_device_free, NULL, 0);
++    if (!*device) {
++        av_free(d);
++        return AVERROR(ENOMEM);
++    }
++    d->fd = open(Y2_DEVICE, O_RDWR);
++    if (d->fd < 0) {
++        ret = AVERROR(errno);
++        goto fail;
++    }
++    fcntl(d->fd, F_SETFD, FD_CLOEXEC);
++    d->config.codec  = codec;
++    d->config.width  = mb_width * 16;
++    d->config.height = mb_height * 16;
++    d->config.frames = FFMIN(frames, Y2_VDEC_MAX_FRAMES);
++    if (ioctl(d->fd, Y2_VDEC_CONFIGURE, &d->config)) {
++        ret = AVERROR(errno);
++        goto fail;
++    }
++    size = (size_t)d->config.y_size + d->config.c_size;
++    d->bitstream = mmap(NULL, d->config.bitstream_size, PROT_READ | PROT_WRITE, MAP_SHARED, d->fd,
++                        Y2_VDEC_MAP_BITSTREAM * (off_t)sysconf(_SC_PAGESIZE));
++    if (d->bitstream == MAP_FAILED) {
++        d->bitstream = NULL;
++        ret = AVERROR(errno);
++        goto fail;
++    }
++    for (unsigned i = 0; i < d->config.frames; i++) {
++        d->frames[i] = mmap(NULL, size, PROT_READ, MAP_SHARED, d->fd,
++                            Y2_VDEC_MAP_FRAME(i) * (off_t)sysconf(_SC_PAGESIZE));
++        if (d->frames[i] == MAP_FAILED) {
++            d->frames[i] = NULL;
++            ret = AVERROR(errno);
++            goto fail;
++        }
++    }
++    av_log(avctx, AV_LOG_VERBOSE, "y2vdec: %ux%u, %u frames\n", d->config.width, d->config.height,
++           d->config.frames);
++    return 0;
++
++fail:
++    av_buffer_unref(device);
++    return ret;
++}
++
++int ff_y2vdec_uninit(AVCodecContext *avctx)
++{
++    av_buffer_unref(y2_device_ref(avctx));
++    return 0;
++}
+diff -Nru a/libavcodec/y2vdec.h b/libavcodec/y2vdec.h
+--- a/libavcodec/y2vdec.h	1970-01-01 01:00:00.000000000 +0100
++++ b/libavcodec/y2vdec.h	2026-11-12 18:25:30.838986548 +0100
+@@ -0,0 +1,73 @@
++/*
++ * The Innioasis Y2's MT6582 hardware video decoder (/dev/y2-vdec): device and frames.
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++/**
++ * @file
++ * What the hardware decoders of the Innioasis Y2 share: the device, its buffers and the frames.
++ *
++ * Frames are AV_PIX_FMT_DRM_PRIME by name only (there is no descriptor): data[0] is the luma and
++ * data[1] the interleaved chroma of the driver's read-only frame mapping, in the hardware's block
++ * layout (luma 16x32 blocks, chroma 16x16 blocks, blocks in raster order, each row-major);
++ * linesize[0] and linesize[1] are the coded width, a multiple of 16. data[3] is the frame's index
++ * plus one.
++ */
++
++#ifndef AVCODEC_Y2VDEC_H
++#define AVCODEC_Y2VDEC_H
++
++#include <stdatomic.h>
++#include <stddef.h>
++#include <stdint.h>
++
++#include "libavutil/buffer.h"
++#include "libavutil/frame.h"
++
++#include "avcodec.h"
++#include "y2_vdec_uapi.h"
++
++/** The device and its mappings. Frames handed out keep it alive past the decoder. */
++typedef struct Y2Device {
++    int fd;
++    struct y2_vdec_config config;
++    uint8_t *bitstream;
++    uint8_t *frames[Y2_VDEC_MAX_FRAMES];
++    atomic_uint used; ///< bit n: frame n is handed out
++} Y2Device;
++
++/**
++ * Open the device for a stream of `mb_width` x `mb_height` macroblocks with `frames` frames (as
++ * many as the driver has when that is more). The private context of the hwaccel must begin with an
++ * AVBufferRef pointer, which receives the device. AVERROR(ENOSYS) when the size is not the
++ * hardware's: the decoder then goes on in software.
++ */
++int ff_y2vdec_open(AVCodecContext *avctx, unsigned codec, unsigned mb_width, unsigned mb_height,
++                   unsigned frames);
++/** FFHWAccel.alloc_frame: a free frame of the device. */
++int ff_y2vdec_alloc_frame(AVCodecContext *avctx, AVFrame *frame);
++/** FFHWAccel.uninit. */
++int ff_y2vdec_uninit(AVCodecContext *avctx);
++
++/** Index of a frame of the device, negative for any other frame. */
++static inline int ff_y2vdec_frame_index(const AVFrame *frame)
++{
++    return frame ? (int)(uintptr_t)frame->data[3] - 1 : -1;
++}
++
++#endif /* AVCODEC_Y2VDEC_H */
+diff -Nru a/libavcodec/y2vdec_h264.c b/libavcodec/y2vdec_h264.c
+--- a/libavcodec/y2vdec_h264.c	1970-01-01 01:00:00.000000000 +0100
++++ b/libavcodec/y2vdec_h264.c	2026-11-12 18:23:12.975873569 +0100
+@@ -0,0 +1,228 @@
++/*
++ * H.264 decoding on the Innioasis Y2's MT6582 hardware decoder (/dev/y2-vdec).
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++/**
++ * @file
++ * FFmpeg parses the stream and keeps the reference pictures; the kernel driver programs the
++ * hardware, one call per picture (a field is a picture). 4:2:0 8-bit streams only: init refuses
++ * the rest and the decoder falls back to software.
++ *
++ * The frames are described in y2vdec.h.
++ */
++
++#include <errno.h>
++#include <string.h>
++#include <sys/ioctl.h>
++
++#include "libavutil/buffer.h"
++#include "libavutil/mem.h"
++
++#include "libavutil/intreadwrite.h"
++
++#include "avcodec.h"
++#include "decode.h"
++#include "internal.h"
++#include "h264dec.h"
++#include "h264_ps.h"
++#include "hwaccel_internal.h"
++#include "y2vdec.h"
++
++/* Frames beyond the stream's references: the one being decoded, pictures waiting for their turn in
++ * output order, and two the caller may still be reading. */
++#define Y2_EXTRA_FRAMES 3
++/* What the driver adds behind the picture's data. */
++#define Y2_BITSTREAM_TAIL 0x104
++
++typedef struct Y2Context {
++    AVBufferRef *device; ///< Y2Device; first, as y2vdec.h asks
++    struct y2_vdec_h264 picture;
++    size_t filled;       ///< bytes of the picture in the bitstream buffer
++    int failed;          ///< the picture cannot be sent
++} Y2Context;
++
++static int y2_frame_index(const H264Picture *pic)
++{
++    return ff_y2vdec_frame_index(pic->f);
++}
++
++static int y2_init(AVCodecContext *avctx)
++{
++    const H264Context *h = avctx->priv_data;
++    const SPS *sps = h->ps.sps;
++
++    if (!sps || sps->chroma_format_idc != 1 || sps->bit_depth_luma != 8)
++        return AVERROR(ENOSYS);
++    return ff_y2vdec_open(avctx, Y2_VDEC_CODEC_H264, sps->mb_width, sps->mb_height,
++                          FFMAX(sps->ref_frame_count, 1) + FFMAX(sps->num_reorder_frames, 0) +
++                          Y2_EXTRA_FRAMES);
++}
++
++static void y2_fill_ref(struct y2_vdec_h264 *p, const H264Picture *pic, unsigned number, int is_long)
++{
++    struct y2_vdec_h264_ref *ref = &p->ref[p->refs];
++    int index = y2_frame_index(pic);
++
++    if (index < 0 || p->refs == FF_ARRAY_ELEMS(p->ref))
++        return;
++    ref->frame      = index;
++    ref->flags      = is_long ? Y2_VDEC_H264_REF_LONG : 0;
++    if (pic->reference & PICT_TOP_FIELD)
++        ref->flags |= Y2_VDEC_H264_REF_TOP;
++    if (pic->reference & PICT_BOTTOM_FIELD)
++        ref->flags |= Y2_VDEC_H264_REF_BOTTOM;
++    if (pic->field_picture)
++        ref->flags |= Y2_VDEC_H264_REF_FIELDS;
++    else if (pic->mbaff)
++        ref->flags |= Y2_VDEC_H264_REF_MBAFF;
++    ref->number     = number;
++    ref->top_poc    = pic->field_poc[0];
++    ref->bottom_poc = pic->field_poc[1];
++    p->refs++;
++}
++
++static int y2_start_frame(AVCodecContext *avctx, const AVBufferRef *buf_ref, const uint8_t *buf,
++                          uint32_t buf_size)
++{
++    const H264Context *h = avctx->priv_data;
++    const SPS *sps = h->ps.sps;
++    const PPS *pps = h->ps.pps;
++    const H264Picture *cur = h->cur_pic_ptr;
++    Y2Context *ctx = avctx->internal->hwaccel_priv_data;
++    struct y2_vdec_h264 *p = &ctx->picture;
++    int index = y2_frame_index(cur);
++
++    ctx->filled = 0;
++    ctx->failed = 0;
++    if (index < 0 || pps->slice_group_count > 1) {
++        ctx->failed = 1;
++        return AVERROR(ENOSYS);
++    }
++    memset(p, 0, sizeof(*p));
++    p->frame         = index;
++    p->structure     = h->picture_structure;
++    p->nal_ref_idc   = h->nal_ref_idc;
++    p->nal_unit_type = h->nal_unit_type;
++    p->frame_num     = h->poc.frame_num;
++    p->top_poc       = cur->field_poc[0];
++    p->bottom_poc    = cur->field_poc[1];
++
++    p->log2_max_frame_num = sps->log2_max_frame_num;
++    p->poc_type           = sps->poc_type;
++    p->log2_max_poc_lsb   = sps->log2_max_poc_lsb;
++    p->max_ref_frames     = sps->ref_frame_count;
++    if (sps->delta_pic_order_always_zero_flag)
++        p->flags |= Y2_VDEC_H264_DELTA_POC_ZERO;
++    if (sps->direct_8x8_inference_flag)
++        p->flags |= Y2_VDEC_H264_DIRECT_8X8;
++    if (!sps->frame_mbs_only_flag)
++        p->flags |= Y2_VDEC_H264_FIELDS;
++    if (sps->mb_aff)
++        p->flags |= Y2_VDEC_H264_MBAFF;
++
++    p->weighted_bipred_idc     = pps->weighted_bipred_idc;
++    p->ref_l0_default          = pps->ref_count[0];
++    p->ref_l1_default          = pps->ref_count[1];
++    p->pic_init_qp             = pps->init_qp - 26;
++    p->chroma_qp_offset        = pps->chroma_qp_index_offset[0];
++    p->second_chroma_qp_offset = pps->chroma_qp_index_offset[1];
++    if (pps->cabac)
++        p->flags |= Y2_VDEC_H264_CABAC;
++    if (pps->pic_order_present)
++        p->flags |= Y2_VDEC_H264_PIC_ORDER_PRESENT;
++    if (pps->weighted_pred)
++        p->flags |= Y2_VDEC_H264_WEIGHTED_PRED;
++    if (pps->deblocking_filter_parameters_present)
++        p->flags |= Y2_VDEC_H264_DEBLOCKING_CONTROL;
++    if (pps->constrained_intra_pred)
++        p->flags |= Y2_VDEC_H264_CONSTRAINED_INTRA;
++    if (pps->transform_8x8_mode)
++        p->flags |= Y2_VDEC_H264_TRANSFORM_8X8;
++    if (pps->redundant_pic_cnt_present)
++        p->flags |= Y2_VDEC_H264_REDUNDANT_PIC_CNT;
++    if (sps->scaling_matrix_present || pps->pic_scaling_matrix_present_flag) {
++        p->flags |= Y2_VDEC_H264_SCALING;
++        memcpy(p->scaling4, pps->scaling_matrix4, sizeof(p->scaling4));
++        /* 4:2:0 uses the luma intra and inter 8x8 lists. */
++        memcpy(p->scaling8[0], pps->scaling_matrix8[0], sizeof(p->scaling8[0]));
++        memcpy(p->scaling8[1], pps->scaling_matrix8[3], sizeof(p->scaling8[1]));
++    }
++
++    for (int i = 0; i < h->short_ref_count; i++)
++        y2_fill_ref(p, h->short_ref[i], h->short_ref[i]->frame_num, 0);
++    for (int i = 0; i < 16; i++)
++        if (h->long_ref[i])
++            y2_fill_ref(p, h->long_ref[i], i, 1);
++    return 0;
++}
++
++static int y2_decode_slice(AVCodecContext *avctx, const uint8_t *buf, uint32_t buf_size)
++{
++    Y2Context *ctx = avctx->internal->hwaccel_priv_data;
++    Y2Device *d = (Y2Device *)ctx->device->data;
++
++    if (ctx->failed)
++        return AVERROR(ENOSYS);
++    if (ctx->filled + 3 + buf_size > d->config.bitstream_size - Y2_BITSTREAM_TAIL) {
++        ctx->failed = 1;
++        return AVERROR(ENOSPC);
++    }
++    AV_WB24(d->bitstream + ctx->filled, 1);
++    memcpy(d->bitstream + ctx->filled + 3, buf, buf_size);
++    ctx->filled += 3 + buf_size;
++    return 0;
++}
++
++static int y2_end_frame(AVCodecContext *avctx)
++{
++    H264Context *h = avctx->priv_data;
++    Y2Context *ctx = avctx->internal->hwaccel_priv_data;
++    Y2Device *d = (Y2Device *)ctx->device->data;
++    struct y2_vdec_h264 *p = &ctx->picture;
++
++    if (ctx->failed || !ctx->filled)
++        return AVERROR_INVALIDDATA;
++    p->size = ctx->filled;
++    if (ioctl(d->fd, Y2_VDEC_H264_DECODE, p)) {
++        int ret = AVERROR(errno);
++        av_log(avctx, AV_LOG_ERROR, "y2vdec: decode: %s\n", av_err2str(ret));
++        return ret;
++    }
++    if (p->error || !p->complete) {
++        av_log(avctx, AV_LOG_WARNING, "y2vdec: picture error %#x at macroblock %u,%u\n", p->error,
++               p->mb_x, p->mb_y);
++        h->cur_pic_ptr->f->flags |= AV_FRAME_FLAG_CORRUPT;
++        h->cur_pic_ptr->f->decode_error_flags |= FF_DECODE_ERROR_DECODE_SLICES;
++    }
++    return 0;
++}
++
++const FFHWAccel ff_h264_y2vdec_hwaccel = {
++    .p.name         = "h264_y2vdec",
++    .p.type         = AVMEDIA_TYPE_VIDEO,
++    .p.id           = AV_CODEC_ID_H264,
++    .p.pix_fmt      = AV_PIX_FMT_DRM_PRIME,
++    .alloc_frame    = ff_y2vdec_alloc_frame,
++    .start_frame    = y2_start_frame,
++    .decode_slice   = y2_decode_slice,
++    .end_frame      = y2_end_frame,
++    .init           = y2_init,
++    .uninit         = ff_y2vdec_uninit,
++    .priv_data_size = sizeof(Y2Context),
++};
+diff -Nru a/libavcodec/y2vdec_mpeg4.c b/libavcodec/y2vdec_mpeg4.c
+--- a/libavcodec/y2vdec_mpeg4.c	1970-01-01 01:00:00.000000000 +0100
++++ b/libavcodec/y2vdec_mpeg4.c	2026-11-12 18:52:04.599626321 +0100
+@@ -0,0 +1,297 @@
++/*
++ * MPEG-4 Part 2 decoding on the Innioasis Y2's MT6582 hardware decoder (/dev/y2-vdec).
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++/**
++ * @file
++ * FFmpeg parses the headers and keeps the reference pictures; the kernel driver programs the
++ * hardware, one call per picture. Simple and Advanced Simple profile, progressive, without sprites
++ * and without data partitioning: init refuses the rest and the decoder falls back to software.
++ *
++ * The hardware has its own inverse transform, as the standard allows: a picture differs from the
++ * software decoder's by one or two levels in a few samples.
++ */
++
++#include <errno.h>
++#include <string.h>
++#include <sys/ioctl.h>
++
++#include "avcodec.h"
++#include "get_bits.h"
++#include "hwaccel_internal.h"
++#include "internal.h"
++#include "mpeg4video.h"
++#include "mpeg4videodec.h"
++#include "mpeg4videodefs.h"
++#include "mpegutils.h"
++#include "mpegvideo.h"
++#include "put_bits.h"
++#include "y2vdec.h"
++
++/* Two references, the picture being decoded, one in between while the references change, and two
++ * the caller may still be reading. */
++#define Y2_FRAMES 6
++/* What the driver adds behind the picture's data. */
++#define Y2_BITSTREAM_TAIL 0x400
++
++typedef struct Y2Context {
++    AVBufferRef *device;  ///< Y2Device; first, as y2vdec.h asks
++    size_t filled;        ///< bytes of the picture in the bitstream buffer
++    unsigned header_bits; ///< bits of them before the first macroblock
++} Y2Context;
++
++static int y2_supported(AVCodecContext *avctx)
++{
++    const Mpeg4DecContext *ctx = avctx->priv_data;
++    const MPVContext *s = &ctx->h.c;
++
++    return avctx->codec_id == AV_CODEC_ID_MPEG4 && !s->studio_profile &&
++           avctx->bits_per_raw_sample <= 8 && s->progressive_sequence && !ctx->vol_sprite_usage &&
++           ctx->shape == RECT_SHAPE && !ctx->h.data_partitioning && ctx->quant_precision == 5;
++}
++
++static int y2_init(AVCodecContext *avctx)
++{
++    const Mpeg4DecContext *ctx = avctx->priv_data;
++    const MPVContext *s = &ctx->h.c;
++
++    if (!y2_supported(avctx))
++        return AVERROR(ENOSYS);
++    return ff_y2vdec_open(avctx, Y2_VDEC_CODEC_MPEG4, (s->width + 15) / 16, (s->height + 15) / 16,
++                          Y2_FRAMES);
++}
++
++static int y2_start_frame(AVCodecContext *avctx, const AVBufferRef *buf_ref, const uint8_t *buf,
++                          uint32_t buf_size)
++{
++    Y2Context *y2 = avctx->internal->hwaccel_priv_data;
++
++    y2->filled = 0;
++    return 0;
++}
++
++static int y2_bit(const uint8_t *data, size_t at)
++{
++    return data[at >> 3] >> (7 - (at & 7)) & 1;
++}
++
++static void y2_copy_bits(PutBitContext *pb, GetBitContext *gb, size_t from, size_t to)
++{
++    skip_bits_long(gb, from - get_bits_count(gb));
++    for (; to - from >= 32; from += 32)
++        put_bits32(pb, get_bits_long(gb, 32));
++    if (to > from)
++        put_bits(pb, to - from, get_bits_long(gb, to - from));
++}
++
++/**
++ * Copy a B picture without its video packet headers.
++ *
++ * The hardware misses a packet header in front of a macroblock that it skips because the same
++ * macroblock of the backward reference was not coded, and loses the rest of the picture (the stock
++ * firmware reports such pictures as broken). In a B picture a header at the start of a macroblock
++ * row with the quantiser of the picture changes nothing: the motion vector predictors start
++ * afresh in every row anyway. Such headers are cut out with the stuffing in front of them, and
++ * the stuffing that ends the picture is written again where the picture ends now (the hardware
++ * checks it). A picture with any other header is left as it is.
++ *
++ * @param skip bits of `from` before the first macroblock
++ * @return bytes written, 0 when the picture is left as it is
++ */
++static size_t y2_cut_packet_headers(const Mpeg4DecContext *ctx, uint8_t *to, size_t room,
++                                    const uint8_t *from, size_t size, unsigned skip)
++{
++    const MPVContext *s = &ctx->h.c;
++    const int zeros = ff_mpeg4_get_video_packet_prefix_length(AV_PICTURE_TYPE_B, ctx->f_code,
++                                                              ctx->b_code);
++    const int number_bits = av_log2(s->mb_num - 1) + 1;
++    const size_t header = zeros + 1 + number_bits + 5 + 1;
++    GetBitContext gb, head;
++    PutBitContext pb;
++    size_t at = skip, bytes = size, end;
++    int cut = 0;
++
++    if (size < 8 || size > room || init_get_bits8(&gb, from, size) < 0)
++        return 0;
++    init_put_bits(&pb, to, room);
++    if (skip)
++        put_bits(&pb, skip, 0);
++    for (size_t byte = (skip + 7) / 8; byte * 8 + header <= size * 8; byte++) {
++        size_t stuffing = byte * 8 - 1;
++        unsigned number, quant, extension;
++
++        if (from[byte] || from[byte + 1] || byte * 8 <= at)
++            continue;
++        if (from[byte + 2] == 1) {
++            bytes = byte; // the next start code: the picture ends here
++            break;
++        }
++        head = gb;
++        skip_bits_long(&head, byte * 8 - get_bits_count(&head));
++        if (get_bits(&head, zeros) || !get_bits1(&head))
++            continue;
++        number    = get_bits(&head, number_bits);
++        quant     = get_bits(&head, 5);
++        extension = get_bits1(&head);
++        /* The stuffing: a zero and as many ones as it takes to the next byte. */
++        while (stuffing > at && byte * 8 - stuffing < 8 && y2_bit(from, stuffing))
++            stuffing--;
++        if (number % s->mb_width || number >= s->mb_num || quant != s->qscale || extension ||
++            y2_bit(from, stuffing))
++            return 0;
++        y2_copy_bits(&pb, &gb, at, stuffing);
++        at = get_bits_count(&head);
++        cut++;
++    }
++    /* The stuffing that ends the picture: a zero and up to seven ones. */
++    for (end = bytes * 8 - 1; end > at && bytes * 8 - end < 8 && y2_bit(from, end); end--)
++        ;
++    if (!cut || y2_bit(from, end))
++        return 0;
++    y2_copy_bits(&pb, &gb, at, end);
++    put_bits(&pb, 1, 0);
++    while (put_bits_count(&pb) & 7)
++        put_bits(&pb, 1, 1);
++    y2_copy_bits(&pb, &gb, bytes * 8, size * 8);
++    flush_put_bits(&pb);
++    return put_bytes_output(&pb);
++}
++
++static int y2_decode_slice(AVCodecContext *avctx, const uint8_t *buf, uint32_t buf_size)
++{
++    const Mpeg4DecContext *ctx = avctx->priv_data;
++    const MPVContext *s = &ctx->h.c;
++    Y2Context *y2 = avctx->internal->hwaccel_priv_data;
++    Y2Device *d = (Y2Device *)y2->device->data;
++    size_t room = d->config.bitstream_size - Y2_BITSTREAM_TAIL;
++
++    if (y2->filled)
++        return 0;
++    if (!buf_size || buf_size > room)
++        return AVERROR(ENOSPC);
++    y2->header_bits = get_bits_count(&ctx->h.gb) & 7;
++    if (s->pict_type == AV_PICTURE_TYPE_B && ctx->resync_marker)
++        y2->filled = y2_cut_packet_headers(ctx, d->bitstream, room, buf, buf_size, y2->header_bits);
++    if (!y2->filled) {
++        memcpy(d->bitstream, buf, buf_size);
++        y2->filled = buf_size;
++    }
++    return 0;
++}
++
++/* The decoder keeps the threshold; the hardware wants intra_dc_vlc_thr as it was coded. */
++static int y2_intra_dc_vlc_thr(const Mpeg4DecContext *ctx)
++{
++    static const uint8_t threshold[8] = { 99, 13, 15, 17, 19, 21, 23, 0 };
++
++    for (int i = 0; i < 8; i++)
++        if (ctx->intra_dc_threshold == threshold[i])
++            return i;
++    return 0;
++}
++
++static int y2_reference(const MPVWorkPicture *pic)
++{
++    return FFMAX(ff_y2vdec_frame_index(pic->ptr ? pic->ptr->f : NULL), 0);
++}
++
++static void y2_fill_picture(AVCodecContext *avctx, struct y2_vdec_mpeg4 *p)
++{
++    const Mpeg4DecContext *ctx = avctx->priv_data;
++    const MPVContext *s = &ctx->h.c;
++    const Y2Context *y2 = avctx->internal->hwaccel_priv_data;
++    const int b = s->pict_type == AV_PICTURE_TYPE_B;
++
++    *p = (struct y2_vdec_mpeg4) {
++        .size                      = y2->filled,
++        .header_bits               = y2->header_bits,
++        .frame                     = ff_y2vdec_frame_index(s->cur_pic.ptr->f),
++        .forward                   = y2_reference(&s->last_pic),
++        .backward                  = y2_reference(&s->next_pic),
++        .coding_type               = s->pict_type - AV_PICTURE_TYPE_I,
++        .time_increment_resolution = avctx->framerate.num,
++        .width                     = s->width,
++        .height                    = s->height,
++        .quant                     = s->qscale,
++        .intra_dc_vlc_thr          = y2_intra_dc_vlc_thr(ctx),
++        .fcode_forward             = s->pict_type == AV_PICTURE_TYPE_I ? 0 : ctx->f_code,
++        .fcode_backward            = b ? ctx->b_code : 0,
++        .trd                       = s->pp_time,
++        .trb                       = b ? s->pb_time : 0,
++    };
++    if (s->quarter_sample)
++        p->flags |= Y2_VDEC_MPEG4_QUARTER_SAMPLE;
++    if (!ctx->resync_marker)
++        p->flags |= Y2_VDEC_MPEG4_RESYNC_DISABLE;
++    if (ctx->rvlc)
++        p->flags |= Y2_VDEC_MPEG4_REVERSIBLE_VLC;
++    if (s->no_rounding)
++        p->flags |= Y2_VDEC_MPEG4_ROUNDING;
++    if (b && s->next_pic.ptr && s->next_pic.ptr->f->pict_type == AV_PICTURE_TYPE_I)
++        p->flags |= Y2_VDEC_MPEG4_BACKWARD_INTRA;
++    if (ctx->mpeg_quant) {
++        p->flags |= Y2_VDEC_MPEG4_MPEG_QUANT;
++        for (int i = 0; i < 64; i++) {
++            int n = s->idsp.idct_permutation[ff_zigzag_direct[i]];
++            p->intra_matrix[i] = s->intra_matrix[n];
++            p->inter_matrix[i] = s->inter_matrix[n];
++        }
++    }
++}
++
++static int y2_end_frame(AVCodecContext *avctx)
++{
++    Mpeg4DecContext *ctx = avctx->priv_data;
++    MPVContext *s = &ctx->h.c;
++    Y2Context *y2 = avctx->internal->hwaccel_priv_data;
++    Y2Device *d = (Y2Device *)y2->device->data;
++    struct y2_vdec_mpeg4 p;
++
++    if (!y2->filled || !y2_supported(avctx) || s->pict_type > AV_PICTURE_TYPE_B ||
++        ff_y2vdec_frame_index(s->cur_pic.ptr->f) < 0 ||
++        FFALIGN(s->width, 16) != d->config.width || FFALIGN(s->height, 16) != d->config.height)
++        return AVERROR(ENOSYS);
++    y2_fill_picture(avctx, &p);
++    if (ioctl(d->fd, Y2_VDEC_MPEG4_DECODE, &p)) {
++        int ret = AVERROR(errno);
++        av_log(avctx, AV_LOG_ERROR, "y2vdec: decode: %s\n", av_err2str(ret));
++        return ret;
++    }
++    if (p.error || !p.complete) {
++        av_log(avctx, AV_LOG_WARNING, "y2vdec: picture error %#x at macroblock %u,%u\n", p.error,
++               p.mb_x, p.mb_y);
++        s->cur_pic.ptr->f->flags |= AV_FRAME_FLAG_CORRUPT;
++        s->cur_pic.ptr->f->decode_error_flags |= FF_DECODE_ERROR_DECODE_SLICES;
++    }
++    return 0;
++}
++
++const FFHWAccel ff_mpeg4_y2vdec_hwaccel = {
++    .p.name         = "mpeg4_y2vdec",
++    .p.type         = AVMEDIA_TYPE_VIDEO,
++    .p.id           = AV_CODEC_ID_MPEG4,
++    .p.pix_fmt      = AV_PIX_FMT_DRM_PRIME,
++    .alloc_frame    = ff_y2vdec_alloc_frame,
++    .start_frame    = y2_start_frame,
++    .decode_slice   = y2_decode_slice,
++    .end_frame      = y2_end_frame,
++    .init           = y2_init,
++    .uninit         = ff_y2vdec_uninit,
++    .priv_data_size = sizeof(Y2Context),
++};
+diff -Nru a/libavcodec/y2_vdec_uapi.h b/libavcodec/y2_vdec_uapi.h
+--- a/libavcodec/y2_vdec_uapi.h	1970-01-01 01:00:00.000000000 +0100
++++ b/libavcodec/y2_vdec_uapi.h	2026-11-12 18:22:33.021330928 +0100
+@@ -0,0 +1,130 @@
++/* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
++/* /dev/y2-vdec: the MT6582 hardware video decoder of the Innioasis Y2.
++ *
++ * One process at a time opens the device, sizes the buffers (CONFIGURE), maps the bitstream buffer and
++ * the frames, and asks for one picture per DECODE call. The caller parses the stream (parameter sets,
++ * picture order, reference marking); the driver programs the hardware and returns when the picture is in
++ * the frame. Userspace never sees a register or a physical address.
++ *
++ * Frames are NV12 in the decoder's block layout: luma in 16x32 blocks, chroma (CbCr interleaved) in 16x16
++ * blocks, blocks in raster order, each block row-major. Luma starts at offset 0 of the frame mapping and
++ * is `y_size` bytes; chroma follows and is `c_size` bytes. */
++#ifndef Y2_VDEC_UAPI_H
++#define Y2_VDEC_UAPI_H
++#include <linux/ioctl.h>
++#include <linux/types.h>
++
++#define Y2_VDEC_MAX_FRAMES 24
++#define Y2_VDEC_CODEC_H264 1
++#define Y2_VDEC_CODEC_MPEG4 2
++
++/* mmap offsets, in pages: the bitstream buffer (read/write) and frame `n` (read only). */
++#define Y2_VDEC_MAP_BITSTREAM 0
++#define Y2_VDEC_MAP_FRAME(n) (1 + (n))
++
++struct y2_vdec_config {
++	__u32 codec;          /* in: Y2_VDEC_CODEC_* */
++	__u32 width, height;  /* in: coded size, multiples of 16 */
++	__u32 frames;         /* in: number of frames, 1..Y2_VDEC_MAX_FRAMES */
++	__u32 y_size, c_size; /* out: bytes of luma and of chroma in one frame */
++	__u32 bitstream_size; /* out: bytes of the bitstream buffer */
++	__u32 reserved;
++};
++
++#define Y2_VDEC_H264_REF_LONG 0x01
++#define Y2_VDEC_H264_REF_TOP 0x02    /* its top field is a reference */
++#define Y2_VDEC_H264_REF_BOTTOM 0x04 /* its bottom field is a reference */
++#define Y2_VDEC_H264_REF_FIELDS 0x08 /* it was coded as two field pictures */
++#define Y2_VDEC_H264_REF_MBAFF 0x10  /* it was coded as a frame with field macroblock pairs */
++struct y2_vdec_h264_ref {
++	__u8 frame;      /* index of the frame holding the reference */
++	__u8 flags;      /* Y2_VDEC_H264_REF_*; a frame is a reference with both fields */
++	__u16 number;    /* frame_num, or LongTermFrameIdx of a long-term reference */
++	__s32 top_poc, bottom_poc;
++};
++
++#define Y2_VDEC_H264_CABAC 0x0001
++#define Y2_VDEC_H264_PIC_ORDER_PRESENT 0x0002
++#define Y2_VDEC_H264_WEIGHTED_PRED 0x0004
++#define Y2_VDEC_H264_DEBLOCKING_CONTROL 0x0008
++#define Y2_VDEC_H264_CONSTRAINED_INTRA 0x0010
++#define Y2_VDEC_H264_TRANSFORM_8X8 0x0020
++#define Y2_VDEC_H264_REDUNDANT_PIC_CNT 0x0040
++#define Y2_VDEC_H264_SCALING 0x0080
++#define Y2_VDEC_H264_DELTA_POC_ZERO 0x0100
++#define Y2_VDEC_H264_DIRECT_8X8 0x0200
++#define Y2_VDEC_H264_FIELDS 0x0400 /* the stream may hold fields (frame_mbs_only_flag is 0) */
++#define Y2_VDEC_H264_MBAFF 0x0800  /* mb_adaptive_frame_field_flag */
++
++#define Y2_VDEC_H264_TOP_FIELD 1
++#define Y2_VDEC_H264_BOTTOM_FIELD 2
++#define Y2_VDEC_H264_FRAME 3
++
++/* One H.264 picture (4:2:0, 8 bit): a frame, or one field of a frame (two calls into the same
++ * frame). The bitstream buffer holds the picture's slice NAL units, each behind a 00 00 01 start
++ * code, `size` bytes in all. */
++struct y2_vdec_h264 {
++	__u32 size;
++	__u8 frame;        /* frame to decode into */
++	__u8 nal_ref_idc, nal_unit_type;
++	__u8 refs;         /* entries used in `ref` */
++	__u16 flags;       /* Y2_VDEC_H264_* */
++	__u16 frame_num;
++	__s32 top_poc, bottom_poc;
++	/* Sequence parameter set. */
++	__u8 log2_max_frame_num, poc_type, log2_max_poc_lsb, max_ref_frames;
++	/* Picture parameter set. */
++	__u8 weighted_bipred_idc, ref_l0_default, ref_l1_default; /* counts, not minus one */
++	__s8 pic_init_qp, chroma_qp_offset, second_chroma_qp_offset; /* pic_init_qp: minus 26 */
++	__u8 structure;    /* Y2_VDEC_H264_FRAME, _TOP_FIELD or _BOTTOM_FIELD */
++	__u8 reserved;
++	struct y2_vdec_h264_ref ref[16];
++	__u8 scaling4[6][16], scaling8[2][64]; /* raster order; read with Y2_VDEC_H264_SCALING */
++	/* Result. */
++	__u32 error;       /* the hardware's error word, 0 when the picture is good */
++	__u32 complete;    /* 1 when the hardware reports the whole picture */
++	__u32 mb_x, mb_y;  /* macroblock the hardware stopped at */
++};
++
++#define Y2_VDEC_MPEG4_INTERLACED 0x0001
++#define Y2_VDEC_MPEG4_TOP_FIELD_FIRST 0x0002
++#define Y2_VDEC_MPEG4_ALTERNATE_SCAN 0x0004
++#define Y2_VDEC_MPEG4_QUARTER_SAMPLE 0x0008
++#define Y2_VDEC_MPEG4_MPEG_QUANT 0x0010      /* quant_type 1: `intra_matrix` and `inter_matrix` are read */
++#define Y2_VDEC_MPEG4_RESYNC_DISABLE 0x0020  /* resync_marker_disable */
++#define Y2_VDEC_MPEG4_DATA_PARTITIONED 0x0040
++#define Y2_VDEC_MPEG4_REVERSIBLE_VLC 0x0080
++#define Y2_VDEC_MPEG4_ROUNDING 0x0100        /* vop_rounding_type */
++#define Y2_VDEC_MPEG4_BACKWARD_INTRA 0x0200  /* the backward reference of this B picture is an I picture */
++
++#define Y2_VDEC_MPEG4_I 0
++#define Y2_VDEC_MPEG4_P 1
++#define Y2_VDEC_MPEG4_B 2
++
++/* One MPEG-4 Part 2 picture (Simple and Advanced Simple profile without sprites, a rectangular
++ * 4:2:0 8-bit VOP). The bitstream buffer holds the VOP from any byte up to its end, `size` bytes;
++ * the first macroblock starts `header_bits` bits into it. The caller has parsed the headers. */
++struct y2_vdec_mpeg4 {
++	__u32 size;
++	__u32 header_bits;
++	__u8 frame;              /* frame to decode into */
++	__u8 forward, backward;  /* reference frames: forward for P and B, backward for B */
++	__u8 coding_type;        /* Y2_VDEC_MPEG4_I, _P or _B */
++	__u16 flags;             /* Y2_VDEC_MPEG4_* */
++	__u16 time_increment_resolution;
++	__u16 width, height;     /* of the picture, at most the configured size */
++	__u8 quant, intra_dc_vlc_thr, fcode_forward, fcode_backward;
++	/* Ticks between the two references and from the forward reference to this B picture, counted
++	 * in frames and (interlaced) in fields. */
++	__s32 trd, trb, trd_field, trb_field;
++	__u8 intra_matrix[64], inter_matrix[64]; /* zigzag order, as in the stream */
++	/* Result. */
++	__u32 error;       /* the hardware's error word, 0 when the picture is good */
++	__u32 complete;    /* 1 when the hardware reports the whole picture */
++	__u32 mb_x, mb_y;  /* macroblock the hardware stopped at */
++};
++
++#define Y2_VDEC_CONFIGURE _IOWR('y', 1, struct y2_vdec_config)
++#define Y2_VDEC_H264_DECODE _IOWR('y', 2, struct y2_vdec_h264)
++#define Y2_VDEC_MPEG4_DECODE _IOWR('y', 3, struct y2_vdec_mpeg4)
++#endif

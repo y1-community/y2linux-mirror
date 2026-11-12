@@ -22,6 +22,8 @@ bool y2_spm_disp_access_begin(unsigned long *flags);
 void y2_spm_disp_access_end(unsigned long flags);
 int y2_ccf_radio_remap(unsigned domain);
 int y2_spm_mfg_status(void);
+int y2_spm_vde_power(int on);
+int y2_spm_vde_status(void);
 #if IS_ENABLED(CONFIG_Y2_POWER)
 int y2_spm_disp_status(void);
 int y2_spm_isp_status(void);

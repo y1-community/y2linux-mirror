@@ -40,4 +40,5 @@ void y2_mm_dcm_apply(void);
 void y2_mm_release_loader_hold(void);
 void y2_ccf_reclaim_unused(void);
 int y2_ccf_usb_claim(void);
+int y2_ccf_vdec_source(int on, unsigned *config);
 #endif

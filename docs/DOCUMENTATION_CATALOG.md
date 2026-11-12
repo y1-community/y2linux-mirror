@@ -367,6 +367,7 @@ Indexed pages: **352**. Explicit scope notices: **228**.
 | [Y2Linux 1.0 Beta 9.3.21 report](validation/Y2-LINUX-1.0-BETA-9.3.21.md) | Beta 9.3.21 (Baseline 232): Bluetooth on a weak signal (bounded catch-up, silence filler, Wi-Fi channel mask; Y2Reborn #87, #99), Wi-Fi channels 12 and 13 (#110), sleep without radios (Y2Reborn #116), exFAT partial block, FLAC and Opus bitrate (#87) |
 | [Y2Linux 1.0 Beta 9.3.22 report](validation/Y2-LINUX-1.0-BETA-9.3.22.md) | Beta 9.3.22 (Baseline 233): a sleep that fails before the kernel is entered leaves the screen dark (Y2Player #132, Y2Reborn #116); issue forms and the list of declined ideas |
 | [Y2Linux 1.0 Beta 9.3.23 report](validation/Y2-LINUX-1.0-BETA-9.3.23.md) | Beta 9.3.23 (Baseline 234): Now Playing's progress wave in the cover's colour (#108); issue forms ask the install method and radio state, needs-info workflow, report summary tool |
+| [Y2Linux 1.0 Beta 9.3.25 report](validation/Y2-LINUX-1.0-BETA-9.3.25.md) | Beta 9.3.25 (Baseline 248): videos (own hardware decoder driver, H.264 and MPEG-4 on the video chip, Videos in Reborn; early version), genres split at "/" (Y2Reborn #124) |
 | [Y2Linux 1.0 Beta 9.3.24 report](validation/Y2-LINUX-1.0-BETA-9.3.24.md) | Beta 9.3.24 (Baseline 235): SBC XQ removed (Y2Reborn #123), battery level after charging while off (#113), encoder rate log in reports |
 | [Y2Linux 1.0 Beta 9.3.19 report](validation/Y2-LINUX-1.0-BETA-9.3.19.md) | Beta 9.3.19 (Baseline 228): the update message works again and is opt-in: Update Notifications on Software Update, off by default (Y2Reborn #97) |
 | [Y2Linux 1.0 Beta 9.3.18 report](validation/Y2-LINUX-1.0-BETA-9.3.18.md) | Beta 9.3.18 (Baseline 227): USB always reconnects (#102), Luna XP skin, bitrate (#87), update page without Wi-Fi (Y2Reborn #96), Quick Menu hold (#101), Artist's Albums order (#75), Cover Flow follows the skin (#100), unplayable files named (#104) |
@@ -401,6 +402,9 @@ Indexed pages: **352**. Explicit scope notices: **228**.
 | [Platform Rust idiomatic plan](planning/PLATFORM-RUST-IDIOMATIC-PLAN.md) | From the port to idiomatic Rust: typed records instead of loose JSON (P0–P7, finishing Q1–Q5), owner decisions, test builds 180–185 |
 | [Platform Rust next-agent handoff](planning/PLATFORM-RUST-NEXT-AGENT-HANDOFF.md) | The remaining Rust-logic, refactor and duplication work for one agent: order, method, owner decisions, build/verify |
 | [Speaker and haptics plan](planning/SPEAKER-HAPTICS-PLAN.md) | Stock REA of the vibrator, AW87559 and CS43131 speaker route; plan and device checks |
+| [Videos on the Y2](VIDEO.md) | Owner test builds: how to use it, what plays, what was checked on the player, what is not done |
+| [Video playback plan](planning/VIDEO-PLAYBACK-PLAN.md) | Hardware video decoder driver, software VP8/VP9, Videos in Reborn: owner decisions, steps and gates |
+| [MT6582 hardware video decoder](knowledge/video-decoder.md) | What the stock firmware does: base, interrupt, power, and the H.264 register sequence |
 | [Bluetooth reimplementation plan](planning/BLUETOOTH-REIMPLEMENTATION-PLAN.md) | One radio daemon for Bluetooth and the shared core: evidence, design, phases, as built (Beta 9.3) |
 | [Y2Linux 1.0 Beta 8.39 report](validation/Y2-LINUX-1.0-BETA-8.39.md) | Beta 8.39 (Baseline 153): Folders by file name, Shuffle Albums, playlist Sort, a 120 000-song card measured and made fast |
 | [Y2Linux 1.0 Beta 8.38 report](validation/Y2-LINUX-1.0-BETA-8.38.md) | Beta 8.38 (Baseline 146): Bluetooth sound after Pause → Play (F43), a smooth wave that moves with the music |

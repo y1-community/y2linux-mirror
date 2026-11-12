@@ -79,8 +79,11 @@ def apply(buildroot_source: Path, download_dir: Path) -> None:
     # Buildroot 2025.02 carries fixes for the 6.1 branch. FFmpeg 9 already
     # contains those fixes, and several target unrelated hardware paths that
     # are disabled in the Y2 audio-only configuration.
+    # Our own patches (buildroot/patches/ffmpeg, "*-y2-*.patch") are for FFmpeg 9 and stay;
+    # modernize_buildroot copies them in and removes the ones dropped from the source tree.
     for patch in package.glob("*.patch"):
-        patch.rename(patch.with_name(patch.name + ".ffmpeg6"))
+        if "-y2-" not in patch.name:
+            patch.rename(patch.with_name(patch.name + ".ffmpeg6"))
 
 
 if __name__ == "__main__":

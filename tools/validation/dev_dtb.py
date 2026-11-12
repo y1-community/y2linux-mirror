@@ -52,6 +52,9 @@ POWER_REGS = {
 }
 GPU = '/gpu@13010000'
 GPU_REGS = {GPU:(0x13010000,0x10000), '/clock-controller@13000000':(0x13000000,0x10)}
+# Video decoder (audit VIDEO): stock VDEC_GCON and decoder block, MT_VDEC_IRQ_ID hwirq 171 level low.
+VDEC = '/video-decoder@16000000'
+VDEC_REGS = {VDEC:(0x16000000,0x1000,0x16020000,0x9000)}
 CONN = '/connectivity@18070000'
 CONN_REGS = {
  '/clock-controller@10000000': (0x10000000,0x1000,0x10003000,0x1000,0x10001000,0x2000,0x10209000,0x600),
@@ -131,6 +134,9 @@ def check(data, initrd_size, production=True, recovery=False):
     if gpu:
         require(power and connectivity, 'GPU retains M4/M5 platform')
         regs=regs|GPU_REGS
+    if VDEC in nodes:
+        require(gpu, 'video decoder retains the display/GPU platform (SMI common, DIS)')
+        regs=regs|VDEC_REGS
     for path,reg in regs.items(): require(nodes[path]['reg']==cells(*reg),'MMIO mapping '+path)
     for path,(irq,flags) in IRQS.items(): require(nodes[path]['interrupts']==cells(0,irq,flags),'IRQ mapping '+path)
     require({p for p,v in nodes.items() if p.count('/')==1 and 'reg' in v}==set(regs)|{'/memory@80000000'},'unreviewed MMIO controller')
@@ -178,6 +184,14 @@ def check(data, initrd_size, production=True, recovery=False):
         require(nodes['/power-controller@10006000']['clocks']==cells(handle('/clock-controller@10000000'),24) and
                 nodes['/power-controller@10006000']['clock-names']==strings('mfg'), 'MFG source held throughout domain transition')
         require(not any(k in props for k in ('resets','mali-supply','operating-points-v2','dma-coherent','memory-region')), 'no guessed GPU resource')
+    if VDEC in nodes:
+        props=nodes[VDEC]
+        require(props['compatible']==strings('innioasis,y2-vdec'), 'video decoder binding')
+        require(props['interrupts']==cells(0,139,8), 'video decoder active-low IRQ (hwirq 171)')
+        require(props['clocks']==cells(handle('/syscon@14000000'),0) and props['clock-names']==strings('bus'),
+                'video decoder bus clock is SMI common')
+        require(props['power-domains']==cells(handle('/power-controller@10006000'),1), 'video decoder holds DIS while decoding')
+        require(not any(k in props for k in ('resets','iommus','memory-region','dma-coherent')), 'no guessed decoder resource')
     require(nodes['/cpus']['enable-method']==strings('innioasis,y2-smp'),'SMP release and hotplug method')
     require({p for p in nodes if p.startswith('/cpus/cpu@')}=={'/cpus/cpu@'+str(i) for i in range(4)},'CPU count')
     for i in range(4): require(nodes['/cpus/cpu@'+str(i)]['reg']==cells(i),'CPU index')

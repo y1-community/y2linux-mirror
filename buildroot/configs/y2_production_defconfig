@@ -107,7 +107,9 @@ BR2_PACKAGE_MESA3D_OPENGL_ES=y
 BR2_PACKAGE_MESA3D_GBM=y
 BR2_PACKAGE_Y2_GPU_CHECK=y
 
-# Reborn audio stack; local music/artwork only, no FFmpeg CLI/encoders/network.
+# Reborn media stack; local music, artwork and video only, no FFmpeg CLI/encoders/network.
+# Video (plan VIDEO-PLAYBACK-PLAN.md): H.264, MPEG-4 Part 2 family, VP8, VP9 in software, H.264 also on
+# the hardware decoder through our own path (buildroot/patches/ffmpeg); subtitles as text.
 BR2_PACKAGE_REBORN=y
 BR2_PACKAGE_Y2_PLATFORM=y
 BR2_PACKAGE_FFMPEG=y
@@ -115,14 +117,14 @@ BR2_PACKAGE_FFMPEG=y
 # BR2_PACKAGE_FFMPEG_FFPROBE is not set
 BR2_PACKAGE_FFMPEG_SWSCALE=y
 BR2_PACKAGE_FFMPEG_ENCODERS=""
-BR2_PACKAGE_FFMPEG_DECODERS="flac mp3 mp3float aac alac vorbis opus ape wavpack pcm_s16le pcm_s16be pcm_s24le pcm_s24be pcm_s32le pcm_s32be pcm_f32le pcm_f32be mjpeg png webp"
+BR2_PACKAGE_FFMPEG_DECODERS="flac mp3 mp3float aac alac vorbis opus ape wavpack pcm_s16le pcm_s16be pcm_s24le pcm_s24be pcm_s32le pcm_s32be pcm_f32le pcm_f32be mjpeg png webp h264 mpeg4 h263 msmpeg4v3 vp8 vp9 ac3 subrip ass movtext webvtt"
 BR2_PACKAGE_FFMPEG_MUXERS=""
-BR2_PACKAGE_FFMPEG_DEMUXERS="flac mp3 mov ogg wav aac aiff ape wv"
-BR2_PACKAGE_FFMPEG_PARSERS="flac mpegaudio aac opus vorbis"
+BR2_PACKAGE_FFMPEG_DEMUXERS="flac mp3 mov ogg wav aac aiff ape wv matroska avi srt ass webvtt"
+BR2_PACKAGE_FFMPEG_PARSERS="flac mpegaudio aac opus vorbis h264 mpeg4video h263 vp8 vp9 ac3"
 BR2_PACKAGE_FFMPEG_BSFS=""
 BR2_PACKAGE_FFMPEG_PROTOCOLS="file"
 BR2_PACKAGE_FFMPEG_FILTERS="aformat aresample volume equalizer lowshelf highshelf alimiter acrossfade amix atrim afade asetnsamples atempo"
-BR2_PACKAGE_FFMPEG_EXTRACONF="--disable-programs --disable-avdevice --disable-network --disable-autodetect --disable-hwaccels --disable-devices"
+BR2_PACKAGE_FFMPEG_EXTRACONF="--disable-programs --disable-avdevice --disable-network --disable-autodetect --disable-hwaccels --enable-hwaccel=h264_y2vdec --enable-hwaccel=mpeg4_y2vdec --disable-devices"
 # BR2_PACKAGE_FFMPEG_INDEVS is not set
 # BR2_PACKAGE_FFMPEG_OUTDEVS is not set
 BR2_PACKAGE_SQLITE=y
