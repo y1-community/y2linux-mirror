@@ -21,8 +21,7 @@ Something missing here may still be a duplicate: please search the open and clos
 | Idea | Why not | Issue |
 |---|---|---|
 | Double tap on the centre button | To tell a double tap from a single one, the player would have to wait after every tap, which makes the button slower everywhere. Tap selects, hold opens the menu. | [Y2Reborn #98](https://github.com/SchulzCode/Y2Reborn/issues/98) |
-| Wake the player with the centre button or the wheel | Only Power wakes it, so it can't wake in a pocket or bag. What the other buttons do with the screen off is in Settings → Customize → Wheel & Buttons. | [Y2Linux #71](https://github.com/SchulzCode/Y2Linux/issues/71) |
-| Your own long-press actions per button | The controls stay simple and the same on every player. | [Y2Linux #78](https://github.com/SchulzCode/Y2Linux/issues/78) |
+| Wake the player with the centre button or the wheel | Only Power wakes it, so it can't wake in a pocket or bag. What the other buttons do with the screen off is in Settings → Customize → Buttons → Screen Off. | [Y2Linux #71](https://github.com/SchulzCode/Y2Linux/issues/71) |
 | A setting for the wheel's seek step | The wheel already seeks faster the faster you turn it. | [Y2Reborn #50](https://github.com/SchulzCode/Y2Reborn/issues/50) |
 | A setting for button debounce | If buttons bounce on a player, that gets fixed for everyone rather than turned into a setting. Send an error report if you see doubled presses. | [Y2Reborn #54](https://github.com/SchulzCode/Y2Reborn/issues/54) |
 

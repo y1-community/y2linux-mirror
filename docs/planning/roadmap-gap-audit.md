@@ -9931,3 +9931,26 @@ writes from Reborn already go through the platform's SD write window (`media wri
 | Device checks | — | OWED: from a computer and a phone on the owner's Wi-Fi |
 
 **Gate decision:** source work and an owner test build. Publishing is the owner's decision.
+
+## Button Mapper (Customize > Buttons): scope note — 2026-11-13
+
+**Boundary:** production scope, no hardware: Reborn's input router answers through button layouts instead of a
+fixed table. Owner request 2026-11-13 ("a custom button mapper ... people can not lock themselves out ... buttons
+when the device is turned on and when turned off"), then "do all as you think it is best". Plan:
+[REBORN-BUTTON-MAPPER.md](https://github.com/SchulzCode/Y2Reborn/blob/main/docs/ui/REBORN-BUTTON-MAPPER.md).
+
+**Evidence (owner's player, 9.3.28):** `/proc/bus/input/devices` lists the five front buttons as
+`gpio-keys-polled` (GPIO 6/7/9/10/54, no interrupt), the wheel on EINT 55, the volume buttons on the keypad and
+Power on the PMIC; only `mtk-pmic-keys` is wake-enabled. The SPM suspend mask already includes KP and EINT
+(`kernel/platform/spm-suspend-policy.h`); the PMIC's ~10 s Power reset is armed outside shutdown (F57).
+
+| Area | Before | Now |
+| --- | --- | --- |
+| Input router | fixed table, two settings (Wheel on Now Playing, Buttons While Screen Off) | layouts in three layers (menus, Now Playing, screen off); Reborn Default = the old table, proven by the unchanged router tests; the two settings become a preset once |
+| Power | sleep/wake, hold = Quick Menu | unchanged and in no layout |
+| Lockout | — | layout check + a walk through the real menus before Save, Keep-or-Undo within 15 s, button pages, Quick Menu and keyboard answer as Reborn Default, a Quick Menu tile and Back held 5 s in the first minute bring Reborn Default back, unusable stored layouts fall back |
+| Buttons while asleep | only Power wakes | unchanged: needs interrupt-driven front buttons and wake sources (kernel + sleep helper); a separate project with hardware evidence |
+| Platform contract, kernel, images | — | unchanged; `/data` additive (`settings.buttons`) |
+| Device checks | — | OWED on the owner's player: every lockout path, dark feedback, a remapped layout through a day |
+
+**Gate decision:** source work and an owner test build. Publishing is the owner's decision.

@@ -43,12 +43,12 @@
   "Y2Reborn/crates/reborn-ui/src/screens.rs": 3
  },
  "long_files": {
-  "Y2Reborn/app/reborn/src/bin/reborn-preview.rs": 2223,
-  "Y2Reborn/app/reborn/src/main_loop.rs": 2365,
-  "Y2Reborn/crates/reborn-core/src/lib.rs": 2212,
+  "Y2Reborn/app/reborn/src/bin/reborn-preview.rs": 2217,
+  "Y2Reborn/app/reborn/src/main_loop.rs": 2361,
+  "Y2Reborn/crates/reborn-core/src/lib.rs": 2169,
   "Y2Reborn/crates/reborn-library/src/lib.rs": 2212,
   "Y2Reborn/crates/reborn-platform/src/client.rs": 1545,
-  "Y2Reborn/crates/reborn-ui/src/pages.rs": 1740
+  "Y2Reborn/crates/reborn-ui/src/pages.rs": 1715
  },
  "long_functions": {
   "Y2Linux/platform/crates/y2-platform/src/commands/connectivity/wifi/monitor.rs::event": 152,
@@ -64,14 +64,14 @@
   "Y2Linux/platform/crates/y2-platform/src/commands/suspend/audit/delta.rs::delta": 271,
   "Y2Linux/platform/crates/y2-platform/src/commands/suspend/receipt.rs::record": 158,
   "Y2Reborn/app/reborn/src/bin/reborn-bench.rs::run": 368,
-  "Y2Reborn/app/reborn/src/bin/reborn-preview.rs::main": 1816,
+  "Y2Reborn/app/reborn/src/bin/reborn-preview.rs::main": 1808,
   "Y2Reborn/app/reborn/src/main_loop.rs::control_requests": 174,
   "Y2Reborn/app/reborn/src/main_loop.rs::run": 544,
   "Y2Reborn/app/reborn/src/main_loop.rs::workers": 177,
   "Y2Reborn/app/reborn/src/playback/decode.rs::crossfade": 179,
   "Y2Reborn/app/reborn/src/playback/decode.rs::play": 294,
   "Y2Reborn/app/reborn/src/playback/output.rs::wait_and_commands": 179,
-  "Y2Reborn/app/reborn/src/runtime/effects.rs::effect_inner": 307,
+  "Y2Reborn/app/reborn/src/runtime/effects.rs::effect_inner": 303,
   "Y2Reborn/app/reborn/src/runtime/platform.rs::poll_platform": 346,
   "Y2Reborn/crates/reborn-library/src/benchmark.rs::database": 171,
   "Y2Reborn/crates/reborn-library/src/benchmark.rs::platform_db_on_media": 376,
@@ -82,7 +82,7 @@
   "Y2Reborn/crates/reborn-platform/src/wifi.rs::run": 263,
   "Y2Reborn/crates/reborn-ui/src/actions.rs::action_inner": 187,
   "Y2Reborn/crates/reborn-ui/src/actions.rs::select_row": 307,
-  "Y2Reborn/crates/reborn-ui/src/catalog.rs::build": 250,
+  "Y2Reborn/crates/reborn-ui/src/catalog.rs::build": 227,
   "Y2Reborn/crates/reborn-ui/src/context_menus.rs::context_action": 286,
   "Y2Reborn/crates/reborn-ui/src/motion.rs::apply": 188,
   "Y2Reborn/crates/reborn-ui/src/rows.rs::context_rows": 173,

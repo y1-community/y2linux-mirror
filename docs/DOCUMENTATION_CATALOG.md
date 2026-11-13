@@ -13,7 +13,7 @@ document links, rather than relocating or deleting proof. See the
 [shared knowledge rules](KNOWLEDGE_BASE.md)
 and the other repository's catalog for product-wide context.
 
-Indexed pages: **352**. Explicit scope notices: **228**.
+Indexed pages: **353**. Explicit scope notices: **228**.
 
 ## Entry
 
@@ -370,6 +370,8 @@ Indexed pages: **352**. Explicit scope notices: **228**.
 | [Y2Linux 1.0 Beta 9.3.26 report](validation/Y2-LINUX-1.0-BETA-9.3.26.md) | Beta 9.3.26 (Baseline 251): FM radio for later-revision Y2s, pairing from a car (#116), Next and Previous between films (Y2Reborn #128) |
 | [Y2Linux 1.0 Beta 9.3.27 report](validation/Y2-LINUX-1.0-BETA-9.3.27.md) | Beta 9.3.27 (Baseline 254): Wi-Fi Share, a file browser for Internal Storage and the SD card in any browser on the same Wi-Fi (#115); what was and was not tested |
 | [Y2Linux 1.0 Beta 9.3.28 report](validation/Y2-LINUX-1.0-BETA-9.3.28.md) | Beta 9.3.28 (Baseline 256): a fast Audiobooks list for big collections (Y2Reborn #27), films follow a seek during catch-up (Y2Reborn #129), films with few reference pictures play on the video chip |
+| [Y2Linux 1.0 Beta 9.3.29 report](validation/Y2-LINUX-1.0-BETA-9.3.29.md) | Beta 9.3.29 (Baseline 259): Buttons (Customize > Buttons): layouts for the menus, Now Playing and the dark, Reborn Default always back, nobody locked out; what was tested on the player |
+| [Y2Linux 1.0 Beta 9.3.30 report](validation/Y2-LINUX-1.0-BETA-9.3.30.md) | Beta 9.3.30 (Baseline 261): films in every skin (Y2Reborn #131), albums by Album Artist rules (Various Artists), Shuffle in folders, Zero:BLUE2 profile |
 | [Y2Linux 1.0 Beta 9.3.25 report](validation/Y2-LINUX-1.0-BETA-9.3.25.md) | Beta 9.3.25 (Baseline 248): videos (own hardware decoder driver, H.264 and MPEG-4 on the video chip, Videos in Reborn; early version), genres split at "/" (Y2Reborn #124) |
 | [Y2Linux 1.0 Beta 9.3.24 report](validation/Y2-LINUX-1.0-BETA-9.3.24.md) | Beta 9.3.24 (Baseline 235): SBC XQ removed (Y2Reborn #123), battery level after charging while off (#113), encoder rate log in reports |
 | [Y2Linux 1.0 Beta 9.3.19 report](validation/Y2-LINUX-1.0-BETA-9.3.19.md) | Beta 9.3.19 (Baseline 228): the update message works again and is opt-in: Update Notifications on Software Update, off by default (Y2Reborn #97) |
@@ -407,6 +409,7 @@ Indexed pages: **352**. Explicit scope notices: **228**.
 | [Speaker and haptics plan](planning/SPEAKER-HAPTICS-PLAN.md) | Stock REA of the vibrator, AW87559 and CS43131 speaker route; plan and device checks |
 | [FM radio on the Y2](FM-RADIO.md) | Which players receive FM, setting it up (the firmware file again), using and hiding it, what was checked and what was not |
 | [Wi-Fi Share](WIFI-SHARE.md) | Copying music over Wi-Fi from a phone or computer through the player's own web page: how to use it, who can get in, limits |
+| [Buttons](BUTTONS.md) | Customize > Buttons: giving buttons, holds and wheel turns other commands in the menus, on Now Playing and with the screen off; layouts and why nobody gets locked out |
 | [Videos on the Y2](VIDEO.md) | Owner test builds: how to use it, what plays, what was checked on the player, what is not done |
 | [Video playback plan](planning/VIDEO-PLAYBACK-PLAN.md) | Hardware video decoder driver, software VP8/VP9, Videos in Reborn: owner decisions, steps and gates |
 | [MT6582 hardware video decoder](knowledge/video-decoder.md) | What the stock firmware does: base, interrupt, power, and the H.264 register sequence |

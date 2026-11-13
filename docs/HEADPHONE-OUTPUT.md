@@ -67,7 +67,7 @@ table tops out at −3 dB, so the stock maximum is about 0.71 Vrms.
 - **DAC Filter** (Settings → Sound → Output): Fast (default, the chip's and stock's), Fast Phase Compensated, Slow, Slow Phase
   Compensated, Nonoversampling. These are the upstream controls `PCM Filter Speed`, `PCM Phase Compensation` and `PCM
   Nonoversample Emulate`, applied at once.
-- **Headphone Profile** (Settings → Sound → Equalizer → Headphone Profile): 47 AutoEQ profiles of common headphones
+- **Headphone Profile** (Settings → Sound → Equalizer → Headphone Profile): 48 AutoEQ profiles of common headphones
   and IEMs come with the image (`/usr/share/reborn/eq`, Reborn `assets/eq/SOURCES.md`, MIT). More: put AutoEQ
   `ParametricEQ.txt` files in a folder named `EQ` on Internal Storage or the SD card; a file there replaces a
   shipped profile of the same name. Up to 10 filters: PK (peaking), LSC (low shelf) and HSC (high
