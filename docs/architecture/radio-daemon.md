@@ -68,6 +68,12 @@ changes while one is open.
   codec it runs waits up to 3 s for the list (BlueZ asks a headset that connected by itself only after the stream). New codec settings
   (`codec-settings`) restart BlueALSA once nothing plays (`ReloadCodecs`).
 - **Pairing agent** (`bt/agent.rs`): `DisplayYesNo`; the owner's yes/no, refused after 60 s; Pairable for 90 s.
+  A search (`Scan`) also makes the player Discoverable and Pairable for 120 s (BlueZ's own timeouts end
+  both if the daemon stops), so a device that pairs from its own side finds it: a car's "add device"
+  list (#116). Its number is the owner's question; after the owner's yes, that device's
+  `AuthorizeService` is answered without a second question, and once BlueZ bonded it the daemon
+  trusts it, hides the player again and uses it for audio like headphones paired here
+  (`adopt_welcomed`). Bluetooth off, a sleep or a pairing of our own end the visibility early.
 
 ## Records
 

@@ -367,6 +367,8 @@ Indexed pages: **352**. Explicit scope notices: **228**.
 | [Y2Linux 1.0 Beta 9.3.21 report](validation/Y2-LINUX-1.0-BETA-9.3.21.md) | Beta 9.3.21 (Baseline 232): Bluetooth on a weak signal (bounded catch-up, silence filler, Wi-Fi channel mask; Y2Reborn #87, #99), Wi-Fi channels 12 and 13 (#110), sleep without radios (Y2Reborn #116), exFAT partial block, FLAC and Opus bitrate (#87) |
 | [Y2Linux 1.0 Beta 9.3.22 report](validation/Y2-LINUX-1.0-BETA-9.3.22.md) | Beta 9.3.22 (Baseline 233): a sleep that fails before the kernel is entered leaves the screen dark (Y2Player #132, Y2Reborn #116); issue forms and the list of declined ideas |
 | [Y2Linux 1.0 Beta 9.3.23 report](validation/Y2-LINUX-1.0-BETA-9.3.23.md) | Beta 9.3.23 (Baseline 234): Now Playing's progress wave in the cover's colour (#108); issue forms ask the install method and radio state, needs-info workflow, report summary tool |
+| [Y2Linux 1.0 Beta 9.3.26 report](validation/Y2-LINUX-1.0-BETA-9.3.26.md) | Beta 9.3.26 (Baseline 251): FM radio for later-revision Y2s, pairing from a car (#116), Next and Previous between films (Y2Reborn #128) |
+| [Y2Linux 1.0 Beta 9.3.27 report](validation/Y2-LINUX-1.0-BETA-9.3.27.md) | Beta 9.3.27 (Baseline 254): Wi-Fi Share, a file browser for Internal Storage and the SD card in any browser on the same Wi-Fi (#115); what was and was not tested |
 | [Y2Linux 1.0 Beta 9.3.25 report](validation/Y2-LINUX-1.0-BETA-9.3.25.md) | Beta 9.3.25 (Baseline 248): videos (own hardware decoder driver, H.264 and MPEG-4 on the video chip, Videos in Reborn; early version), genres split at "/" (Y2Reborn #124) |
 | [Y2Linux 1.0 Beta 9.3.24 report](validation/Y2-LINUX-1.0-BETA-9.3.24.md) | Beta 9.3.24 (Baseline 235): SBC XQ removed (Y2Reborn #123), battery level after charging while off (#113), encoder rate log in reports |
 | [Y2Linux 1.0 Beta 9.3.19 report](validation/Y2-LINUX-1.0-BETA-9.3.19.md) | Beta 9.3.19 (Baseline 228): the update message works again and is opt-in: Update Notifications on Software Update, off by default (Y2Reborn #97) |
@@ -402,6 +404,8 @@ Indexed pages: **352**. Explicit scope notices: **228**.
 | [Platform Rust idiomatic plan](planning/PLATFORM-RUST-IDIOMATIC-PLAN.md) | From the port to idiomatic Rust: typed records instead of loose JSON (P0–P7, finishing Q1–Q5), owner decisions, test builds 180–185 |
 | [Platform Rust next-agent handoff](planning/PLATFORM-RUST-NEXT-AGENT-HANDOFF.md) | The remaining Rust-logic, refactor and duplication work for one agent: order, method, owner decisions, build/verify |
 | [Speaker and haptics plan](planning/SPEAKER-HAPTICS-PLAN.md) | Stock REA of the vibrator, AW87559 and CS43131 speaker route; plan and device checks |
+| [FM radio on the Y2](FM-RADIO.md) | Which players receive FM, setting it up (the firmware file again), using and hiding it, what was checked and what was not |
+| [Wi-Fi Share](WIFI-SHARE.md) | Copying music over Wi-Fi from a phone or computer through the player's own web page: how to use it, who can get in, limits |
 | [Videos on the Y2](VIDEO.md) | Owner test builds: how to use it, what plays, what was checked on the player, what is not done |
 | [Video playback plan](planning/VIDEO-PLAYBACK-PLAN.md) | Hardware video decoder driver, software VP8/VP9, Videos in Reborn: owner decisions, steps and gates |
 | [MT6582 hardware video decoder](knowledge/video-decoder.md) | What the stock firmware does: base, interrupt, power, and the H.264 register sequence |

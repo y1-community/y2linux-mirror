@@ -168,6 +168,7 @@ pub(super) fn install(root: &Root, reviewed: &Reviewed, files: Files) -> Result<
         return Err(Error::Value("firmware_target_unsafe".into()));
     }
     let old = parent.join(format!(".mt6582.old.{pid}"));
+    super::fm::carry(&target, &staging);
     if target.exists() {
         fs::rename(&target, &old).map_err(|e| rename_error(e, &target, &old))?;
     }

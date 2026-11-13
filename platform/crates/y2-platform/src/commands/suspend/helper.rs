@@ -197,6 +197,7 @@ impl Run {
         wait_for_application(root, pm, &previous_irqs)?;
         record(root, Stage::new("quiescing_radios", Some(0)))?;
         self.radios_changed = true;
+        quiesce_fm(root)?;
         for radio in ["wifi", "bluetooth"] {
             quiesce_radio(root, pm, radio, &previous_irqs)?;
         }
@@ -458,6 +459,17 @@ fn service(root: &Root, argv: &[&str]) -> Result<(), E> {
         return Err(E::RuntimeError(format!("sleep_service_failed:{name}")));
     }
     Ok(())
+}
+
+/// Reborn stops the FM radio while it prepares. A tuner left on would hold its function of the
+/// radio chip and refuse the connectivity suspend, so it is switched off here too; FM is not
+/// restored after the wake (a Power sleep stops FM).
+fn quiesce_fm(root: &Root) -> Result<(), E> {
+    const POWER: &str = "/sys/devices/platform/18070000.connectivity/fm/power";
+    if root.read(POWER).is_none_or(|value| value.trim() != "1") {
+        return Ok(());
+    }
+    std::fs::write(root.path(POWER), "0\n").map_err(|_| E::refused("fm_power_down"))
 }
 
 /// Runtime-off one radio, waiting out a platform Bluetooth operation.

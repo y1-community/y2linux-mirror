@@ -9,7 +9,7 @@ Last.fm and seventeen skins. Once it's installed, the player updates itself over
   <img src="docs/images/reborn-hero.png" alt="Reborn on the Y2: the Home screen, Now Playing with its progress wave, and Cover Flow" width="100%">
 </p>
 
-> **Current version: Y2Linux 1.0 Beta 9.3.25** (12 November 2026), a public beta. New: it plays videos (an early version).
+> **Current version: Y2Linux 1.0 Beta 9.3.27** (13 November 2026), a public beta. New: Wi-Fi Share, copying music without a cable, from an iPhone too.
 > **[Download it from the releases page](https://github.com/SchulzCode/Y2Linux/releases/latest)** and follow the
 > [install guide](docs/INSTALL.md). It runs every day on the developer's Y2 and on many others, but it is still a
 > beta: read [Known issues](#known-issues) first.
@@ -38,6 +38,8 @@ Last.fm and seventeen skins. Once it's installed, the player updates itself over
   player's volume controls theirs.
 - **Internet radio** from the free radio-browser.info directory (popular, by country, by genre, search), favorites
   and your own station lists.
+- **FM radio** on Y2s whose hardware receives FM (later revisions; the first revision has the tuner but receives
+  nothing): the player's own tuner, wired headphones as the antenna ([guide](docs/FM-RADIO.md)).
 - **Last.fm scrobbling**: sign in by scanning a QR code with your phone; plays wait on the player while offline.
 
 **Audiobooks**
@@ -51,6 +53,9 @@ Last.fm and seventeen skins. Once it's installed, the player updates itself over
 
 **Everyday**
 - Copy music over USB (MTP) from Windows, macOS or Linux at about 30 MB/s; the player charges at the same time.
+- **Wi-Fi Share**: copy music without a cable. The player becomes a small website on your home network; a phone
+  (an iPhone too), tablet or computer opens a file browser for Internal Storage and the SD card
+  ([guide](docs/WIFI-SHARE.md)).
 - **Quick Menu**: hold Power on any screen for Wi-Fi, Bluetooth, brightness, the sleep timer, Restart and Power Off.
 - Deep sleep when the screen turns off, waking with Power in about half a second; a clock that sets its time zone
   by itself.
@@ -112,7 +117,7 @@ Wi-Fi ([how updates work](docs/RECOVERY-AND-UPDATES.md)). More guides: [Storage]
   they reconnect within seconds, but pressing play during those 20 seconds can stay silent until they are back.
 - **The speaker** uses the same volume as the headphones; its loudest step is the stock speaker's. Start low the
   first time.
-- **Radio:** stations that stream only in HLS (such as the BBC) don't play yet. FM radio is planned for a later beta.
+- **Radio:** stations that stream only in HLS (such as the BBC) don't play yet.
 - **Going back to stock** doesn't restore the old storage format: copy your music off first; stock Android then has
   to format that storage ([Storage](docs/STORAGE.md)).
 
@@ -130,16 +135,16 @@ calibration and factory partitions untouched. A Y2 with a different board, stora
 
 ## For developers
 
-| | 1.0 Beta 9.3.25 (Baseline 248) |
+| | 1.0 Beta 9.3.27 (Baseline 254) |
 | --- | --- |
-| Git tag (both repositories) | `baseline-248` (previous: `baseline-235`); the GitHub release carries the first-install images, the signed over-the-air update and the GPL sources |
-| Release / kernel | `1.0.0-beta.9.3.25` / `6.18.56-y2linux-1.0.0-beta.9.3.25` (Linux 6.18 long-term line) |
-| Root filesystem | `2026.08-platform-v1.271` (Buildroot 2026.08) |
+| Git tag (both repositories) | `baseline-254` (previous: `baseline-251`); the GitHub release carries the first-install images, the signed over-the-air update and the GPL sources |
+| Release / kernel | `1.0.0-beta.9.3.27` / `6.18.56-y2linux-1.0.0-beta.9.3.27` (Linux 6.18 long-term line) |
+| Root filesystem | `2026.08-platform-v1.277` (Buildroot 2026.08) |
 | Platform | `y2-platform` (Rust 1.99): the battery, sleep, Wi-Fi, Bluetooth, storage, update, USB and report services; no Python on the player |
-| Player | Y2Reborn 1.0.0-beta.9.3.25 (Rust 1.99, OpenGL ES on the Mali-400 GPU through DRM + Lima, FFmpeg, SQLite) |
+| Player | Y2Reborn 1.0.0-beta.9.3.27 (Rust 1.99, OpenGL ES on the Mali-400 GPU through DRM + Lima, FFmpeg, SQLite) |
 | Bluetooth codecs | SBC, AAC (fdk-aac-free) and LDAC |
 | Main components | GCC 15.3 / glibc 2.44, Mesa 26.2.4, FFmpeg 9.0.2, BlueZ 5.87, OpenSSL 4.0.3 |
-| Images built from | Y2Linux `d163c3e5`, Y2Reborn `a5d85be` ([Beta 9.3.25 report](docs/validation/Y2-LINUX-1.0-BETA-9.3.25.md); every earlier release report is listed in the [documentation catalog](docs/DOCUMENTATION_CATALOG.md)) |
+| Images built from | Y2Linux `6e04e7b7`, Y2Reborn `e4a76ca` ([Beta 9.3.27 report](docs/validation/Y2-LINUX-1.0-BETA-9.3.27.md); every earlier release report is listed in the [documentation catalog](docs/DOCUMENTATION_CATALOG.md)) |
 
 - **[Build from source](docs/BUILDING.md)**: host setup, the build, the first-install package and releases.
 - **[Coding standard](docs/CODING-STANDARD.md)** for the platform and Reborn; `tools/development/platform-gate.sh`

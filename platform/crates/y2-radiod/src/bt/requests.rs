@@ -9,6 +9,8 @@ use y2p_contract::radiod::{Ended, Radio, Reply, Request, Scan};
 
 const SCAN_FOR: Duration = Duration::from_secs(15);
 const PAIR_DEADLINE: Duration = Duration::from_secs(70);
+/// How long a pairing this player starts keeps the adapter Pairable.
+const PAIRABLE_FOR: Duration = Duration::from_secs(90);
 
 impl Controller {
     pub(super) fn request(&mut self, request: Request, client: Client) {
@@ -83,6 +85,7 @@ impl Controller {
         } else {
             self.asked = None;
             self.stop_discovery(false);
+            self.close_pairing_window();
         }
         if on {
             // The owner is using the player: whatever a sleep left is over.
@@ -180,7 +183,7 @@ impl Controller {
             return Reply::refused("bluetooth_not_ready");
         };
         self.stop_discovery(false);
-        if let Err(error) = self.open_pairing_window() {
+        if let Err(error) = self.open_pairing_window(PAIRABLE_FOR) {
             self.fail("pair_failed", &error, Some(address));
             return Reply::refused("pairing_window");
         }
@@ -336,6 +339,7 @@ impl Controller {
         }
         self.stop_discovery(false);
         self.confirm(false);
+        self.close_pairing_window();
         if !self.desired.bluetooth && !self.world.powered() {
             // Off already, and a wake restores only radios that are on: nothing to take down
             // and nothing to come back from.

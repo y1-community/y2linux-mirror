@@ -245,6 +245,8 @@ pub(super) fn scan(root: &Root, reviewed: &Reviewed) -> Result<Status> {
             )?;
             return Ok(Status::of("Failed", Some(reason)));
         }
+        // The same image holds the FM tuner's two files (optional).
+        super::fm::take(root, &source);
         remove(root, &source);
         tidy(root);
         record_state(
@@ -291,6 +293,8 @@ pub(super) fn leftover(root: &Root, reviewed: &Reviewed) -> Result<Status> {
             value.kept = Some(seen);
             break;
         }
+        // A player that has its radio firmware gets the FM tuner's files from this later copy.
+        super::fm::take(root, &source);
         remove(root, &source);
         tidy(root);
     }

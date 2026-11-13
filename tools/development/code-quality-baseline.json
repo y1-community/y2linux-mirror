@@ -43,12 +43,12 @@
   "Y2Reborn/crates/reborn-ui/src/screens.rs": 3
  },
  "long_files": {
-  "Y2Reborn/app/reborn/src/bin/reborn-preview.rs": 2283,
+  "Y2Reborn/app/reborn/src/bin/reborn-preview.rs": 2223,
   "Y2Reborn/app/reborn/src/main_loop.rs": 2365,
-  "Y2Reborn/crates/reborn-core/src/lib.rs": 2334,
+  "Y2Reborn/crates/reborn-core/src/lib.rs": 2212,
   "Y2Reborn/crates/reborn-library/src/lib.rs": 2212,
   "Y2Reborn/crates/reborn-platform/src/client.rs": 1545,
-  "Y2Reborn/crates/reborn-ui/src/pages.rs": 1903
+  "Y2Reborn/crates/reborn-ui/src/pages.rs": 1740
  },
  "long_functions": {
   "Y2Linux/platform/crates/y2-platform/src/commands/connectivity/wifi/monitor.rs::event": 152,
@@ -64,7 +64,7 @@
   "Y2Linux/platform/crates/y2-platform/src/commands/suspend/audit/delta.rs::delta": 271,
   "Y2Linux/platform/crates/y2-platform/src/commands/suspend/receipt.rs::record": 158,
   "Y2Reborn/app/reborn/src/bin/reborn-bench.rs::run": 368,
-  "Y2Reborn/app/reborn/src/bin/reborn-preview.rs::main": 1878,
+  "Y2Reborn/app/reborn/src/bin/reborn-preview.rs::main": 1816,
   "Y2Reborn/app/reborn/src/main_loop.rs::control_requests": 174,
   "Y2Reborn/app/reborn/src/main_loop.rs::run": 544,
   "Y2Reborn/app/reborn/src/main_loop.rs::workers": 177,
@@ -168,7 +168,7 @@
   "Y2Reborn/crates/reborn-ui/src/fontdata.rs": 15,
   "Y2Reborn/crates/reborn-ui/src/lib.rs": 7,
   "Y2Reborn/crates/reborn-ui/src/maskdata.rs": 4,
-  "Y2Reborn/crates/reborn-ui/src/pages.rs": 19,
+  "Y2Reborn/crates/reborn-ui/src/pages.rs": 18,
   "Y2Reborn/crates/reborn-ui/src/rows.rs": 2,
   "Y2Reborn/crates/reborn-ui/src/skin/compile.rs": 2
  },

@@ -208,6 +208,7 @@ impl Controller {
             return;
         }
         self.reconcile_discovery();
+        self.adopt_welcomed();
         self.reconcile_target(now);
         let ready: Vec<String> = self
             .world
@@ -265,7 +266,8 @@ impl Controller {
         }
     }
 
-    /// A scan asked for while the adapter was off starts once it is on.
+    /// A scan asked for while the adapter was off starts once it is on; the player is visible to
+    /// other devices from then on (`show_to_others`).
     fn reconcile_discovery(&mut self) {
         let start = self.discovery.as_ref().is_some_and(|d| !d.started);
         if start && !self.in_flight(|k| matches!(k, Kind::Discovery(_))) {
@@ -273,6 +275,7 @@ impl Controller {
                 discovery.started = true;
             }
             self.discovery_call(true);
+            self.show_to_others();
         }
     }
 

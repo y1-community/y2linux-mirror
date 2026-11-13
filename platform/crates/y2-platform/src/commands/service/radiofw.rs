@@ -27,6 +27,7 @@ use y2p_core::{
 
 mod copy;
 mod files;
+mod fm;
 
 pub(crate) use self::copy::inbox;
 use self::{copy::*, files::*};

@@ -2,7 +2,7 @@
 //! run one after another in one test). Each scenario is
 //! a field failure the old stack mishandled: a stuck page (F65, #92), headphones switched off, a
 //! remote end, the owner's own disconnect, a codec the headphones refuse, a stream that never came,
-//! a codec change that ends the link (#94).
+//! a codec change that ends the link (#94), a car that pairs from its own side (#116).
 use super::*;
 use crate::arbiter::Event;
 use dbus::{
@@ -66,6 +66,16 @@ struct Fake {
     /// A change takes BlueALSA's stream away for this long (it is set up again for the new codec).
     select_gap: Duration,
     gap_until: Option<Instant>,
+    /// The device is not paired yet (a car, #116); `paired`/`trusted` once BlueZ bonded/trusted it.
+    stranger: bool,
+    paired: bool,
+    trusted: bool,
+    /// The adapter's Discoverable and Pairable as last written.
+    discoverable: bool,
+    pairable: bool,
+    /// Who registered the pairing agent, and the agent's answer to AuthorizeService.
+    agent: Option<String>,
+    authorized: Option<bool>,
 }
 
 fn variant<T: RefArg + 'static>(value: T) -> Variant<Box<dyn RefArg>> {
@@ -81,9 +91,10 @@ fn bluez_objects(fake: &Fake) -> Objects {
     let mut device = PropMap::new();
     device.insert("Address".into(), variant(ADDRESS.to_string()));
     device.insert("Alias".into(), variant("Buds".to_string()));
-    for key in ["Paired", "Bonded", "Trusted"] {
-        device.insert(key.into(), variant(true));
-    }
+    let paired = !fake.stranger || fake.paired;
+    device.insert("Paired".into(), variant(paired));
+    device.insert("Bonded".into(), variant(paired));
+    device.insert("Trusted".into(), variant(!fake.stranger || fake.trusted));
     device.insert("Blocked".into(), variant(false));
     device.insert("Connected".into(), variant(fake.connected));
     device.insert(
@@ -177,15 +188,34 @@ fn answer(fake: &Mutex<Fake>, message: &Message, connection: &Connection) -> Mes
         "GetManagedObjects" if path == "/" => message.return_with_args((bluez_objects(&fake),)),
         "GetManagedObjects" => message.return_with_args((bluealsa_objects(&fake),)),
         "Set" => {
-            let (_, name, value): (String, String, Variant<bool>) =
+            let (_, name, value): (String, String, Variant<Box<dyn RefArg>>) =
                 message.read3().expect("Set arguments");
-            if name == "Powered" {
-                fake.powered = value.0;
-                if !value.0 {
-                    fake.connected = false;
+            let on = value.0.as_u64().unwrap_or(0) != 0;
+            match name.as_str() {
+                "Powered" => {
+                    fake.powered = on;
+                    if !on {
+                        fake.connected = false;
+                    }
+                    let _ = connection.send(changed(ADAPTER, "org.bluez.Adapter1"));
                 }
-                let _ = connection.send(changed(ADAPTER, "org.bluez.Adapter1"));
+                "Discoverable" => fake.discoverable = on,
+                "Pairable" => fake.pairable = on,
+                "Trusted" => fake.trusted = on,
+                _ => {}
             }
+            message.method_return()
+        }
+        "Get" if path.starts_with("/org/bluez") => {
+            let (_, name): (String, String) = message.read2().expect("Get arguments");
+            match name.as_str() {
+                "PairableTimeout" => message.return_with_args((variant(0u32),)),
+                "Pairable" => message.return_with_args((variant(fake.pairable),)),
+                _ => message.return_with_args((variant(!fake.stranger || fake.paired),)),
+            }
+        }
+        "RegisterAgent" => {
+            fake.agent = message.sender().map(|s| s.to_string());
             message.method_return()
         }
         "ConnectProfile" => {
@@ -264,10 +294,53 @@ enum Control {
     Drop(&'static str),
     /// The headphones connect by themselves.
     Arrive,
+    /// A car pairs from its side: BlueZ asks the agent to confirm its number.
+    Pair,
+    /// BlueZ bonded the car.
+    Bond,
+    /// The car opens its audio: BlueZ asks the agent (from another thread, as BlueZ waits).
+    Authorize(String),
 }
 
-fn act(fake: &Mutex<Fake>, control: Control, connection: &Connection) {
+fn act(fake: &Arc<Mutex<Fake>>, control: Control, connection: &Connection) {
+    let agent = || {
+        fake.lock()
+            .expect("fake")
+            .agent
+            .clone()
+            .expect("agent registered")
+    };
     match control {
+        Control::Pair => {
+            let question = Message::new_method_call(
+                agent(),
+                super::agent::PATH,
+                "org.bluez.Agent1",
+                "RequestConfirmation",
+            )
+            .expect("call")
+            .append2(DbusPath::from(DEVICE), 123_456u32);
+            let _ = connection.send(question);
+            return;
+        }
+        Control::Bond => fake.lock().expect("fake").paired = true,
+        Control::Authorize(bus) => {
+            let (fake, agent) = (fake.clone(), agent());
+            std::thread::spawn(move || {
+                let mut channel = Channel::open_private(&bus).expect("bus");
+                channel.register().expect("register");
+                let asking = Connection::from(channel);
+                let answer: Result<(), dbus::Error> = asking
+                    .with_proxy(agent, super::agent::PATH, Duration::from_secs(3))
+                    .method_call(
+                        "org.bluez.Agent1",
+                        "AuthorizeService",
+                        (DbusPath::from(DEVICE), super::world::SINK),
+                    );
+                fake.lock().expect("fake").authorized = Some(answer.is_ok());
+            });
+            return;
+        }
         Control::Drop(reason) => {
             fake.lock().expect("fake").connected = false;
             let signal = Message::new_signal(DEVICE, "org.bluez.Device1", "Disconnected")
@@ -794,6 +867,61 @@ fn quick_drops_park_the_headset() {
         .expect("the owner's tap connects again");
 }
 
+/// The fake's state once `wanted` holds, within `within`.
+fn fake_until(h: &Harness, within: Duration, wanted: impl Fn(&Fake) -> bool) -> Option<Fake> {
+    let end = Instant::now() + within;
+    while Instant::now() < end {
+        let fake = h.fake();
+        if wanted(&fake) {
+            return Some(fake);
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    None
+}
+
+/// #116: a car pairs from its own side. A search makes the player visible and pairable; the
+/// car's number is the owner's question; after the owner's yes the car's audio needs no second
+/// question; once bonded the car is trusted, the player hidden again and the car used for audio.
+fn a_car_pairs_from_its_side() {
+    let Some(h) = Harness::start(
+        "car",
+        Fake {
+            stranger: true,
+            ..Fake::default()
+        },
+    ) else {
+        return;
+    };
+    h.until(LONG, |s| s.powered).expect("powered");
+    fake_until(&h, Duration::from_secs(5), |f| f.agent.is_some()).expect("agent registered");
+    assert!(!h.fake().discoverable, "hidden until the owner searches");
+    let answer = h.ask(Request::Scan { on: true });
+    assert!(answer.contains("\"ok\":true"), "{answer}");
+    fake_until(&h, Duration::from_secs(5), |f| f.discoverable && f.pairable)
+        .expect("visible and pairable while searching");
+    let _ = h.control.send(Control::Pair);
+    let asked = h
+        .until(Duration::from_secs(5), |s| s.pairing.is_some())
+        .expect("the car's number is asked");
+    assert_eq!(asked.pairing.expect("question").display, "Confirm 123456");
+    let answer = h.ask(Request::Confirm { accept: true });
+    assert!(answer.contains("\"ok\":true"), "{answer}");
+    let _ = h.control.send(Control::Authorize(h._bus.address.clone()));
+    let authorized = fake_until(&h, Duration::from_secs(5), |f| f.authorized.is_some());
+    assert_eq!(
+        authorized.and_then(|f| f.authorized),
+        Some(true),
+        "the owner's yes covers the car's audio"
+    );
+    let _ = h.control.send(Control::Bond);
+    let done = fake_until(&h, Duration::from_secs(5), |f| f.trusted && !f.discoverable)
+        .expect("trusted and hidden again");
+    assert!(!done.pairable, "Pairable put back");
+    h.link(LONG, Link::Ready)
+        .expect("the car is used for audio");
+}
+
 #[test]
 fn field_failures_against_a_fake_bluez() {
     if private_bus().is_none() {
@@ -810,4 +938,5 @@ fn field_failures_against_a_fake_bluez() {
     missing_stream_asks_a2dp_then_restarts_bluealsa();
     codec_reload_reconnects_cleanly();
     quick_drops_park_the_headset();
+    a_car_pairs_from_its_side();
 }

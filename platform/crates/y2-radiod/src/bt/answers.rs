@@ -125,12 +125,7 @@ impl Controller {
         let result = result.and_then(|()| self.trust(address));
         self.close_pairing_window();
         match result {
-            Ok(()) => {
-                self.asked = Some(address.to_owned());
-                self.desired.preferred = Some(address.to_owned());
-                self.desired.save_preferred(&self.root);
-                self.trigger(address, links::Trigger::User);
-            }
+            Ok(()) => self.use_paired(address),
             Err(message) => {
                 self.cancel_pairing(address);
                 self.fail("pair_failed", &message, Some(address));
@@ -138,8 +133,16 @@ impl Controller {
         }
     }
 
+    /// A new pairing is the owner's audio device from now on, connected at once.
+    pub(super) fn use_paired(&mut self, address: &str) {
+        self.asked = Some(address.to_owned());
+        self.desired.preferred = Some(address.to_owned());
+        self.desired.save_preferred(&self.root);
+        self.trigger(address, links::Trigger::User);
+    }
+
     /// A bond was saved: trust it so it may reconnect.
-    fn trust(&mut self, address: &str) -> Result<(), String> {
+    pub(super) fn trust(&mut self, address: &str) -> Result<(), String> {
         let (Some(owner), Some(path)) = (
             self.world.bluez.clone(),
             self.world.devices.get(address).map(|d| d.path.clone()),

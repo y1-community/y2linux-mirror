@@ -9883,3 +9883,51 @@ library reads.
 | Device checks | — | OWED on a build with the new kernel: hardware against software on files, films in Reborn, drain |
 
 **Gate decision:** source work and an owner-only test build. Not a release authorization.
+
+## FM radio re-entry: gap audit — 2026-11-12
+
+**Boundary:** a hardware function that no release has switched on (the MT6627 tuner inside the radio chip, its
+supply VCN28, the second I2S input of the audio front end) and a product function (FM under Radio). Owner request
+2026-11-12: bring FM back, Radio with FM and Internet below it, a setting to hide FM on players that cannot
+receive. Plan and the October evidence: [BETA-8-FM-PLAN.md](BETA-8-FM-PLAN.md).
+
+**Evidence (date, revision, origin, limits):** owner's player over USB network 2026-11-12, read-only: kernel
+`6.18.56-y2linux-1.0.0-beta.9.3.25` (baseline-248); the connectivity device has no `fm` group; `vcn28` has no
+user and is off; the radio firmware directory holds the seven radio files and no `mt6627_fm_v1_*`; ALSA has one
+playback device and no capture device; no `Firmware` folder on Internal Storage. The owner's player is a
+first-revision Y2 whose tuner receives nothing (owner, 2026-10-16 and again today); later revisions received FM
+under the owner's Android app. The October work was never run on any player.
+
+| Area | State before | Plan / gap |
+| --- | --- | --- |
+| Tuner driver | NOT IN MAIN (branch `beta8-fm`, never run) | `connectivity/fm.c` as written in October: sequences byte-identical to the stock kernel in an emulator (`tests/test_fm.py`) |
+| Supply VCN28 | off, no user | on only while FM is on (stock `hwPowerOn(LDO_VCN28)`), WMT function 1 |
+| Audio | playback only | `Y2 FM Capture`: second I2S in as slave, rate converter, capture memory |
+| Firmware | seven radio files on Y2DATA | two more, optional, from the owner's `system.img` (never in images); a player that has its radio firmware takes them from a later copy |
+| Sleep | radios quiesced | a tuner left on is switched off before the kernel sleep; FM does not come back after a wake |
+| Reborn | internet radio | FM Radio and Internet Radio below Radio; a switch to hide FM |
+| Device checks | NOT_RUN | OWED on the owner's player: power-up and patch download, tune, signal read-out, capture stream, sleep with FM on, Wi-Fi and Bluetooth beside it. Reception can only be confirmed by owners of later revisions |
+
+**Gate decision:** source work and an owner-only test build; the first power-up of the tuner on the owner's player
+is part of that test. Not a release authorization: FM has never played on a Y2 under Y2Linux.
+
+## Wi-Fi Share (a web file browser on the player): scope note — 2026-11-12
+
+**Boundary:** production scope, no hardware: Reborn gains a network service (plain HTTP on port 80) that lists,
+receives, renames and deletes files on Internal Storage and the SD card. Owner request 2026-11-12 after #115
+("make a plan for the wifi share mode ... implement this also"). Plan:
+[REBORN-WIFI-SHARE.md](https://github.com/SchulzCode/Y2Reborn/blob/main/docs/ui/REBORN-WIFI-SHARE.md).
+
+**Evidence:** the player has had no listening service besides the owner-only SSH on the USB network; storage
+writes from Reborn already go through the platform's SD write window (`media write --holder reborn`).
+
+| Area | Before | Now |
+| --- | --- | --- |
+| Listening services | none for listeners | one, only while Settings → Library → Wi-Fi Share is on screen; a six-digit code from the screen, lockout after five wrong ones; unencrypted, said so in the guide |
+| What it reaches | — | the two music roots; paths resolved inside them, links never followed, hidden names refused (tests) |
+| SD card | read-only between writes | unchanged: each change inside a write window, renewed during an upload |
+| Sleep | — | the player stays awake while the page is open |
+| Platform contract, kernel, images | — | unchanged |
+| Device checks | — | OWED: from a computer and a phone on the owner's Wi-Fi |
+
+**Gate decision:** source work and an owner test build. Publishing is the owner's decision.

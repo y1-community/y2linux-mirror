@@ -76,7 +76,12 @@ class CodecClock(unittest.TestCase):
         get = function(source, 'y2_clk_get')
         self.assertLess(get.index('if (CS43130_MCLK_22M % rate) {'), get.index('mutex_lock(&cs43130->clk_mutex);'))
         afe = (Path(__file__).resolve().parents[1]/'kernel/audio/mt6582-afe.c').read_text()
-        self.assertNotIn('SNDRV_PCM_RATE_48000', afe)
+        # Playback only: the FM tuner's capture (48 kHz into memory) never reaches the codec.
+        playback = afe[afe.index('static const struct snd_pcm_hardware mt6582_hw'):afe.index('mt6582_fm_hw')]
+        self.assertNotIn('SNDRV_PCM_RATE_48000', playback)
+        self.assertEqual(afe.count('SNDRV_PCM_RATE_48000'), 2)
+        macro = afe[afe.index('#define MT6582_PLAYBACK'):afe.index('static struct snd_soc_dai_driver')]
+        self.assertIn('SNDRV_PCM_RATE_44100', macro)
         self.assertIn('.rate_min = 44100, .rate_max = 44100,', afe)
         preamble = source[source.index('#define Y2_XTAL_WAIT_MS'):source.index('static void y2_xtal_boost(')]
         run_c(r'''
