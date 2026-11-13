@@ -146,7 +146,7 @@ diff -Nru a/libavcodec/mpeg4videodec.c b/libavcodec/mpeg4videodec.c
 diff -Nru a/libavcodec/y2vdec.c b/libavcodec/y2vdec.c
 --- a/libavcodec/y2vdec.c	1970-01-01 01:00:00.000000000 +0100
 +++ b/libavcodec/y2vdec.c	2026-11-12 18:22:33.023541592 +0100
-@@ -0,0 +1,176 @@
+@@ -0,0 +1,180 @@
 +/*
 + * The Innioasis Y2's MT6582 hardware video decoder (/dev/y2-vdec): device and frames.
 + *
@@ -287,6 +287,10 @@ diff -Nru a/libavcodec/y2vdec.c b/libavcodec/y2vdec.c
 +    d->config.codec  = codec;
 +    d->config.width  = mb_width * 16;
 +    d->config.height = mb_height * 16;
++    /* Each frame thread holds a picture it is decoding, as FFmpeg's own hardware pools count:
++     * a stream with one reference frame and four threads otherwise ran out after a few pictures. */
++    if (avctx->active_thread_type & FF_THREAD_FRAME)
++        frames += avctx->thread_count;
 +    d->config.frames = FFMIN(frames, Y2_VDEC_MAX_FRAMES);
 +    if (ioctl(d->fd, Y2_VDEC_CONFIGURE, &d->config)) {
 +        ret = AVERROR(errno);
