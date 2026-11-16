@@ -1,10 +1,10 @@
 {
-  "release_version": "1.0.0-beta.9.3.30",
-  "rootfs_version": "2026.08-platform-v1.284",
-  "build_id": "Y2LINUX-1.0.0-BETA-9.3.30",
+  "release_version": "1.0.0-beta.9.3.31",
+  "rootfs_version": "2026.08-platform-v1.285",
+  "build_id": "Y2LINUX-1.0.0-BETA-9.3.31",
   "platform_api_version": 1,
   "feature_contract_version": 2,
   "battery_profile_schema": 1,
   "low_battery_policy_schema": 2,
-  "update_sequence": 16710
+  "update_sequence": 16800
 }
