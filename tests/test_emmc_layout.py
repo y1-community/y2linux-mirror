@@ -96,10 +96,23 @@ int main(void) {
     const unsigned logical[]={0,1024,145408,166912,2104320};
     const unsigned global[]={0x1400000,0x1480000,0x5b00000,0x6580000,0x41780000};
     for(unsigned op=0;op<64;op++)for(unsigned i=0;i<5;i++) {
-        unsigned wire=y2_emmc_wire_arg(op,logical[i]);
+        unsigned wire=y2_emmc_wire_arg(op,logical[i],Y2_EMMC_USER_OFFSET);
         assert(wire==((op==17||op==18||op==24||op==25)?(global[i]-0x880000)/512:logical[i]));
     }
     assert(Y2_EMMC_USER_OFFSET+Y2_EMMC_DISK_SECTORS+Y2_EMMC_TAIL_SECTORS==15269888);
+    /* The offset follows EXT_CSD as stock's msdc_get_offset does: the first
+     * chip (RPMB 512 KiB) and the RPMB 4 MiB batch (Y2Reborn #130), whose
+     * SPFT chip info shows boot 0x400000 each, RPMB 0x400000, USER 0x1d2000000. */
+    unsigned char ext[512]={0};
+    ext[212]=15269888&255;ext[213]=15269888>>8&255;ext[214]=15269888>>16&255;ext[215]=15269888>>24;
+    ext[226]=32;ext[168]=4;assert(y2_emmc_layout_valid(ext)&&y2_emmc_user_offset(ext)==Y2_EMMC_USER_OFFSET);
+    ext[168]=32;assert(y2_emmc_layout_valid(ext)&&y2_emmc_user_offset(ext)==(0x1400000-3*0x400000)/512);
+    /* The fixed disk window ends inside stock's own window on that chip. */
+    assert(y2_emmc_user_offset(ext)+Y2_EMMC_DISK_SECTORS<=15269888-Y2_EMMC_TAIL_SECTORS);
+    for(unsigned v=0;v<256;v++){ext[168]=v;assert(y2_emmc_layout_valid(ext)==(v==4||v==32));}
+    ext[168]=32;ext[226]=16;assert(!y2_emmc_layout_valid(ext));ext[226]=32;
+    ext[150]=1;assert(!y2_emmc_layout_valid(ext));ext[150]=0;
+    ext[212]--;assert(!y2_emmc_layout_valid(ext));
     /* Every native sector reachable by an allowed write is in the independent
      * physical extents of ANDROID, USRDATA and the p8 media partition (which
      * directly follows USRDATA), the MISC bootloader message (native 0x4f00000,
@@ -111,7 +124,7 @@ int main(void) {
         unsigned image=mode?0x2900000/512:0x3900000/512;
         r.recovery_image=mode;
         for(r.arg=0;r.arg<15269888;r.arg++) {
-            unsigned wire=y2_emmc_wire_arg(24,r.arg);
+            unsigned wire=y2_emmc_wire_arg(24,r.arg,Y2_EMMC_USER_OFFSET);
             bool expected=(wire>=190464 && wire<1869824)||(wire>=2127872 && wire<3766272)||(wire>=3766272 && wire<15226880)||
                           (wire>=image && wire<image+0x1000000/512)||(wire>=0x4f00000/512 && wire<0x4f00000/512+8);
             assert(!!y2_emmc_request_allowed(&r)==expected);

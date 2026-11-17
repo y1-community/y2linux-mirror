@@ -26,7 +26,7 @@ static unsigned char sectors[3][512];
 static unsigned char *read_part_sector(struct parsed_partitions *s, sector_t n, Sector *b) {
     (void)s;(void)b;
     if(n>=15203328)return NULL;
-    unsigned wire=y2_emmc_wire_arg(17,n);
+    unsigned wire=y2_emmc_wire_arg(17,n,Y2_EMMC_USER_OFFSET);
     /* Independently observed native locations, not logical fixture aliases. */
     return wire==23552?sectors[0]:wire==24576?sectors[1]:wire==168960?sectors[2]:NULL;
 }

@@ -39,6 +39,7 @@ Something missing here may still be a duplicate: please search the open and clos
 | Idea | Why not | Issue |
 |---|---|---|
 | More volume or gain for Bluetooth, or with an equalizer profile | The player lowers the level just enough that the profile's highest boost can't distort. Louder would mean distortion; a profile with smaller boosts keeps more volume. | [Y2Linux #80](https://github.com/SchulzCode/Y2Linux/issues/80) |
+| Playing above 44.1 kHz on the headphone jack (96 kHz and up, "bit perfect") | The Y2's chip sends audio to the DAC at 44.1 or 48 kHz only, and 48 kHz needs the DAC's PLL, which stopped the crystal on some players ([Y2Linux #52](https://github.com/SchulzCode/Y2Linux/issues/52)); the stock firmware plays everything at 44.1 kHz too. Higher rates are converted down; 24-bit depth is kept. | [Y2Reborn #122](https://github.com/SchulzCode/Y2Reborn/issues/122) |
 | Crossfade or gapless on a manual skip | A skip should be immediate. Gapless and crossfade apply when one song runs into the next. | [Y2Linux #65](https://github.com/SchulzCode/Y2Linux/issues/65) |
 
 ## Wi-Fi

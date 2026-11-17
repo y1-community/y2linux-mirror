@@ -278,6 +278,26 @@ fn failed_daemon_and_failed_bind_have_bounded_retry() {
     assert_eq!(usb.tick()["state"], "Failed");
 }
 
+/// Y2Linux #117: the kernel unbound the gadget while the responder ran on; the service set nothing up
+/// again, so the player stayed invisible through cable changes until a restart.
+#[test]
+fn a_gadget_the_kernel_unbound_is_set_up_and_bound_again() {
+    let mut usb = Usb::new();
+    usb.ready();
+    let first = usb.pid();
+    usb.fixture.put(&format!("{GADGET}/UDC"), "");
+    let lost = usb.tick();
+    assert_eq!(lost["state"], "Failed");
+    assert_eq!(lost["reason"], "gadget_unbound");
+    assert!(!alive(first));
+    assert!(!usb.service.terminal);
+    usb.tick();
+    usb.descriptors();
+    assert_eq!(usb.tick()["state"], "Ready");
+    assert_eq!(usb.gadget("UDC"), "musb");
+    assert_ne!(usb.pid(), first);
+}
+
 #[test]
 fn failure_budget_decays_after_a_stable_responder() {
     let mut usb = Usb::new();

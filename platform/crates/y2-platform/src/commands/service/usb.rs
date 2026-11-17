@@ -261,7 +261,10 @@ impl UsbService {
             .file_name()
             .map(|n| n.to_string_lossy().into_owned())
             .unwrap_or_default();
-        match self.attempt(requested, &cable, &name) {
+        match self
+            .lost_bind()
+            .and_then(|()| self.attempt(requested, &cable, &name))
+        {
             Err(error) => {
                 if self.stop().is_err() {
                     self.terminal = true;
@@ -285,6 +288,23 @@ impl UsbService {
             }
             other => other,
         }
+    }
+
+    /// The kernel can unbind the gadget behind the service (FunctionFS does when the responder's
+    /// endpoints close). Y2Linux #117: after a transfer broke, the player stayed invisible to every
+    /// computer, through cable changes, until a restart. A lost bind is a failed attempt: the gadget
+    /// and responder are set up again, within the restart budget; there is nothing left to unbind.
+    fn lost_bind(&mut self) -> Result<(), Failure> {
+        let lost = self.bound
+            && self
+                .root
+                .read(&format!("{GADGET}/UDC"))
+                .is_some_and(|udc| udc.is_empty());
+        if lost {
+            self.bound = false;
+            return Err(Failure::os_message("gadget_unbound"));
+        }
+        Ok(())
     }
 
     /// The part of a tick whose refusal counts against the responder's restart budget.

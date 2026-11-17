@@ -11,7 +11,7 @@ static void setup(unsigned op,unsigned sector,unsigned count,bool use_sbc) {
     ncommands=prepared=started=done=resets=poll_fault=0;
     card=(struct mmc_card){true};mmc=(struct mmc_host){&card,&host};
     host=(struct msdc_host){.y2_emmc=true,.y2_identified=true,.y2_blockaddr=true,
-        .y2_sectors=15269888,.mmc=&mmc,.base=registers};
+        .y2_sectors=15269888,.y2_user_offset=23552,.mmc=&mmc,.base=registers};
     cmd=(struct mmc_command){.opcode=op,.arg=sector,.flags=MMC_RSP_R1|MMC_CMD_ADTC,.data=&data};
     sbc=(struct mmc_command){.opcode=23,.arg=count,.flags=MMC_RSP_R1};
     stop=(struct mmc_command){.opcode=12,.flags=MMC_RSP_R1B};

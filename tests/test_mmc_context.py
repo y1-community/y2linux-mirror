@@ -27,7 +27,7 @@ typedef uint32_t u32;typedef uint8_t u8;
 struct mmc_command {unsigned opcode,arg,resp[4];int error;};
 struct mmc_data {int error;unsigned flags,bytes_xfered,sg_len;void *sg;};
 struct mmc_request {struct mmc_command *cmd;struct mmc_data *data;};
-struct msdc_host {bool y2_emmc,y2_blockaddr,y2_identified,y2_switch_pending,y2_ext_id_saved;unsigned y2_partition,y2_pending_partition,y2_sectors;u8 y2_ext_id[512];void *dev;};
+struct msdc_host {bool y2_emmc,y2_blockaddr,y2_identified,y2_switch_pending,y2_ext_id_saved;unsigned y2_partition,y2_pending_partition,y2_sectors,y2_user_offset;u8 y2_ext_id[512];void *dev;};
 #define MMC_TIMING_LEGACY 0
 struct mmc_host {struct {unsigned timing;} ios;};
 static struct mmc_host the_mmc;
@@ -54,6 +54,10 @@ int main(void) {
  assert(!memcmp(original,ext,512)); /* never spoof the card's real EXT_CSD */
  /* The identification copy (legacy timing) is what later readbacks verify. */
  assert(h.y2_ext_id_saved&&!memcmp(h.y2_ext_id,ext,512));
+ assert(h.y2_user_offset==23552);
+ /* The RPMB 4 MiB batch (Y2Reborn #130): stock's offset is 20 MiB - 12 MiB. */
+ ext[168]=32;complete(&h,&r);assert(h.y2_identified&&h.y2_user_offset==16384);
+ ext[168]=4;complete(&h,&r);assert(h.y2_identified&&h.y2_user_offset==23552);
  the_mmc.ios.timing=9;ext[196]^=0x10;complete(&h,&r);ext[196]^=0x10;
  assert(!memcmp(h.y2_ext_id,original,512)); /* a high-speed read never replaces it */
  the_mmc.ios.timing=MMC_TIMING_LEGACY;complete(&h,&r);assert(h.y2_identified);

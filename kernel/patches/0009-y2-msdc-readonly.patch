@@ -20,13 +20,14 @@
  #include "cqhci.h"
  #include "mmc_hsq.h"
  
-@@ -465,6 +474,57 @@
+@@ -465,6 +474,58 @@
  };
  
  struct msdc_host {
 +	bool y2_emmc;
 +	bool y2_identified, y2_blockaddr, y2_switch_pending;
 +	u32 y2_sectors;
++	u32 y2_user_offset;	/* native USER sector of logical 0 */
 +	u8 y2_partition, y2_pending_partition;
 +	bool y2_sd;
 +	u32 y2_clock_limit;
@@ -78,7 +79,7 @@
  	struct device *dev;
  	const struct mtk_mmc_compatible *dev_comp;
  	int cmd_rsp;
-@@ -692,6 +752,8 @@
+@@ -692,6 +753,8 @@
  };
  
  static const struct of_device_id msdc_of_ids[] = {
@@ -87,7 +88,7 @@
  	{ .compatible = "mediatek,mt2701-mmc", .data = &mt2701_compat},
  	{ .compatible = "mediatek,mt2712-mmc", .data = &mt2712_compat},
  	{ .compatible = "mediatek,mt6779-mmc", .data = &mt6779_compat},
-@@ -950,6 +1012,44 @@
+@@ -950,6 +1013,44 @@
  				  (val & MSDC_CFG_CKSTB), 1, 20000);
  }
  
@@ -132,7 +133,7 @@
  static void msdc_new_tx_setting(struct msdc_host *host)
  {
  	u32 val;
-@@ -984,7 +1084,174 @@
+@@ -984,7 +1085,174 @@
  	writel(val, host->top_base + LOOP_TEST_CONTROL);
  }
  
@@ -308,7 +309,7 @@
  {
  	struct mmc_host *mmc = mmc_from_priv(host);
  	u32 mode;
-@@ -994,13 +1261,23 @@
+@@ -994,13 +1262,23 @@
  	u32 tune_reg = host->dev_comp->pad_tune_reg;
  	u32 val;
  	bool timing_changed;
@@ -333,7 +334,7 @@
  	}
  
  	if (host->timing != timing)
-@@ -1008,6 +1285,8 @@
+@@ -1008,6 +1286,8 @@
  	else
  		timing_changed = false;
  
@@ -342,7 +343,7 @@
  	flags = readl(host->base + MSDC_INTEN);
  	sdr_clr_bits(host->base + MSDC_INTEN, flags);
  	if (host->dev_comp->clk_div_bits == 8)
-@@ -1069,8 +1348,15 @@
+@@ -1069,8 +1349,15 @@
  			      MSDC_CFG_CKMOD_EXTRA | MSDC_CFG_CKDIV_EXTRA,
  			      (mode << 12) | div);
  
@@ -360,7 +361,7 @@
  	sdr_set_bits(host->base + MSDC_CFG, MSDC_CFG_CKPDN);
  	mmc->actual_clock = sclk;
  	host->mclk = hz;
-@@ -1119,6 +1405,233 @@
+@@ -1119,6 +1406,233 @@
  
  	dev_dbg(host->dev, "sclk: %d, timing: %d\n", mmc->actual_clock,
  		timing);
@@ -594,7 +595,7 @@
  }
  
  static inline u32 msdc_cmd_find_resp(struct msdc_host *host,
-@@ -1180,7 +1693,7 @@
+@@ -1180,7 +1694,7 @@
  		struct mmc_data *data = cmd->data;
  
  		if (mmc_op_multi(opcode)) {
@@ -603,7 +604,7 @@
  			    !(mrq->sbc->arg & 0xFFFF0000))
  				rawcmd |= BIT(29); /* AutoCMD23 */
  		}
-@@ -1188,7 +1701,9 @@
+@@ -1188,7 +1702,9 @@
  		rawcmd |= ((data->blksz & 0xFFF) << 16);
  		if (data->flags & MMC_DATA_WRITE)
  			rawcmd |= BIT(13);
@@ -614,7 +615,7 @@
  			rawcmd |= BIT(12);
  		else
  			rawcmd |= BIT(11);
-@@ -1276,6 +1791,14 @@
+@@ -1276,6 +1792,14 @@
  
  static void msdc_track_cmd_data(struct msdc_host *host, struct mmc_command *cmd)
  {
@@ -629,7 +630,7 @@
  	if (host->error &&
  	    ((!mmc_op_tuning(cmd->opcode) && !host->hs400_tuning) ||
  	     cmd->error == -ETIMEDOUT))
-@@ -1294,6 +1817,15 @@
+@@ -1294,6 +1818,15 @@
  	 * path will go here!
  	 */
  	cancel_delayed_work(&host->req_timeout);
@@ -645,7 +646,7 @@
  
  	/*
  	 * If the request was handled from Host Software Queue, there's almost
-@@ -1320,6 +1852,62 @@
+@@ -1320,6 +1853,64 @@
  	host->mrq = NULL;
  	spin_unlock_irqrestore(&host->lock, flags);
  
@@ -691,9 +692,11 @@
 +						host->y2_partition = bytes[179];
 +						host->y2_switch_pending = false;
 +						host->y2_identified = y2_emmc_layout_valid(bytes);
++						if (host->y2_identified)
++							host->y2_user_offset = y2_emmc_user_offset(bytes);
 +						dev_info(host->dev, "eMMC context: sector-addressed=%u sectors=%u PART_CONFIG=%02x stock-layout=%u offset=%u disk=%u\n",
 +							host->y2_blockaddr, host->y2_sectors, host->y2_partition,
-+							host->y2_identified, Y2_EMMC_USER_OFFSET, Y2_EMMC_DISK_SECTORS);
++							host->y2_identified, host->y2_user_offset, Y2_EMMC_DISK_SECTORS);
 +					} else {
 +						dev_info_ratelimited(host->dev, "partition read CMD%u sector=%u bytes=%u signature=%02x%02x SBC=%u/%08x R1=%08x\n",
 +							op, sector, data->bytes_xfered, bytes[510], bytes[511],
@@ -708,7 +711,7 @@
  	msdc_track_cmd_data(host, mrq->cmd);
  	if (mrq->data)
  		msdc_unprepare_data(host, mrq->data);
-@@ -1373,7 +1961,9 @@
+@@ -1373,7 +1964,9 @@
  		}
  	}
  
@@ -719,7 +722,7 @@
  		if ((events & MSDC_INT_CMDTMO && !host->hs400_tuning) ||
  		    (!mmc_op_tuning(cmd->opcode) && !host->hs400_tuning))
  			/*
-@@ -1391,6 +1981,14 @@
+@@ -1391,6 +1984,14 @@
  			host->error |= REQ_CMD_TMO;
  		}
  	}
@@ -734,19 +737,19 @@
  	if (cmd->error)
  		dev_dbg(host->dev,
  				"%s: cmd=%d arg=%08X; rsp %08X; cmd_error=%d\n",
-@@ -1461,7 +2059,10 @@
+@@ -1461,7 +2062,10 @@
  	sdr_set_bits(host->base + MSDC_INTEN, cmd_ints_mask);
  	spin_unlock_irqrestore(&host->lock, flags);
  
 -	writel(cmd->arg, host->base + SDC_ARG);
 +	/* The stock Y2 disk starts after a reserved native USER prefix. The
 +	 * request guard checked logical bounds before reaching this point. */
-+	writel(host->y2_emmc ? y2_emmc_wire_arg(cmd->opcode, cmd->arg) : cmd->arg,
++	writel(host->y2_emmc ? y2_emmc_wire_arg(cmd->opcode, cmd->arg, host->y2_user_offset) : cmd->arg,
 +	       host->base + SDC_ARG);
  	writel(rawcmd, host->base + SDC_CMD);
  }
  
-@@ -1484,7 +2085,55 @@
+@@ -1484,7 +2088,55 @@
  static void msdc_ops_request(struct mmc_host *mmc, struct mmc_request *mrq)
  {
  	struct msdc_host *host = mmc_priv(mmc);
@@ -803,7 +806,7 @@
  	host->error = 0;
  	WARN_ON(!host->hsq_en && host->mrq);
  	host->mrq = mrq;
-@@ -1507,7 +2156,10 @@
+@@ -1507,7 +2159,10 @@
  	 * if HW option is enabled, and SBC does not have "special" flags,
  	 * use HW option,  otherwise use SW option
  	 */
@@ -815,7 +818,7 @@
  	    (mrq->sbc->arg & 0xFFFF0000)))
  		msdc_start_command(host, mrq, mrq->sbc);
  	else
-@@ -1562,6 +2214,17 @@
+@@ -1562,6 +2217,17 @@
  	     | MSDC_INT_DMA_PROTECT);
  	u32 val;
  	int ret;
@@ -833,7 +836,7 @@
  
  	spin_lock_irqsave(&host->lock, flags);
  	done = !host->data;
-@@ -1581,18 +2244,25 @@
+@@ -1581,18 +2247,25 @@
  
  		ret = readl_poll_timeout_atomic(host->base + MSDC_DMA_CTRL, val,
  						!(val & MSDC_DMA_CTRL_STOP), 1, 20000);
@@ -862,7 +865,7 @@
  			data->bytes_xfered = data->blocks * data->blksz;
  		} else {
  			dev_dbg(host->dev, "interrupt events: %x\n", events);
-@@ -1600,7 +2270,9 @@
+@@ -1600,7 +2273,9 @@
  			host->error |= REQ_DAT_ERR;
  			data->bytes_xfered = 0;
  
@@ -873,7 +876,7 @@
  				data->error = -ETIMEDOUT;
  			else if (events & MSDC_INT_DATCRCERR)
  				data->error = -EILSEQ;
-@@ -1654,14 +2326,34 @@
+@@ -1654,14 +2329,34 @@
  		if (ret < 0) {
  			dev_dbg(host->dev, "Regulator set error %d (%d)\n",
  				ret, ios->signal_voltage);
@@ -914,7 +917,7 @@
  	}
  	return 0;
  }
-@@ -1840,6 +2532,19 @@
+@@ -1840,6 +2535,19 @@
  
  		dev_dbg(host->dev, "%s: events=%08X\n", __func__, events);
  
@@ -934,7 +937,7 @@
  		if (cmd)
  			msdc_cmd_done(host, events, mrq, cmd);
  		else if (data)
-@@ -1847,6 +2552,28 @@
+@@ -1847,6 +2555,28 @@
  	}
  
  	return IRQ_HANDLED;
@@ -963,7 +966,7 @@
  }
  
  static void msdc_init_hw(struct msdc_host *host)
-@@ -1904,6 +2631,8 @@
+@@ -1904,6 +2634,8 @@
  	}
  	writel(0, host->base + MSDC_IOCON);
  	sdr_set_field(host->base + MSDC_IOCON, MSDC_IOCON_DDLSEL, 0);
@@ -972,7 +975,7 @@
  
  	/*
  	 * Patch bit 0 and 1 are completely rewritten, but for patch bit 2
-@@ -2027,9 +2756,18 @@
+@@ -2027,9 +2759,18 @@
  		if (host->top_base)
  			sdr_set_bits(host->top_base + EMMC_TOP_CONTROL,
  				     PAD_RXDLY_SEL);
@@ -992,7 +995,7 @@
  	}
  
  	if (mmc->caps2 & MMC_CAP2_NO_SDIO) {
-@@ -2146,8 +2884,13 @@
+@@ -2146,8 +2887,13 @@
  		}
  		break;
  	case MMC_POWER_OFF:
@@ -1007,7 +1010,7 @@
  
  		if (!IS_ERR(mmc->supply.vqmmc) && host->vqmmc_enabled) {
  			regulator_disable(mmc->supply.vqmmc);
-@@ -2158,6 +2901,11 @@
+@@ -2158,6 +2904,11 @@
  		break;
  	}
  
@@ -1019,7 +1022,7 @@
  	if (host->mclk != ios->clock || host->timing != ios->timing)
  		msdc_set_mclk(host, ios->timing, ios->clock);
  }
-@@ -2581,6 +3329,632 @@
+@@ -2581,6 +3332,632 @@
  				EMMC_TOP_CONTROL);
  		host->saved_tune_para.emmc_top_cmd = readl(host->top_base +
  				EMMC_TOP_CMD);
@@ -1652,7 +1655,7 @@
  	}
  	return ret;
  }
-@@ -2838,7 +4212,22 @@
+@@ -2838,7 +4215,22 @@
  	cqhci_writel(cq_host, reg, CQHCI_CFG);
  }
  
@@ -1675,7 +1678,7 @@
  	.post_req = msdc_post_req,
  	.pre_req = msdc_pre_req,
  	.request = msdc_ops_request,
-@@ -2850,7 +4239,8 @@
+@@ -2850,7 +4242,8 @@
  	.ack_sdio_irq = msdc_ack_sdio_irq,
  	.start_signal_voltage_switch = msdc_ops_switch_volt,
  	.card_busy = msdc_card_busy,
@@ -1685,7 +1688,7 @@
  	.prepare_hs400_tuning = msdc_prepare_hs400_tuning,
  	.execute_hs400_tuning = msdc_execute_hs400_tuning,
  	.card_hw_reset = msdc_hw_reset,
-@@ -2957,11 +4347,139 @@
+@@ -2957,11 +4350,139 @@
  	return 0;
  }
  
@@ -1825,7 +1828,7 @@
  
  	if (!pdev->dev.of_node) {
  		dev_err(&pdev->dev, "No DT found\n");
-@@ -2983,6 +4501,9 @@
+@@ -2983,6 +4504,9 @@
  		return PTR_ERR(host->base);
  
  	host->dev_comp = of_device_get_match_data(&pdev->dev);
@@ -1835,7 +1838,7 @@
  
  	if (host->dev_comp->needs_top_base) {
  		host->top_base = devm_platform_ioremap_resource(pdev, 1);
-@@ -3016,6 +4537,11 @@
+@@ -3016,6 +4540,11 @@
  	if (host->irq < 0)
  		return host->irq;
  
@@ -1847,7 +1850,7 @@
  	host->pinctrl = devm_pinctrl_get(&pdev->dev);
  	if (IS_ERR(host->pinctrl))
  		return dev_err_probe(&pdev->dev, PTR_ERR(host->pinctrl),
-@@ -3032,6 +4558,8 @@
+@@ -3032,6 +4561,8 @@
  		dev_err(&pdev->dev, "Cannot find pinctrl uhs!\n");
  		return PTR_ERR(host->pins_uhs);
  	}
@@ -1856,7 +1859,7 @@
  
  	/* Support for SDIO eint irq ? */
  	if ((mmc->pm_caps & MMC_PM_WAKE_SDIO_IRQ) && (mmc->pm_caps & MMC_PM_KEEP_POWER)) {
-@@ -3048,9 +4576,64 @@
+@@ -3048,9 +4579,64 @@
  	}
  
  	msdc_of_property_parse(pdev, host);
@@ -1921,7 +1924,7 @@
  	/* Set host parameters to mmc */
  	mmc->ops = &mt_msdc_ops;
  	if (host->dev_comp->clk_div_bits == 8)
-@@ -3072,6 +4655,8 @@
+@@ -3072,6 +4658,8 @@
  		mmc->caps2 |= MMC_CAP2_SDIO_IRQ_NOTHREAD;
  
  	mmc->caps |= MMC_CAP_CMD23;
@@ -1930,7 +1933,7 @@
  	if (host->cqhci)
  		mmc->caps2 |= MMC_CAP2_CQE | MMC_CAP2_CQE_DCMD;
  	/* MMC core transfer sizes tunable parameters */
-@@ -3102,6 +4687,10 @@
+@@ -3102,6 +4690,10 @@
  	}
  	msdc_init_gpd_bd(host, &host->dma);
  	INIT_DELAYED_WORK(&host->req_timeout, msdc_request_timeout);
@@ -1941,7 +1944,7 @@
  	spin_lock_init(&host->lock);
  
  	platform_set_drvdata(pdev, mmc);
-@@ -3132,7 +4721,7 @@
+@@ -3132,7 +4724,7 @@
  		mmc->max_seg_size = 64 * 1024;
  		/* Reduce CIT to 0x40 that corresponds to 2.35us */
  		msdc_cqe_cit_cal(host, 2350);
@@ -1950,7 +1953,7 @@
  		/* Use HSQ on eMMC/SD (but not on SDIO) if HW CQE not supported */
  		struct mmc_hsq *hsq = devm_kzalloc(&pdev->dev, sizeof(*hsq), GFP_KERNEL);
  		if (!hsq) {
-@@ -3160,9 +4749,51 @@
+@@ -3160,9 +4752,51 @@
  
  	if (ret)
  		goto end;
@@ -2003,7 +2006,7 @@
  	pm_runtime_disable(host->dev);
  release:
  	msdc_deinit_hw(host);
-@@ -3189,6 +4820,19 @@
+@@ -3189,6 +4823,19 @@
  
  	mmc = platform_get_drvdata(pdev);
  	host = mmc_priv(mmc);
@@ -2023,7 +2026,7 @@
  
  	pm_runtime_get_sync(host->dev);
  
-@@ -3278,6 +4922,86 @@
+@@ -3278,6 +4925,86 @@
  		__msdc_enable_sdio_irq(host, 1);
  }
  
@@ -2110,7 +2113,7 @@
  static int msdc_runtime_suspend(struct device *dev)
  {
  	struct mmc_host *mmc = dev_get_drvdata(dev);
-@@ -3285,6 +5009,12 @@
+@@ -3285,6 +5012,12 @@
  
  	if (host->hsq_en)
  		mmc_hsq_suspend(mmc);
@@ -2123,7 +2126,7 @@
  
  	msdc_save_reg(host);
  
-@@ -3306,6 +5036,8 @@
+@@ -3306,6 +5039,8 @@
  	struct msdc_host *host = mmc_priv(mmc);
  	int ret;
  

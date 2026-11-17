@@ -44,7 +44,7 @@ struct mmc_card {bool is_mmc;};
 struct mmc_host {struct mmc_card *card;struct msdc_host *priv;};
 struct msdc_host {bool y2_emmc,y2_sd,hsq_en,y2_identified,y2_blockaddr,y2_switch_pending,hs400_tuning;
     int y2_clock_error;
-    unsigned y2_sectors,y2_partition,y2_pending_partition,error,timeout_ns,timeout_clks;
+    unsigned y2_sectors,y2_user_offset,y2_partition,y2_pending_partition,error,timeout_ns,timeout_clks;
     int lock,cmd_rsp;struct mmc_host *mmc;struct mmc_request *mrq;
     struct mmc_command *cmd;struct mmc_data *data;unsigned char *base;};
 static unsigned char registers[4096];
