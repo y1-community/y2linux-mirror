@@ -5,8 +5,8 @@ Measures the production code (tests excluded: `*tests.rs`, `tests/`, `*_tests/`,
 {}` and files of `#[cfg(test)] mod …;` declarations) and compares it with code-quality-baseline.json next to
 this script. The check is a ratchet: nothing may get worse, everything may get better.
 
-- functions over 150 lines: none new, none longer (aim for 100: CODING-STANDARD.md §2);
-- files over 1500 lines: none new, none longer (aim for 1000);
+- functions over 150 lines and files over 1500 lines: printed as warnings, never blocking (owner, 2026-11-19);
+  aim for 100 / 1000 lines (CODING-STANDARD.md §2);
 - `unsafe` (blocks, functions, impls) per crate: no more, and none in a crate that has none;
 - `.unwrap()` / `.expect(` per crate, `panic!` / `todo!` / `unimplemented!` / `unreachable!` per crate,
   `#[allow(…)]` per crate: no more;
@@ -36,6 +36,8 @@ FILE_LINES = 1500
 LINE_COLUMNS = 100
 PER_CRATE = ('unsafe', 'unwrap', 'panic', 'allow')
 PER_FILE = ('json_lookups', 'long_lines')
+# Lengths only warn (owner, 2026-11-19: a one-line fix must never fail the gate on length).
+WARN_ONLY = ('long_functions', 'long_files')
 
 
 def blank(source):
@@ -211,7 +213,8 @@ def main():
     baseline = json.loads(BASELINE.read_text())
     found = regressions(baseline, now)
     for line in found:
-        print(line)
+        print(('warning (length): ' if line.split(':')[0] in WARN_ONLY else '') + line)
+    found = [line for line in found if line.split(':')[0] not in WARN_ONLY]
     better = [f'{m}: {w}' for m, values in baseline.items() for w, v in values.items() if now.get(m, {}).get(w, 0) < v]
     if better and not found:
         print(f'{len(better)} figures improved: record them with --update')
