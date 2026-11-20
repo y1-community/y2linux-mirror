@@ -25,15 +25,16 @@ and to the ALSA plug-in's transfer thread, which share this code.
 
 --- a/src/shared/rt.c
 +++ b/src/shared/rt.c
-@@ -5,6 +5,7 @@
+@@ -5,6 +5,8 @@
   */
  
  #include "rt.h"
++#include "log.h"
 +#include "y2-catchup.h"
  
  #include <stdlib.h>
  #include <sys/time.h>
-@@ -38,6 +39,7 @@
+@@ -38,6 +40,7 @@
  	struct timespec ts_rate;
  	struct timespec ts;
  
@@ -41,7 +42,7 @@ and to the ALSA plug-in's transfer thread, which share this code.
  	asrs->frames += frames;
  	frames = asrs->frames;
  
-@@ -46,6 +48,8 @@
+@@ -46,6 +49,8 @@
  
  	gettimestamp(&ts);
  
@@ -50,7 +51,7 @@ and to the ALSA plug-in's transfer thread, which share this code.
  	asrs->synced = false;
  	/* maintain constant rate */
  	timespecsub(&ts, &asrs->ts0, &ts);
-@@ -53,6 +57,30 @@
+@@ -53,6 +58,34 @@
  		nanosleep(&asrs->ts_idle, NULL);
  		asrs->synced = true;
  	}
@@ -66,6 +67,10 @@ and to the ALSA plug-in's transfer thread, which share this code.
 +				ts_last.tv_sec * INT64_C(1000000000) + ts_last.tv_nsec,
 +				&shift_ns);
 +		if (shift_ns > 0) {
++			/* One line per stall, for error reports: when and how long the
++			 * radio link held the stream back (the owed rest is forgotten). */
++			warn("Y2 stall: stream %lld ms behind real time",
++					(long long)((shift_ns + Y2_CATCHUP_MAX_NS) / INT64_C(1000000)));
 +			const struct timespec ts_shift = {
 +				.tv_sec = shift_ns / INT64_C(1000000000),
 +				.tv_nsec = shift_ns % INT64_C(1000000000) };

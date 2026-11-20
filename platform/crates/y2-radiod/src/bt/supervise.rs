@@ -189,6 +189,9 @@ impl Supervise {
                     "-p",
                     "a2dp-source",
                     "--loglevel=warning",
+                    // Its warnings into the system log, so error reports carry them (each
+                    // radio stall the catch-up patch 0009 bounds is one line).
+                    "--syslog",
                     &keep_alive,
                     &io_priority,
                     // One rate for every headset and codec, the rate most music has: no LDAC

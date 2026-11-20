@@ -12,6 +12,7 @@ failed to start. Reads the .tar.gz in place (nothing is extracted).
 # SPDX-License-Identifier: GPL-2.0-only
 import argparse
 import json
+import re
 import sys
 import tarfile
 from pathlib import Path
@@ -21,13 +22,16 @@ import fetch  # noqa: E402  (sibling module: pending() and the default folder)
 
 STATUS = 'commands/platform_status.txt'
 STARTUP_LOG = 'files/data/reborn/logs/startup-last.jsonl'
+SYSTEM_LOG = 'files/data/logs/system.log'
+# BlueALSA's line for each radio stall it bounds (patch 0009, from Beta 9.3.34).
+STALL = re.compile(r'Y2 stall: stream (\d+) ms behind')
 SETTINGS = {'wifi': 'files/data/network/enabled', 'bluetooth': 'files/data/bluetooth/enabled'}
 MEMBER_LIMIT = 4 * 1024 * 1024
 
 
 def members(path):
     """Name → text of the members a summary reads; missing ones are absent."""
-    wanted = {'report.json', STATUS, STARTUP_LOG, *SETTINGS.values()}
+    wanted = {'report.json', STATUS, STARTUP_LOG, SYSTEM_LOG, *SETTINGS.values()}
     found = {}
     with tarfile.open(path, 'r:gz') as archive:
         for info in archive:
@@ -74,6 +78,12 @@ def startup_failure(text):
     return fatal
 
 
+def stalls(text):
+    """How many Bluetooth stalls the system log names, and the longest in ms (None without any)."""
+    lengths = [int(m.group(1)) for m in STALL.finditer(text or '')]
+    return (len(lengths), max(lengths)) if lengths else None
+
+
 def summarize(path):
     texts = members(path)
     report = json_or_empty(texts.get('report.json'))
@@ -97,6 +107,9 @@ def summarize(path):
             get(status, 'storage', 'media', 'lifecycle', 'reason')
             or get(status, 'storage', 'media', 'lifecycle', 'state')),
     ]
+    stalled = stalls(texts.get(SYSTEM_LOG))
+    if stalled:
+        lines.append('  Bluetooth stalls in the system log: %d, longest %d ms' % stalled)
     failure = startup_failure(texts.get(STARTUP_LOG))
     if failure:
         lines.append('  Reborn startup failure: %s' % failure)

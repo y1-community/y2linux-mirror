@@ -6732,7 +6732,7 @@
     "['/usr/libexec/y2/wpa-event','wlan0','DISCONNECTED'] timeout 3 (wpa restart, detach)",
     "['/usr/sbin/y2-platform','wifi-event','SERVICE_RESTART'] timeout 3 (wpa restart)",
     "['wpa_supplicant','-B','-u','-g','/run/wpa_supplicant/global','-P','/run/y2/wpa.pid'] timeout 3",
-    "['start-stop-daemon','-S','-b','-m','-p','/run/y2/bluealsa.pid','-x','/usr/bin/bluealsad','--','-p','a2dp-source','--loglevel=warning',*codec_runtime_args] timeout 3",
+    "['start-stop-daemon','-S','-b','-m','-p','/run/y2/bluealsa.pid','-x','/usr/bin/bluealsad','--','-p','a2dp-source','--loglevel=warning','--syslog',*codec_runtime_args] timeout 3",
     "['start-stop-daemon','-S','-b','-m','-p','/run/y2/<name>.pid','-x',<binary>,'--'] timeout 3 (calibration=/usr/sbin/y2-calibration, reconnect=/usr/sbin/y2-bt-reconnect)",
     "['wpa_cli','-g','/run/wpa_supplicant/global','interface_remove','wlan0'] timeout 2",
     "['wpa_cli','-g','/run/wpa_supplicant/global','interface_add','wlan0','/data/network/wpa_supplicant.conf','nl80211','/run/wpa_supplicant'] timeout 3 (success = ok and last output line == 'OK')",

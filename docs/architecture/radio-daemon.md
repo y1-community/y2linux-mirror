@@ -99,7 +99,9 @@ back-pressure only reaches the client. Three BlueALSA and platform rules follow:
 
 - **Bounded catch-up** (`buildroot/patches/bluez-alsa/0009`, `src/shared/y2-catchup.h`): at most 200 ms of
   audio is owed after a stall, sent at no more than 4/3 of real time; the rest is forgotten (the music
-  continues from where it stopped). On time, or late by ordinary jitter, nothing changes.
+  continues from where it stopped). On time, or late by ordinary jitter, nothing changes. Each such stall
+  is one warning in the system log (`Y2 stall: stream N ms behind real time`; bluealsad runs with
+  `--syslog` since 9.3.34), which `tools/reports/summary.py` counts.
 - **Silence while a client is late** (`0010`, `src/y2-filler.h`): once a client has played, an A2DP source
   stream that gets no audio for 100 ms is fed silence until audio returns, the client drains or closes. A
   started stream therefore always carries packets, whatever the player's own audio thread does.

@@ -63,6 +63,18 @@ class Summary(unittest.TestCase):
         self.assertIn('(no readable commands/platform_status.txt)', text)
         self.assertIn('switched unknown', text)
 
+    def test_bluetooth_stalls_are_counted_from_the_system_log(self):
+        log = '\n'.join([
+            'Nov 19 09:47:12 y2linux daemon.warn bluealsad[401]: Y2 stall: stream 1840 ms behind real time',
+            'Nov 19 09:47:30 y2linux daemon.info bluetoothd[393]: fd(19) ready',
+            'Nov 19 09:48:02 y2linux daemon.warn bluealsad[401]: Y2 stall: stream 620 ms behind real time'])
+        with tempfile.TemporaryDirectory() as directory:
+            text = summary.summarize(archive(directory, {
+                'report.json': json.dumps(REPORT), summary.SYSTEM_LOG: log}))
+            quiet = summary.summarize(archive(directory, {'report.json': json.dumps(REPORT)}))
+        self.assertIn('Bluetooth stalls in the system log: 2, longest 1840 ms', text)
+        self.assertNotIn('Bluetooth stalls', quiet)
+
 
 if __name__ == '__main__':
     unittest.main()
