@@ -6,6 +6,8 @@
   "post_install": [
     "https://innioasis.app/y2reborn_wifibt.html"
   ],
+  "post_install2": [],
+  "icon": "https://innioasis.app/assets/reborn_icon.jpg",
   "title_prefix": "Portable Flashing Package: ",
   "copy_original_assets": true,
   "source_readme": {
@@ -21,7 +23,7 @@
     "exclude_tags": []
   },
   "defaults": {
-    "software_name": "Reborn (Y2Linux)",
+    "software_name": "Reborn",
     "target_model": "Y2",
     "target_type": "Stock",
     "description": ""
