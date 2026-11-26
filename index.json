@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at": "2026-11-25T22:40:04Z",
+  "generated_at": "2026-11-26T15:21:14Z",
   "source_repo": "schulzcode/y2linux",
   "source_fallback_repo": "",
   "mirror_repo": "y1-community/y2linux-mirror",
@@ -67,6 +67,95 @@
     }
   ],
   "releases": [
+    {
+      "tag": "baseline-288",
+      "title": "Portable Flashing Package: Y2Linux 1.0 Beta 9.3.41",
+      "source_title": "Y2Linux 1.0 Beta 9.3.41",
+      "source_url": "https://github.com/schulzcode/y2linux/releases/tag/baseline-288",
+      "source_fallback_url": "",
+      "published_at": "2026-11-26T12:29:04Z",
+      "prerelease": false,
+      "source_notes": "**Y2Linux 1.0 Beta 9.3.41**: cleaner quiet listening on headphones, a Storage page that shows what fills it, a smoother Home and eleven fixes.\n\n## What's new\n- **Cleaner sound at low volume on headphones**: the headphone volume is now set in the DAC chip itself instead of being taken out of the music first, so quiet listening keeps every bit of a 16-bit song. Audio that has to be converted to 16 bits (24-bit files, MP3/AAC, resampled audio, EQ or ReplayGain) gets dither instead of plain rounding. One wheel step is now 1.0 or 1.5 dB instead of 1.2 dB. The speaker and Bluetooth are unchanged (thanks to jonasevcik).\n- **Storage shows what fills it**: Settings \u2192 Library \u2192 Storage splits each bar into Music, Audiobooks, Videos and Other, with size, count and play time for each (thanks to jonasevcik).\n- **Smoother Home**: choosing a place no longer moves the other rows, the chosen name grows into place, a long Home menu scrolls with the next place peeking at the bottom, and Back on Home returns to the first place (thanks to jonasevcik).\n\n## Fixed\n- **Last.fm**: a song tagged with several artists (\"A;B\") is scrobbled as its first artist instead of as one artist called \"A;B\" (Y2Linux #149).\n- **Radio and songs without a length**: the elapsed time runs instead of staying at 0:00.\n- **Taking out the SD card** no longer pauses a song from Internal Storage.\n- **A song still starting** when the SD card changed, Stop was pressed or an SD repair began no longer leaves \"Playing\" with no sound.\n- **Sleep timer**: after the fade, the volume comes back right with Bluetooth headphones.\n- **Videos**: films whose pictures carry no time are shown, subtitles past line 4096 are kept, and sound and picture start together in films whose clock does not start at 0.\n- **Wi-Fi**: networks with accented or other non-English names are shown and joined by their real name; name and password limits count the way the network does (an accented letter takes two).\n- **Lists Wrap Around set to Everywhere**: Up from the first song under a heading wraps.\n- **Cover Flow** no longer crashes when the list gets shorter under it (an SD card taken out, a rescan).\n- Thanks to jonasevcik for finding and fixing these.\n\n## Known issues\n- Song positions now count from the very start of the file: a song resumed from before the update may start a few hundredths of a second later.\n- Over Bluetooth, video and sound can drift apart on some players (Y2Linux #145). Videos larger than 1920 \u00d7 1080 are too much for the player.\n- Something wrong? Send an error report (Settings \u2192 System \u2192 Error Reports). **Restore Previous System** (Settings \u2192 System \u2192 About, tap Version seven times, then Diagnostics) takes you back to the version you had, with your data kept.\n\nMore details in plain words: **[Beta 9.3.41 report](https://github.com/SchulzCode/Y2Linux/blob/main/docs/validation/Y2-LINUX-1.0-BETA-9.3.41.md)**.\n\n<!-- github-only -->\n\n## Already running Y2Linux\nSettings \u2192 System \u2192 Software Update \u2192 **Update Now**. Your music, playlists, settings, Wi-Fi networks and Bluetooth pairings stay. (On Beta 9.2.8 and older: Settings \u2192 About & Updates \u2192 Check for Updates \u2192 **Update Now**.)\n\n## Install with the Innioasis Updater (easiest)\nThe community **Innioasis Updater CE** installs Y2Linux for you, on **Windows, macOS and Linux**. No SP Flash Tool needed.\n\n1. Download Innioasis Updater CE for your computer from [innioasis.app](https://innioasis.app/guide.html#download-updater) and open it.\n2. Choose **Y2**, then **Reborn (Y2Linux)** and the latest release.\n3. Click **Install / Restore**, switch the Y2 off and connect it when the updater asks. Wait until it confirms, then unplug.\n4. Connect the Y2 to the computer and **copy** `system.img` from the Innioasis Y2 firmware package v3.2.0 into the **Firmware** folder on **Internal Storage**. The player takes the Wi-Fi/Bluetooth firmware from it and turns the radios on.\n\nStep-by-step guides for each computer: [Reborn (Y2Linux) install guide](https://innioasis.app/guides/reborn-y2linux-y2.html). The way back to stock is in the updater too: choose **Y2** and **Original Software**.\n\n## Install with SP Flash Tool\nYou need SP Flash Tool v5.2032, a USB cable, **`Y2Linux-1.0.0-beta.9.3.41-first-install.zip`** below and the **Innioasis Y2 firmware package v3.2.0** from Innioasis (only this version works; it is also your way back to stock).\n\n1. Unpack both.\n2. SP Flash Tool \u2192 **Download Only** \u2192 load `MT6582_Android_scatter.txt` **from the Y2Linux zip**. Exactly BOOTIMG, RECOVERY, ANDROID and USRDATA are ticked.\n3. Click Download and connect the switched-off Y2; wait for the green tick.\n4. Unplug and press Power: the player sets up its Internal Storage (a few seconds), then Y2Linux and Reborn start, music works.\n5. Connect the Y2 to the computer and **copy** (don't move) `system.img` from the Innioasis package into the **Firmware** folder on **Internal Storage**. The player takes the Wi-Fi/Bluetooth firmware from it and turns the radios on.\n\nFull guide: [INSTALL](https://github.com/SchulzCode/Y2Linux/blob/main/docs/INSTALL.md) \u00b7 How updates work: [Recovery and updates](https://github.com/SchulzCode/Y2Linux/blob/main/docs/RECOVERY-AND-UPDATES.md) \u00b7 Storage: [Storage](https://github.com/SchulzCode/Y2Linux/blob/main/docs/STORAGE.md) \u00b7 [Videos](https://github.com/SchulzCode/Y2Linux/blob/main/docs/VIDEO.md) \u00b7 [FM radio](https://github.com/SchulzCode/Y2Linux/blob/main/docs/FM-RADIO.md) \u00b7 [Wi-Fi Share](https://github.com/SchulzCode/Y2Linux/blob/main/docs/WIFI-SHARE.md) \u00b7 [Buttons](https://github.com/SchulzCode/Y2Linux/blob/main/docs/BUTTONS.md) \u00b7 [Audiobooks](https://github.com/SchulzCode/Y2Linux/blob/main/docs/AUDIOBOOKS.md) \u00b7 Headphone settings: [Headphone output](https://github.com/SchulzCode/Y2Linux/blob/main/docs/HEADPHONE-OUTPUT.md) \u00b7 [Last.fm](https://github.com/SchulzCode/Y2Linux/blob/main/docs/LASTFM.md) \u00b7 [Error reports](https://github.com/SchulzCode/Y2Linux/blob/main/docs/ERROR-REPORTS.md) \u00b7 Skins: [skin guide](https://github.com/SchulzCode/Y2Reborn/blob/main/docs/skins.md)\n\n## How it was tested\nThe platform's full check, Reborn's tests and the 582 tests of the release images passed. New tests cover the DAC volume (bit-exact sound at reduced volume, the volume following the wheel and balance, the fallback when the chip refuses), dither only where a conversion loses information, the Storage sums, the Home layout and Back, each of the eleven fixes where a test could be written, and the Last.fm artist. On the developer's player, each change as its own test build: the DAC volume followed the wheel from 0 to \u221281 dB in its 0.5 dB steps and returned exactly, the speaker kept its own volume; the Storage page matched the library and the free space, also with the SD card taken out and put back; Home scrolled its eight places at about 60 pictures a second and drew nothing while idle; MP3 positions and seeks, Stop during a start, a film in sync after a seek (no pictures dropped), the radio's elapsed time and an Internal Storage song playing on while the SD card went. **Not tested on a player: listening with real headphones, a network with a non-English name, the Last.fm change (it would scrobble to a real account), the sleep timer with Bluetooth headphones.**\n\n## Files\n- `Y2Linux-1.0.0-beta.9.3.41-first-install.zip`: images, scatter files and checksums for SP Flash Tool. The data image has no SSH key (developers: `tools/production/first_owner.py`).\n- `manifest.json`, `manifest.sig`, `rootfs.ext4.gz`, `bootimg.img.gz`, `recovery.img.gz`: the signed over-the-air update (Ed25519 key `platform-v1-release-20261015`, sequence 19300).\n- `Y2Linux-1.0.0-beta.9.3.41-sources-buildroot-legal-info.tar` (licences, manifests, this project's packages) and the third-party, toolchain and Linux sources linked below: corresponding sources. Our own code: Y2Linux and Y2Reborn at tag `baseline-288`. The video chip is driven by this project's own driver; no MediaTek video code is on the player. The speaker amplifier driver is Chris Hendrickson's GPL-2.0 AW87559 driver. The headphone profiles are AutoEq results (MIT, Jaakko Pasanen); their licence ships with them.\n- `SHA256SUMS` for the attached files.\n\nBeta software: use at your own risk. Not affiliated with Innioasis, MediaTek, Awinic, Last.fm, AutoEq, Strawberry, MusicBee, HandBrake, FFmpeg or Google. Noto Sans CJK is licensed under the SIL Open Font License 1.1.\n\n<!-- /github-only -->\n\n<!-- github-only -->\n\n## Sources unchanged since an earlier release\n- [`Y2Linux-sources-third-party-716c8829939c.tar`](https://github.com/SchulzCode/Y2Linux/releases/download/baseline-283/Y2Linux-sources-third-party-716c8829939c.tar) (attached to `baseline-283`), SHA-256 `716c8829939c3bd85897152b8d79de81adaab5222375c37b1567aed2e006300e`\n- [`Y2Linux-sources-toolchain-f7cda4c7d213.tar`](https://github.com/SchulzCode/Y2Linux/releases/download/baseline-120/Y2Linux-sources-toolchain-f7cda4c7d213.tar) (attached to `baseline-120`), SHA-256 `f7cda4c7d2134bed15dacc7afd7e1687621a57412d60e49c725efc3880bf1bc6`\n- [`linux-6.18.56.tar.xz`](https://github.com/SchulzCode/Y2Linux/releases/download/baseline-120/linux-6.18.56.tar.xz) (attached to `baseline-120`), SHA-256 `4633bbda2ab95eaf2a7af4041236451d6759c72e6946265531af4b3aacefbf89`\n\n<!-- /github-only -->\n",
+      "assets": [
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.41-first-install-windows.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.41-first-install.zip",
+          "platform": "windows",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 259177571,
+          "sha256": "b9584c1ac60e088009b2c45bbd3eed2f03e0d2f9e15605e922ed64362be82c67",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-288/Y2Linux-1.0.0-beta.9.3.41-first-install-windows.zip",
+          "fallback_url": "https://github.com/ryan-specter/y2linux-mirror/releases/download/baseline-288/Y2Linux-1.0.0-beta.9.3.41-first-install-windows.zip"
+        },
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.41-first-install-windows-legacy.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.41-first-install.zip",
+          "platform": "windows-legacy",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 144270629,
+          "sha256": "fada60baf63ad917812cdeaad789bbfc8d92ba806b6623b46843e06e16ab3efe",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-288/Y2Linux-1.0.0-beta.9.3.41-first-install-windows-legacy.zip",
+          "fallback_url": "https://github.com/ryan-specter/y2linux-mirror/releases/download/baseline-288/Y2Linux-1.0.0-beta.9.3.41-first-install-windows-legacy.zip"
+        },
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.41-first-install-linux.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.41-first-install.zip",
+          "platform": "linux",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 371114856,
+          "sha256": "2d6b135e7eeee31205dff017adb9aac6791d7e2ea77e297742288323b8e1d24b",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-288/Y2Linux-1.0.0-beta.9.3.41-first-install-linux.zip",
+          "fallback_url": "https://github.com/ryan-specter/y2linux-mirror/releases/download/baseline-288/Y2Linux-1.0.0-beta.9.3.41-first-install-linux.zip"
+        },
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.41-first-install-linux-arm64.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.41-first-install.zip",
+          "platform": "linux-arm64",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 196017926,
+          "sha256": "264ad833fdb99805bf6cd330fd1a87eb3e878d79ea93b4e82ea9505ca5d6c4f2",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-288/Y2Linux-1.0.0-beta.9.3.41-first-install-linux-arm64.zip",
+          "fallback_url": "https://github.com/ryan-specter/y2linux-mirror/releases/download/baseline-288/Y2Linux-1.0.0-beta.9.3.41-first-install-linux-arm64.zip"
+        },
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.41-first-install-linux-legacy.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.41-first-install.zip",
+          "platform": "linux-legacy",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 142684955,
+          "sha256": "0a9fd9212c44a16d0996c1f685f3bf4d831bf93ff7da002f122c676b36c5714d",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-288/Y2Linux-1.0.0-beta.9.3.41-first-install-linux-legacy.zip",
+          "fallback_url": "https://github.com/ryan-specter/y2linux-mirror/releases/download/baseline-288/Y2Linux-1.0.0-beta.9.3.41-first-install-linux-legacy.zip"
+        },
+        {
+          "name": "Y2Linux-1.0.0-beta.9.3.41-first-install-macos.zip",
+          "source_asset": "Y2Linux-1.0.0-beta.9.3.41-first-install.zip",
+          "platform": "macos",
+          "model": "Y2",
+          "type": "Stock",
+          "size": 178687566,
+          "sha256": "8d6ddbe0f257d93b2e05aa487f63f739007a1aa3b190d33680ad38a5044d000b",
+          "url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-288/Y2Linux-1.0.0-beta.9.3.41-first-install-macos.zip",
+          "fallback_url": "https://github.com/ryan-specter/y2linux-mirror/releases/download/baseline-288/Y2Linux-1.0.0-beta.9.3.41-first-install-macos.zip"
+        }
+      ],
+      "original_assets": [
+        "bootimg.img.gz",
+        "manifest.json",
+        "manifest.sig",
+        "recovery.img.gz",
+        "rootfs.ext4.gz",
+        "SHA256SUMS",
+        "Y2Linux-1.0.0-beta.9.3.41-first-install.zip",
+        "Y2Linux-1.0.0-beta.9.3.41-sources-buildroot-legal-info.tar"
+      ],
+      "stats_url": "https://github.com/y1-community/y2linux-mirror/releases/download/baseline-288/stats.txt"
+    },
     {
       "tag": "baseline-283",
       "title": "Portable Flashing Package: Y2Linux 1.0 Beta 9.3.40",
