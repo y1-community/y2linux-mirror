@@ -13,7 +13,7 @@ document links, rather than relocating or deleting proof. See the
 [shared knowledge rules](KNOWLEDGE_BASE.md)
 and the other repository's catalog for product-wide context.
 
-Indexed pages: **362**. Explicit scope notices: **228**.
+Indexed pages: **363**. Explicit scope notices: **228**.
 
 ## Entry
 
@@ -383,6 +383,7 @@ Indexed pages: **362**. Explicit scope notices: **228**.
 | [Y2Linux 1.0 Beta 9.3.39 report](validation/Y2-LINUX-1.0-BETA-9.3.39.md) | Beta 9.3.39 (Baseline 275): the cover and quality tag stay while seeking (Y2Reborn #151, PR #154 by jonasevcik; #150 restored cover survives Play); films in formats the player cannot show (HEVC, AV1, …) listed in Videos as unplayable, never among songs |
 | [Y2Linux 1.0 Beta 9.3.40 report](validation/Y2-LINUX-1.0-BETA-9.3.40.md) | Beta 9.3.40 (Baseline 283): power plan (maintenance wake backoff, calm-rate wave #197, Battery Saver), sleep timer End of Queue (#175), chapter buttons (#177), audiobook speed slider (PR #198), lyrics keep the screen on (#142), SD skin after restart (#143), skin labels (#196), Home Menu notes (#195), update check reasons (PR #179/#140), Alpine 3.24.4 build lock (#199) |
 | [Y2Linux 1.0 Beta 9.3.41 report](validation/Y2-LINUX-1.0-BETA-9.3.41.md) | Beta 9.3.41 (Baseline 288): wired headphone volume in the DAC chip + 16-bit dither (PR #207), Storage split by kind (PR #206), Home motion and Back to top (PR #182), eleven review fixes (PR #205), multi-artist Last.fm scrobbles (#149) |
+| [Y2Linux 1.0 Beta 9.3.42 report](validation/Y2-LINUX-1.0-BETA-9.3.42.md) | Beta 9.3.42 (Baseline 294): audiobook series by tag or folder and Hörspiele (#144, Y2Reborn #185); the SD card as a USB stick (experimental, SD only; Internal Storage stays MTP); USB network with the drive on at boot (EP4 FIFO) |
 | [Y2Linux 1.0 Beta 9.3.25 report](validation/Y2-LINUX-1.0-BETA-9.3.25.md) | Beta 9.3.25 (Baseline 248): videos (own hardware decoder driver, H.264 and MPEG-4 on the video chip, Videos in Reborn; early version), genres split at "/" (Y2Reborn #124) |
 | [Y2Linux 1.0 Beta 9.3.24 report](validation/Y2-LINUX-1.0-BETA-9.3.24.md) | Beta 9.3.24 (Baseline 235): SBC XQ removed (Y2Reborn #123), battery level after charging while off (#113), encoder rate log in reports |
 | [Y2Linux 1.0 Beta 9.3.19 report](validation/Y2-LINUX-1.0-BETA-9.3.19.md) | Beta 9.3.19 (Baseline 228): the update message works again and is opt-in: Update Notifications on Software Update, off by default (Y2Reborn #97) |
@@ -422,6 +423,7 @@ Indexed pages: **362**. Explicit scope notices: **228**.
 | [Wi-Fi Share](WIFI-SHARE.md) | Copying music over Wi-Fi from a phone or computer through the player's own web page: how to use it, who can get in, limits |
 | [Buttons](BUTTONS.md) | Customize > Buttons: giving buttons, holds and wheel turns other commands in the menus, on Now Playing and with the screen off; layouts and why nobody gets locked out |
 | [Videos on the Y2](VIDEO.md) | Owner test builds: how to use it, what plays, what was checked on the player, what is not done |
+| [SD card as a USB drive](planning/SD-DISK-MODE-PLAN.md) | Settings → Storage → SD Card as a USB Stick: the SD card lent to a computer as a removable drive; owner decisions, how the lend works, device checks owed |
 | [Video playback plan](planning/VIDEO-PLAYBACK-PLAN.md) | Hardware video decoder driver, software VP8/VP9, Videos in Reborn: owner decisions, steps and gates |
 | [MT6582 hardware video decoder](knowledge/video-decoder.md) | What the stock firmware does: base, interrupt, power, and the H.264 register sequence |
 | [Bluetooth reimplementation plan](planning/BLUETOOTH-REIMPLEMENTATION-PLAN.md) | One radio daemon for Bluetooth and the shared core: evidence, design, phases, as built (Beta 9.3) |
